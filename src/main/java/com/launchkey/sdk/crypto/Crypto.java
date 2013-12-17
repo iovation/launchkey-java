@@ -3,10 +3,7 @@ package com.launchkey.sdk.crypto;
 import com.launchkey.sdk.Util;
 
 import javax.crypto.Cipher;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Security;
+import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -76,5 +73,13 @@ public class Crypto {
         Cipher rsaCipher = getRSACipher();
         rsaCipher.init(Cipher.DECRYPT_MODE, pKey);
         return rsaCipher.doFinal(message);
+    }
+
+    public static boolean verifySignature(String publicKeyIn, byte[] signatureIn, byte[] data) throws Exception {
+        PublicKey publicKey = getRSAPublicKeyFromString(publicKeyIn);
+        Signature signature = Signature.getInstance("SHA256withRSA", "BC");
+        signature.initVerify(publicKey);
+        signature.update(data);
+        return signature.verify(signatureIn);
     }
 }

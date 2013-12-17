@@ -6,6 +6,9 @@ import com.launchkey.sdk.http.AuthController;
 import com.launchkey.sdk.http.JSONResponse;
 import net.sf.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class AuthenticationManager {
     private static final String AUTHENTICATE = "Authenticate";
     private static final String REVOKE = "Revoke";
@@ -211,6 +214,36 @@ public class AuthenticationManager {
             throw new AuthenticationException(getErrorMessage(pingResponse.getJson()),
                     getErrorCode(pingResponse.getJson()));
         }
+    }
+
+    /**
+     * Verify the deorbit request by signature and timestamp
+     * @param deorbit  JSON string from LaunchKey with the user_hash and launchkey_time.
+     * @param signature Signature signed by API to verify the authenticity of the data found in the deorbit JSON.
+     * @return the user_hash needed to identify the user and log them out, null on failure
+     */
+    public String deorbit(String deorbit, String signature) {
+        JSONResponse pingResponse = this.authController.pingGet();
+        if(pingResponse.isSuccess()) {
+            String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
+            try {
+                if(Crypto.verifySignature(this._publicKey, signature.getBytes("UTF-8"),
+                        deorbit.getBytes("UTF-8"))) {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date pingTime = simpleDateFormat.parse(launchkeyTime);
+                    JSONObject jsonObject = JSONObject.fromObject(deorbit);
+                    Date requestDate = simpleDateFormat.parse(jsonObject.getString("launchkey_time"));
+                    if(pingTime.getTime() - requestDate.getTime() < 5 * 1000 * 60) {
+                        //only handle requests within a 5 minute time delay
+                        return jsonObject.getString("user_hash");
+                    }
+                }
+            }
+            catch(Exception e) {
+                //no op
+            }
+        }
+        return null;
     }
 
     private static String getErrorMessage(JSONObject response) {
