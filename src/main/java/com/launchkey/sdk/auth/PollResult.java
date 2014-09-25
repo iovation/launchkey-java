@@ -1,10 +1,19 @@
 package com.launchkey.sdk.auth;
 
 public class PollResult {
+    private String userPushId;
     private String userHash;
     private String authRequest;
     private String appPins;
     private String deviceId;
+
+    public String getUserPushId() {
+        return userPushId;
+    }
+
+    public void setUserPushId(String userPushId) {
+        this.userPushId = userPushId;
+    }
 
     public String getUserHash() {
         return userHash;

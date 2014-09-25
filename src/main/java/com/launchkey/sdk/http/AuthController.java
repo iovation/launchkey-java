@@ -36,7 +36,7 @@ public class AuthController extends HttpController {
         }
     }
 
-    public JSONResponse authsPost(String launchKeyTime, String publicKey, String userName, boolean session) {
+    public JSONResponse authsPost(String launchKeyTime, String publicKey, String userName, boolean session, boolean userPushId) {
         StringBuilder url = new StringBuilder(SERVER_URL);
         url.append(AUTHS_PATH);
         HttpPost post = new HttpPost(url.toString());
@@ -44,6 +44,7 @@ public class AuthController extends HttpController {
             ArrayList<NameValuePair> params = this.defaultPostParams(launchKeyTime, publicKey);
             params.add(new BasicNameValuePair("username", userName));
             params.add(new BasicNameValuePair("session", String.valueOf(session)));
+            params.add(new BasicNameValuePair("user_push_id", String.valueOf(userPushId)));
 
             post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
             return httpClient.execute(post, new JSONResponseHandler());

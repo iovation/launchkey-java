@@ -29,22 +29,33 @@ public class AuthenticationManager {
      * @param username
      */
     public AuthorizeResult authorize(final String username) throws AuthenticationException {
-        return authorize(username, false);
+        return authorize(username, false, false);
+    }
+
+    /**
+     * Call to authorize a username via LaunchKey
+     *
+     * @param username
+     * @param userPushId
+     */
+    public AuthorizeResult authorize(final String username, boolean userPushId) throws AuthenticationException {
+        return authorize(username, false, userPushId);
     }
 
     /**
      * Call to authorize a username via LaunchKey
      * @param username
      * @param transactional
+     * @param userPushId
      * @return
      * @throws AuthenticationException
      */
-    public AuthorizeResult authorize(final String username, boolean transactional) throws AuthenticationException {
+    public AuthorizeResult authorize(final String username, boolean transactional, boolean userPushId) throws AuthenticationException {
         JSONResponse pingResponse = this.authController.pingGet();
         if(pingResponse.isSuccess()) {
             String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
             _publicKey = pingResponse.getJson().getString("key");
-            JSONResponse authsPostResponse = authController.authsPost(launchkeyTime, _publicKey, username, !transactional);
+            JSONResponse authsPostResponse = authController.authsPost(launchkeyTime, _publicKey, username, !transactional, userPushId);
             if(authsPostResponse.isSuccess()) {
                 AuthorizeResult result = new AuthorizeResult();
                 result.setAuthRequest(authsPostResponse.getJson().getString("auth_request"));
@@ -112,6 +123,7 @@ public class AuthenticationManager {
        if(pollGetResponse.isSuccess()) {
            String encryptedAuth = pollGetResponse.getJson().getString("auth");
            String userHash = pollGetResponse.getJson().getString("user_hash");
+           String userPushId = pollGetResponse.getJson().getString("user_push_id");
 
            byte[] resultNot64 = null;
            String result = null;
@@ -134,7 +146,7 @@ public class AuthenticationManager {
                String appPins = jsonResult.getString("app_pins");
                String deviceId = jsonResult.getString("device_id");
 
-               return logsPutAuthenticate(userHash, authRequest, appPins, deviceId, action);
+               return logsPutAuthenticate(userHash, authRequest, appPins, deviceId, userPushId, action);
            }
 
        }
@@ -159,11 +171,12 @@ public class AuthenticationManager {
      * @param authRequest
      * @param appPins
      * @param deviceId
+     * @param userPushId
      * @param status
      * @return
      * @throws AuthenticationException
      */
-    private PollResult logsPutAuthenticate(String userHash, String authRequest, String appPins, String deviceId,
+    private PollResult logsPutAuthenticate(String userHash, String authRequest, String appPins, String deviceId, String userPushId,
                                      final boolean status) throws AuthenticationException {
         JSONResponse pingResponse = this.authController.pingGet();
         if(pingResponse.isSuccess()) {
@@ -177,6 +190,7 @@ public class AuthenticationManager {
                     pollResult.setAuthRequest(authRequest);
                     pollResult.setAppPins(appPins);
                     pollResult.setDeviceId(deviceId);
+                    pollResult.setUserPushId(userPushId);
                     return pollResult;
                 }
                 else {
