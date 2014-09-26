@@ -45,17 +45,17 @@ public class AuthenticationManager {
     /**
      * Call to authorize a username via LaunchKey
      * @param username
-     * @param transactional
+     * @param session
      * @param userPushId
      * @return
      * @throws AuthenticationException
      */
-    public AuthorizeResult authorize(final String username, boolean transactional, boolean userPushId) throws AuthenticationException {
+    public AuthorizeResult authorize(final String username, boolean session, boolean userPushId) throws AuthenticationException {
         JSONResponse pingResponse = this.authController.pingGet();
         if(pingResponse.isSuccess()) {
             String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
             _publicKey = pingResponse.getJson().getString("key");
-            JSONResponse authsPostResponse = authController.authsPost(launchkeyTime, _publicKey, username, !transactional, userPushId);
+            JSONResponse authsPostResponse = authController.authsPost(launchkeyTime, _publicKey, username, session, userPushId);
             if(authsPostResponse.isSuccess()) {
                 AuthorizeResult result = new AuthorizeResult();
                 result.setAuthRequest(authsPostResponse.getJson().getString("auth_request"));
