@@ -2,23 +2,24 @@ package com.launchkey.sdk.auth;
 
 import com.launchkey.sdk.Util;
 import com.launchkey.sdk.crypto.Crypto;
-import com.launchkey.sdk.http.AuthController;
+import com.launchkey.sdk.http.AuthControllerInterface;
 import com.launchkey.sdk.http.JSONResponse;
 import net.sf.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AuthenticationManager {
     private static final String AUTHENTICATE = "Authenticate";
     private static final String REVOKE = "Revoke";
     private static final String DEFAULT_ERROR_CODE = "1000";
 
-    private final AuthController authController;
+    private final AuthControllerInterface authController;
     private final String _privateKeyString;
-    private String _publicKey;
 
-    public AuthenticationManager(AuthController authController) {
+    public AuthenticationManager(AuthControllerInterface authController) {
         this.authController = authController;
         this._privateKeyString = authController.getPrivateKey();
     }
@@ -54,7 +55,7 @@ public class AuthenticationManager {
         JSONResponse pingResponse = this.authController.pingGet();
         if(pingResponse.isSuccess()) {
             String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
-            _publicKey = pingResponse.getJson().getString("key");
+            String _publicKey = pingResponse.getJson().getString("key");
             JSONResponse authsPostResponse = authController.authsPost(launchkeyTime, _publicKey, username, session, userPushId);
             if(authsPostResponse.isSuccess()) {
                 AuthorizeResult result = new AuthorizeResult();
@@ -83,6 +84,7 @@ public class AuthenticationManager {
     public boolean isAuthorized(final String authRequest, String launchkeyTime)
             throws AuthenticationException {
         JSONResponse pingResponse = this.authController.pingGet();
+        String _publicKey = pingResponse.getJson().getString("key");
         if(pingResponse.isSuccess()) {
             JSONResponse pollResponse = authController.pollGet(launchkeyTime, _publicKey, authRequest);
             if(pollResponse.isSuccess()) {
@@ -119,50 +121,64 @@ public class AuthenticationManager {
      * @throws AuthenticationException
      */
     public PollResult poll(String authRequest, String launchkeyTime) throws AuthenticationException {
-       JSONResponse pollGetResponse =  authController.pollGet(launchkeyTime, _publicKey, authRequest);
-       if(pollGetResponse.isSuccess()) {
-           String encryptedAuth = pollGetResponse.getJson().getString("auth");
-           String userHash = pollGetResponse.getJson().getString("user_hash");
-           String userPushId = pollGetResponse.getJson().getString("user_push_id");
+        JSONResponse pingResponse = this.authController.pingGet();
+        if (pingResponse.isSuccess()) {
+            String _publicKey = pingResponse.getJson().getString("key");
 
-           byte[] resultNot64 = null;
-           String result = null;
-           try {
-               resultNot64 = Crypto.decryptWithPrivateKey(Util.base64Decode(encryptedAuth.getBytes("UTF-8")),
-                       _privateKeyString);
-               result = new String(resultNot64, "UTF-8");
-           }
-           catch(Exception e) {
-               //no op
-           }
+            JSONResponse pollGetResponse =  authController.pollGet(launchkeyTime, _publicKey, authRequest);
+            if(pollGetResponse.isSuccess()) {
+                String encryptedAuth = pollGetResponse.getJson().getString("auth");
+                String userHash = pollGetResponse.getJson().getString("user_hash");
+                String userPushId = pollGetResponse.getJson().getString("user_push_id");
 
-           JSONObject jsonResult = JSONObject.fromObject(result);
+                byte[] resultNot64 = null;
+                String result = null;
+                try {
+                    resultNot64 = Crypto.decryptWithPrivateKey(Util.base64Decode(encryptedAuth.getBytes("UTF-8")),
+                            _privateKeyString);
+                    result = new String(resultNot64, "UTF-8");
+                }
+                catch(Exception e) {
+                    //no op
+                }
 
-           if(!authRequest.equals(jsonResult.getString("auth_request"))) {
-               throw new AuthenticationException("Auth tokens do not match", DEFAULT_ERROR_CODE);
-           }
-           else {
-               boolean action = Boolean.valueOf(jsonResult.getString("response"));
-               String appPins = jsonResult.getString("app_pins");
-               String deviceId = jsonResult.getString("device_id");
+                JSONObject jsonResult = JSONObject.fromObject(result);
 
-               return logsPutAuthenticate(userHash, authRequest, appPins, deviceId, userPushId, action);
-           }
+                if(!authRequest.equals(jsonResult.getString("auth_request"))) {
+                    throw new AuthenticationException("Auth tokens do not match", DEFAULT_ERROR_CODE);
+                }
+                else {
+                    boolean action = Boolean.valueOf(jsonResult.getString("response"));
+                    String appPins = jsonResult.getString("app_pins");
+                    String deviceId = jsonResult.getString("device_id");
 
-       }
-        else {
-           if(pollGetResponse.getJson().has("message_code")) {
-               if(pollGetResponse.getJson().getString("message_code").equals("70404")) {
-                   throw new AuthenticationException("User denied request", DEFAULT_ERROR_CODE);
-               }
-               else if(!pollGetResponse.getJson().getString("message_code").equals("70403")) {
-                   throw new AuthenticationException(getErrorMessage(pollGetResponse.getJson()),
-                           getErrorCode(pollGetResponse.getJson()));
-               }
-           }
-           throw new AuthenticationException(getErrorMessage(pollGetResponse.getJson()),
-                   getErrorCode(pollGetResponse.getJson()));
-       }
+                    return logsPutAuthenticate(userHash, authRequest, appPins, deviceId, userPushId, action);
+                }
+
+            } else {
+                if(pollGetResponse.getJson().has("message_code")) {
+                    if(pollGetResponse.getJson().getString("message_code").equals("70404")) {
+                        throw new AuthenticationException("User denied request", DEFAULT_ERROR_CODE);
+                    }
+                    else if(!pollGetResponse.getJson().getString("message_code").equals("70403")) {
+                        throw new AuthenticationException(
+                            getErrorMessage(pollGetResponse.getJson()),
+                            getErrorCode(pollGetResponse.getJson())
+                        );
+                    }
+                }
+                throw new AuthenticationException(getErrorMessage(
+                    pollGetResponse.getJson()),
+                    getErrorCode(pollGetResponse.getJson())
+                );
+            }
+        } else {
+            throw new AuthenticationException(
+                getErrorMessage(pingResponse.getJson()),
+                getErrorCode(pingResponse.getJson())
+            );
+
+        }
     }
 
     /**
@@ -181,7 +197,7 @@ public class AuthenticationManager {
         JSONResponse pingResponse = this.authController.pingGet();
         if(pingResponse.isSuccess()) {
             String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
-            _publicKey = pingResponse.getJson().getString("key");
+            String _publicKey = pingResponse.getJson().getString("key");
             JSONResponse logsPutResponse = authController.logsPut(authRequest, launchkeyTime, _publicKey, AUTHENTICATE, status);
             if(logsPutResponse.isSuccess()) {
                 if(status) {
@@ -219,7 +235,7 @@ public class AuthenticationManager {
         JSONResponse pingResponse = this.authController.pingGet();
         if(pingResponse.isSuccess()) {
             String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
-            _publicKey = pingResponse.getJson().getString("key");
+            String _publicKey = pingResponse.getJson().getString("key");
             JSONResponse logsPutResponse = authController.logsPut(authRequest, launchkeyTime, _publicKey, REVOKE,
                     status);
             return logsPutResponse.isSuccess();
@@ -239,9 +255,10 @@ public class AuthenticationManager {
     public String deorbit(String deorbit, String signature) {
         JSONResponse pingResponse = this.authController.pingGet();
         if(pingResponse.isSuccess()) {
+            String _publicKey = pingResponse.getJson().getString("key");
             String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
             try {
-                if(Crypto.verifySignature(this._publicKey, signature.getBytes("UTF-8"),
+                if(Crypto.verifySignature(_publicKey, Util.base64Decode(signature.getBytes()),
                         deorbit.getBytes("UTF-8"))) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date pingTime = simpleDateFormat.parse(launchkeyTime);

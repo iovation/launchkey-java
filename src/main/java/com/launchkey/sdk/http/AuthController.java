@@ -14,7 +14,7 @@ import org.apache.http.protocol.HTTP;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AuthController extends HttpController {
+public class AuthController extends HttpController implements AuthControllerInterface {
     private static final String PING_PATH = "/ping";
     private static final String AUTHS_PATH = "/auths";
     private static final String LOGS_PATH = "/logs";
@@ -24,6 +24,7 @@ public class AuthController extends HttpController {
         super(httpClient);
     }
 
+    @Override
     public JSONResponse pingGet() {
         StringBuilder url = new StringBuilder(SERVER_URL);
         url.append(PING_PATH);
@@ -36,6 +37,7 @@ public class AuthController extends HttpController {
         }
     }
 
+    @Override
     public JSONResponse authsPost(String launchKeyTime, String publicKey, String userName, boolean session, boolean userPushId) {
         StringBuilder url = new StringBuilder(SERVER_URL);
         url.append(AUTHS_PATH);
@@ -54,6 +56,7 @@ public class AuthController extends HttpController {
         }
     }
 
+    @Override
     public JSONResponse pollGet(String launchKeyTime, String publicKey, String authRequest) {
         try {
             StringBuilder url = new StringBuilder(SERVER_URL);
@@ -69,6 +72,7 @@ public class AuthController extends HttpController {
         }
     }
 
+    @Override
     public JSONResponse logsPut(String authRequest, String launchKeyTime, String publicKey, String action, boolean status) {
         StringBuilder url = new StringBuilder(SERVER_URL);
         url.append(LOGS_PATH);

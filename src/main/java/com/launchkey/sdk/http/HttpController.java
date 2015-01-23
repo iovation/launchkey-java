@@ -32,7 +32,7 @@ public class HttpController {
         this.httpClient = httpClient;
     }
 
-    protected final class JSONCallbackResponseHandler implements ResponseHandler<Integer> {
+    protected static final class JSONCallbackResponseHandler implements ResponseHandler<Integer> {
         private final JSONHttpCallback callback;
 
         public JSONCallbackResponseHandler(JSONHttpCallback callback) {
@@ -53,11 +53,10 @@ public class HttpController {
         }
     }
 
-    protected final class JSONResponseHandler implements ResponseHandler<JSONResponse> {
+    protected static final class JSONResponseHandler implements ResponseHandler<JSONResponse> {
         public JSONResponse handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
             int statusCode = response.getStatusLine().getStatusCode();
             String responseString = EntityUtils.toString(response.getEntity());
-            LOG.warning(responseString);
             JSONObject jsonObject = JSONObject.fromObject(responseString);
             JSONResponse jsonResponse = new JSONResponse();
             jsonResponse.setJson(jsonObject);
