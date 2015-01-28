@@ -1,4 +1,6 @@
-LaunchKey Java SDK
+# LaunchKey Java SDK
+
+[![Build Status](https://travis-ci.org/LaunchKey/launchkey-java.svg)](https://travis-ci.org/LaunchKey/launchkey-java)
 
 To use:
 
