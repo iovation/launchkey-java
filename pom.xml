@@ -22,8 +22,8 @@
         <connection>scm:git:git@github.com:LaunchKey/launchkey-java.git</connection>
         <developerConnection>scm:git:git@github.com:LaunchKey/launchkey-java.git</developerConnection>
         <url>https://github.com/LaunchKey/launchkey-java</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <licenses>
         <license>
