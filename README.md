@@ -2,110 +2,203 @@
 
 [![Build Status](https://travis-ci.org/LaunchKey/launchkey-java.svg)](https://travis-ci.org/LaunchKey/launchkey-java)
 
-To use:
+  * [Overview](#overview)
+  * [Pre-Requisites](#prerequisites)
+  * [Obtaining the Library With Dependencies](#obtaining)
+    * [Dependency Management](#dependency-management)
+    * [Manual Installation](#manual-installation)
+  * [Usage](#usage)
+  * [Support](#support)
 
-1. build the launchkey-java artifacts:
- $> cd launchkey-sdk-java/
- $> mvn clean install
+# <a name="overview"></a>Overview
 
-2. include the sdk in your project with the following maven dependency:
- <dependency>
-     <groupId>com.launchkey.sdk</groupId>
-     <artifactId>launchkey-sdk</artifactId>
-     <version>1.0</version>
- </dependency>
+LaunchKey is an identity and access management platform  This Java SDK enables developers to quickly integrate
+the LaunchKey platform and Java based applications without the need to directly interact with the platform API.
 
-3. To use with Spring:
+Developer documentation for using the LaunchKey API is found [here](https://launchkey.com/docs/).
 
- - define the following in a properties file:
+An overview of the LaunchKey platform can be found [here](https://launchkey.com/platform).
 
-launchkey-app-key=<LAUNCHKEY APP KEY>
-launchkey-app-secret=<YOUR APP SECRET>
-launchkey-private-key=<YOUR PRIVATE KEY>
+#  <a name="prerequisites"></a>Pre-Requisites
 
- - create an HttpClient to inject into an AuthController:
+Utilization of the LaunchKey SDK requires the following items:
 
-<bean id="httpClientInstanceFactory"
-      class="com.launchkey.sdk.http.HttpClientFactory">
-    <property name="maxConnections" value="200"/>
-</bean>
+ * LaunchKey Account - The [LaunchKey Mobile App](https://launchkey.com/app) is required to set up a new account and
+ access the LaunchKey Dashboard.
+ 
+ * An application - A new application can be created in the [LaunchKey Dashboard](https://dashboard.launchkey.com/).
+   From the application, you will need the following items found in the keys section of the application details:
 
-<bean id="httpClient" factory-bean="httpClientInstanceFactory"
-      factory-method="createClient">
-</bean>
+    * The app key
+    * The secret key
+    * The private key
 
- - create an AuthController to inject into an AuthenticationManager:
+#  <a name="obtaining"></a>Obtaining the Library With Dependencies
 
-<bean id="launchkeyAuthController" class="com.launchkey.sdk.http.AuthController">
-    <constructor-arg index="0" ref="httpClient"/>
-    <property name="appKey" value="${launchkey-app-key}"/>
-    <property name="secretKey" value="${launchkey-app-secret}"/>
-    <property name="privateKey" value="${launchkey-private-key}"/>
-</bean>
+The JAR, source, and doc files are available through either Maven or GitHub.
 
- - create an AuthenticationManager, use it to for calling the LaunchKey API methods:
+## <a name="dependency-management"></a>Maven/Ivy/SBT/Buildr/Ivy/Grape/Gradle/SBT/Leiningen (Suggested)
 
-<bean id="launchkeyAuthenticationManager" class="com.launchkey.sdk.auth.AuthenticationManager">
-    <constructor-arg index="0" ref="launchkeyAuthController"/>
-</bean>
+__Group ID:__ com.launchkey.sdk
+__Artifact ID:__ launchkey-sdk
 
-4. To use without Spring:
- - create an HttpClient to inject into an AuthController:
+_Maven Example:_
 
-HttpClientFactory factory = new HttpClientFactory();
-factory.setMaxConnections(200);
-HttpClient httpClient = factory.createClient();
+```
+<dependency>
+  <groupId>com.launchkey.sdk</groupId>
+  <artifactId>launchkey-sdk</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
 
- - create an AuthController to inject into an AuthenticationManager:
+_Apache Buildr Example_
 
-AuthController authController = new AuthController(httpClient);
-authController.setAppKey();
-authController.setSecretKey();
-authController.setPrivateKey();
+```
+'com.launchkey.sdk:launchkey-sdk:jar:1.0.0'
+```
+
+_Apache Ivy Example_
+
+```
+<dependency org="com.launchkey.sdk" name="launchkey-sdk" rev="1.0.0" />
+```
+
+_Groovy Grape Example_
+
+```
+@Grapes( 
+@Grab(group='com.launchkey.sdk', module='launchkey-sdk', version='1.0.0') 
+)
+```
+
+_Gradle/Grails Example_
+
+```
+compile 'com.launchkey.sdk:launchkey-sdk:1.0.0'
+```
+
+_Scala SBT Example_
+
+```
+libraryDependencies += "com.launchkey.sdk" % "launchkey-sdk" % "1.0.0"
+```
+
+_Leiningen Example_
+
+```
+[com.launchkey.sdk/launchkey-sdk "1.0.0"]
+```
 
 
- - create an AuthenticationManager, use it to for calling the LaunchKey API methods:
+## <a name="manual-installation"></a>Manual Installation (Not Suggested)
 
-AuthenticationManager authenticationManager = new AuthenticationManager(authController);
+Download the JAR files for the LaunchKey SDK and it's dependencies and place them in your classpath:
 
-5. use the SDK:
+  * [LaunchKey SDK](https://github.com/LaunchKey/launchkey-java/releases/latest)
+  * [Apache HttpComponents - Core](http://hc.apache.org/downloads.cgi)
+  * [Apache HttpComponents - Client](http://hc.apache.org/downloads.cgi)
+  * [Apache Commons - Logging](http://commons.apache.org/proper/commons-logging/download_logging.cgi)
+  * [Apache Commons - Codec](http://commons.apache.org/proper/commons-codec/download_codec.cgi)
+  * [Apache Commons - Bean Utils](http://commons.apache.org/proper/commons-beanutils/download_beanutils.cgi)
+  * [Apache Commons - Collections](http://commons.apache.org/proper/commons-collections/download_collections.cgi)
+  * [Apache Commons - Lang](http://commons.apache.org/proper/commons-lang/download_lang.cgi)
+  * [EZMorph](http://sourceforge.net/projects/ezmorph/files/ezmorph/)
+  * [JSON Lib](http://sourceforge.net/projects/json-lib/files/json-lib/)
+  * [Bouncy Castle - Provider](https://www.bouncycastle.org/latest_releases.html)
 
- - Authorize a username via LaunchKey:
+__Due to the number of dependencies required by the LaunchKey SDK, it would be best to use a dependency management tool__
 
-AuthorizeResult result = null;
-try {
-    result = authenticationManager.authorize(username);
-}
-catch(AuthenticationException e) {
-    //error handling
-}
+#  <a name="usage"></a>Usage
 
- - determine whether the username is still authorized (i.e. has not remotely ended the session):
+  1. Create an HttpClient to inject into an AuthController
 
-boolean isAuthorized = false;
-try {
-    isAuthorized = authenticationManager.isAuthorized(authRequest, serverTime);
-}
-catch(AuthenticationException e) {
-    //error handling
-}
+    ```
+    HttpClientFactory factory = new HttpClientFactory();
+    factory.setMaxConnections(200);
+    HttpClient httpClient = factory.createClient();
+    ```
 
- - poll (Poll GET) the server for an authorization:
+  2. Create an AuthController to inject into an AuthenticationManager
 
-PollResult pollResult = null;
-try {
-    pollResult = authenticationManager.poll(authRequest, serverTime);
-}
-catch(AuthenticationException e) {
-    //error handling
-}
+    ```
+    AuthController authController = new AuthController(httpClient);
+    authController.setAppKey("Your App Key");
+    authController.setSecretKey("Your Secret Key");
+    authController.setPrivateKey("Your Private Key Data Minus the Start and End demarcation lines");
+    ```
 
- - end a session:
+  3. create an AuthenticationManager, use it to for calling the LaunchKey API methods
 
-try {
-    authenticationManager.logout(authRequest);
-}
-catch(AuthenticationException e) {
-   //error handling
-}
+    ```java
+    AuthenticationManager authenticationManager = new AuthenticationManager(authController);
+    ```
 
+  5. Use the SDK
+    * Authorize a username via LaunchKey
+
+        ```java
+        AuthorizeResult result = null;
+        try {
+            result = authenticationManager.authorize(username);
+        }
+        catch(AuthenticationException e) {
+            //error handling
+        }
+        ```
+
+    * Determine whether the username is still authorized (i.e. has not remotely ended the session)
+
+        ```java
+        boolean isAuthorized = false;
+        try {
+            isAuthorized = authenticationManager.isAuthorized(authRequest, serverTime);
+        }
+        catch(AuthenticationException e) {
+            //error handling
+        }
+        ```
+
+    * Poll (Poll GET) the server for an authorization
+    
+        ```java
+        PollResult pollResult = null;
+        try {
+            pollResult = authenticationManager.poll(authRequest, serverTime);
+        }
+        catch(AuthenticationException e) {
+            //error handling
+        }
+        ```
+
+    * End a session
+
+        ```java
+        try {
+            authenticationManager.logout(authRequest);
+        }
+        catch(AuthenticationException e) {
+           //error handling
+        }
+
+        ```
+
+#  <a name="support"></a>Support
+
+## GitHub
+
+Submit feature requests and bugs on [GitHub](https://github.com/LaunchKey/launchkey-java/issues).
+
+## Twitter
+
+Submit a question to the Twitter Handle [@LaunchKeyHelp](https://twitter.com/LaunchKeyHelp).
+
+## IRC
+
+Engage the LaunchKey team in the `#launchkey` chat room on [freenode](https://freenode.net/).
+
+## LaunchKey Help Desk
+
+Browse FAQ's or submit a question to the LaunchKey support team for both
+technical and non-technical issues. Visit the LaunchKey Help Desk [here](https://launchkey.desk.com/).
+     
