@@ -21,15 +21,22 @@ import java.util.logging.Logger;
 public class HttpController {
     private static final Logger LOG = Logger.getLogger(HttpController.class.getName());
 
-    protected static final String SERVER_URL = "https://api.launchkey.com/v1";
+    protected static final String PROD_SERVER_URL = "https://api.launchkey.com/v1";
+    protected static final String STAGING_SERVER_URL = "https://staging-api.launchkey.com/v1";
 
     protected final HttpClient httpClient;
+    protected final String serverUrl;
     protected String appKey;
     protected String secretKey;
     protected String privateKey;
 
     public HttpController(HttpClient httpClient) {
+        this(httpClient, false);
+    }
+
+    public HttpController(HttpClient httpClient, boolean isStaging) {
         this.httpClient = httpClient;
+        serverUrl = isStaging ? STAGING_SERVER_URL : PROD_SERVER_URL;
     }
 
     protected static final class JSONCallbackResponseHandler implements ResponseHandler<Integer> {

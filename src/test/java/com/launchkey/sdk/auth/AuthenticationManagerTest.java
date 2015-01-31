@@ -27,7 +27,7 @@ public class AuthenticationManagerTest extends TestAbstract {
     private static final String USER_HASH = "UserHash";
 
     private static final String USER_PUSH_ID = "UserPushId";
-
+    
     private static final String AUTH_DATA_SAME_AUTH_REQUEST =
             "K7fjTWGiT2MYe4qP7pRDmA2zxTvw5tXAp4zB5LFWxfbw2kZW1lkq8+Y7N8AKPAx/CpXfsFX7EJYf\ntiSeM2yivuJd2LzzQtzRYTaBGo/tdoO5AxC4q9lGon1gE0L9Wa2fgeLcXB25WFTA17w4bA6TAolY\n2WhfZbXHX+ibdHUL4T3kmXacKkgcGZZShn8AgyV+erTD515L+AMVDdoCIAmWDxpW0A85FRJVZBM2\n1zpGFsErUE5QnzHcGedt/qsck81+F9QcmhSybaDPHJsKffIZh9hF4OOqeblCSs9J7LRmRNwr/Osy\nxYNuV5xMqB6pff1wyGRAmti6CvsSLxSNPACgug==\n";
 
@@ -44,6 +44,10 @@ public class AuthenticationManagerTest extends TestAbstract {
     private JSONResponse pollResponse;
 
     private JSONObject pollResponseJson;
+    
+    private JSONResponse usersPostResponse;
+    
+    private JSONObject usersPostResponseJson;
 
     private AuthenticationManager authenticationManager;
 
@@ -89,6 +93,18 @@ public class AuthenticationManagerTest extends TestAbstract {
 
         when(authController.getPrivateKey()).thenReturn(PRIVATE_KEY);
 
+        usersPostResponse = new JSONResponse();
+        usersPostResponse.setSuccess(true);
+        JSONObject intermediateUserPostResponseJson = new JSONObject();
+        usersPostResponse.setJson(intermediateUserPostResponseJson);
+        usersPostResponseJson = new JSONObject();
+        usersPostResponseJson.put("qrcode", "a qrcode");
+        usersPostResponseJson.put("lk_identifier", "and lk identifier");
+        usersPostResponseJson.put("code", "a code");
+        intermediateUserPostResponseJson.put("response", usersPostResponseJson);
+
+        when(authController.usersPost(anyString(), anyString(), anyString())).thenReturn(usersPostResponse);
+
         authenticationManager = new AuthenticationManager(authController);
     }
 
@@ -102,6 +118,8 @@ public class AuthenticationManagerTest extends TestAbstract {
         logsPutResponse = null;
         pingResponse = null;
         pingResponseJson = null;
+        usersPostResponse = null;
+        usersPostResponseJson = null;
     }
 
     @Test
@@ -417,5 +435,107 @@ public class AuthenticationManagerTest extends TestAbstract {
         pollResponseJson.put("message_code", "70404");
         authenticationManager.isAuthorized(AUTH_REQUEST, LAUNCHKEY_TIME);
         verify(authController).logsPut(anyString(), anyString(), anyString(), anyString(), eq(true));
+    }
+
+    @Test
+    public void testCreateWhiteLabelUserSendsLaunchKeyTimeFromPingToAuthController() throws Exception {
+        authenticationManager.createWhiteLabelUser("expected");
+        verify(authController).usersPost(eq(LAUNCHKEY_TIME), anyString(), anyString());
+    }
+
+    @Test
+    public void testCreateWhiteLabelUserSendsPublicKeyFromPingToAuthController() throws Exception {
+        authenticationManager.createWhiteLabelUser("expected");
+        verify(authController).usersPost(anyString(), eq(PUBLIC_KEY), anyString());
+    }
+
+    @Test
+    public void testCreateWhiteLabelUserSendsIdentifierToAuthController() throws Exception {
+        authenticationManager.createWhiteLabelUser("expected");
+        verify(authController).usersPost(anyString(), anyString(), eq("expected"));
+    }
+
+    @Test(expected = UserCreationException.class)
+    public void testCreateWhiteLabelThrowsUserCreationExceptionWhenErrorResponseIsReturnedFromPing() throws Exception {
+        pingResponse.setSuccess(false);
+        authenticationManager.createWhiteLabelUser("user");
+    }
+
+    @Test
+    public void testCreateWhiteLabelThrowsUserCreationExceptionWithProperErrorCodeWhenErrorResponseIsReturnedFromPing() throws Exception {
+        pingResponse.setSuccess(false);
+        pingResponse.getJson().put("message_code", "1111");
+        try {
+            authenticationManager.createWhiteLabelUser("user");
+            fail("UserCreationException expected but not thrown");
+        } catch (UserCreationException e) {
+            assertEquals("1111", e.getCode());
+        }
+    }
+
+    @Test
+    public void testCreateWhiteLabelThrowsUserCreationExceptionWithProperErrorMessageWhenErrorResponseIsReturnedFromPing() throws Exception {
+        pingResponse.setSuccess(false);
+        pingResponse.getJson().put("message", "expected");
+        try {
+            authenticationManager.createWhiteLabelUser("user");
+            fail("UserCreationException expected but not thrown");
+        } catch (UserCreationException e) {
+            assertEquals("expected", e.getMessage());
+        }
+    }
+
+    @Test(expected = UserCreationException.class)
+    public void testCreateWhiteLabelThrowsUserCreationExceptionWhenErrorResponseIsReturnedFromUsersPost() throws Exception {
+        usersPostResponse.setSuccess(false);
+        authenticationManager.createWhiteLabelUser("user");
+    }
+
+    @Test
+    public void testCreateWhiteLabelThrowsUserCreationExceptionWithProperErrorCodeWhenErrorResponseIsReturnedFromUsersPost() throws Exception {
+        usersPostResponse.setSuccess(false);
+        usersPostResponse.getJson().put("message_code", "1111");
+        try {
+            authenticationManager.createWhiteLabelUser("user");
+            fail("UserCreationException expected but not thrown");
+        } catch (UserCreationException e) {
+            assertEquals("1111", e.getCode());
+        }
+    }
+
+    @Test
+    public void testCreateWhiteLabelThrowsUserCreationExceptionWithProperErrorMessageWhenErrorResponseIsReturnedFromUsersPost() throws Exception {
+        usersPostResponse.setSuccess(false);
+        usersPostResponse.getJson().put("message", "expected");
+        try {
+            authenticationManager.createWhiteLabelUser("user");
+            fail("UserCreationException expected but not thrown");
+        } catch (UserCreationException e) {
+            assertEquals("expected", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateWhiteLabelReturnsQrCodeUrlInResult() throws Exception {
+        usersPostResponseJson.put("qrcode", "expected");
+        usersPostResponse.getJson().put("response", usersPostResponseJson);
+        WhiteLabelUserCreateResult actual = authenticationManager.createWhiteLabelUser("user");
+        assertEquals("expected", actual.getQrCodeUrl());
+    }
+
+    @Test
+    public void testCreateWhiteLabelReturnsLaunchKeyIdentifierInResult() throws Exception {
+        usersPostResponseJson.put("lk_identifier", "expected");
+        usersPostResponse.getJson().put("response", usersPostResponseJson);
+        WhiteLabelUserCreateResult actual = authenticationManager.createWhiteLabelUser("user");
+        assertEquals("expected", actual.getLaunchKeyIdentifier());
+    }
+
+    @Test
+    public void testCreateWhiteLabelReturnsManualCodeInResult() throws Exception {
+        usersPostResponseJson.put("code", "expected");
+        usersPostResponse.getJson().put("response", usersPostResponseJson);
+        WhiteLabelUserCreateResult actual = authenticationManager.createWhiteLabelUser("user");
+        assertEquals("expected", actual.getCode());
     }
 }

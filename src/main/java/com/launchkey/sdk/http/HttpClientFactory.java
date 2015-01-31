@@ -1,36 +1,18 @@
 package com.launchkey.sdk.http;
 
-import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.params.ConnManagerParams;
-import org.apache.http.conn.params.ConnPerRouteBean;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 public class HttpClientFactory {
-    private int maxConnections;
+    private Integer maxConnections;
 
     public HttpClient createClient() {
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(
-                new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        if (maxConnections != null) {
+            builder.setMaxConnPerRoute(maxConnections);
+        }
 
-        HttpParams params = new BasicHttpParams();
-        ConnManagerParams.setMaxTotalConnections(params, this.maxConnections);
-        ConnPerRouteBean connPerRoute = new ConnPerRouteBean();
-        HttpHost host = new HttpHost("api.launchkey.com");
-        connPerRoute.setMaxForRoute(new HttpRoute(host), 200);
-        ConnManagerParams.setMaxConnectionsPerRoute(params, connPerRoute);
-
-        ThreadSafeClientConnManager threadSafeClientConnManager = new ThreadSafeClientConnManager(params, schemeRegistry);
-
-        return new DefaultHttpClient(threadSafeClientConnManager, params);
+        return builder.build();
     }
 
     public int getMaxConnections() {

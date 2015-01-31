@@ -8,8 +8,6 @@ import net.sf.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AuthenticationManager {
     private static final String AUTHENTICATE = "Authenticate";
@@ -129,7 +127,9 @@ public class AuthenticationManager {
             if(pollGetResponse.isSuccess()) {
                 String encryptedAuth = pollGetResponse.getJson().getString("auth");
                 String userHash = pollGetResponse.getJson().getString("user_hash");
-                String userPushId = pollGetResponse.getJson().getString("user_push_id");
+                String userPushId = pollGetResponse.getJson().has("user_push_id")
+                        ? pollGetResponse.getJson().getString("user_push_id")
+                        : null;
 
                 byte[] resultNot64 = null;
                 String result = null;
@@ -275,6 +275,39 @@ public class AuthenticationManager {
             }
         }
         return null;
+    }
+
+    /**
+     * This method is for creating users for a White Label application only.
+     * 
+     * It Create a new user for a White Label application  .If the user for the specified identifier already exists,
+     * then set up a new device for that user
+     *  
+     * @param identifier  Unique identifier for the user in your application.  This should be a static value such as a
+     *                    user's ID or UUID value rather than an email address which may be subject to change.
+     * @return
+     * @throws UserCreationException
+     */
+    public WhiteLabelUserCreateResult createWhiteLabelUser(String identifier) throws UserCreationException {
+        WhiteLabelUserCreateResult result;
+        JSONResponse pingResponse = this.authController.pingGet();
+        if (pingResponse.isSuccess()) {
+            String publicKey = pingResponse.getJson().getString("key");
+            String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
+            JSONResponse response = authController.usersPost(launchkeyTime, publicKey, identifier);
+            if (response.isSuccess()) {
+                result = new WhiteLabelUserCreateResult(
+                        response.getJson().getJSONObject("response").getString("qrcode"),
+                        response.getJson().getJSONObject("response").getString("lk_identifier"),
+                        response.getJson().getJSONObject("response").getString("code")
+                );
+            } else {
+                throw new UserCreationException(getErrorMessage(response.getJson()), getErrorCode(response.getJson()));
+            }
+        } else {
+            throw new UserCreationException(getErrorMessage(pingResponse.getJson()), getErrorCode(pingResponse.getJson()));
+        }
+        return result;
     }
 
     private static String getErrorMessage(JSONObject response) {
