@@ -182,6 +182,20 @@ __Due to the number of dependencies required by the LaunchKey SDK, it would be b
         }
 
         ```
+        
+    * Add a white label user
+
+        ```java
+        try {
+            authenticationManager.createWhiteLabelUser(myUniqueUserIdentifier);
+            
+            // Show the user the QR Code from the QR Code URL to be validated in a white label application
+        }
+        catch(AuthenticationException e) {
+           //error handling
+        }
+
+        ```
 
 #  <a name="support"></a>Support
 

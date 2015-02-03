@@ -32,6 +32,7 @@ public class AuthControllerTest extends TestAbstract {
     public static final String APP_KEY = "AppKey";
     public static final String SECRET_KEY = "SecretKey";
     public static final String LAUNCH_KEY_TIME = "LaunchKeyTime";
+
     @Mock
     private HttpClient httpClient;
 
@@ -327,4 +328,80 @@ public class AuthControllerTest extends TestAbstract {
                 containsString("status=false")
         );
     }
+
+    @Test
+    public void testUsersPostUsesCorrectUrl() throws Exception {
+        authController.usersPost("LaunchKeyTime", PUBLIC_KEY, "identifierValue");
+        ArgumentCaptor<HttpPost> captor = ArgumentCaptor.forClass(HttpPost.class);
+        verify(httpClient).execute(captor.capture(), any(ResponseHandler.class));
+        assertEquals("https://api.launchkey.com/v1/users", captor.getValue().getURI().toASCIIString());
+    }
+
+    @Test
+    public void testUsersPostUsesCorrectMethod() throws Exception {
+        authController.usersPost("LaunchKeyTime", PUBLIC_KEY, "identifierValue");
+        ArgumentCaptor<HttpPost> captor = ArgumentCaptor.forClass(HttpPost.class);
+        verify(httpClient).execute(captor.capture(), any(ResponseHandler.class));
+        assertEquals("POST", captor.getValue().getMethod());
+
+    }
+
+    @Test
+    public void testUsersPostSendsSecretKey() throws Exception {
+        authController.usersPost("LaunchKeyTime", PUBLIC_KEY, "identifierValue");
+        ArgumentCaptor<HttpPost> captor = ArgumentCaptor.forClass(HttpPost.class);
+        verify(httpClient).execute(captor.capture(), any(ResponseHandler.class));
+        assertThat(
+                "Missing secret key",
+                URLDecoder.decode(new String(IOUtils.readFully(captor.getValue().getEntity().getContent(), -1, false)), HTTP.UTF_8),
+                containsString("secret_key=")
+        );
+    }
+
+    @Test
+    public void testUsersPostSendsSignature() throws Exception {
+        authController.usersPost("LaunchKeyTime", PUBLIC_KEY, "identifierValue");
+        ArgumentCaptor<HttpPost> captor = ArgumentCaptor.forClass(HttpPost.class);
+        verify(httpClient).execute(captor.capture(), any(ResponseHandler.class));
+        assertThat(
+                "Missing signature",
+                URLDecoder.decode(new String(IOUtils.readFully(captor.getValue().getEntity().getContent(), -1, false)), HTTP.UTF_8),
+                containsString("signature=")
+        );
+    }
+    @Test
+    public void testUsersPostSendsCorrectAppKey() throws Exception {
+        authController.usersPost("LaunchKeyTime", PUBLIC_KEY, "identifierValue");
+        ArgumentCaptor<HttpPost> captor = ArgumentCaptor.forClass(HttpPost.class);
+        verify(httpClient).execute(captor.capture(), any(ResponseHandler.class));
+        assertThat(
+                "Unexpected value for app key",
+                URLDecoder.decode(new String(IOUtils.readFully(captor.getValue().getEntity().getContent(), -1, false)), HTTP.UTF_8),
+                containsString("app_key=" + APP_KEY)
+        );
+    }
+
+    @Test
+    public void testUsersPostSendsIdentifierValue() throws Exception {
+        authController.usersPost("LaunchKeyTime", PUBLIC_KEY, "identifierValue");
+        ArgumentCaptor<HttpPost> captor = ArgumentCaptor.forClass(HttpPost.class);
+        verify(httpClient).execute(captor.capture(), any(ResponseHandler.class));
+        assertThat(
+                "Unexpected value for identifier",
+                URLDecoder.decode(new String(IOUtils.readFully(captor.getValue().getEntity().getContent(), -1, false)), HTTP.UTF_8),
+                containsString("identifier=identifierValue")
+        );
+    }
+ 
+    @Test
+    public void testUsersPostSendsErrorResponseOnIoException() throws Exception {
+        String message = "Expected error message";
+        when(httpClient.execute(any(HttpUriRequest.class), any(ResponseHandler.class))).
+                thenThrow(new IOException(message));
+        JSONResponse actual = authController.usersPost("LaunchKeyTime", PUBLIC_KEY, "identifierValue");
+        assertFalse("Unexpected success value", actual.isSuccess());
+        assertEquals("Unexpected message_code", "1000", actual.getJson().get("message_code"));
+        assertEquals("Unexpected message", message, actual.getJson().get("message"));
+    }
+
 }

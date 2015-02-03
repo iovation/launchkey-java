@@ -2,8 +2,6 @@ package com.launchkey.sdk.crypto;
 
 import com.launchkey.sdk.TestAbstract;
 import com.launchkey.sdk.Util;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.Crypt;
 import org.junit.Ignore;
 import org.junit.Test;
 

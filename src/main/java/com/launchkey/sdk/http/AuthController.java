@@ -19,14 +19,19 @@ public class AuthController extends HttpController implements AuthControllerInte
     private static final String AUTHS_PATH = "/auths";
     private static final String LOGS_PATH = "/logs";
     private static final String POLL_PATH = "/poll";
+    private static final String USERS_PATH = "/users";
 
     public AuthController(HttpClient httpClient) {
         super(httpClient);
     }
 
+    public AuthController(HttpClient httpClient, boolean isStaging) {
+        super(httpClient, isStaging);
+    }
+
     @Override
     public JSONResponse pingGet() {
-        StringBuilder url = new StringBuilder(SERVER_URL);
+        StringBuilder url = new StringBuilder(this.serverUrl);
         url.append(PING_PATH);
         HttpGet get = new HttpGet(url.toString());
         try {
@@ -39,7 +44,7 @@ public class AuthController extends HttpController implements AuthControllerInte
 
     @Override
     public JSONResponse authsPost(String launchKeyTime, String publicKey, String userName, boolean session, boolean userPushId) {
-        StringBuilder url = new StringBuilder(SERVER_URL);
+        StringBuilder url = new StringBuilder(this.serverUrl);
         url.append(AUTHS_PATH);
         HttpPost post = new HttpPost(url.toString());
         try {
@@ -59,7 +64,7 @@ public class AuthController extends HttpController implements AuthControllerInte
     @Override
     public JSONResponse pollGet(String launchKeyTime, String publicKey, String authRequest) {
         try {
-            StringBuilder url = new StringBuilder(SERVER_URL);
+            StringBuilder url = new StringBuilder(this.serverUrl);
             url.append(POLL_PATH);
             ArrayList<NameValuePair> params = this.defaultPostParams(launchKeyTime, publicKey);
             params.add(new BasicNameValuePair("auth_request", authRequest));
@@ -74,7 +79,7 @@ public class AuthController extends HttpController implements AuthControllerInte
 
     @Override
     public JSONResponse logsPut(String authRequest, String launchKeyTime, String publicKey, String action, boolean status) {
-        StringBuilder url = new StringBuilder(SERVER_URL);
+        StringBuilder url = new StringBuilder(this.serverUrl);
         url.append(LOGS_PATH);
         HttpPut put = new HttpPut(url.toString());
         try {
@@ -88,6 +93,24 @@ public class AuthController extends HttpController implements AuthControllerInte
         catch(Exception e) {
             return getErrorResponse(e);
         }
+    }
+    
+    @Override
+    public JSONResponse usersPost(String launchKeyTime, String publicKey, String identifier) {
+        StringBuilder url = new StringBuilder(this.serverUrl);
+        url.append(USERS_PATH);
+        HttpPost post = new HttpPost(url.toString());
+
+        JSONResponse response;
+        try {
+            ArrayList<NameValuePair> params = this.defaultPostParams(launchKeyTime, publicKey);
+            params.add(new BasicNameValuePair("identifier", identifier));
+            post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+            response = httpClient.execute(post, new JSONResponseHandler());
+        } catch (Exception e) {
+            response = getErrorResponse(e);
+        }
+        return response;
     }
 
     private static JSONResponse getErrorResponse(Exception e) {
