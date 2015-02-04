@@ -75,15 +75,14 @@ public class AuthenticationManager {
     /**
      * Call to determine whether the username is still authorized (i.e. has not remotely ended the session)
      * @param authRequest
-     * @param launchkeyTime
      * @return
      * @throws AuthenticationException
      */
-    public boolean isAuthorized(final String authRequest, String launchkeyTime)
-            throws AuthenticationException {
+    public boolean isAuthorized(final String authRequest) throws AuthenticationException {
         JSONResponse pingResponse = this.authController.pingGet();
-        String _publicKey = pingResponse.getJson().getString("key");
         if(pingResponse.isSuccess()) {
+            String _publicKey = pingResponse.getJson().getString("key");
+            String launchkeyTime = pingResponse.getJson().getString("launchkey_time");
             JSONResponse pollResponse = authController.pollGet(launchkeyTime, _publicKey, authRequest);
             if(pollResponse.isSuccess()) {
                 return true;
@@ -100,6 +99,21 @@ public class AuthenticationManager {
             throw new AuthenticationException(getErrorMessage(pingResponse.getJson()),
                     getErrorCode(pingResponse.getJson()));
         }
+    }
+
+    /**
+     * Call to determine whether the username is still authorized (i.e. has not remotely ended the session)
+     *
+     * This method has been deprecated in favor of isAuthorized(String)
+     *
+     * @param authRequest
+     * @param launchkeyTime
+     * @return
+     * @throws AuthenticationException
+     */
+    @Deprecated
+    public boolean isAuthorized(final String authRequest, String launchkeyTime) throws AuthenticationException {
+        return isAuthorized(authRequest);
     }
 
     /**

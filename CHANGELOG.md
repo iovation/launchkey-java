@@ -16,3 +16,9 @@ is the change hash To get the diff between two versions, go to
     * Added ability to connect to staging servers for pre-release testing
     * Fixed bug in authentication manager that would error looking for a user_push_id response attribute when login call
         specified false for userPushId parameter
+
+  * 1.1.1
+    * Remove requirement for providing LaunchKey time for isAuthorized method in authentication manager.  It will use
+        the LaunchKey time from the ping call it performs before it checks authorization. Authentication manager method
+        isAuthorized(String, String) is now deprecated.  It will simply call the isAuthorized(String) and ignore the
+        LaunchKey time provided.
