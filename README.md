@@ -152,7 +152,7 @@ __Due to the number of dependencies required by the LaunchKey SDK, it would be b
         ```java
         boolean isAuthorized = false;
         try {
-            isAuthorized = authenticationManager.isAuthorized(authRequest, serverTime);
+            isAuthorized = authenticationManager.isAuthorized(authRequest);
         }
         catch(AuthenticationException e) {
             //error handling
