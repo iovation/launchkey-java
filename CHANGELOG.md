@@ -22,3 +22,9 @@ is the change hash To get the diff between two versions, go to
         the LaunchKey time from the ping call it performs before it checks authorization. Authentication manager method
         isAuthorized(String, String) is now deprecated.  It will simply call the isAuthorized(String) and ignore the
         LaunchKey time provided.
+
+  * 1.2.0
+    * Update AuthenticationManager.createWhiteLabelUser() for new API implementation
+    * Move more cryptography functions to Crypto helper class
+    * Allow usage of RSA keys with header data
+    * Mark Bouncy Castle as provided in POM.  Can't be used in the unsigned JAR anyway.
