@@ -1,5 +1,8 @@
 package com.launchkey.sdk.http;
 
+import com.launchkey.sdk.Util;
+import com.launchkey.sdk.crypto.Crypto;
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -7,12 +10,17 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AuthController extends HttpController implements AuthControllerInterface {
     private static final String PING_PATH = "/ping";
@@ -97,16 +105,30 @@ public class AuthController extends HttpController implements AuthControllerInte
     
     @Override
     public JSONResponse usersPost(String launchKeyTime, String publicKey, String identifier) {
-        StringBuilder url = new StringBuilder(this.serverUrl);
-        url.append(USERS_PATH);
-        HttpPost post = new HttpPost(url.toString());
-
         JSONResponse response;
         try {
-            ArrayList<NameValuePair> params = this.defaultPostParams(launchKeyTime, publicKey);
-            params.add(new BasicNameValuePair("identifier", identifier));
-            post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+            JSONObject packetObject = new JSONObject();
+            packetObject.put("secret_key", new String(Util.base64Encode(getEncryptedSecretKey(secretKey, launchKeyTime, publicKey))));
+            packetObject.put("app_key", appKey);
+            packetObject.put("identifier", identifier);
+            String packet = packetObject.toString();
+
+            String url = new StringBuilder(this.serverUrl).append(USERS_PATH).toString();
+            URIBuilder uriBuilder = new URIBuilder(url.toString());
+            uriBuilder.addParameter("signature", new String(Util.base64Encode(Crypto.signWithPrivateKey(packet.getBytes(), privateKey))));
+
+            HttpPost post = new HttpPost(uriBuilder.build());
+            post.setEntity(new StringEntity(packet, ContentType.APPLICATION_JSON));
             response = httpClient.execute(post, new JSONResponseHandler());
+            JSONObject responseObject = response.getJson().getJSONObject("response");
+            byte[] keyIvBytes = Crypto.decryptRSA(Util.base64Decode(responseObject.getString("cipher").getBytes()), privateKey);
+            byte[] key = Arrays.copyOfRange(keyIvBytes, 0, keyIvBytes.length - 16);
+            byte[] iv = Arrays.copyOfRange(keyIvBytes, keyIvBytes.length - 16, keyIvBytes.length);
+            byte[] data = Crypto.decryptAES(Util.base64Decode(responseObject.getString("data").getBytes()), key, iv);
+            JSONObject responseJSON = JSONObject.fromObject(new String(data));
+            responseObject.put("qrcode", responseJSON.get("qrcode"));
+            responseObject.put("lk_identifier", responseJSON.get("lk_identifier"));
+            responseObject.put("code", responseJSON.get("code"));
         } catch (Exception e) {
             response = getErrorResponse(e);
         }

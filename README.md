@@ -52,6 +52,21 @@ _Maven Example:_
 </dependency>
 ```
 
+For Maven, you may also need to supply the requirement for Bouncy Castle in your implementation:
+
+```
+<dependency>
+    <groupId>bouncycastle</groupId>
+    <artifactId>bcprov-jdk16</artifactId>
+    <version>[0.0,)</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+Bouncy Castle is required by the SDK for encryption but is not included as the JAR is not currently signed.  The above
+dependency keeps a wide open version as the version is specified in the SDK.  Don't be alarmed by the jdk16 predicate
+on the package.  It is actually for JDK 1.6 and above.
+
 _Apache Buildr Example_
 
 ```

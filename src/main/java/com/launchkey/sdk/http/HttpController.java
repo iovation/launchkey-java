@@ -3,6 +3,7 @@ package com.launchkey.sdk.http;
 import com.launchkey.sdk.Util;
 import com.launchkey.sdk.crypto.Crypto;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.digest.Crypt;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -80,7 +81,7 @@ public class HttpController {
 
     protected ArrayList<NameValuePair> defaultPostParams(String launchKeyTime, String publicKey) throws Exception {
         byte[] encryptedSecretKey = getEncryptedSecretKey(secretKey, launchKeyTime, publicKey);
-        byte[] signedData = getSignatureOnSecretKey(encryptedSecretKey, privateKey);
+        byte[] signedData = Crypto.signWithPrivateKey(encryptedSecretKey, privateKey);
 
         ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("secret_key", new String(Util.base64Encode(encryptedSecretKey), "UTF-8")));
@@ -91,81 +92,20 @@ public class HttpController {
     }
 
     /**
-     * Pad a string into multiples of 16 bytes
-     *
-     * @return padded byte[]
-     * @throws Exception
-     */
-    private static byte[] padString16Bytes(String s) throws Exception {
-        byte[] bytes = s.getBytes("UTF-8");
-        if(bytes.length % 16 != 0) {
-            int bytesToPad = 16 - (bytes.length % 16);
-            byte[] paddedBytes = new byte[bytes.length + bytesToPad];
-            System.arraycopy(bytes, 0, paddedBytes, 0, bytes.length);
-            for(int i = bytes.length; i < paddedBytes.length; i++) {
-                paddedBytes[i] = " ".getBytes()[0];
-            }
-            return paddedBytes;
-        }
-        return bytes;
-    }
-
-    /**
-     * Pad a string into multiples of 16 bytes
-     *
-     * @return padded byte[]
-     * @throws Exception
-     */
-    private byte[] encryptWithApiPublicKey(byte[] message, String publicKey) throws Exception {
-        String strippedKey = Crypto.stripPublicKeyHeaders(publicKey);
-        PublicKey apiPublicKey =
-                Crypto.getRSAPublicKeyFromString(strippedKey);
-        Cipher rsaCipher = Crypto.getRSACipher();
-        rsaCipher.init(Cipher.ENCRYPT_MODE, apiPublicKey);
-        return rsaCipher.doFinal(message);
-    }
-
-    /**
-     * Signs with the private key
-     *
-     * @return signature on the bytes[]
-     * @throws Exception
-     */
-    private byte[] signWithPrivateKey(byte[] bytes, String privateKey) throws Exception {
-        Signature signature = Signature.getInstance("SHA256withRSA", "BC");
-        signature.initSign(Crypto.getRSAPrivateKeyFromString(privateKey));
-        signature.update(bytes);
-        return signature.sign();
-    }
-
-    /**
      * Builds the encrypted secret_key json dictionary included in calls to the LaunchKey api
      *
      * @return The encrypted secret_key json dictionary
      * @throws Exception
      */
-    private byte[] getEncryptedSecretKey(String secretKey, String launchkeyTime, String publicKey) throws Exception {
+    protected byte[] getEncryptedSecretKey(String secretKey, String launchkeyTime, String publicKey) throws Exception {
         JSONObject json = new JSONObject();
         json.put("secret", secretKey);
         json.put("stamped", launchkeyTime);
 
-        byte[] jsonBytes = padString16Bytes(json.toString());
-        byte[] encryptedCipher = encryptWithApiPublicKey(jsonBytes, publicKey);
+        byte[] encryptedCipher = Crypto.encryptRSA(json.toString().getBytes(), publicKey);
 
         return encryptedCipher;
     }
-
-    /**
-     * Builds the signature on the encrypted secret_key json dictionary
-     *
-     * @return The signature on the secret_key json dictionary
-     * @throws Exception
-     */
-    private byte[] getSignatureOnSecretKey(byte[] secret, String privateKey) throws Exception {
-        byte[] signedData = signWithPrivateKey(secret, privateKey);
-        return signedData;
-    }
-
 
     public String getAppKey() {
         return appKey;

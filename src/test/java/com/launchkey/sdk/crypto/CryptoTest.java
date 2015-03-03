@@ -1,15 +1,8 @@
 package com.launchkey.sdk.crypto;
 
 import com.launchkey.sdk.TestAbstract;
-import com.launchkey.sdk.Util;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.crypto.Cipher;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
@@ -34,7 +27,7 @@ public class CryptoTest extends TestAbstract {
     @Test
     public void testStripPublicKeyHeaders() throws Exception {
         String expected = "HelloWorld";
-        String actual = Crypto.stripPublicKeyHeaders("BEGIN PUBLIC KEY\nHello\nWorld\nEND PUBLIC KEY\n");
+        String actual = Crypto.stripKeyHeaders("-----BEGIN PUBLIC KEY-----\nHello\nWorld\n-----END PUBLIC KEY-----\n");
         assertEquals(expected, actual);
     }
 
@@ -57,11 +50,24 @@ public class CryptoTest extends TestAbstract {
         String expected = "This is the expected unencrypted value";
         String base64encodedEncrypted =
                 "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
-                "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
-                "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
-                "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
-                "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
+                        "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
+                        "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
+                        "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
+                        "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
         String actual = new String(Crypto.decryptWithPrivateKey(BASE_64.decode(base64encodedEncrypted), PRIVATE_KEY));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecryptRSAWithPrivateKey() throws Exception {
+        String expected = "This is the expected unencrypted value";
+        String base64encodedEncrypted =
+                "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
+                        "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
+                        "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
+                        "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
+                        "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
+        String actual = new String(Crypto.decryptRSA(BASE_64.decode(base64encodedEncrypted), PRIVATE_KEY));
         assertEquals(expected, actual);
     }
 
@@ -74,7 +80,7 @@ public class CryptoTest extends TestAbstract {
                 "lgl4Z/z9/z6hiEbutDdmh8lcAaCQnGbPYoH174oXvIXHdVhMD9ajNVb4gWqWlGzz/xih2hQS9DoR\n" +
                 "87tsVDUtqZjnN1qgiO3nzxZw2RrBSBPnZWtpcHs24a7R/AHnL+tKrFcIDbADiMIM3+Mao73ZWSf7\n" +
                 "kTXLdICAqZOuCqYZcU4xdr9Wy/R2tWKOlPm9rw==\n";
-        String actual = new String(Crypto.decryptWithPrivateKey(BASE_64.decode(base64encodedEncrypted), PRIVATE_KEY));
+        String actual = new String(Crypto.decryptRSA(BASE_64.decode(base64encodedEncrypted), PRIVATE_KEY));
         assertEquals(expected, actual);
     }
 
@@ -118,5 +124,25 @@ public class CryptoTest extends TestAbstract {
                 BASE_64.decode(base64encodedEncrypted)
         );
         assertFalse(actual);
+    }
+
+    @Test
+    public void testDecryptAes() throws Exception {
+        String expected = "This is the expected unencrypted value";
+
+        String base64encodedEncrypted = "Uc7ZMWqCc6TfQU/KTdl1KHEkTIWQWSC+uuSyMU5Kg088E32HLePvHkwwxTdqzhgH";
+        String actual = new String(Crypto.decryptAES(
+                BASE_64.decode(base64encodedEncrypted),
+                "myciphermyciphermyciphermycipher".getBytes(),
+                "iviviviviviviviv".getBytes()
+        ));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testSignJSONObject() throws Exception {
+        byte[] dataToSign = "{\"text\": \"This is the data to sign\"}".getBytes();
+        byte[] signature = Crypto.signWithPrivateKey(dataToSign, PRIVATE_KEY);
+        assertTrue("Signature did not verify", Crypto.verifySignature(PUBLIC_KEY, signature, dataToSign));
     }
 }
