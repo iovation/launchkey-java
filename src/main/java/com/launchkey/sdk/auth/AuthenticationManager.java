@@ -312,7 +312,7 @@ public class AuthenticationManager {
             if (response.isSuccess()) {
                 result = new WhiteLabelUserCreateResult(
                         response.getJson().getJSONObject("response").getString("qrcode"),
-                        response.getJson().getJSONObject("response").getString("lk_identifier"),
+                        response.getJson().getJSONObject("response").optString("lk_identifier", null),
                         response.getJson().getJSONObject("response").getString("code")
                 );
             } else {

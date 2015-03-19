@@ -28,3 +28,7 @@ is the change hash To get the diff between two versions, go to
     * Move more cryptography functions to Crypto helper class
     * Allow usage of RSA keys with header data
     * Mark Bouncy Castle as provided in POM.  Can't be used in the unsigned JAR anyway.
+
+  * 1.2.1
+    * Update AuthenticationManager.createWhiteLabelUser() to allow for no lk_identifier in response to enable forwards
+        compatibility with new API change forthcoming.
