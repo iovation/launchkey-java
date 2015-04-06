@@ -127,7 +127,6 @@ public class AuthController extends HttpController implements AuthControllerInte
             byte[] data = Crypto.decryptAES(Util.base64Decode(responseObject.getString("data").getBytes()), key, iv);
             JSONObject responseJSON = JSONObject.fromObject(new String(data));
             responseObject.put("qrcode", responseJSON.get("qrcode"));
-            responseObject.put("lk_identifier", responseJSON.get("lk_identifier"));
             responseObject.put("code", responseJSON.get("code"));
         } catch (Exception e) {
             response = getErrorResponse(e);

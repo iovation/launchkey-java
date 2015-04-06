@@ -12,24 +12,17 @@ public class WhiteLabelUserCreateResult {
     private String qrCodeUrl;
 
     /**
-     *  The value to store in order to push future requests to this user
-     */
-    private String launchKeyIdentifier;
-
-    /**
      * Code for the user to type into their device for manual verification if they are unable to scan the QR Code
      */
     private String code;
 
     /**
      * @param qrCodeUrl The URL to a QR Code for the device to scan
-     * @param launchKeyIdentifier The value to store in order to push future requests to this user
      * @param code Code for the user to type into their device for manual verification if they are unable to scan the
      *             QR Code
      */
-    public WhiteLabelUserCreateResult(String qrCodeUrl, String launchKeyIdentifier, String code) {
+    public WhiteLabelUserCreateResult(String qrCodeUrl, String code) {
         this.qrCodeUrl = qrCodeUrl;
-        this.launchKeyIdentifier = launchKeyIdentifier;
         this.code = code;
     }
 
@@ -38,13 +31,6 @@ public class WhiteLabelUserCreateResult {
      */
     public String getQrCodeUrl() {
         return qrCodeUrl;
-    }
-
-    /**
-     * @return The value to store in order to push future requests to this user
-     */
-    public String getLaunchKeyIdentifier() {
-        return launchKeyIdentifier;
     }
 
     /**

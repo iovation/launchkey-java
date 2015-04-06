@@ -502,14 +502,6 @@ public class AuthControllerTest extends TestAbstract {
     }
 
     @Test
-    public void testUsersPostReturnsCorrectLkIdentifier() throws Exception {
-        when(httpClient.execute(any(HttpUriRequest.class), any(ResponseHandler.class))).
-                thenReturn(getValidUsersPostJSONResponse());
-        JSONResponse actual = authController.usersPost("LaunchKeyTime", PUBLIC_KEY, "identifierValue");
-        assertEquals("Expected LK Identifier", actual.getJson().getJSONObject("response").get("lk_identifier"));
-    }
-
-    @Test
     public void testUsersPostReturnsCorrectCode() throws Exception {
         when(httpClient.execute(any(HttpUriRequest.class), any(ResponseHandler.class))).
                 thenReturn(getValidUsersPostJSONResponse());

@@ -99,7 +99,6 @@ public class AuthenticationManagerTest extends TestAbstract {
         usersPostResponse.setJson(intermediateUserPostResponseJson);
         usersPostResponseJson = new JSONObject();
         usersPostResponseJson.put("qrcode", "a qrcode");
-        usersPostResponseJson.put("lk_identifier", "and lk identifier");
         usersPostResponseJson.put("code", "a code");
         intermediateUserPostResponseJson.put("response", usersPostResponseJson);
 
@@ -521,14 +520,6 @@ public class AuthenticationManagerTest extends TestAbstract {
         usersPostResponse.getJson().put("response", usersPostResponseJson);
         WhiteLabelUserCreateResult actual = authenticationManager.createWhiteLabelUser("user");
         assertEquals("expected", actual.getQrCodeUrl());
-    }
-
-    @Test
-    public void testCreateWhiteLabelReturnsLaunchKeyIdentifierInResult() throws Exception {
-        usersPostResponseJson.put("lk_identifier", "expected");
-        usersPostResponse.getJson().put("response", usersPostResponseJson);
-        WhiteLabelUserCreateResult actual = authenticationManager.createWhiteLabelUser("user");
-        assertEquals("expected", actual.getLaunchKeyIdentifier());
     }
 
     @Test

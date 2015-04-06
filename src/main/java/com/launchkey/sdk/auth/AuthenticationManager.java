@@ -298,7 +298,9 @@ public class AuthenticationManager {
      * then set up a new device for that user
      *  
      * @param identifier  Unique identifier for the user in your application.  This should be a static value such as a
-     *                    user's ID or UUID value rather than an email address which may be subject to change.
+     *                    user's ID or UUID value rather than an email address which may be subject to change. This
+     *                    identifier will be used authenticate the user as well as pair devices additional devices to
+     *                    the user's account within your white label group.
      * @return
      * @throws UserCreationException
      */
@@ -312,7 +314,6 @@ public class AuthenticationManager {
             if (response.isSuccess()) {
                 result = new WhiteLabelUserCreateResult(
                         response.getJson().getJSONObject("response").getString("qrcode"),
-                        response.getJson().getJSONObject("response").optString("lk_identifier", null),
                         response.getJson().getJSONObject("response").getString("code")
                 );
             } else {
