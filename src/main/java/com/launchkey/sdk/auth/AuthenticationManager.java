@@ -163,7 +163,7 @@ public class AuthenticationManager {
                 }
                 else {
                     boolean action = Boolean.valueOf(jsonResult.getString("response"));
-                    String appPins = jsonResult.getString("app_pins");
+                    String appPins = jsonResult.optString("app_pins");
                     String deviceId = jsonResult.getString("device_id");
 
                     return logsPutAuthenticate(userHash, authRequest, appPins, deviceId, userPushId, action);
