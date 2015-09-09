@@ -5,6 +5,8 @@
 .project
 out/*
 target/*
+*/target/*
+*/*/target/*
 *.class
 *.jar
 .DS_Store
