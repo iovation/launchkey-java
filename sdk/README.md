@@ -47,7 +47,7 @@ We recommend the Bouncy Castle JCE provider.  Installation consists of:
 
 1. Download the JAR file for the Bouncy Castle cryptography provider from [Maven Central here](https://repo1.maven.org/maven2/org/bouncycastle/bcprov-jdk15on/1.52/bcprov-jdk15on-1.52-javadoc.jar).
 
-2. Place the JAR file in the `lib/ext` directory of the JRE you plan to use for running the demo.
+2. Place the JAR file in the `lib/ext` directory of the JRE.
 
 #  <a name="obtaining"></a>Obtaining the Library With Dependencies
 
@@ -252,7 +252,8 @@ catch(LaunchKeyException e) {
 
 ```java
 try {
-    PairResponse result = launchKeyClient.whiteLabel().whiteLabelService.pairUser(identifier);    
+    PairResponse result = launchKeyClient.whiteLabel().pairUser(identifier);
+
     // Show the user the QR Code from the QR Code URL to be validated in a white label application
 }
 catch(LaunchKeyException e) {
@@ -266,7 +267,7 @@ Server Sent Events (SSE) allow your application to reduce its load by not requir
 with the SDK.  You must create an endpoint to receive the SSE request and update your Rocket configuration accordingly.
 Here is a link to the setup instructions: [LaunchKey Docs](https://docs.launchkey.com/developer/api/callbacks/).
 
-Server sent events are HTTP GET requests.  Collect the query parameters from the callback endpoint and place them
+Server sent events are HTTP POST requests.  Collect the query parameters from the callback endpoint and place them
 in a `Map<String, String>` object and call the `handleCallback` method in the `auth` service.
  
  ```java

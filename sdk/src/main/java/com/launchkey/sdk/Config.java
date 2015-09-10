@@ -1,12 +1,3 @@
-package com.launchkey.sdk;
-
-import com.launchkey.sdk.cache.PingResponseCache;
-import com.launchkey.sdk.crypto.Crypto;
-import org.apache.http.client.HttpClient;
-
-import java.security.PrivateKey;
-import java.security.Provider;
-
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
  *
@@ -17,6 +8,19 @@ import java.security.Provider;
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+package com.launchkey.sdk;
+
+import com.launchkey.sdk.cache.PingResponseCache;
+import com.launchkey.sdk.crypto.Crypto;
+import org.apache.http.client.HttpClient;
+
+import java.security.PrivateKey;
+import java.security.Provider;
+
+/**
+ * Configuration object for building LaunchKeyClient objects with the factory
  */
 public class Config {
 
