@@ -46,6 +46,11 @@
             <version>${spring-security-version}</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring-security-version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.launchkey.sdk</groupId>
             <artifactId>launchkey-sdk</artifactId>
             <version>${project.parent.version}</version>
