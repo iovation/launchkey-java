@@ -2,15 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>examples-parent</artifactId>
+        <artifactId>launchkey-examples-parent</artifactId>
         <groupId>com.launchkey.sdk</groupId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
-    <name>LaunchKey Spring MVC Example</name>
-    <modelVersion>4.0.0</modelVersion>
+    <artifactId>launchkey-examples-spring-mvc</artifactId>
+    <name>LaunchKey Spring MVC Example Application</name>
+    <description>Example application for using the LaunchKey SDK in a Spring MVC application</description>
 
-    <artifactId>examples-spring-mvc</artifactId>
 
     <properties>
         <java.version>1.6</java.version>
