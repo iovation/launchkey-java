@@ -24,6 +24,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Scanner;
+
 import org.apache.commons.codec.binary.Base64;
 
 /**
@@ -191,8 +193,10 @@ public class JCECrypto implements Crypto {
     }
 
     private static byte[] getKeyBytesFromPEM(String pem) {
-        StringBuilder strippedKey = new StringBuilder();
-        for(String line : pem.split("\n")) {
+        StringBuilder strippedKey = new StringBuilder(pem.length());
+        Scanner scanner = new Scanner(pem);
+        while(scanner.hasNextLine()) {
+            String line = scanner.nextLine();
             if(!line.matches(".*(BEGIN|END) (RSA )?(PUBLIC|PRIVATE) KEY.*")) {
                 strippedKey.append(line.trim());
             }
