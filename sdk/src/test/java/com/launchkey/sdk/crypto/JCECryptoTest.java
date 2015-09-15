@@ -52,6 +52,11 @@ public class JCECryptoTest {
                     "Ud+Zy3E0RJXToW0t3Eo5UexVieglvpgxG7x1SCdvxYtTl6CZ520=\n" +
                     "-----END RSA PRIVATE KEY-----\n");
 
+
+
+    private static final String PRIVATE_KEY_CARRIAGE_RETURN = PRIVATE_KEY.replace('\n', '\r');
+    private static final String PRIVATE_KEY_CARRIAGE_RETURN_NEWLINE = PRIVATE_KEY.replace("\n", "\r\n");
+
     private static final String PUBLIC_KEY =
             ("-----BEGIN RSA PUBLIC KEY-----\n" +
                     "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq2izh7NEarDdrdZLrpli\n" +
@@ -62,6 +67,9 @@ public class JCECryptoTest {
                     "ac4AlR80AEaBeiuFYxjHpruS6BRcyW8UvqX0l9rKMDAWNAtMWt2egYAe6XOEXIWO\n" +
                     "iQIDAQAB\n" +
                     "-----END RSA PUBLIC KEY-----\n");
+
+    private static final String PUBLIC_KEY_CARRIAGE_RETURN = PUBLIC_KEY.replace('\n', '\r');
+    private static final String PUBLIC_KEY_CARRIAGE_RETURN_NEWLINE = PUBLIC_KEY.replace("\n", "\r\n");
 
     private Base64 base64;
     private BouncyCastleProvider provider;
@@ -194,8 +202,32 @@ public class JCECryptoTest {
     }
 
     @Test
+    public void testGetRSAPublicKeyFromPEM_CarriageReturn() throws Exception {
+        RSAPublicKey actual = JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY_CARRIAGE_RETURN);
+        assertNotNull(actual);
+    }
+
+    @Test
+    public void testGetRSAPublicKeyFromPEM_CarriageReturnNewline() throws Exception {
+        RSAPublicKey actual = JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY_CARRIAGE_RETURN_NEWLINE);
+        assertNotNull(actual);
+    }
+
+    @Test
     public void testGetRSAPrivateKeyFromPEM() throws Exception {
         RSAPrivateKey actual = JCECrypto.getRSAPrivateKeyFromPEM(provider, PRIVATE_KEY);
+        assertNotNull(actual);
+    }
+
+    @Test
+    public void testGetRSAPrivateKeyFromPEM_CarriageReturn() throws Exception {
+        RSAPrivateKey actual = JCECrypto.getRSAPrivateKeyFromPEM(provider, PRIVATE_KEY_CARRIAGE_RETURN);
+        assertNotNull(actual);
+    }
+
+    @Test
+    public void testGetRSAPrivateKeyFromPEM_CarriageReturnNewline() throws Exception {
+        RSAPrivateKey actual = JCECrypto.getRSAPrivateKeyFromPEM(provider, PRIVATE_KEY_CARRIAGE_RETURN_NEWLINE);
         assertNotNull(actual);
     }
 }
