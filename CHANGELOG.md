@@ -6,6 +6,13 @@ To get the diff for a specific change, go to [https://github.com/LaunchKey/launc
 is the change hash To get the diff between two versions, go to
 [https://github.com/LaunchKey/launchkey-java/compare/launchkey-sdk-1.0.0...launchkey-sdk-1.1.0](https://github.com/LaunchKey/launchkey-java/compare/launchkey-sdk-1.0.0...launchkey-sdk-1.1.0)
 
+  * 2.0.2
+    * Update JCE Crypto to allow for creating Public/Private keys with PEM formatted files having Linux (\n) and
+        Windows (\r\n) line ending styles.
+
+  * 2.0.1
+    * Fix POM for Spring MVC Example to require correct version of spring-security-core
+
   * 2.0.0
     * Make client easier to create with factories
     * Make client more extensible
