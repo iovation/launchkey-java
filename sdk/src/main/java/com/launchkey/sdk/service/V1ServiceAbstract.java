@@ -44,11 +44,11 @@ public abstract class V1ServiceAbstract {
     protected final LaunchKeyDateFormat launchKeyDateFormat = new LaunchKeyDateFormat();
 
     /**
-     * @param transport
-     * @param crypto
-     * @param pingResponseCache
-     * @param rocketKey
-     * @param secretKey
+     * @param transport Transport service
+     * @param crypto Crypto service
+     * @param pingResponseCache Ping response cache service
+     * @param rocketKey Rocket key for the requests
+     * @param secretKey Secret key for the requests
      */
     public V1ServiceAbstract(
             Transport transport,

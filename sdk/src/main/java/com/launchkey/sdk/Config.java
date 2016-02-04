@@ -72,7 +72,7 @@ public class Config {
     /**
      * Set the crypto service that will be used to encrypt, decrypt, and sign data
      * @param crypto Crypto service that will be used to encrypt, decrypt, and sign data
-     * @return
+     * @return this
      */
     public Config setCrypto(Crypto crypto) {
         this.crypto = crypto;
@@ -91,7 +91,7 @@ public class Config {
      * Set the JCE provider to be used to build a {@link com.launchkey.sdk.crypto.JCECrypto} service.  This value will
      * be ignored if a {@link Crypto} service is provided to {@link #setCrypto(Crypto)}
      * @param JCEProvider JCE provider to be used to build a {@link com.launchkey.sdk.crypto.JCECrypto} service
-     * @return
+     * @return this
      */
     public Config setJCEProvider(Provider JCEProvider) {
         this.JCEProvider = JCEProvider;
@@ -109,7 +109,7 @@ public class Config {
     /**
      * Set the Private Key to be used by the crypto service for decrypting and signing via RSA
      * @param privateKey Private Key to be used by the crypto service for decrypting and signing via RSA
-     * @return
+     * @return this
      */
     public Config setPrivateKey(PrivateKey privateKey) {
         this.privateKey = privateKey;
@@ -130,7 +130,7 @@ public class Config {
      * provided via {@link #setPrivateKey}.
      * @param rsaPrivateKeyPEM Private Key PEM formatted string that will be used to generate a {@link PrivateKey} to be used by the
      * crypto service for decrypting and signing via RSA
-     * @return
+     * @return this
      */
     public Config setRSAPrivateKeyPEM(String rsaPrivateKeyPEM) {
         this.rsaPrivateKeyPEM = rsaPrivateKeyPEM;
@@ -150,7 +150,7 @@ public class Config {
     /**
      * Set the Apache HTTP client that will be utilized for making requests of teh LaunchKey API
      * @param apacheHttpClient Apache HTTP client that will be utilized for making requests of the LaunchKey API
-     * @return
+     * @return this
      */
     public Config setApacheHttpClient(HttpClient apacheHttpClient) {
         this.apacheHttpClient = apacheHttpClient;
@@ -169,7 +169,7 @@ public class Config {
      * Set the Time To Live in seconds for HTTP client connections in the connection pool.  This value will be ignored
      * if an {@link HttpClient} is set with {@link #setApacheHttpClient(HttpClient)}
      * @param httpClientConnectionTTLSecs Time To Live in seconds for HTTP client connections in the connection pool.
-     * @return
+     * @return this
      */
     public Config setHttpClientConnectionTTLSecs(int httpClientConnectionTTLSecs) {
         this.httpClientConnectionTTLSecs = httpClientConnectionTTLSecs;
@@ -188,7 +188,7 @@ public class Config {
      * Set the max HTTP client connections in the connection pool.  This value will be ignored
      * if an {@link HttpClient} is set with {@link #setApacheHttpClient(HttpClient)}
      * @param httpMaxClients Max HTTP client connections in the connection pool
-     * @return
+     * @return this
      */
     public Config setHttpMaxClients(int httpMaxClients) {
         this.httpMaxClients = httpMaxClients;
@@ -207,7 +207,7 @@ public class Config {
      * Set the Ping Response cache Time To Live in milliseconds.  This value will be ignored
      * if an {@link PingResponseCache} is set with {@link #setPingResponseCache(PingResponseCache)}
      * @param pingResponseCacheTTL Set the Ping Response cache Time To Live in milliseconds
-     * @return
+     * @return this
      */
     public Config setPingResponseCacheTTL(int pingResponseCacheTTL) {
         this.pingResponseCacheTTL = pingResponseCacheTTL;
@@ -225,7 +225,7 @@ public class Config {
     /**
      * Set the base URL for the LaunchKey Engine API. e.g.: https://api.launchkey.com/v1
      * @param APIBaseURL Base URL for the LaunchKey Engine API. e.g.: https://api.launchkey.com/v1
-     * @return
+     * @return this
      */
     public Config setAPIBaseURL(String APIBaseURL) {
         this.APIBaseURL = APIBaseURL;
@@ -243,7 +243,7 @@ public class Config {
     /**
      * Set the ping response cache to be used for caching LaunchKey Engine API /ping calls
      * @param pingResponseCache Ping response cache to be used for caching LaunchKey Engine API /ping calls
-     * @return
+     * @return this
      */
     public Config setPingResponseCache(PingResponseCache pingResponseCache) {
         this.pingResponseCache = pingResponseCache;

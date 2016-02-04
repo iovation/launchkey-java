@@ -18,13 +18,21 @@ package com.launchkey.sdk.service.error;
  */
 public class InvalidResponseException extends LaunchKeyException {
     /**
-     * @see LaunchKeyException#LaunchKeyException(String, int)
+     * @param message the detail message (which is saved for later retrieval
+     *                by the {@link #getMessage()} method).
+     * @param code    HTTP status code or 0 if no HTTP status code was returned
      */
     public InvalidResponseException(String message, int code) {
         super(message, code);
     }
+
     /**
-     * @see LaunchKeyException#LaunchKeyException(String, Throwable, int)
+     * @param message the detail message (which is saved for later retrieval
+     *                by the {@link #getMessage()} method).
+     * @param cause   the cause (which is saved for later retrieval by the
+     *                {@link #getCause()} method).  (A <tt>null</tt> value is
+     *                permitted, and indicates that the cause is nonexistent or
+     *                unknown.)
      */
     public InvalidResponseException(String message, Throwable cause) {
         super(message, cause, 0);

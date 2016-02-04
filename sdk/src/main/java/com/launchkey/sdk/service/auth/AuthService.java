@@ -13,6 +13,7 @@
 package com.launchkey.sdk.service.auth;
 
 import com.launchkey.sdk.service.error.CommunicationErrorException;
+import com.launchkey.sdk.service.error.InvalidCallbackException;
 import com.launchkey.sdk.service.error.LaunchKeyException;
 
 import java.util.Map;
@@ -37,6 +38,7 @@ public interface AuthService {
      *
      * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
      * @return Unique identifier for tracking status of the authorization request
+     * @throws LaunchKeyException when an error occurs in the request
      */
     String login(String username) throws LaunchKeyException;
 
@@ -44,7 +46,7 @@ public interface AuthService {
      * Request that the session started with {@link AuthService#login(String)} be terminated
      *
      * @param authRequestId Unique identifier returned by {@link AuthService#login(String)}
-     * @throws LaunchKeyException
+     * @throws LaunchKeyException when an error occurs in the request
      */
     void logout(String authRequestId) throws LaunchKeyException;
 
@@ -54,7 +56,7 @@ public interface AuthService {
      * @param authRequestId Unique identifier returned by {@link AuthService#login(String)}
      * @return Null is returned if the user has not responded otherwise an AuthResponse is returned with the data
      * for that decision
-     * @throws LaunchKeyException
+     * @throws LaunchKeyException when an error occurs in the request
      */
     AuthResponse getAuthResponse(String authRequestId) throws LaunchKeyException;
 
@@ -74,8 +76,8 @@ public interface AuthService {
      * de-orbiting, logging out, from a paired mobile device or an {@link AuthResponseCallbackResponse} when the
      * server sent event was initiated by the user responding to a {@link AuthService#login(String)} or
      * {@link AuthService#authorize(String)} request.
-     * @throws com.launchkey.sdk.service.error.InvalidCallbackException When ther is an issue with the callback data
-     * @throws LaunchKeyException
+     * @throws InvalidCallbackException When there is an issue with the callback data
+     * @throws LaunchKeyException when an error occurs in the request
      */
     CallbackResponse handleCallback(Map<String, String> callbackData, int signatureTimeThreshold) throws LaunchKeyException;
 }

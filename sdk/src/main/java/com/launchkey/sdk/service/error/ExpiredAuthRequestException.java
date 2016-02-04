@@ -18,7 +18,9 @@ package com.launchkey.sdk.service.error;
  */
 public class ExpiredAuthRequestException extends LaunchKeyException {
     /**
-     * @see LaunchKeyException#LaunchKeyException(String, int)
+     * @param  message the detail message (which is saved for later retrieval
+     *         by the {@link #getMessage()} method).
+     * @param  code The error code
      */
     public ExpiredAuthRequestException(String message, int code) {
         super(message, code);

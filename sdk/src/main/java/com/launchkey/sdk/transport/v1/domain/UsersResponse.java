@@ -130,7 +130,7 @@ public class UsersResponse {
 
     /**
      * Is the response for a successful request
-     * @return
+     * @return successful flag
      */
     public Boolean isSuccessful() {
         return successful;
@@ -138,7 +138,7 @@ public class UsersResponse {
 
     /**
      * Get the message code for the response
-     * @return
+     * @return message code
      */
     public Integer getMessageCode() {
         return messageCode;
@@ -146,7 +146,7 @@ public class UsersResponse {
 
     /**
      * Get the message for the request
-     * @return
+     * @return message
      */
     public String getMessage() {
         return message;

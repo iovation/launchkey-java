@@ -17,7 +17,9 @@ package com.launchkey.sdk.service.error;
  */
 public class LaunchKeyEngineErrorException extends LaunchKeyException {
     /**
-     * @see LaunchKeyException#LaunchKeyException(String, int)
+     * @param message the detail message (which is saved for later retrieval
+     *                by the {@link #getMessage()} method).
+     * @param code    HTTP status code or 0 if no HTTP status code was returned
      */
     public LaunchKeyEngineErrorException(String message, int code) {
         super(message, code);

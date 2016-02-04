@@ -12,9 +12,6 @@
 
 package com.launchkey.sdk.transport.v1.domain;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
  * Data for an "logs" request
  */
@@ -41,8 +38,8 @@ public class LogsRequest {
 
     /**
      * Base64 encoded secret JSON string containing these attributes:
-     *      secret:   Rocket Secret Key of the rocket whose key is included in the current request.
-     *      stamped:  LaunchKey formatted Date representing the current time of the request.
+     * secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     * stamped:  LaunchKey formatted Date representing the current time of the request.
      */
     private final String secretKey;
 
@@ -52,16 +49,20 @@ public class LogsRequest {
     private final String signature;
 
     /**
+     * @param action      Action to log -- Currently must be Authenticate or Revoke
+     * @param status      Status of the action -- true or false as a string
      * @param authRequest The unique ID of the authentication request. This value should have been returned by a
-     *                     success "auths" request.
-     *                     @see AuthsResponse
-     * @param rocketKey Rocket Key of your Rocket. This is found on the Keys tab of your Rocket details in the LaunchKey Dashboard.
-     * @param secretKey Base64 encoded secret JSON string containing these attributes:
-     *                      secret:   Rocket Secret Key of the rocket whose key is included in the current request.
-     *                      stamped:  LaunchKey formatted Date representing the current time of the request.
-     * @param signature Base64 encoded RSA Signature of the base64 decoded secretKey value.
+     *                    success "auths" request.
+     * @param rocketKey   Rocket Key of your Rocket. This is found on the Keys tab of your Rocket details in the LaunchKey Dashboard.
+     * @param secretKey   Base64 encoded secret JSON string containing these attributes:
+     *                    secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     *                    stamped:  LaunchKey formatted Date representing the current time of the request.
+     * @param signature   Base64 encoded RSA Signature of the base64 decoded secretKey value.
+     * @throws IllegalArgumentException when arguments have unacceptable values
      */
-    public LogsRequest(String action, boolean status, String authRequest, long rocketKey, String secretKey, String signature) {
+    public LogsRequest(
+            String action, boolean status, String authRequest, long rocketKey, String secretKey, String signature
+    ) {
         if (action == null || (!action.equals("Authenticate") && !action.equals("Revoke"))) {
             throw new IllegalArgumentException("action must be Authenticate or Revoke");
         }
@@ -75,6 +76,7 @@ public class LogsRequest {
 
     /**
      * Get the action being logged (Authenticate or Revoke)
+     *
      * @return Authenticate or Revoke
      */
     public String getAction() {
@@ -83,7 +85,8 @@ public class LogsRequest {
 
     /**
      * Get the status of the action being logged (Granted or Denied)
-     * @returnGranted or Denied
+     *
+     * @return Granted or Denied
      */
     public String getStatus() {
         return status ? "true" : "false";
@@ -92,8 +95,8 @@ public class LogsRequest {
     /**
      * Get the unique ID of the authentication request. This value should have been returned by a successful
      * "auths" request.
-     * @see AuthsResponse
-     * @return Unique ID
+     *
+     * @return Unique ID for the auth request
      */
     public String getAuthRequest() {
         return authRequest;
@@ -101,6 +104,7 @@ public class LogsRequest {
 
     /**
      * Get the Rocket Key of the Rocket associate with this request
+     *
      * @return Rocket Key
      */
     public long getRocketKey() {
@@ -109,8 +113,9 @@ public class LogsRequest {
 
     /**
      * Get the Base64 encoded secret JSON string containing these attributes:
-     *      secret:   Rocket Secret Key of the rocket whose key is included in the current request.
-     *      stamped:  LaunchKey formatted Date representing the current time of the request.
+     * secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     * stamped:  LaunchKey formatted Date representing the current time of the request.
+     *
      * @return Base64 encoded secret JSON string
      */
     public String getSecretKey() {
@@ -118,7 +123,8 @@ public class LogsRequest {
     }
 
     /**
-     *  Get the Base64 encoded RSA Signature of the base64 decoded secretKey value.
+     * Get the Base64 encoded RSA Signature of the base64 decoded secretKey value.
+     *
      * @return Base64 encoded RSA Signature
      */
     public String getSignature() {

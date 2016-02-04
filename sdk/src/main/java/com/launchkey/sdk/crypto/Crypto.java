@@ -29,7 +29,7 @@ public interface Crypto {
      * @param message Message to be encrypted
      * @param publicKey Public key with which to encrypt the message
      *
-     * @return Encrypted message
+     * @return encrypted message
      */
     byte[] encryptRSA(byte[] message, PublicKey publicKey);
 
@@ -38,7 +38,7 @@ public interface Crypto {
      * RSA/ECB/OAEP with SHA1 cipher and MGF1 padding.
      *
      * @param message Message to decrypt
-     * @return
+     * @return decrypted message
      */
     byte[] decryptRSA(byte[] message);
 
@@ -47,7 +47,7 @@ public interface Crypto {
      * SHA256 with RSA.
      *
      * @param message Message to sign
-     * @return
+     * @return signature
      */
     byte[] sign(byte[] message);
 
@@ -58,16 +58,16 @@ public interface Crypto {
      * @param signature Signature to verify
      * @param message Message to verify against
      * @param publicKey Public key paired with the private key used tpo generate the signature
-     * @return Returns true if valid an false if not valid
+     * @return true if valid an false if not valid
      */
     boolean verifySignature(byte[] signature, byte[] message, PublicKey publicKey);
 
     /**
      * Decrypt AES/CBC
-     * @param message
-     * @param key
-     * @param iv
-     * @return
+     * @param message Message to sign
+     * @param key Key for crypto
+     * @param iv Initialization Vector (IV) for crypto
+     * @return decrypted message
      * @throws GeneralSecurityException When an error occurred decrypting the message
      */
     byte[] decryptAES(byte[] message, byte[] key, byte[] iv) throws GeneralSecurityException;
@@ -75,8 +75,8 @@ public interface Crypto {
     /**
      * Get a public key from the provided PEM formatted string
      *
-     * @param publicKey
-     * @return
+     * @param publicKey PEM formatted public key string
+     * @return RSA Public Key object
      */
     RSAPublicKey getRSAPublicKeyFromPEM(String publicKey);
 }

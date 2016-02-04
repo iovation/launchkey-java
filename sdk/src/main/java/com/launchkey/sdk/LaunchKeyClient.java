@@ -44,8 +44,8 @@ public class LaunchKeyClient {
 
     /**
      * LaunchKey client with all services
-     * @param auth
-     * @param whiteLabel
+     * @param auth auth service
+     * @param whiteLabel white label service
      */
     public LaunchKeyClient(AuthService auth, WhiteLabelService whiteLabel) {
         this.auth = auth;
@@ -54,7 +54,7 @@ public class LaunchKeyClient {
 
     /**
      * Get an auth service
-     * @return
+     * @return auth service
      */
     public AuthService auth() {
         return auth;
@@ -62,7 +62,7 @@ public class LaunchKeyClient {
 
     /**
      * Get a white label service
-     * @return
+     * @return white label service
      */
     public WhiteLabelService whiteLabel() {
         return whiteLabel;
@@ -70,8 +70,8 @@ public class LaunchKeyClient {
 
     /**
      * Build a LaunchKey Client from the provided config data
-     * @param config
-     * @return
+     * @param config Config object for the factory
+     * @return a LaunchKey client
      */
     public static LaunchKeyClient factory(Config config) {
         long rocketKey = config.getRocketKey();
@@ -99,7 +99,7 @@ public class LaunchKeyClient {
      * @param privateKeyPEM Private Key PEM formatted string that will be used to generate a {@link PrivateKey} to
      *                      be used by the crypto service for decrypting and signing via RSA
      * @param provider JCE provider to be used to build a {@link com.launchkey.sdk.crypto.JCECrypto} service
-     * @return
+     * @return a LaunchKey client
      */
     public static LaunchKeyClient factory(long rocketKey, String secretKey, String privateKeyPEM, Provider provider) {
         Config config = new Config(rocketKey, secretKey);

@@ -18,14 +18,20 @@ package com.launchkey.sdk.cache;
  */
 public class CachePersistenceException extends Exception {
     /**
-     * @see Exception#Exception(String)
+     * @param  message the detail message. The detail message is saved for
+     *         later retrieval by the {@link #getMessage()} method.
      */
     public CachePersistenceException(String message) {
         super(message);
     }
 
     /**
-     * @see Exception#Exception(String, Throwable)
+     * @param  message the detail message (which is saved for later retrieval
+     *         by the {@link #getMessage()} method).
+     * @param  cause the cause (which is saved for later retrieval by the
+     *         {@link #getCause()} method).  (A <tt>null</tt> value is
+     *         permitted, and indicates that the cause is nonexistent or
+     *         unknown.)
      */
     public CachePersistenceException(String message, Throwable cause) {
         super(message, cause);

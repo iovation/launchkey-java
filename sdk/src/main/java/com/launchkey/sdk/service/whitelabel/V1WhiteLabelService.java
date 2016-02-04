@@ -32,11 +32,11 @@ import java.security.GeneralSecurityException;
 public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabelService{
 
     /**
-     * @param transport
-     * @param crypto
-     * @param pingResponseCache
-     * @param rocketKey
-     * @param secretKey
+     * @param transport Transport service
+     * @param crypto Crypto service
+     * @param pingResponseCache Ping response cache
+     * @param rocketKey Rocket key for this implementation
+     * @param secretKey Secret key for this implementation
      */
     public V1WhiteLabelService(
             Transport transport, Crypto crypto, PingResponseCache pingResponseCache, long rocketKey, String secretKey
@@ -44,9 +44,7 @@ public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabel
        super(transport, crypto, pingResponseCache, rocketKey, secretKey);
     }
 
-    /**
-     * @see WhiteLabelService#pairUser(String)
-     */
+    @Override
     public PairResponse pairUser(String identifier) throws LaunchKeyException {
         UsersResponse usersResponse = transport.users(
                 new UsersRequest(

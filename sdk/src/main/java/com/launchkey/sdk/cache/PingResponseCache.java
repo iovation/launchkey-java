@@ -20,7 +20,7 @@ import com.launchkey.sdk.transport.v1.domain.PingResponse;
 public interface PingResponseCache {
     /**
      * Set the ping response in the cache
-     * @param pingResponse
+     * @param pingResponse Ping response to cache
      * @throws CachePersistenceException When an error occurred saving the cached response in a persistence engine
      */
     void setPingResponse(PingResponse pingResponse) throws CachePersistenceException;

@@ -12,6 +12,8 @@
 
 package com.launchkey.sdk.crypto;
 
+import org.apache.commons.codec.binary.Base64;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -25,8 +27,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * Crypto provider utilizing the Java Cryptography Extension
@@ -42,8 +42,8 @@ public class JCECrypto implements Crypto {
     private static final Base64 BASE_64 = new Base64(0);
 
     /**
-     * @param privateKey
-     * @param provider
+     * @param privateKey Private Key
+     * @param provider   Crypto Provider
      */
     public JCECrypto(PrivateKey privateKey, Provider provider) {
         this.provider = provider;
@@ -64,24 +64,18 @@ public class JCECrypto implements Crypto {
         }
     }
 
-    /**
-     * @see Crypto#encryptRSA(byte[], PublicKey)
-     */
+    @Override
     public byte[] encryptRSA(byte[] message, PublicKey publicKey) {
         return processRSA(message, publicKey, Cipher.ENCRYPT_MODE);
     }
 
 
-    /**
-     * @see Crypto#decryptRSA(byte[])
-     */
+    @Override
     public byte[] decryptRSA(byte[] message) {
         return processRSA(message, privateKey, Cipher.DECRYPT_MODE);
     }
 
-    /**
-     * @see Crypto#sign(byte[])
-     */
+    @Override
     public byte[] sign(byte[] message) {
         try {
             Signature signature = getSha256withRSA();
@@ -97,9 +91,7 @@ public class JCECrypto implements Crypto {
         }
     }
 
-    /**
-     * @see Crypto#verifySignature(byte[], byte[], PublicKey)
-     */
+    @Override
     public boolean verifySignature(byte[] signature, byte[] message, PublicKey publicKey) {
         try {
             Signature sig = getSha256withRSA();
@@ -116,25 +108,22 @@ public class JCECrypto implements Crypto {
     }
 
 
-    /**
-     * @see Crypto#decryptRSA(byte[])
-     */
+    @Override
     public byte[] decryptAES(byte[] message, byte[] key, byte[] iv) throws GeneralSecurityException {
         return processAES(Cipher.DECRYPT_MODE, message, key, iv);
     }
 
-    /**
-     * @see Crypto#getRSAPublicKeyFromPEM(String)
-     */
+    @Override
     public RSAPublicKey getRSAPublicKeyFromPEM(String publicKey) {
         return getRSAPublicKeyFromPEM(provider, publicKey);
     }
 
     /**
      * Get an RSA private key utilizing the provided provider and PEM formatted string
+     *
      * @param provider Provider to generate the key
-     * @param pem PEM formatted key string
-     * @return
+     * @param pem      PEM formatted key string
+     * @return RSA private key
      */
     public static RSAPrivateKey getRSAPrivateKeyFromPEM(Provider provider, String pem) {
         try {
@@ -149,9 +138,10 @@ public class JCECrypto implements Crypto {
 
     /**
      * Get an RSA public key utilizing the provided provider and PEM formatted string
+     *
      * @param provider Provider to generate the key
-     * @param pem PEM formatted key string
-     * @return
+     * @param pem      PEM formatted key string
+     * @return RSA piblic key
      */
     public static RSAPublicKey getRSAPublicKeyFromPEM(Provider provider, String pem) {
         try {
@@ -185,6 +175,7 @@ public class JCECrypto implements Crypto {
             throw new IllegalArgumentException("Provider does not provide required padding: MGF1", e);
         }
     }
+
     private byte[] processAES(int mode, byte[] message, byte[] key, byte[] iv) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance(AES_CRYPTO_CIPHER, provider);
         cipher.init(mode, new SecretKeySpec(key, "AES"), new IvParameterSpec(iv));
@@ -195,9 +186,9 @@ public class JCECrypto implements Crypto {
     private static byte[] getKeyBytesFromPEM(String pem) {
         StringBuilder strippedKey = new StringBuilder(pem.length());
         Scanner scanner = new Scanner(pem);
-        while(scanner.hasNextLine()) {
+        while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            if(!line.matches(".*(BEGIN|END) (RSA )?(PUBLIC|PRIVATE) KEY.*")) {
+            if (!line.matches(".*(BEGIN|END) (RSA )?(PUBLIC|PRIVATE) KEY.*")) {
                 strippedKey.append(line.trim());
             }
         }

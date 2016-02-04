@@ -23,8 +23,10 @@ public class LaunchKeyException extends Exception {
 
     /**
      * Get the proper exception for the provided LaunchKey message code and message
-     * @param code LaunchKey message code
-     * @param message Message for the error
+     *
+     * @param  code HTTP status code or 0 if no HTTP status code was returned
+     * @param  message the detail message (which is saved for later retrieval
+     *         by the {@link #getMessage()} method).
      * @return Exception that properly correlates with the code
      */
     public static LaunchKeyException fromCode(int code, String message) {
@@ -91,8 +93,9 @@ public class LaunchKeyException extends Exception {
     }
 
     /**
-     * @param message Message describing exception
-     * @param code Code associated with exception
+     * @param  message the detail message (which is saved for later retrieval
+     *         by the {@link #getMessage()} method).
+     * @param  code HTTP status code or 0 if no HTTP status code was returned
      */
     public LaunchKeyException(String message, int code) {
         super(message);
@@ -100,9 +103,13 @@ public class LaunchKeyException extends Exception {
     }
 
     /**
-     * @param message Message describing exception
-     * @param cause Underlying exception that caused this exception to be thrown
-     * @param code Code associated with exception
+     * @param  message the detail message (which is saved for later retrieval
+     *         by the {@link #getMessage()} method).
+     * @param  cause the cause (which is saved for later retrieval by the
+     *         {@link #getCause()} method).  (A <tt>null</tt> value is
+     *         permitted, and indicates that the cause is nonexistent or
+     *         unknown.)
+     * @param  code HTTP status code or 0 if no HTTP status code was returned
      */
     public LaunchKeyException(String message, Throwable cause, int code) {
         super(message, cause);

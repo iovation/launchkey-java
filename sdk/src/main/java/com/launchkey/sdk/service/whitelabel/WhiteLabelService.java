@@ -24,6 +24,8 @@ public interface WhiteLabelService {
      * the user's account within your white label group.
      *
      * @return {@link PairResponse} object containing information for pairing a device with a user.
+     *
+     * @throws LaunchKeyException when an error occurs pairing the user
      */
     PairResponse pairUser(String identifier) throws LaunchKeyException;
 }

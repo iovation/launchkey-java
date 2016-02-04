@@ -34,29 +34,32 @@ import java.util.Map;
  */
 public class V1AuthService extends V1ServiceAbstract implements AuthService {
 
+    /**
+     * Constructor
+     *
+     * @param transport Transport service
+     * @param crypto Srypto service
+     * @param pingResponseCache Ping Response Cahce service
+     * @param rocketKey Rocket key for requests
+     * @param secretKey Secret key for requests
+     */
     public V1AuthService(
             Transport transport, Crypto crypto, PingResponseCache pingResponseCache, long rocketKey, String secretKey
     ) {
         super(transport, crypto, pingResponseCache, rocketKey, secretKey);
     }
 
-    /**
-     * @see AuthService#authorize(String)
-     */
+    @Override
     public String authorize(String username) throws LaunchKeyException {
         return auth(username, false);
     }
 
-    /**
-     * @see AuthService#login(String)
-     */
+    @Override
     public String login(String username) throws LaunchKeyException {
         return auth(username, true);
     }
 
-    /**
-     * @see AuthService#logout(String)
-     */
+    @Override
     public void logout(String authRequestId) throws LaunchKeyException {
         byte[] secret = getSecret();
         transport.logs(
@@ -71,9 +74,7 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
         );
     }
 
-    /**
-     * @see AuthService#getAuthResponse(String)
-     */
+    @Override
     public AuthResponse getAuthResponse(String authRequestId) throws LaunchKeyException {
         AuthResponse authResponse = null;
         byte[] secret = getSecret();
@@ -124,9 +125,7 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
         return authResponse;
     }
 
-    /**
-     * @see AuthService#handleCallback(Map, int)
-     */
+    @Override
     public CallbackResponse handleCallback(
             Map<String, String> callbackData, int signatureTimeThreshold
     ) throws LaunchKeyException {
@@ -203,9 +202,10 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
     }
 
     /**
-     * Default signatureTimeThreshold to 300 seconds (5 minutes)
-     *
-     * @see AuthService#handleCallback(Map, int)
+     * Handle a callback request
+     * @param callbackData Callback data received
+     * @return parsed callback
+     * @throws LaunchKeyException when an error occurs handling the callback
      */
     public CallbackResponse handleCallback(Map<String, String> callbackData) throws LaunchKeyException {
         return handleCallback(callbackData, 300);
