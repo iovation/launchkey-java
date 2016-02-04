@@ -42,7 +42,10 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
                         new UsersResponse.UsersResponseResponse(
                                 base64.encodeAsString("Encoded encrypted cipher".getBytes()),
                                 base64.encodeAsString("Encoded encrypted data".getBytes())
-                        )
+                        ),
+                        true,
+                        1,
+                        null
                 )
         );
         when(crypto.decryptRSA(any(byte[].class))).thenReturn("myciphermyciphermyciphermycipheriviviviviviviviv".getBytes());

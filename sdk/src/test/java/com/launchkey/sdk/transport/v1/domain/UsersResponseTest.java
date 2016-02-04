@@ -34,7 +34,7 @@ public class UsersResponseTest {
                         "hjysYgEyHRVDn1jUyw4TtFOLb2tSHDmBM+DWWA==\n",
                 "1Umh/uC3oHAgzYSX3TB+4qGT0d1Z1ATczUAYYUiqj7eInHxmrV4cLuRK+La7O4P8ss8NH2TPc1zzQ2o7w6KGA4" +
                         "ulLtTKcQYiifHaZKQhtuT6gvo1I7Jlgdr/Exs/5F0Q"
-        ));
+        ), true, 1111, "message");
 
     }
 
@@ -60,6 +60,21 @@ public class UsersResponseTest {
                 "1Umh/uC3oHAgzYSX3TB+4qGT0d1Z1ATczUAYYUiqj7eInHxmrV4cLuRK+La7O4P8ss8NH2TPc1zzQ2o7w6KGA4" +
                         "ulLtTKcQYiifHaZKQhtuT6gvo1I7Jlgdr/Exs/5F0Q",
                 usersResponse.getData());
+    }
+
+    @Test
+    public void testGetMessageCode() throws Exception {
+        assertEquals(new Integer(1111), usersResponse.getMessageCode());
+    }
+
+    @Test
+    public void testGetMessage() throws Exception {
+        assertEquals("message", usersResponse.getMessage());
+    }
+
+    @Test
+    public void testGetIsSuccessful() throws Exception {
+        assertTrue(usersResponse.isSuccessful());
     }
 
     @Test
@@ -98,36 +113,36 @@ public class UsersResponseTest {
 
     @Test
     public void testEqualObjectsReturnTrueForEquals() throws Exception {
-        UsersResponse left = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"));
-        UsersResponse right = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"));
+        UsersResponse left = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"), true, 1, null);
+        UsersResponse right = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"), true, 1, null);
         assertTrue(left.equals(right));
     }
 
     @Test
     public void testNotEqualObjectsReturnFalseForEquals() throws Exception {
-        UsersResponse left = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"));
-        UsersResponse right = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher2", "data"));
+        UsersResponse left = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"), true, 1, null);
+        UsersResponse right = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher2", "data"), true, 1, null);
         assertFalse(left.equals(right));
     }
 
     @Test
     public void testEqualObjectsReturnSameHashCode() throws Exception {
-        UsersResponse left = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"));
-        UsersResponse right = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"));
+        UsersResponse left = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"), true, 1, null);
+        UsersResponse right = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"), true, 1, null);
         assertEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void testNotEqualObjectsReturnDifferentHashCode() throws Exception {
-        UsersResponse left = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"));
-        UsersResponse right = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher2", "data"));
+        UsersResponse left = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"), true, 1, null);
+        UsersResponse right = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher2", "data"), true, 1, null);
         assertNotEquals(left.hashCode(), right.hashCode());
     }
 
 
     @Test
     public void testToStringContainsClassName() throws Exception {
-        UsersResponse usersResponse = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"));
+        UsersResponse usersResponse = new UsersResponse(new UsersResponse.UsersResponseResponse("cipher", "data"), true, 1, null);
         assertThat(usersResponse.toString(), containsString(UsersResponse.class.getSimpleName()));
     }
 }

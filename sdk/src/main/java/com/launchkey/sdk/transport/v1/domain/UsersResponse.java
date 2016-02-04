@@ -14,12 +14,14 @@ package com.launchkey.sdk.transport.v1.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Response data from "users" call
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UsersResponse {
 
     /**
@@ -36,6 +38,12 @@ public class UsersResponse {
             this.data = data;
         }
 
+        @JsonCreator
+        public UsersResponseResponse(String emptyData) {
+            this.cipher = null;
+            this.data = null;
+        }
+
         public final String getCipher() {
             return cipher;
         }
@@ -44,6 +52,21 @@ public class UsersResponse {
             return data;
         }
     }
+
+    /**
+     * Was the request successful
+     */
+    private final Boolean successful;
+
+    /**
+     * The message code for the request
+     */
+    private final Integer messageCode;
+
+    /**
+     * A descriptive message if there was an error
+     */
+    private final String message;
 
     /**
      * Base64 encoded RSA encrypted JSON string. Once Base64 decoded, decrypt the result with the private key of RSA
@@ -65,11 +88,23 @@ public class UsersResponse {
     /**
      *
      * @param response Intermediary transport class for parsing response from "users" call
+     * @param successful Was the request successful
+     * @param messageCode The message code for the request
+     * @param message A descriptive message if there was an error
      */
+
     @JsonCreator
-    public UsersResponse(@JsonProperty("response") UsersResponseResponse response) {
-        this.cipher = response.getCipher();
-        this.data = response.getData();
+    public UsersResponse(
+            @JsonProperty("response") UsersResponseResponse response,
+            @JsonProperty("successful") Boolean successful,
+            @JsonProperty("message_code") Integer messageCode,
+            @JsonProperty("message") String message
+    ) {
+        this.cipher = (response == null ? null : response.getCipher());
+        this.data = (response == null ? null : response.getData());
+        this.successful = successful;
+        this.messageCode = messageCode;
+        this.message = message;
     }
 
     /**
@@ -93,6 +128,31 @@ public class UsersResponse {
         return data;
     }
 
+    /**
+     * Is the response for a successful request
+     * @return
+     */
+    public Boolean isSuccessful() {
+        return successful;
+    }
+
+    /**
+     * Get the message code for the response
+     * @return
+     */
+    public Integer getMessageCode() {
+        return messageCode;
+    }
+
+    /**
+     * Get the message for the request
+     * @return
+     */
+    public String getMessage() {
+        return message;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -107,7 +167,10 @@ public class UsersResponse {
 
     @Override
     public int hashCode() {
-        int result = cipher != null ? cipher.hashCode() : 0;
+        int result = successful != null ? successful.hashCode() : 0;
+        result = 31 * result + (messageCode != null ? messageCode.hashCode() : 0);
+        result = 31 * result + (message != null ? message.hashCode() : 0);
+        result = 31 * result + (cipher != null ? cipher.hashCode() : 0);
         result = 31 * result + (data != null ? data.hashCode() : 0);
         return result;
     }
@@ -115,7 +178,10 @@ public class UsersResponse {
     @Override
     public String toString() {
         return "UsersResponse{" +
-                "cipher='" + cipher + '\'' +
+                "successful=" + successful +
+                ", messageCode=" + messageCode +
+                ", message='" + message + '\'' +
+                ", cipher='" + cipher + '\'' +
                 ", data='" + data + '\'' +
                 '}';
     }

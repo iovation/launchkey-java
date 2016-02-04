@@ -65,7 +65,7 @@ public class ApacheHttpClientTransportUsersTest {
         response = mock(HttpResponse.class);
         crypto = mock(Crypto.class);
         when(response.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, "OK"));
-        String responseBody = "{\"response\":{\"cipher\": \"expected cipher\",\"data\":\"expected data\"}}";
+        String responseBody = "{\"successful\": true, \"message\": \"Expected Message\", \"message_code\": 1234, \"response\":{\"cipher\": \"expected cipher\",\"data\":\"expected data\"}}";
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream(responseBody.getBytes("UTF-8"))).build()
         );
@@ -111,7 +111,7 @@ public class ApacheHttpClientTransportUsersTest {
     }
 
     @Test
-    public void testPostBodyhasExpectedData() throws Exception {
+    public void testPostBodyHasExpectedData() throws Exception {
         UsersRequest usersRequest = new UsersRequest("identifier", 0L, "secret key");
         String expected = objectMapper.writeValueAsString(usersRequest);
         ArgumentCaptor<HttpPost> request = ArgumentCaptor.forClass(HttpPost.class);
@@ -129,7 +129,7 @@ public class ApacheHttpClientTransportUsersTest {
     @Test
     public void testReturnsExpectedResponse() throws Exception {
         UsersResponse expected = new UsersResponse(
-                new UsersResponse.UsersResponseResponse("expected cipher", "expected data")
+                new UsersResponse.UsersResponseResponse("expected cipher", "expected data"), true, 1, null
         );
         UsersResponse actual = transport.users(new UsersRequest(null, 0L, null));
         assertEquals(expected, actual);
@@ -240,6 +240,20 @@ public class ApacheHttpClientTransportUsersTest {
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream("Unparseable".getBytes("UTF-8"))).build()
         );
+        transport.users(new UsersRequest(null, 0L, null));
+    }
+
+    @Test
+    public void testResponseIsSuccessfulFalseThrowsExpectedException() throws Exception {
+        when(response.getEntity()).thenReturn(
+                EntityBuilder.create().setStream(
+                        new ByteArrayInputStream(
+                                "{\"successful\": false, \"message_code\": 1000, \"message\": \"Expected Special Message\", \"response\": \"\"}".getBytes("UTF-8")
+                        )
+                ).build()
+        );
+        expectedException.expect(LaunchKeyException.class);
+        expectedException.expectMessage("Expected Special Message");
         transport.users(new UsersRequest(null, 0L, null));
     }
 }

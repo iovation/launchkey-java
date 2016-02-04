@@ -214,6 +214,9 @@ public class ApacheHttpClientTransport implements Transport {
             logs.setEntity(new ByteArrayEntity(data));
             HttpResponse httpResponse = client.execute(logs);
             usersResponse = getTransportObjectFromResponse(UsersResponse.class, httpResponse);
+            if (! usersResponse.isSuccessful()) {
+                throw LaunchKeyException.fromCode(usersResponse.getMessageCode(), usersResponse.getMessage());
+            }
         } catch (LaunchKeyException e) {
             log.trace("Error encountered in response from LaunchKey engine", e);
             throw e;
