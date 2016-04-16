@@ -44,7 +44,7 @@ public class V1ServiceTestBase {
     protected final Base64 base64 = new Base64(0);
     protected final ObjectMapper objectMapper = new ObjectMapper();
     protected final LaunchKeyDateFormat launchKeyDateFormat = new LaunchKeyDateFormat();
-    protected final long rocketKey = 12345674890L;
+    protected final long appKey = 12345674890L;
     protected final String secretKey = "ffd62938c9c42c471a440a44854f6b9a";
     protected Transport transport;
     protected Crypto crypto;

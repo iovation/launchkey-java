@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  * limitations under the License.
  */
 public class InvalidCallbackExceptionTest {
-    private LaunchKeyException string;
+    private ApiException string;
     private Throwable throwable;
     private InvalidCallbackException stringThrowable;
 

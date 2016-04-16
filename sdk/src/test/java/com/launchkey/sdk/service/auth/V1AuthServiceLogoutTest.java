@@ -1,9 +1,6 @@
 package com.launchkey.sdk.service.auth;
 
 import com.launchkey.sdk.transport.v1.domain.LogsRequest;
-import com.launchkey.sdk.transport.v1.domain.PollRequest;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -107,7 +104,7 @@ public class V1AuthServiceLogoutTest extends V1AuthServiceTestBase {
         service.logout("Auth Request ID");
         ArgumentCaptor<LogsRequest> argumentCaptor = ArgumentCaptor.forClass(LogsRequest.class);
         verify(transport).logs(argumentCaptor.capture());
-        assertEquals(rocketKey, argumentCaptor.getValue().getRocketKey());
+        assertEquals(appKey, argumentCaptor.getValue().getAppKey());
     }
 
     @Test

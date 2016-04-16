@@ -81,8 +81,13 @@ public class LogsRequestTest {
     }
 
     @Test
-    public void testGetRocketKey() throws Exception {
-        assertEquals(9999999999L, logsRequest.getRocketKey());
+    public void testGetAppKey() throws Exception {
+        assertEquals(9999999999L, logsRequest.getAppKey());
+    }
+
+    @Test
+    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
+        assertEquals(logsRequest.getAppKey(), logsRequest.getRocketKey());
     }
 
     @Test

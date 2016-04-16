@@ -32,13 +32,13 @@ public class LogsRequest {
     private final String authRequest;
 
     /**
-     * Rocket Key of your Rocket. This is found on the Keys tab of your Rocket details in the LaunchKey Dashboard.
+     * Application Key of your Application. This is found on the Keys tab of your Application details in the Dashboard.
      */
-    private final long rocketKey;
+    private final long appKey;
 
     /**
      * Base64 encoded secret JSON string containing these attributes:
-     * secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     * secret:   Secret Key of the Application whose key is included in the current request.
      * stamped:  LaunchKey formatted Date representing the current time of the request.
      */
     private final String secretKey;
@@ -53,15 +53,16 @@ public class LogsRequest {
      * @param status      Status of the action -- true or false as a string
      * @param authRequest The unique ID of the authentication request. This value should have been returned by a
      *                    success "auths" request.
-     * @param rocketKey   Rocket Key of your Rocket. This is found on the Keys tab of your Rocket details in the LaunchKey Dashboard.
+     * @param appKey      Application Key of your Application. This is found on the Keys tab of your Application
+     *                    details in the Dashboard.
      * @param secretKey   Base64 encoded secret JSON string containing these attributes:
-     *                    secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     *                    secret:   Secret Key of the Application whose key is included in the current request.
      *                    stamped:  LaunchKey formatted Date representing the current time of the request.
      * @param signature   Base64 encoded RSA Signature of the base64 decoded secretKey value.
      * @throws IllegalArgumentException when arguments have unacceptable values
      */
     public LogsRequest(
-            String action, boolean status, String authRequest, long rocketKey, String secretKey, String signature
+            String action, boolean status, String authRequest, long appKey, String secretKey, String signature
     ) {
         if (action == null || (!action.equals("Authenticate") && !action.equals("Revoke"))) {
             throw new IllegalArgumentException("action must be Authenticate or Revoke");
@@ -69,7 +70,7 @@ public class LogsRequest {
         this.action = action;
         this.status = status;
         this.authRequest = authRequest;
-        this.rocketKey = rocketKey;
+        this.appKey = appKey;
         this.secretKey = secretKey;
         this.signature = signature;
     }
@@ -103,17 +104,28 @@ public class LogsRequest {
     }
 
     /**
-     * Get the Rocket Key of the Rocket associate with this request
+     * Get the Application Key of the Application associated with this request
      *
-     * @return Rocket Key
+     * @return Application Key
+     * @deprecated Use {@link #getAppKey()}
      */
+    @Deprecated
     public long getRocketKey() {
-        return rocketKey;
+        return getAppKey();
+    }
+
+    /**
+     * Get the Application Key of the Application associated with this request
+     *
+     * @return Application Key
+     */
+    public long getAppKey() {
+        return appKey;
     }
 
     /**
      * Get the Base64 encoded secret JSON string containing these attributes:
-     * secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     * secret:   Secret Key of the Application whose key is included in the current request.
      * stamped:  LaunchKey formatted Date representing the current time of the request.
      *
      * @return Base64 encoded secret JSON string
@@ -138,7 +150,7 @@ public class LogsRequest {
         LogsRequest that = (LogsRequest) o;
 
         if (status != that.status) return false;
-        if (rocketKey != that.rocketKey) return false;
+        if (appKey != that.appKey) return false;
         if (action != null ? !action.equals(that.action) : that.action != null) return false;
         if (authRequest != null ? !authRequest.equals(that.authRequest) : that.authRequest != null) return false;
         if (secretKey != null ? !secretKey.equals(that.secretKey) : that.secretKey != null) return false;
@@ -150,7 +162,7 @@ public class LogsRequest {
         int result = action != null ? action.hashCode() : 0;
         result = 31 * result + (status ? 1 : 0);
         result = 31 * result + (authRequest != null ? authRequest.hashCode() : 0);
-        result = 31 * result + (int) (rocketKey ^ (rocketKey >>> 32));
+        result = 31 * result + (int) (appKey ^ (appKey >>> 32));
         result = 31 * result + (secretKey != null ? secretKey.hashCode() : 0);
         result = 31 * result + (signature != null ? signature.hashCode() : 0);
         return result;
@@ -162,7 +174,7 @@ public class LogsRequest {
                 "action='" + action + '\'' +
                 ", status='" + status + '\'' +
                 ", authRequest='" + authRequest + '\'' +
-                ", rocketKey=" + rocketKey +
+                ", appKey=" + appKey +
                 ", secretKey='" + secretKey + '\'' +
                 ", signature='" + signature + '\'' +
                 '}';

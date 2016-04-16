@@ -4,7 +4,7 @@ import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.CommunicationErrorException;
 import com.launchkey.sdk.service.error.InvalidRequestException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.domain.AuthsRequest;
 import com.launchkey.sdk.transport.v1.domain.AuthsResponse;
 import org.apache.http.HttpResponse;
@@ -13,7 +13,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicStatusLine;
 import org.junit.After;
@@ -24,7 +23,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 import java.io.*;
-import java.util.Date;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -77,7 +75,7 @@ public class ApacheHttpClientTransportAuthsTest {
     @Test
     public void testAuthsExecutesPost() throws Exception {
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
         verify(httpClient).execute(request.capture());
         assertThat(request.getValue().getMethod(), is("POST"));
     }
@@ -86,7 +84,7 @@ public class ApacheHttpClientTransportAuthsTest {
     public void testAuthsUsesCorrectURL() throws Exception {
         transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
         verify(httpClient).execute(request.capture());
         assertThat(request.getValue().getURI().getPath(), is("/v1/auths"));
     }
@@ -94,7 +92,7 @@ public class ApacheHttpClientTransportAuthsTest {
     @Test
     public void testAuthsPassesUsername() throws Exception {
         ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
-        transport.auths(new AuthsRequest("expected_username", 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest("expected_username", 0L, null, null, 0, 0, null));
         verify(httpClient).execute(request.capture());
         assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString("username=expected_username"));
     }
@@ -102,7 +100,7 @@ public class ApacheHttpClientTransportAuthsTest {
     @Test
     public void testAuthsPassesRocketKey() throws Exception {
         ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
-        transport.auths(new AuthsRequest(null, 1234567890L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 1234567890L, null, null, 0, 0, null));
         verify(httpClient).execute(request.capture());
         assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString("app_key=1234567890"));
     }
@@ -110,7 +108,7 @@ public class ApacheHttpClientTransportAuthsTest {
     @Test
     public void testAuthsPassesSecretKey() throws Exception {
         ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
-        transport.auths(new AuthsRequest(null, 0L, "SecretKey==", null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, "SecretKey==", null, 0, 0, null));
         verify(httpClient).execute(request.capture());
         assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString("secret_key=SecretKey%3D%3D"));
     }
@@ -118,7 +116,7 @@ public class ApacheHttpClientTransportAuthsTest {
     @Test
     public void testAuthsPassesSignature() throws Exception {
         ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
-        transport.auths(new AuthsRequest(null, 0L, null, "Signature==", 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, "Signature==", 0, 0, null));
         verify(httpClient).execute(request.capture());
         assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString("signature=Signature%3D%3D"));
     }
@@ -126,7 +124,7 @@ public class ApacheHttpClientTransportAuthsTest {
     @Test
     public void testAuthsPassesSession() throws Exception {
         ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
-        transport.auths(new AuthsRequest(null, 0L, null, null, 1, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 1, 0, null));
         verify(httpClient).execute(request.capture());
         assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString("session=1"));
     }
@@ -134,27 +132,51 @@ public class ApacheHttpClientTransportAuthsTest {
     @Test
     public void testAuthsPassesUserPushId() throws Exception {
         ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 1));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 1, null));
         verify(httpClient).execute(request.capture());
         assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString("user_push_id=1"));
     }
 
     @Test
+    public void testAuthsDoesNotPassContextWhenNull() throws Exception {
+        ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
+        verify(httpClient).execute(request.capture());
+        assertThat(getStringFromReader(request.getValue().getEntity().getContent()), not(containsString("context=")));
+    }
+
+    @Test
+    public void testAuthsDoesNotPassContextWhenEmpty() throws Exception {
+        ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, ""));
+        verify(httpClient).execute(request.capture());
+        assertThat(getStringFromReader(request.getValue().getEntity().getContent()), not(containsString("context=")));
+    }
+
+    @Test
+    public void testAuthsPassedContextWhenNotNull() throws Exception {
+        ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, "expected_context"));
+        verify(httpClient).execute(request.capture());
+        assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString("context=expected_context"));
+    }
+
+    @Test
     public void testAuthsReturnsExpectedResponse() throws Exception {
         AuthsResponse expected = new AuthsResponse("Expected auth_request");
-        AuthsResponse actual = transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        AuthsResponse actual = transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
         assertEquals(expected, actual);
     }
 
     @Test
     public void testAuthsWrapsClientExceptionInLaunchKeyException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception caught processing auths request");
         expectedException.expectCause(is(expectedCause));
 
         when(httpClient.execute(any(HttpUriRequest.class))).thenThrow(expectedCause);
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     @Test
@@ -165,7 +187,7 @@ public class ApacheHttpClientTransportAuthsTest {
 
         expectedException.expect(InvalidResponseException.class);
         expectedException.expectMessage("Error parsing response body");
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     @Test
@@ -176,7 +198,7 @@ public class ApacheHttpClientTransportAuthsTest {
         when(response.getStatusLine()).thenReturn(
                 new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 100, "Expected Message")
         );
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     @Test
@@ -187,18 +209,18 @@ public class ApacheHttpClientTransportAuthsTest {
         when(response.getStatusLine()).thenReturn(
                 new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 300, "Expected Message")
         );
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     @Test
     public void testResponseStatusCodeOf401ThrowsExpectedException() throws Exception {
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Expected Message");
 
         when(response.getStatusLine()).thenReturn(
                 new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 401, "Expected Message")
         );
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     @Test
@@ -209,7 +231,7 @@ public class ApacheHttpClientTransportAuthsTest {
         when(response.getStatusLine()).thenReturn(
                 new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 500, "Expected Message")
         );
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     @Test
@@ -226,7 +248,7 @@ public class ApacheHttpClientTransportAuthsTest {
         );
         expectedException.expect(InvalidRequestException.class);
         expectedException.expectMessage("Expected Message");
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     @Test
@@ -240,7 +262,7 @@ public class ApacheHttpClientTransportAuthsTest {
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream("Unparseable".getBytes("UTF-8"))).build()
         );
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     @Test
@@ -251,7 +273,7 @@ public class ApacheHttpClientTransportAuthsTest {
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream("Unparseable".getBytes("UTF-8"))).build()
         );
-        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0));
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
     }
 
     private String getStringFromReader(InputStream content) throws Exception {

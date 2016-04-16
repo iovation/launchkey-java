@@ -1,9 +1,5 @@
 package com.launchkey.example.springmvc;
 
-import com.launchkey.sdk.LaunchKeyClient;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,10 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-
-import javax.naming.ConfigurationException;
-import java.io.BufferedReader;
-import java.io.FileReader;
 
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
@@ -47,6 +39,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth, AuthManager authManager, LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         this.logoutSuccessHandler = logoutSuccessHandler;
-        auth.authenticationProvider(new LaunchKeyAuthenticationProvider(authManager));
+        auth.authenticationProvider(new MultiFactorAuthenticationProvider(authManager));
     }
 }

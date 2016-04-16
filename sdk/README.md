@@ -21,15 +21,15 @@
 
 Utilization of the LaunchKey SDK requires the following items:
 
- * LaunchKey Account - The [LaunchKey Mobile App](https://launchkey.com/app) is required to set up a new account and
- access the LaunchKey Dashboard.
+ * Account - The mobile authenticator is required to set up a new account and
+ access the Dashboard.
  
-## LaunchKey Rocket
+## Application
 
- * A new Rocket can be created in the [LaunchKey Dashboard](https://dashboard.launchkey.com/).
-   From the Rocket, you will need the following items found in the keys section of the rocket details:
+ * A new Application can be created in the Dashboard.
+   From the Application, you will need the following items found in the keys section of the Application details:
 
-    * The rocket key
+    * The application key
     * The secret key
     * The private key
     
@@ -143,7 +143,7 @@ __Due to the number of dependencies required by the LaunchKey SDK, it would be b
 ### <a name="create-client-simple"></a>Simple
 
 A LaunchKey client can be created with default settings by simply passing the following to the `factory` method:
-* Rocket Key
+* Application Key
 * Secret Key
 * Private Key PEM string
 * Cryptography Provider
@@ -151,7 +151,7 @@ A LaunchKey client can be created with default settings by simply passing the fo
 Here is an example using the BouncyCastle provider:
   
 ```java
-long rocketKey = 1234567890;
+long appKey = 1234567890;
 String secretKey = "xbv739jxzx63xrexdtrkcdkpksotctewk"
 String privateKey = "-----BEGIN RSA PRIVATE KEY-----\n"+
         "MIIBOwIBAAJBALEihtCuDrAp35QpaUZ+ycfsdsCGRQGUz8nbkNwP2XsCZPqamj2A\n"+
@@ -163,7 +163,7 @@ String privateKey = "-----BEGIN RSA PRIVATE KEY-----\n"+
         "UHCrSnIR6lx7FksBbVZdvqNZViJL1kVVLNXa9JgHiw==\n"+
         "-----END RSA PRIVATE KEY-----\n";
 Provider provider = new BouncyCastleProvider();
-LaunchKeyClient client = LaunchKeyClient.factory(rocketKey, secretKey, privateKey, provider);
+LaunchKeyClient client = LaunchKeyClient.factory(appKey, secretKey, privateKey, provider);
 ```
 
 ### <a name="create-client-advanced"></a>Advanced
@@ -172,7 +172,7 @@ The `Config` object can be used to fine tune a litany of options related to the 
 LaunchKey Engine. Here is an example:
 
 ```java
-long rocketKey = 1234567890;
+long appKey = 1234567890;
 String secretKey = "xbv739jxzx63xrexdtrkcdkpksotctewk"
 String privateKey = "-----BEGIN RSA PRIVATE KEY-----\n"+
         "MIIBOwIBAAJBALEihtCuDrAp35QpaUZ+ycfsdsCGRQGUz8nbkNwP2XsCZPqamj2A\n"+
@@ -264,7 +264,7 @@ catch(LaunchKeyException e) {
 ### <a name="use-sdk-sse"></a>Process Server Sent Events
 
 Server Sent Events (SSE) allow your application to reduce its load by not requiring polling of the LaunchKey Engine API
-with the SDK.  You must create an endpoint to receive the SSE request and update your Rocket configuration accordingly.
+with the SDK.  You must create an endpoint to receive the SSE request and update your Application configuration accordingly.
 Here is a link to the setup instructions: [LaunchKey Docs](https://docs.launchkey.com/developer/api/callbacks/).
 
 Server sent events are HTTP POST requests.  Collect the query parameters from the callback endpoint and place them

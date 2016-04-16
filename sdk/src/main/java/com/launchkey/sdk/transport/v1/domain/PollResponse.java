@@ -23,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PollResponse {
     /**
      *  Base64 encoded RSA encrypted JSON string. Once Base64 decoded, decrypt the result with the private key of RSA
-     *  public/private key pair associated with the Rocket whose Rocket Key was included in the request. The resulting
-     *  JSON will have the following attributes:
+     *  public/private key pair associated with the Application whose Application Key was included in the request. The
+     *  resulting JSON will have the following attributes:
      *      response:        The users response to the authorization request. true if approved and false if denied
      *      app_pins:           (optional) Up to 5 response tokens used for user validation. The functionality has been
      *                          deprecated and will be removed in future releases of the API
@@ -40,15 +40,15 @@ public class PollResponse {
     private final String userHash;
 
     /**
-     * Optional - A string that uniquely identifies the user across the entire Organization to which the Rocket whose
-     * Rocket Key was included in the request belongs. This will be returned if, and only if, the Rocket belongs to an
+     * Optional - A string that uniquely identifies the user across the entire Organization to which the Application whose
+     * Application Key was included in the request belongs. This will be returned if, and only if, the Application belongs to an
      * Organization.
      */
     private final String organizationUser;
 
     /**
      * Optional - A value uniquely and permanently identifying the User associated with the auth_request within
-     * the Rocket whose Rocket Key was included in the request belongs. This value may be used in place of a username
+     * the Application whose Application Key was included in the request belongs. This value may be used in place of a username
      * or White Label User identifier for authorization requests. This will be returned if, and only if, the
      * originating request passed a form control with the name user_push_id and a value of 1.
      */
@@ -56,7 +56,7 @@ public class PollResponse {
 
     /**
      * @param auth Base64 encoded RSA encrypted JSON string. Once Base64 decoded, decrypt the result with the private
-     *             key of RSA public/private key pair associated with the Rocket whose Rocket Key was included in the
+     *             key of RSA public/private key pair associated with the Application whose Application Key was included in the
      *             request. The resulting JSON will have the following attributes:
      *                  response:      The users response to the authorization request. true if approved and false
      *                                     if denied
@@ -67,10 +67,10 @@ public class PollResponse {
      * @param userHash Hashed user identifier to track a specific user across applications. This value will be used by
      *                 the Remote De-Orbit Event to identify the de-orbiting user.
      * @param organizationUser A string that uniquely identifies the user across the entire Organization to which the
-     *                         Rocket whose Rocket Key was included in the request belongs. This will be returned if,
-     *                         and only if, the Rocket belongs to an Organization.
+     *                         Application whose Application Key was included in the request belongs. This will be returned if,
+     *                         and only if, the Application belongs to an Organization.
      * @param userPushId A value uniquely and permanently identifying the User associated with the auth_request within
-     *                   the Rocket whose Rocket Key was included in the request belongs. This value may be used in
+     *                   the Application whose Application Key was included in the request belongs. This value may be used in
      *                   place of a username or White Label User identifier for authorization requests. This will be
      *                   returned if, and only if, the originating request passed a form control with the name
      *                   user_push_id and a value of 1.
@@ -89,7 +89,7 @@ public class PollResponse {
 
     /**
      * @return Base64 encoded RSA encrypted JSON string. Once Base64 decoded, decrypt the result with the private
-     * key of RSA public/private key pair associated with the Rocket whose Rocket Key was included in the
+     * key of RSA public/private key pair associated with the Application whose Application Key was included in the
      * request. The resulting JSON will have the following attributes:
      * response:      The users response to the authorization request. true if approved and false if denied
      * app_pins:      (optional) Up to 5 response tokens used for user validation. The functionality
@@ -110,8 +110,8 @@ public class PollResponse {
     }
 
     /**
-     * @return Optional - A string that uniquely identifies the user across the entire Organization to which the Rocket
-     * whose Rocket Key was included in the request belongs. This will be returned if, and only if, the Rocket belongs
+     * @return Optional - A string that uniquely identifies the user across the entire Organization to which the Application
+     * whose Application Key was included in the request belongs. This will be returned if, and only if, the Application belongs
      * to an Organization.  Will return null if not supplied.
      */
     public String getOrganizationUser() {
@@ -120,7 +120,7 @@ public class PollResponse {
 
     /**
      * @return Optional - A value uniquely and permanently identifying the User associated with the auth_request within
-     * the Rocket whose Rocket Key was included in the request belongs. This value may be used in place of a username
+     * the Application whose Application Key was included in the request belongs. This value may be used in place of a username
      * or White Label User identifier for authorization requests. This will be returned if, and only if, the
      * originating request passed a form control with the name user_push_id and a value of 1.  Will return null if not
      * supplied.

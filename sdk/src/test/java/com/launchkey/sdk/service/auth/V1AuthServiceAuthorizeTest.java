@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@SuppressWarnings("Duplicates")
 public class V1AuthServiceAuthorizeTest extends V1AuthServiceTestBase{
 
     protected final AuthsResponse authsResponse = new AuthsResponse("auth request");
@@ -68,7 +69,7 @@ public class V1AuthServiceAuthorizeTest extends V1AuthServiceTestBase{
         service.authorize("username");
         ArgumentCaptor<AuthsRequest> argumentCaptor = ArgumentCaptor.forClass(AuthsRequest.class);
         verify(transport).auths(argumentCaptor.capture());
-        assertEquals(rocketKey, argumentCaptor.getValue().getRocketKey());
+        assertEquals(appKey, argumentCaptor.getValue().getAppKey());
     }
 
     @Test
@@ -128,5 +129,29 @@ public class V1AuthServiceAuthorizeTest extends V1AuthServiceTestBase{
         ArgumentCaptor<AuthsRequest> argumentCaptor = ArgumentCaptor.forClass(AuthsRequest.class);
         verify(transport).auths(argumentCaptor.capture());
         assertEquals(1, argumentCaptor.getValue().getUserPushID());
+    }
+
+    @Test
+    public void testPassesContextInAuthsRequest() throws Exception {
+        String expected = "Expected Context";
+        service.authorize("username", "Expected Context");
+        ArgumentCaptor<AuthsRequest> argumentCaptor = ArgumentCaptor.forClass(AuthsRequest.class);
+        verify(transport).auths(argumentCaptor.capture());
+        assertEquals(expected, argumentCaptor.getValue().getContext());
+    }
+
+    @Test
+    public void testPassesContextWithNoExceptionWhenContextIs400Chars() throws Exception {
+        String expected = (new String(new char[400])).replace("\0", "x");
+        service.authorize("username", expected);
+        ArgumentCaptor<AuthsRequest> argumentCaptor = ArgumentCaptor.forClass(AuthsRequest.class);
+        verify(transport).auths(argumentCaptor.capture());
+        assertEquals(expected, argumentCaptor.getValue().getContext());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRaisesIllegalArgumentExceptionWhenContextGreaterThan400Chars() throws Exception {
+        String expected = (new String(new char[401])).replace("\0", "x");
+        service.authorize("username", expected);
     }
 }

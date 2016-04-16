@@ -10,12 +10,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
 import java.security.Provider;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
@@ -61,153 +63,64 @@ public class LaunchKeyClientTest {
     private WhiteLabelService whiteLabel;
     private AuthService auth;
     private Provider provider;
-    private LaunchKeyClient client;
+    private Client client;
+    private Client targetClient;
 
     @Before
     public void setUp() throws Exception {
         provider = new BouncyCastleProvider();
         auth = mock(AuthService.class);
         whiteLabel = mock(WhiteLabelService.class);
-        client = new LaunchKeyClient(auth, whiteLabel);
+        targetClient = mock(Client.class);
     }
 
     @After
     public void tearDown() throws Exception {
-        client = null;
+        targetClient = null;
         auth = null;
         whiteLabel = null;
         provider = null;
     }
 
     @Test
-    public void testAuth() throws Exception {
+    public void testServicesConstructorAuth() throws Exception {
+        client = new LaunchKeyClient(auth, whiteLabel);
         assertSame(auth, client.auth());
     }
 
     @Test
-    public void testWhiteLabel() throws Exception {
+    public void testServicesConstructorWhiteLabel() throws Exception {
+        client = new LaunchKeyClient(auth, whiteLabel);
         assertSame(whiteLabel, client.whiteLabel());
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFactoryLongStringStringProviderThrowsIllegalArgumentExceptionForNullSecretKey() throws Exception {
-        LaunchKeyClient.factory(12345, null, PRIVATE_KEY, provider);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFactoryLongStringStringProviderThrowsIllegalArgumentExceptionForInvalidPrivateKey() throws Exception {
-        LaunchKeyClient.factory(12345, "secret key", "Invalid private key", provider);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFactoryLongStringStringProviderThrowsIllegalArgumentExceptionForNullProvider() throws Exception {
-        LaunchKeyClient.factory(12345, "secret key", PRIVATE_KEY, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFactoryLongStringStringProviderReturnsLaunchKeyClient() throws Exception {
-        LaunchKeyClient actual = LaunchKeyClient.factory(12345, "secret key", PRIVATE_KEY, null);
-        assertNotNull(actual);
+    @Test
+    public void testClientConstructorAuth() throws Exception {
+        when(this.targetClient.auth()).thenReturn(this.auth);
+        client = new LaunchKeyClient(targetClient);
+        AuthService actual = client.auth();
+        verify(targetClient).auth();
+        assertSame(this.auth, actual);
     }
 
     @Test
-    public void testFactoryConfigReturnsClient() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setRSAPrivateKeyPEM(PRIVATE_KEY)
-                .setJCEProvider(provider);
-        assertNotNull(LaunchKeyClient.factory(config));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFactoryConfigThrowsIllegalArgumentExceptionForNullSecretKey() throws Exception {
-        Config config = new Config(12345, null)
-                .setRSAPrivateKeyPEM(PRIVATE_KEY)
-                .setJCEProvider(provider);
-        LaunchKeyClient.factory(config);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFactoryConfigThrowsIllegalArgumentExceptionForNoPrivateKeyOrPEM() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setJCEProvider(provider);
-        LaunchKeyClient.factory(config);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFactoryConfigThrowsIllegalArgumentExceptionForNoProvider() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setRSAPrivateKeyPEM(PRIVATE_KEY);
-        LaunchKeyClient.factory(config);
+    public void testClientConstructorWhiteLabel() throws Exception {
+        when(this.targetClient.whiteLabel()).thenReturn(this.whiteLabel);
+        client = new LaunchKeyClient(targetClient);
+        WhiteLabelService actual = client.whiteLabel();
+        verify(targetClient).whiteLabel();
+        assertSame(this.whiteLabel, actual);
     }
 
     @Test
-    public void testFactoryConfigAllowsCryptoInsteadOfProviderAndPPrivateKeyOrPEM() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setCrypto(mock(Crypto.class));
+    public void testFactoryConfig() throws Exception {
+        Config config = mock(Config.class);
+        when(config.getCrypto()).thenReturn(mock(Crypto.class));
+        when(config.getHttpMaxClients()).thenReturn(null);
         assertNotNull(LaunchKeyClient.factory(config));
     }
 
     @Test
-    public void testFactoryConfigAllowsPrivateKeyInsteadOfPEM() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setPrivateKey(JCECrypto.getRSAPrivateKeyFromPEM(provider, PRIVATE_KEY))
-                .setJCEProvider(provider);
-        assertNotNull(LaunchKeyClient.factory(config));
-    }
-
-    @Test
-    public void testFactoryConfigAllowsProvidingApacheHttpClient() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setCrypto(mock(Crypto.class))
-                .setApacheHttpClient(mock(HttpClient.class));
-        assertNotNull(LaunchKeyClient.factory(config));
-    }
-
-    @Test
-    public void testFactoryConfigAllowsProvidingApiBaseUrl() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setCrypto(mock(Crypto.class))
-                .setAPIBaseURL("https://api.launchkey.com/xxx");
-        assertNotNull(LaunchKeyClient.factory(config));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFactoryConfigThrowsIllegalArgumentExceptionForInvalidApiBaseUrl() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setCrypto(mock(Crypto.class))
-                .setAPIBaseURL("Invalid URI");
-        assertNotNull(LaunchKeyClient.factory(config));
-    }
-
-    @Test
-    public void testFactoryConfigAllowsProvidingPingResponseCache() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setCrypto(mock(Crypto.class))
-                .setPingResponseCache(mock(PingResponseCache.class));
-        assertNotNull(LaunchKeyClient.factory(config));
-    }
-
-    @Test
-    public void testFactoryConfigAllowsProvidingPingResponseCacheTTL() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setCrypto(mock(Crypto.class))
-                .setPingResponseCacheTTL(30);
-        assertNotNull(LaunchKeyClient.factory(config));
-    }
-
-    @Test
-    public void testFactoryConfigAllowsProvidingHttpClientConnectionTTLSecs() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setCrypto(mock(Crypto.class))
-                .setHttpClientConnectionTTLSecs(30);
-        assertNotNull(LaunchKeyClient.factory(config));
-    }
-
-    @Test
-    public void testFactoryConfigAllowsProvidingHttpMaxClients() throws Exception {
-        Config config = new Config(12345, "secret key")
-                .setCrypto(mock(Crypto.class))
-                .setHttpMaxClients(30);
-        assertNotNull(LaunchKeyClient.factory(config));
+    public void testFactoryValues() throws Exception {
+        assertNotNull(LaunchKeyClient.factory(123L, "secret key", PRIVATE_KEY, this.provider));
     }
 }

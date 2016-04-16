@@ -12,9 +12,6 @@
 
 package com.launchkey.sdk.transport.v1.domain;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
  * Data for an "auths" request
  */
@@ -26,13 +23,13 @@ public class AuthsRequest {
     private final String username;
 
     /**
-     * Rocket Key of your Rocket. This is found on the Keys tab of your Rocket details in the LaunchKey Dashboard.
+     * Application Key of your Application. This is found on the Keys tab of your Application details in the Dashboard.
      */
-    private final long rocketKey;
+    private final long appKey;
 
     /**
      * Base64 encoded secret JSON string containing these attributes:
-     *      secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     *      secret:   Secret Key of the Application whose key is included in the current request.
      *      stamped:  LaunchKey formatted Date representing the current time of the request.
      */
     private final String secretKey;
@@ -53,18 +50,44 @@ public class AuthsRequest {
     private final int userPushID;
 
     /**
+     * Arbitrary string of data up to 400 characters to be presented to the user during authorization to
+     * provide context regarding the individual request
+     */
+    private final String context;
+
+    /**
+     * @deprecated Use {@link AuthsRequest#AuthsRequest(String, long, String, String, int, int, String)}
      * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
-     * @param rocketKey Rocket Key of your Rocket. This is found on the Keys tab of your Rocket details in the LaunchKey Dashboard.
+     * @param appKey Application Key of your Application. This is found on the Keys tab of your Application details
+     *                  in the LaunchKey Dashboard.
      * @param secretKey Base64 encoded secret JSON string containing these attributes:
-     *                      secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     *                      secret:   Secret Key of the Application whose key is included in the current request.
      *                      stamped:  LaunchKey formatted Date representing the current time of the request.
      * @param signature Base64 encoded RSA Signature of the base64 decoded secretKey value.
      * @param session Should this authentication request be designated as a session. Set the value to 1 for yes and 0 for no.
      * @param userPushID Request a User Push ID be returned in the AuthsResponse by setting this value to 1.
      */
-    public AuthsRequest(String username, long rocketKey, String secretKey, String signature, int session, int userPushID) {
+    @Deprecated
+    public AuthsRequest(String username, long appKey, String secretKey, String signature, int session, int userPushID) {
+        this(username, appKey, secretKey, signature, session, userPushID, null);
+    }
+
+    /**
+     * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
+     * @param appKey Application Key of your Application. This is found on the Keys tab of your Application details
+     *                  in the LaunchKey Dashboard.
+     * @param secretKey Base64 encoded secret JSON string containing these attributes:
+     *                      secret:   Secret Key of the Application whose key is included in the current request.
+     *                      stamped:  LaunchKey formatted Date representing the current time of the request.
+     * @param signature Base64 encoded RSA Signature of the base64 decoded secretKey value.
+     * @param session Should this authentication request be designated as a session. Set the value to 1 for yes and 0 for no.
+     * @param userPushID Request a User Push ID be returned in the AuthsResponse by setting this value to 1.
+     * @param context  Arbitrary string of data up to 400 characters to be presented to the user during authorization to
+     *                 provide context regarding the individual request
+     */
+    public AuthsRequest(String username, long appKey, String secretKey, String signature, int session, int userPushID, String context) {
         this.username = username;
-        this.rocketKey = rocketKey;
+        this.appKey = appKey;
         this.secretKey = secretKey;
         this.signature = signature;
         if (session != 0 && session != 1) {
@@ -75,6 +98,7 @@ public class AuthsRequest {
             throw new IllegalArgumentException("userPushID must be 0 or 1");
         }
         this.userPushID = userPushID;
+        this.context = context;
     }
 
     /**
@@ -86,16 +110,26 @@ public class AuthsRequest {
     }
 
     /**
-     * Get the Rocket Key of the Rocket associate with this request
-     * @return Rocket Key
+     * Get the Application Key of the Application associate with this request
+     * @return Application Key
+     * @deprecated Use {@link #getAppKey()}
      */
+    @Deprecated
     public long getRocketKey() {
-        return rocketKey;
+        return getAppKey();
+    }
+
+    /**
+     * Get the Application Key of the Application associate with this request
+     * @return Application Key
+     */
+    public long getAppKey() {
+        return appKey;
     }
 
     /**
      * Get the Base64 encoded secret JSON string containing these attributes:
-     *      secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     *      secret:   Secret Key of the Application whose key is included in the current request.
      *      stamped:  LaunchKey formatted Date representing the current time of the request.
      * @return Base64 encoded secret JSON string
      */
@@ -127,15 +161,25 @@ public class AuthsRequest {
         return userPushID;
     }
 
+    /**
+     * Get the request context
+     * @return Arbitrary string of data up to 400 characters to be presented to the user during authorization to
+     * provide context regarding the individual request
+     */
+    public String getContext() {
+        return context;
+    }
+
     @Override
     public String toString() {
         return "AuthsRequest{" +
                 "username='" + username + '\'' +
-                ", rocketKey=" + rocketKey +
+                ", appKey=" + appKey +
                 ", secretKey='" + secretKey + '\'' +
                 ", signature='" + signature + '\'' +
                 ", session=" + session +
                 ", userPushID=" + userPushID +
+                ", context=" + context +
                 '}';
     }
 
@@ -146,21 +190,23 @@ public class AuthsRequest {
 
         AuthsRequest that = (AuthsRequest) o;
 
-        if (rocketKey != that.rocketKey) return false;
+        if (appKey != that.appKey) return false;
         if (session != that.session) return false;
         if (userPushID != that.userPushID) return false;
         if (username != null ? !username.equals(that.username) : that.username != null) return false;
         if (secretKey != null ? !secretKey.equals(that.secretKey) : that.secretKey != null) return false;
-        return !(signature != null ? !signature.equals(that.signature) : that.signature != null);
+        if (signature != null ? !signature.equals(that.signature) : that.signature != null) return false;
+        return !(context != null ? !context.equals(that.context) : that.context != null);
 
     }
 
     @Override
     public int hashCode() {
         int result = username != null ? username.hashCode() : 0;
-        result = 31 * result + (int) (rocketKey ^ (rocketKey >>> 32));
+        result = 31 * result + (int) (appKey ^ (appKey >>> 32));
         result = 31 * result + (secretKey != null ? secretKey.hashCode() : 0);
         result = 31 * result + (signature != null ? signature.hashCode() : 0);
+        result = 31 * result + (context != null ? context.hashCode() : 0);
         result = 31 * result + session;
         result = 31 * result + userPushID;
         return result;

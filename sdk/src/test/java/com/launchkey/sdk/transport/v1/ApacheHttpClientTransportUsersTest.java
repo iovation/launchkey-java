@@ -5,9 +5,7 @@ import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.CommunicationErrorException;
 import com.launchkey.sdk.service.error.InvalidRequestException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
-import com.launchkey.sdk.transport.v1.domain.PollRequest;
-import com.launchkey.sdk.transport.v1.domain.PollResponse;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.domain.UsersRequest;
 import com.launchkey.sdk.transport.v1.domain.UsersResponse;
 import org.apache.commons.codec.binary.Base64;
@@ -29,9 +27,7 @@ import org.mockito.ArgumentCaptor;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -138,7 +134,7 @@ public class ApacheHttpClientTransportUsersTest {
     @Test
     public void testWrapsClientExceptionInLaunchKeyException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception processing users request");
         expectedException.expectCause(is(expectedCause));
 
@@ -181,7 +177,7 @@ public class ApacheHttpClientTransportUsersTest {
 
     @Test
     public void testResponseStatusCodeOf401ThrowsExpectedException() throws Exception {
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Expected Message");
 
         when(response.getStatusLine()).thenReturn(
@@ -252,7 +248,7 @@ public class ApacheHttpClientTransportUsersTest {
                         )
                 ).build()
         );
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Expected Special Message");
         transport.users(new UsersRequest(null, 0L, null));
     }

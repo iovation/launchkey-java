@@ -4,7 +4,7 @@ import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.CommunicationErrorException;
 import com.launchkey.sdk.service.error.InvalidRequestException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.domain.PingRequest;
 import com.launchkey.sdk.transport.v1.domain.PingResponse;
 import org.apache.http.HttpResponse;
@@ -117,7 +117,7 @@ public class ApacheHttpClientTransportPingTest {
     @Test
     public void testPingWrapsClientExceptionInLaunchKeyException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception caught processing ping request");
         expectedException.expectCause(is(expectedCause));
 
@@ -160,7 +160,7 @@ public class ApacheHttpClientTransportPingTest {
 
     @Test
     public void testResponseStatusCodeOf401ThrowsExpectedException() throws Exception {
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Expected Message");
 
         when(response.getStatusLine()).thenReturn(

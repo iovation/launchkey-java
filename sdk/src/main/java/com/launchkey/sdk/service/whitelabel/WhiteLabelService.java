@@ -12,7 +12,7 @@
 
 package com.launchkey.sdk.service.whitelabel;
 
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 
 public interface WhiteLabelService {
     /**
@@ -25,7 +25,7 @@ public interface WhiteLabelService {
      *
      * @return {@link PairResponse} object containing information for pairing a device with a user.
      *
-     * @throws LaunchKeyException when an error occurs pairing the user
+     * @throws ApiException when an error occurs pairing the user
      */
-    PairResponse pairUser(String identifier) throws LaunchKeyException;
+    PairResponse pairUser(String identifier) throws ApiException;
 }

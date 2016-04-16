@@ -52,7 +52,7 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
 
         when(crypto.decryptAES(any(byte[].class), any(byte[].class), any(byte[].class)))
                 .thenReturn(decryptedUsersResponse.getBytes());
-        service = new V1WhiteLabelService(transport, crypto, pingResponseCache, rocketKey, secretKey);
+        service = new V1WhiteLabelService(transport, crypto, pingResponseCache, appKey, secretKey);
     }
 
     @After
@@ -99,7 +99,7 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
         service.pairUser("identifier");
         ArgumentCaptor<UsersRequest> argumentCaptor = ArgumentCaptor.forClass(UsersRequest.class);
         verify(transport).users(argumentCaptor.capture());
-        assertEquals(rocketKey, argumentCaptor.getValue().getRocketKey());
+        assertEquals(appKey, argumentCaptor.getValue().getAppKey());
     }
 
     @Test

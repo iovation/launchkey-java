@@ -12,9 +12,10 @@
 
 package com.launchkey.example.springmvc;
 
-import com.launchkey.sdk.LaunchKeyClient;
+import com.launchkey.sdk.BasicClient;
+import com.launchkey.sdk.Client;
 import com.launchkey.sdk.service.auth.*;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,25 +39,25 @@ public class AuthManager {
     private final Map<String, List<String>> userHashSessionMap;
 
     @Autowired
-    public AuthManager(LaunchKeyConfig config) throws ConfigurationException, IOException {
-        final Long rocketKey = config.getRocketKey();
+    public AuthManager(PlatformSdkConfig config) throws ConfigurationException, IOException {
+        final Long appKey = config.getAppKey();
         final String secretKey = config.getSecretKey();
         final String privateKeyLocation = config.getPrivateKeyLocation();
 
         boolean halt = false;
-        if (rocketKey == null) {
-            log.error("launchkey.rocket-key property not provided");
+        if (appKey == null) {
+            log.error("mfa.app-key property not provided");
             halt = true;
         }
         if (secretKey == null) {
-            log.error("launchkey.secret-key property not provided");
+            log.error("mfa.secret-key property not provided");
             halt = true;
         }
         if (privateKeyLocation == null) {
-            log.error("launchkey.private-key-location property not provided");
+            log.error("mfa.private-key-location property not provided");
             halt = true;
         }
-        if (halt) throw new ConfigurationException("Missing required LaunchKey configuration");
+        if (halt) throw new ConfigurationException("Missing required mfa configuration");
 
         BufferedReader br = new BufferedReader(new FileReader(privateKeyLocation));
         StringBuilder sb = new StringBuilder();
@@ -72,26 +73,26 @@ public class AuthManager {
             br.close();
         }
         String privateKey = sb.toString();
-        LaunchKeyClient launchKeyClient = LaunchKeyClient.factory(
-                rocketKey,
+        Client client = BasicClient.factory(
+                appKey,
                 secretKey,
                 privateKey,
                 new BouncyCastleProvider()
         );
-        this.authService = launchKeyClient.auth();
+        this.authService = client.auth();
         this.sessionAuthenticationMap = Collections.synchronizedMap(new HashMap<String, Boolean>());
         this.sessionAuthRequestMap = new ConcurrentHashMap<String, String>();
         this.userHashSessionMap = new ConcurrentHashMap<String, List<String>>();
     }
 
-    public void login(String username) throws AuthException {
+    public void login(String username, String context) throws AuthException {
         try {
-            String authRequestId = this.authService.login(username);
+            String authRequestId = this.authService.login(username, context);
             String sessionId = getSessionId();
             sessionAuthRequestMap.put(sessionId, authRequestId);
             sessionAuthenticationMap.put(sessionId, null);
-        } catch (LaunchKeyException launchKeyException) {
-            throw new AuthException("Error logging in with username: " + username, launchKeyException);
+        } catch (ApiException apiException) {
+            throw new AuthException("Error logging in with username: " + username, apiException);
         }
     }
 
@@ -112,10 +113,10 @@ public class AuthManager {
                     authService.logout(sessionAuthRequestMap.get(sessionId));
                     sessionAuthenticationMap.put(sessionId, false);
                     sessionAuthRequestMap.remove(sessionId);
-                } catch (LaunchKeyException launchKeyException) {
+                } catch (ApiException apiException) {
                     throw new AuthException(
                             "Error on logout for auth request: " + sessionAuthRequestMap.get(sessionId),
-                            launchKeyException
+                            apiException
                     );
                 }
             } else {
@@ -159,8 +160,8 @@ public class AuthManager {
                 }
                 userHashSessionMap.remove(userHash);
             }
-        } catch (LaunchKeyException launchKeyException) {
-            throw new AuthException("Error handling callback", launchKeyException);
+        } catch (ApiException apiException) {
+            throw new AuthException("Error handling callback", apiException);
         }
     }
 

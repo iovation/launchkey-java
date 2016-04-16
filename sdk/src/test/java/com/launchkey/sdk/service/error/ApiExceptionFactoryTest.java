@@ -1,6 +1,5 @@
 package com.launchkey.sdk.service.error;
 
-import com.launchkey.sdk.service.error.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -21,13 +20,13 @@ import static org.junit.Assert.*;
  * limitations under the License.
  */
 @RunWith(Parameterized.class)
-public class LaunchKeyExceptionFactoryTest {
+public class ApiExceptionFactoryTest {
 
     private final int code;
-    private final Class<LaunchKeyException> expectedException;
+    private final Class<ApiException> expectedException;
 
-    public LaunchKeyExceptionFactoryTest(
-            int code, Class<LaunchKeyException> expectedException
+    public ApiExceptionFactoryTest(
+            int code, Class<ApiException> expectedException
     ) {
         this.code = code;
         this.expectedException = expectedException;
@@ -38,7 +37,7 @@ public class LaunchKeyExceptionFactoryTest {
         return Arrays.asList(
                 new Object[][]{
                         // Unknown code is base
-                        {0, LaunchKeyException.class},
+                        {0, ApiException.class},
 
                         // auths codes
                         {40421, InvalidRequestException.class},
@@ -89,19 +88,19 @@ public class LaunchKeyExceptionFactoryTest {
 
     @Test
     public void testFromCodeReturnsCorrectExceptionType() throws Exception {
-        LaunchKeyException actual = LaunchKeyException.fromCode(code, null);
+        ApiException actual = ApiException.fromCode(code, null);
         assertEquals(expectedException, actual.getClass());
     }
 
     @Test
     public void testFromCodeReturnsExceptionWithCorrectCode() throws Exception {
-        LaunchKeyException actual = LaunchKeyException.fromCode(code, null);
+        ApiException actual = ApiException.fromCode(code, null);
         assertEquals(code, actual.getCode());
     }
 
     @Test
     public void testFromCodeReturnsExceptionWithCorrectMessage() throws Exception {
-        LaunchKeyException actual = LaunchKeyException.fromCode(code, "Expected Message");
+        ApiException actual = ApiException.fromCode(code, "Expected Message");
         assertEquals("Expected Message", actual.getMessage());
     }
 }

@@ -74,7 +74,7 @@ public class V1AuthServiceLoginTest extends V1AuthServiceTestBase{
         service.login("username");
         ArgumentCaptor<AuthsRequest> argumentCaptor = ArgumentCaptor.forClass(AuthsRequest.class);
         verify(transport).auths(argumentCaptor.capture());
-        assertEquals(rocketKey, argumentCaptor.getValue().getRocketKey());
+        assertEquals(appKey, argumentCaptor.getValue().getAppKey());
     }
 
     @Test
@@ -128,5 +128,14 @@ public class V1AuthServiceLoginTest extends V1AuthServiceTestBase{
         ArgumentCaptor<AuthsRequest> argumentCaptor = ArgumentCaptor.forClass(AuthsRequest.class);
         verify(transport).auths(argumentCaptor.capture());
         assertEquals(1, argumentCaptor.getValue().getUserPushID());
+    }
+
+    @Test
+    public void testPassesContextInAuthsRequest() throws Exception {
+        String expected = "Expected context";
+        service.login("username", expected);
+        ArgumentCaptor<AuthsRequest> argumentCaptor = ArgumentCaptor.forClass(AuthsRequest.class);
+        verify(transport).auths(argumentCaptor.capture());
+        assertEquals(expected, argumentCaptor.getValue().getContext());
     }
 }

@@ -43,8 +43,13 @@ public class ConfigTest {
     }
 
     @Test
-    public void testGetRocketKey() throws Exception {
-        assertEquals(12345, config.getRocketKey());
+    public void testGetAppKey() throws Exception {
+        assertEquals(12345, config.getAppKey());
+    }
+
+    @Test
+    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
+        assertEquals(config.getRocketKey(), config.getAppKey());
     }
 
     @Test

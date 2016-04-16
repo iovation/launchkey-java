@@ -3,11 +3,9 @@ package com.launchkey.sdk.service;
 import com.launchkey.sdk.cache.CachePersistenceException;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.Transport;
-import com.launchkey.sdk.transport.v1.domain.PingRequest;
 import com.launchkey.sdk.transport.v1.domain.PingResponse;
-import org.bouncycastle.asn1.cryptopro.CryptoProObjectIdentifiers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +35,7 @@ public class V1ServiceAbstractTest extends V1ServiceTestBase {
     @Override @Before
     public void setUp() throws Exception {
         super.setUp();
-        service = new ConcreteV1Service(transport, crypto, pingResponseCache, rocketKey, secretKey);
+        service = new ConcreteV1Service(transport, crypto, pingResponseCache, appKey, secretKey);
     }
 
     @Override @After
@@ -69,7 +67,7 @@ public class V1ServiceAbstractTest extends V1ServiceTestBase {
             super(transport, crypto, pingResponseCache, rocketKey, secretKey);
         }
 
-        public RSAPublicKey executeGetLaunchKeyPublicKey() throws LaunchKeyException {
+        public RSAPublicKey executeGetLaunchKeyPublicKey() throws ApiException {
             return getLaunchKeyPublicKey();
         }
     }

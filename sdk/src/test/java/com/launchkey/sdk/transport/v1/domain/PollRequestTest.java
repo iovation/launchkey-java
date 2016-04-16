@@ -46,8 +46,14 @@ public class PollRequestTest {
     }
 
     @Test
-    public void testGetRocketKey() throws Exception {
-        assertEquals(9999999999L, pollRequest.getRocketKey());
+    public void testGetAppKey() throws Exception {
+        assertEquals(9999999999L, pollRequest.getAppKey());
+    }
+
+
+    @Test
+    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
+        assertEquals(pollRequest.getAppKey(), pollRequest.getRocketKey());
     }
 
     @Test
