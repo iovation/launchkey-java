@@ -1,9 +1,12 @@
 package com.launchkey.sdk.transport.v1.domain;
 
 import com.launchkey.sdk.transport.v1.domain.AuthsRequest;
+import com.launchkey.sdk.transport.v1.domain.Policy.Policy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
@@ -21,52 +24,57 @@ import static org.junit.Assert.*;
  */
 public class AuthsRequestTest {
     private AuthsRequest authsRequest;
+    private Policy policy;
 
     @Before
     public void setUp() throws Exception {
-        this.authsRequest = new AuthsRequest(
+        policy = new Policy(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        authsRequest = new AuthsRequest(
                 "dennis",
                 9999999999L,
                 "qGp+BP88k4Sh0CbD8L7ERsu4gKNOnCAt0IB3vB0EoWy44jJiZo5nGS6sTR2VSxJ00l7zRvOIRKYi8pgWqurLEx+3W0s7xOFvjJeonuomixDc7Y5CMx5fCNkM6i1KCM/hDNpIp93uSCYCYvzuo6Gw6cJx0peG6UUyV+6+vn/36bLq8fKn6WfKrywzTbBTh52ckvk2kiZiixIiWSyIDrkFDYrW3bwXJsgUrbzkC4vNLDaVGdN8JZYmerJ5fNFiEOUXuvt6mhHFgWfCRljgr3AZTN+smOfNyYCBWU4WPjENyZAUXPIURW5FqqSfyJBnf1Fcf/xA/QRwiEISVJrWi3scfQ==",
                 "rk1mJeZ4GeqYZmpCZtZCW/D1qR5I69WxOeiLW5gELgSC5sFrsSzhxFdn+hkQvHWKWZr6gBAvmdDA63HFLdC9OHD9WxWjgClSUygxO/04RUFLS1mKaEfyf9DW8gLl7/dp5wuvrIqZ7DJxfLWOQOZKY0L6gopZ6dYF8szfVs+50z/3xcl24KQZ1yz13YKB6S2ud3nJsifnp0/pqVqB+M56Tj5sCqFtel1kJmdY5ayVYBvC5SkzKdqAePcYKxDJm9KSM1mjuXKZ4wD+C04kq7qZx2XPGQHC5xf6pmLlZgYwCuk+ynyWDDjxXAiVk5H1HZYKOmNbWJEQPk/IzfTazESFsg==",
                 0,
-                1
+                1,
+                "expected context",
+                policy
         );
     }
 
     @After
     public void tearDown() throws Exception {
-        this.authsRequest = null;
+        policy = null;
+        authsRequest = null;
     }
 
     @Test
     public void testSessionValueOfZeroDoesNotThrowException() throws Exception {
-        new AuthsRequest(null, 0, null, null, 0, 0);
+        new AuthsRequest(null, 0, null, null, 0, 0, null, null);
     }
 
     @Test
     public void testSessionValueOfOneDoesNotThrowException() throws Exception {
-        new AuthsRequest(null, 0, null, null, 1, 0);
+        new AuthsRequest(null, 0, null, null, 1, 0, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSessionValueOfNotZeroOrOneDoesThrowException() throws Exception {
-        new AuthsRequest(null, 0, null, null, 2, 0);
+        new AuthsRequest(null, 0, null, null, 2, 0, null, null);
     }
 
     @Test
     public void testUserPushIDValueOfZeroDoesNotThrowException() throws Exception {
-        new AuthsRequest(null, 0, null, null, 0, 0);
+        new AuthsRequest(null, 0, null, null, 0, 0, null, null);
     }
 
     @Test
     public void testUserPushIdValueOfOneDoesNotThrowException() throws Exception {
-        new AuthsRequest(null, 0, null, null, 0, 1);
+        new AuthsRequest(null, 0, null, null, 0, 1, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testUserPushIdValueOfNotZeroOrOneDoesThrowException() throws Exception {
-        new AuthsRequest(null, 0, null, null, 0, 2);
+        new AuthsRequest(null, 0, null, null, 0, 2, null, null);
     }
 
     @Test
@@ -111,6 +119,16 @@ public class AuthsRequestTest {
     }
 
     @Test
+    public void testGetContext() throws Exception {
+        assertEquals("expected context", authsRequest.getContext());
+    }
+
+    @Test
+    public void testGetPolicy() throws Exception {
+        assertEquals(policy, authsRequest.getPolicy());
+    }
+
+    @Test
     public void testEqualObjectsReturnTrueForEquals() throws Exception {
         AuthsRequest left = new AuthsRequest(
                 "user",
@@ -118,7 +136,9 @@ public class AuthsRequestTest {
                 "secret key",
                 "private key",
                 0,
-                1
+                1,
+                "context",
+                policy
         );
         AuthsRequest right = new AuthsRequest(
                 "user",
@@ -126,7 +146,9 @@ public class AuthsRequestTest {
                 "secret key",
                 "private key",
                 0,
-                1
+                1,
+                "context",
+                policy
         );
         assertTrue(left.equals(right));
     }
@@ -139,7 +161,9 @@ public class AuthsRequestTest {
                 "secret key",
                 "private key",
                 0,
-                1
+                1,
+                "context",
+                policy
         );
         AuthsRequest right = new AuthsRequest(
                 "other user",
@@ -147,7 +171,9 @@ public class AuthsRequestTest {
                 "secret key",
                 "private key",
                 0,
-                1
+                1,
+                "context",
+                policy
         );
         assertFalse(left.equals(right));
     }
@@ -160,7 +186,9 @@ public class AuthsRequestTest {
                 "secret key",
                 "private key",
                 0,
-                1
+                1,
+                "context",
+                policy
         );
         AuthsRequest right = new AuthsRequest(
                 "user",
@@ -168,7 +196,9 @@ public class AuthsRequestTest {
                 "secret key",
                 "private key",
                 0,
-                1
+                1,
+                "context",
+                policy
         );
         assertEquals(left.hashCode(), right.hashCode());
     }
@@ -181,7 +211,9 @@ public class AuthsRequestTest {
                 "secret key",
                 "private key",
                 0,
-                1
+                1,
+                "context",
+                policy
         );
         AuthsRequest right = new AuthsRequest(
                 "other user",
@@ -189,7 +221,9 @@ public class AuthsRequestTest {
                 "secret key",
                 "private key",
                 0,
-                1
+                1,
+                "context",
+                policy
         );
 
         assertNotEquals(left.hashCode(), right.hashCode());

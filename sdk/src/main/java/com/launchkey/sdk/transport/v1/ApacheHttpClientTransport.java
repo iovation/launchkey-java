@@ -68,7 +68,7 @@ public class ApacheHttpClientTransport implements Transport {
         try {
             new URIBuilder(this.baseUrl);
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("baseURL must be be a valid parseable URI with URIBuilder", e);
+            throw new IllegalArgumentException("baseURL must be be a valid parsable URI with URIBuilder", e);
         }
     }
 
@@ -117,6 +117,9 @@ public class ApacheHttpClientTransport implements Transport {
             formData.add(new BasicNameValuePair("user_push_id", Integer.toString(request.getUserPushID())));
             if (request.getContext() != null && request.getContext().length() > 0) {
                 formData.add(new BasicNameValuePair("context", request.getContext()));
+            }
+            if (request.getPolicy() != null) {
+                formData.add(new BasicNameValuePair("policy", objectMapper.writeValueAsString(request.getPolicy())));
             }
             auths.setEntity(new UrlEncodedFormEntity(formData));
             HttpResponse httpResponse = client.execute(auths);
@@ -235,7 +238,7 @@ public class ApacheHttpClientTransport implements Transport {
         return baseUrl + path;
     }
 
-    private <T extends Object> T getTransportObjectFromResponse(Class<T> clazz, HttpResponse httpResponse)
+    private <T> T getTransportObjectFromResponse(Class<T> clazz, HttpResponse httpResponse)
             throws ApiException {
         T response;
         validateResponse(httpResponse);

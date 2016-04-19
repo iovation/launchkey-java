@@ -12,6 +12,8 @@
 
 package com.launchkey.sdk.transport.v1.domain;
 
+import com.launchkey.sdk.transport.v1.domain.Policy.Policy;
+
 /**
  * Data for an "auths" request
  */
@@ -56,7 +58,14 @@ public class AuthsRequest {
     private final String context;
 
     /**
-     * @deprecated Use {@link AuthsRequest#AuthsRequest(String, long, String, String, int, int, String)}
+     * Policy object setting the policy override for this request. The policy can only increase the security level any
+     * existing policy on the server. It can never reduce the security level of the policy.
+     */
+    private final Policy policy;
+
+    /**
+     * @deprecated Context is now available to better identify the request for the user. It is recommended to always
+     * use context. Use {@link AuthsRequest#AuthsRequest(String, long, String, String, int, int, String)}
      * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
      * @param appKey Application Key of your Application. This is found on the Keys tab of your Application details
      *                  in the LaunchKey Dashboard.
@@ -69,7 +78,7 @@ public class AuthsRequest {
      */
     @Deprecated
     public AuthsRequest(String username, long appKey, String secretKey, String signature, int session, int userPushID) {
-        this(username, appKey, secretKey, signature, session, userPushID, null);
+        this(username, appKey, secretKey, signature, session, userPushID, null, null);
     }
 
     /**
@@ -86,6 +95,25 @@ public class AuthsRequest {
      *                 provide context regarding the individual request
      */
     public AuthsRequest(String username, long appKey, String secretKey, String signature, int session, int userPushID, String context) {
+        this(username, appKey, secretKey, signature, session, userPushID, context, null);
+    }
+
+    /**
+     * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
+     * @param appKey Application Key of your Application. This is found on the Keys tab of your Application details
+     *                  in the LaunchKey Dashboard.
+     * @param secretKey Base64 encoded secret JSON string containing these attributes:
+     *                      secret:   Secret Key of the Application whose key is included in the current request.
+     *                      stamped:  LaunchKey formatted Date representing the current time of the request.
+     * @param signature Base64 encoded RSA Signature of the base64 decoded secretKey value.
+     * @param session Should this authentication request be designated as a session. Set the value to 1 for yes and 0 for no.
+     * @param userPushID Request a User Push ID be returned in the AuthsResponse by setting this value to 1.
+     * @param context  Arbitrary string of data up to 400 characters to be presented to the user during authorization to
+     *                 provide context regarding the individual request
+     * @param policy Policy object setting the policy override for this request. The policy can only increase the security level any
+     * existing policy on the server. It can never reduce the security level of the policy.
+     */
+    public AuthsRequest(String username, long appKey, String secretKey, String signature, int session, int userPushID, String context, Policy policy) {
         this.username = username;
         this.appKey = appKey;
         this.secretKey = secretKey;
@@ -99,6 +127,7 @@ public class AuthsRequest {
         }
         this.userPushID = userPushID;
         this.context = context;
+        this.policy = policy;
     }
 
     /**
@@ -170,6 +199,15 @@ public class AuthsRequest {
         return context;
     }
 
+    /**
+     * Get the policy for the request
+     * @return Policy object setting the policy override for this request. The policy can only increase the
+     * security level any existing policy on the server. It can never reduce the security level of the policy.
+     */
+    public Policy getPolicy() {
+        return policy;
+    }
+
     @Override
     public String toString() {
         return "AuthsRequest{" +
@@ -180,6 +218,7 @@ public class AuthsRequest {
                 ", session=" + session +
                 ", userPushID=" + userPushID +
                 ", context=" + context +
+                ", policy=" + policy +
                 '}';
     }
 
@@ -196,7 +235,8 @@ public class AuthsRequest {
         if (username != null ? !username.equals(that.username) : that.username != null) return false;
         if (secretKey != null ? !secretKey.equals(that.secretKey) : that.secretKey != null) return false;
         if (signature != null ? !signature.equals(that.signature) : that.signature != null) return false;
-        return !(context != null ? !context.equals(that.context) : that.context != null);
+        if (context != null ? !context.equals(that.context) : that.context != null) return false;
+        return !(policy != null ? !policy.equals(that.policy) : that.policy != null);
 
     }
 
@@ -207,6 +247,7 @@ public class AuthsRequest {
         result = 31 * result + (secretKey != null ? secretKey.hashCode() : 0);
         result = 31 * result + (signature != null ? signature.hashCode() : 0);
         result = 31 * result + (context != null ? context.hashCode() : 0);
+        result = 31 * result + (policy != null ? policy.hashCode() : 0);
         result = 31 * result + session;
         result = 31 * result + userPushID;
         return result;

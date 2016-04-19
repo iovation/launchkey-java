@@ -1,5 +1,6 @@
 package com.launchkey.sdk.transport.v1;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.CommunicationErrorException;
 import com.launchkey.sdk.service.error.InvalidRequestException;
@@ -7,6 +8,7 @@ import com.launchkey.sdk.service.error.InvalidResponseException;
 import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.domain.AuthsRequest;
 import com.launchkey.sdk.transport.v1.domain.AuthsResponse;
+import com.launchkey.sdk.transport.v1.domain.Policy.Policy;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.ClientProtocolException;
@@ -23,7 +25,10 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 import java.io.*;
+import java.net.URLEncoder;
+import java.util.Collections;
 
+import static java.net.URLEncoder.encode;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -49,6 +54,7 @@ public class ApacheHttpClientTransportAuthsTest {
     private HttpClient httpClient;
     private Transport transport;
     private Crypto crypto;
+    private ObjectMapper objectMapper;
 
     @Before
     public void setUp() throws Exception {
@@ -62,14 +68,17 @@ public class ApacheHttpClientTransportAuthsTest {
         );
         transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(response);
+        objectMapper = new ObjectMapper();
     }
 
+    @SuppressWarnings("Duplicates")
     @After
     public void tearDown() throws Exception {
         httpClient = null;
         response = null;
         transport = null;
         crypto = null;
+        objectMapper = null;
     }
 
     @Test
@@ -159,6 +168,24 @@ public class ApacheHttpClientTransportAuthsTest {
         transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, "expected_context"));
         verify(httpClient).execute(request.capture());
         assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString("context=expected_context"));
+    }
+
+    @Test
+    public void testAuthsDoesNotPassPolicyWhenNull() throws Exception {
+        ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null));
+        verify(httpClient).execute(request.capture());
+        assertThat(getStringFromReader(request.getValue().getEntity().getContent()), not(containsString("context=")));
+    }
+
+    @Test
+    public void testAuthsPassedPolicyWhenNotNull() throws Exception {
+        ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
+        Policy policy = new Policy(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null, policy));
+        String expected = "policy=" + encode(objectMapper.writeValueAsString(policy), "UTF-8");
+        verify(httpClient).execute(request.capture());
+        assertThat(getStringFromReader(request.getValue().getEntity().getContent()), containsString(expected));
     }
 
     @Test

@@ -12,46 +12,72 @@
 
 package com.launchkey.sdk.transport.v1.domain.Policy;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public abstract class Factor {
+@JsonPropertyOrder({"category", "factor", "requirement", "quickfail", "priority", "attributes"})
+public class Factor {
 
     private final boolean quickFail;
-    private final FactorRequirementType requirement;
+    private final Requirement requirement;
     private final int priority;
+    private final Attributes attributes;
+    private final Type type;
+    private final Category category;
 
-    public Factor(boolean quickFail, FactorRequirementType requirement, int priority) {
+    public Factor(
+            Category category,
+            Type type,
+            boolean quickFail,
+            Requirement requirement,
+            int priority,
+            Attributes attributes
+    ) {
         this.quickFail = quickFail;
         this.requirement = requirement;
         this.priority = priority;
+        this.attributes = attributes;
+        this.type = type;
+        this.category = category;
     }
 
-    public Factor() {
-        this(false, FactorRequirementType.FORCED, 1);
+    @JsonProperty("factor")
+    public Type getType() {
+        return type;
     }
 
-    public abstract FactorType getType();
+    @JsonProperty("category")
+    public Category getCategory() {
+        return category;
+    }
 
-    public abstract FactoryCategory getCategory();
-
+    @JsonProperty("quickfail")
     public boolean isQuickFail() {
         return quickFail;
     }
 
-    public FactorRequirementType getRequirement() {
+    @JsonProperty("requirement")
+    public Requirement getRequirement() {
         return requirement;
     }
 
+    @JsonProperty("priority")
     public int getPriority() {
         return priority;
     }
 
-    public List<Attribute> getAttributes() {
-        return new ArrayList<Attribute>();
+    @JsonProperty("attributes")
+    public Attributes getAttributes() {
+        return attributes;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Factor)) return false;
 
@@ -66,7 +92,8 @@ public abstract class Factor {
 
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result = getCategory() != null ? getCategory().hashCode() : 0;
         result = 31 * result + (getType() != null ? getType().hashCode() : 0);
         result = 31 * result + (isQuickFail() ? 1 : 0);
@@ -74,6 +101,152 @@ public abstract class Factor {
         result = 31 * result + getPriority();
         result = 31 * result + (getAttributes() != null ? getAttributes().hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Factor{" +
+                "quickFail=" + quickFail +
+                ", requirement=" + requirement +
+                ", priority=" + priority +
+                ", attributes=" + attributes +
+                ", type=" + type +
+                ", category=" + category +
+                '}';
+    }
+
+    public static final class Attributes {
+        private List<Location> locations;
+
+        public Attributes(List<Location> locations) {
+            this.locations = Collections.unmodifiableList(new ArrayList<Location>(locations));
+        }
+
+        @JsonProperty("locations")
+        public List<Location> getLocations() {
+            return locations;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Attributes)) return false;
+
+            Attributes that = (Attributes) o;
+
+            return getLocations().equals(that.getLocations());
+
+        }
+
+        @Override public int hashCode() {
+            return getLocations() != null ? getLocations().hashCode() : 0;
+        }
+
+        @Override public String toString() {
+            return "FactorAttributes{" +
+                    "locations=" + locations +
+                    '}';
+        }
+    }
+
+    public enum Requirement {
+        FORCED("forced requirement"),
+        ALLOWED("allowed");
+
+        private final String value;
+
+        Requirement(String value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+
+    public enum Type {
+        COMBO_LOCK("combo lock"),
+        PIN_LOCK("pin lock"),
+        DEVICE("device factor"),
+        GEOFENCE("geofence");
+
+        private final String value;
+
+        Type(String value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+
+    public enum Category {
+        KNOWLEDGE("knowledge"),
+        INHERENCE("inherence"),
+        POSSESSION("possession");
+
+        private final String value;
+
+        Category(String value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+
+    public static final class Location {
+        private final double radius;
+        private final double latitude;
+        private final double longitude;
+
+        public Location(double radius, double latitude, double longitude) {
+            this.radius = radius;
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        public double getRadius() {
+            return radius;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Location)) return false;
+
+            Location location = (Location) o;
+
+            if (Double.compare(location.radius, radius) != 0) return false;
+            if (Double.compare(location.latitude, latitude) != 0) return false;
+            return Double.compare(location.longitude, longitude) == 0;
+        }
+
+        @Override public int hashCode() {
+            int result;
+            long temp;
+            temp = Double.doubleToLongBits(radius);
+            result = (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(latitude);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(longitude);
+            result = 31 * result + (int) (temp ^ (temp >>> 32));
+            return result;
+        }
     }
 }
 
