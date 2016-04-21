@@ -65,7 +65,7 @@ public class AuthsRequest {
 
     /**
      * @deprecated Context is now available to better identify the request for the user. It is recommended to always
-     * use context. Use {@link AuthsRequest#AuthsRequest(String, long, String, String, int, int, String)}
+     * use context. Use {@link AuthsRequest#AuthsRequest(String, long, String, String, int, int, String, Policy)}
      * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
      * @param appKey Application Key of your Application. This is found on the Keys tab of your Application details
      *                  in the LaunchKey Dashboard.
@@ -79,23 +79,6 @@ public class AuthsRequest {
     @Deprecated
     public AuthsRequest(String username, long appKey, String secretKey, String signature, int session, int userPushID) {
         this(username, appKey, secretKey, signature, session, userPushID, null, null);
-    }
-
-    /**
-     * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
-     * @param appKey Application Key of your Application. This is found on the Keys tab of your Application details
-     *                  in the LaunchKey Dashboard.
-     * @param secretKey Base64 encoded secret JSON string containing these attributes:
-     *                      secret:   Secret Key of the Application whose key is included in the current request.
-     *                      stamped:  LaunchKey formatted Date representing the current time of the request.
-     * @param signature Base64 encoded RSA Signature of the base64 decoded secretKey value.
-     * @param session Should this authentication request be designated as a session. Set the value to 1 for yes and 0 for no.
-     * @param userPushID Request a User Push ID be returned in the AuthsResponse by setting this value to 1.
-     * @param context  Arbitrary string of data up to 400 characters to be presented to the user during authorization to
-     *                 provide context regarding the individual request
-     */
-    public AuthsRequest(String username, long appKey, String secretKey, String signature, int session, int userPushID, String context) {
-        this(username, appKey, secretKey, signature, session, userPushID, context, null);
     }
 
     /**

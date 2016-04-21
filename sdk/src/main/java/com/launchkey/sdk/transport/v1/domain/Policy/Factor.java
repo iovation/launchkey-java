@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@JsonPropertyOrder({"category", "factor", "requirement", "quickfail", "priority", "attributes"})
+@JsonPropertyOrder({"factor", "requirement", "quickfail", "priority", "attributes"})
 public class Factor {
 
     private final boolean quickFail;
@@ -28,10 +28,8 @@ public class Factor {
     private final int priority;
     private final Attributes attributes;
     private final Type type;
-    private final Category category;
 
     public Factor(
-            Category category,
             Type type,
             boolean quickFail,
             Requirement requirement,
@@ -43,17 +41,11 @@ public class Factor {
         this.priority = priority;
         this.attributes = attributes;
         this.type = type;
-        this.category = category;
     }
 
     @JsonProperty("factor")
     public Type getType() {
         return type;
-    }
-
-    @JsonProperty("category")
-    public Category getCategory() {
-        return category;
     }
 
     @JsonProperty("quickfail")
@@ -86,7 +78,6 @@ public class Factor {
         if (getType() != factor.getType()) return false;
         if (isQuickFail() != factor.isQuickFail()) return false;
         if (getPriority() != factor.getPriority()) return false;
-        if (getCategory() != factor.getCategory()) return false;
         if (getRequirement() != factor.getRequirement()) return false;
         return getAttributes() != null ? getAttributes().equals(factor.getAttributes()) : factor.getAttributes() == null;
 
@@ -94,8 +85,7 @@ public class Factor {
 
     @Override
     public int hashCode() {
-        int result = getCategory() != null ? getCategory().hashCode() : 0;
-        result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+        int result = getType() != null ? getType().hashCode() : 0;
         result = 31 * result + (isQuickFail() ? 1 : 0);
         result = 31 * result + (getRequirement() != null ? getRequirement().hashCode() : 0);
         result = 31 * result + getPriority();
@@ -111,12 +101,11 @@ public class Factor {
                 ", priority=" + priority +
                 ", attributes=" + attributes +
                 ", type=" + type +
-                ", category=" + category +
                 '}';
     }
 
     public static final class Attributes {
-        private List<Location> locations;
+        private final List<Location> locations;
 
         public Attributes(List<Location> locations) {
             this.locations = Collections.unmodifiableList(new ArrayList<Location>(locations));

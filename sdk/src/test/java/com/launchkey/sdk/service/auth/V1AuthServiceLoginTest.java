@@ -70,7 +70,7 @@ public class V1AuthServiceLoginTest extends V1AuthServiceTestBase{
     }
 
     @Test
-    public void testPassesCorrectRocketIDInAuthsRequest() throws Exception {
+    public void testPassesCorrectAppKeyInAuthsRequest() throws Exception {
         service.login("username");
         ArgumentCaptor<AuthsRequest> argumentCaptor = ArgumentCaptor.forClass(AuthsRequest.class);
         verify(transport).auths(argumentCaptor.capture());

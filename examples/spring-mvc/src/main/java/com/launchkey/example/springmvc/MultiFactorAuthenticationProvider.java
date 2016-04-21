@@ -21,7 +21,7 @@ import java.util.ArrayList;
  */
 public class MultiFactorAuthenticationProvider implements AuthenticationProvider {
 
-    private AuthManager authManager;
+    private final AuthManager authManager;
 
     private int authRequestCounter = 0;
 

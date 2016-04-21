@@ -25,6 +25,7 @@ public class PollResponseTest {
     private PollResponse pollResponse;
 
     @Before
+    @SuppressWarnings("SpellCheckingInspection")
     public void setUp() throws Exception {
         pollResponse = new PollResponse(
                 "hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\n" +
@@ -46,6 +47,7 @@ public class PollResponseTest {
 
     @Test
     public void testGetAuth() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         String expected = "hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\n" +
                 "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\n" +
                 "c/bUIAph8ICqJD97WZHqLUhljvm+zK7/dXetkPSULPvpM5J4IzUoRggEBLX6LrWF\n" +
@@ -56,11 +58,13 @@ public class PollResponseTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetOrganizationUser() throws Exception {
         assertEquals("30xIPFOdoq2TZKpVUZohnL6aEPCorReUYPb6vrKax3B", pollResponse.getOrganizationUser());
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetUserHash() throws Exception {
         assertEquals("5VeE21s5ZVI5vY8R5Lx9zOv1XnCSReQyFidc8r1C5iV", pollResponse.getUserHash());
     }
@@ -71,7 +75,8 @@ public class PollResponseTest {
     }
 
     @Test
-    public void testJSONParseableWithNoOptionalFields() throws Exception {
+    public void testJSONParsableWithNoOptionalFields() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         PollResponse expected = new PollResponse(
                 "hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\n" +
                         "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\n" +
@@ -83,6 +88,7 @@ public class PollResponseTest {
                 null,
                 null
         );
+        @SuppressWarnings("SpellCheckingInspection")
         String json = "{\"user_hash\": \"5VeE21s5ZVI5vY8R5Lx9zOv1XnCSReQyFidc8r1C5iV\", " +
                 "\"auth\": \"hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\\n" +
                 "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\\n" +
@@ -96,7 +102,8 @@ public class PollResponseTest {
     }
 
     @Test
-    public void testJSONParseableWithOrganizationUserOptionalField() throws Exception {
+    public void testJSONParsableWithOrganizationUserOptionalField() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         PollResponse expected = new PollResponse(
                 "hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\n" +
                         "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\n" +
@@ -108,6 +115,7 @@ public class PollResponseTest {
                 "30xIPFOdoq2TZKpVUZohnL6aEPCorReUYPb6vrKax3B",
                 null
         );
+        @SuppressWarnings("SpellCheckingInspection")
         String json = "{\"user_hash\": \"5VeE21s5ZVI5vY8R5Lx9zOv1XnCSReQyFidc8r1C5iV\", " +
                 "\"auth\": \"hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\\n" +
                 "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\\n" +
@@ -122,7 +130,8 @@ public class PollResponseTest {
     }
 
     @Test
-    public void testJSONParseableWithUserPushIdOptionalField() throws Exception {
+    public void testJSONParsableWithUserPushIdOptionalField() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         PollResponse expected = new PollResponse(
                 "hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\n" +
                         "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\n" +
@@ -134,6 +143,7 @@ public class PollResponseTest {
                 null,
                 "UA-d2389830-7ffb-419b-a553-c23a09a50b45"
         );
+        @SuppressWarnings("SpellCheckingInspection")
         String json = "{\"user_hash\": \"5VeE21s5ZVI5vY8R5Lx9zOv1XnCSReQyFidc8r1C5iV\", " +
                 "\"auth\": \"hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\\n" +
                 "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\\n" +
@@ -149,6 +159,7 @@ public class PollResponseTest {
 
     @Test
     public void testJSONParseAllowsUnknown() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         PollResponse expected = new PollResponse(
                 "hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\n" +
                         "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\n" +
@@ -160,6 +171,7 @@ public class PollResponseTest {
                 null,
                 null
         );
+        @SuppressWarnings("SpellCheckingInspection")
         String json = "{\"user_hash\": \"5VeE21s5ZVI5vY8R5Lx9zOv1XnCSReQyFidc8r1C5iV\", " +
                 "\"auth\": \"hg7gSUbpI9Q3tv5sA2E285hZ76cKEsTnaioxgOSno6kWDIxCov7hgEB5pHa4g88Y\\n" +
                 "kylEA7Q6IT8GfTEW6ZK/S+hzkR0L3eJJe+rGiv7wzch0sCzypTk7yOdV2N/9S+jy\\n" +

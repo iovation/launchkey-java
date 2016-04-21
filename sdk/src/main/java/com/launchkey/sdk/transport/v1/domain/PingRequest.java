@@ -1,6 +1,6 @@
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
- *
+ * <p>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
  * A copy of the License is located in the "LICENSE.txt" file accompanying
@@ -12,8 +12,6 @@
 
 package com.launchkey.sdk.transport.v1.domain;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Date;
 
 /**

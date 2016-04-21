@@ -27,6 +27,25 @@ public interface AuthService {
      * @param username Platform username, user push ID, or white label user identifier for the user being authenticated
      * @param context Arbitrary string of data up to 400 characters to be presented to the user during authorization to
      *                provide context regarding the individual request
+     * @param policy Authentication policy override for this request. setting the policy override for this request.
+     *               The policy can only increase the security level any existing policy on the server. It can never
+     *               reduce the security level of the server policy.
+     * @return Unique identifier for tracking status of the authorization request
+     * @see AuthService#logout(String)
+     * @see AuthService#getAuthResponse(String)
+     * @see AuthResponse#getAuthRequestId()
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     */
+    String authorize(String username, String context, AuthPolicy policy) throws ApiException;
+
+    /**
+     * Authorize a transaction for the provided username.  This auth method would be utilized if you are using LaunchKey
+     * as a secondary factor for user login or authorizing a single transaction within your application.  This will NOT
+     * begin a user session.
+     *
+     * @param username Platform username, user push ID, or white label user identifier for the user being authenticated
+     * @param context Arbitrary string of data up to 400 characters to be presented to the user during authorization to
+     *                provide context regarding the individual request
      * @return Unique identifier for tracking status of the authorization request
      * @see AuthService#logout(String)
      * @see AuthService#getAuthResponse(String)
@@ -48,6 +67,20 @@ public interface AuthService {
      * @throws CommunicationErrorException If there was an error communicating with the endpoint
      */
     String authorize(String username) throws ApiException;
+
+    /**
+     * Request a login for the provided username.
+     *
+     * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
+     * @param context Arbitrary string of data up to 400 characters to be presented to the user during authorization to
+     *                provide context regarding the individual request
+     * @param policy Authentication policy override for this request. setting the policy override for this request.
+     *               The policy can only increase the security level any existing policy on the server. It can never
+     *               reduce the security level of the server policy.
+     * @return Unique identifier for tracking status of the authorization request
+     * @throws ApiException when an error occurs in the request
+     */
+    String login(String username, String context, AuthPolicy policy) throws ApiException;
 
     /**
      * Request a login for the provided username.

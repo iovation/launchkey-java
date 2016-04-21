@@ -1,12 +1,12 @@
 package com.launchkey.sdk.transport.v1.domain;
 
-import com.launchkey.sdk.transport.v1.domain.AuthsRequest;
+import com.launchkey.sdk.transport.v1.domain.Policy.Factor;
 import com.launchkey.sdk.transport.v1.domain.Policy.Policy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
+import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
@@ -28,7 +28,8 @@ public class AuthsRequestTest {
 
     @Before
     public void setUp() throws Exception {
-        policy = new Policy(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        policy = new Policy(new ArrayList<Policy.MinimumRequirement>(), new ArrayList<Factor>());
+        //noinspection SpellCheckingInspection
         authsRequest = new AuthsRequest(
                 "dennis",
                 9999999999L,
@@ -92,6 +93,7 @@ public class AuthsRequestTest {
         assertEquals(authsRequest.getAppKey(), authsRequest.getRocketKey());
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Test
     public void testGetSecretKey() throws Exception {
         assertEquals(
@@ -101,6 +103,7 @@ public class AuthsRequestTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetSignature() throws Exception {
         assertEquals(
                 "rk1mJeZ4GeqYZmpCZtZCW/D1qR5I69WxOeiLW5gELgSC5sFrsSzhxFdn+hkQvHWKWZr6gBAvmdDA63HFLdC9OHD9WxWjgClSUygxO/04RUFLS1mKaEfyf9DW8gLl7/dp5wuvrIqZ7DJxfLWOQOZKY0L6gopZ6dYF8szfVs+50z/3xcl24KQZ1yz13YKB6S2ud3nJsifnp0/pqVqB+M56Tj5sCqFtel1kJmdY5ayVYBvC5SkzKdqAePcYKxDJm9KSM1mjuXKZ4wD+C04kq7qZx2XPGQHC5xf6pmLlZgYwCuk+ynyWDDjxXAiVk5H1HZYKOmNbWJEQPk/IzfTazESFsg==",

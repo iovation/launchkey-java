@@ -5,7 +5,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 
@@ -21,82 +20,82 @@ import static org.junit.Assert.*;
  * limitations under the License.
  */
 public class MinimumRequirementTest {
-    private Policy.MinimumRequirement minumumRequirement;
+    private Policy.MinimumRequirement minimumRequirement;
 
     @Before
     public void setUp() throws Exception {
-        minumumRequirement = new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.ENABLED, 1, 2, 3, 4);
+        minimumRequirement = new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.ENABLED, 1, 2, 3, 4);
     }
 
     @After
     public void tearDown() throws Exception {
-        minumumRequirement = null;
+        minimumRequirement = null;
     }
 
     @Test
     public void getType() throws Exception {
-        assertEquals(Policy.MinimumRequirement.Type.ENABLED, minumumRequirement.getType());
+        assertEquals(Policy.MinimumRequirement.Type.ENABLED, minimumRequirement.getType());
     }
 
     @Test
     public void getAny() throws Exception {
-        assertEquals(1, minumumRequirement.getAny());
+        assertEquals(1, minimumRequirement.getAll());
     }
 
     @Test
     public void getKnowledge() throws Exception {
-        assertEquals(2, minumumRequirement.getKnowledge());
+        assertEquals(2, minimumRequirement.getKnowledge());
     }
 
     @Test
     public void getInherence() throws Exception {
-        assertEquals(3, minumumRequirement.getInherence());
+        assertEquals(3, minimumRequirement.getInherence());
     }
 
     @Test
     public void getPossession() throws Exception {
-        assertEquals(4, minumumRequirement.getPossession());
+        assertEquals(4, minimumRequirement.getPossession());
     }
 
     @Test
     public void equalsWhenObjectsAreEqual() throws Exception {
         Policy.MinimumRequirement o = new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.ENABLED, 1, 2, 3, 4);
-        assertEquals(minumumRequirement, o);
+        assertEquals(minimumRequirement, o);
     }
 
     @Test
     public void notEqualsWhenObjectsAreNotEqual() throws Exception {
         Policy.MinimumRequirement o = new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.ENABLED, 0, 2, 3, 4);
-        assertNotEquals(minumumRequirement, o);
+        assertNotEquals(minimumRequirement, o);
     }
 
     @Test
-    public void hashCodeEqualWhenObectsAreEqual() throws Exception {
+    public void hashCodeEqualWhenObjectsAreEqual() throws Exception {
         Policy.MinimumRequirement o = new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.ENABLED, 1, 2, 3, 4);
-        assertEquals(minumumRequirement, o);
+        assertEquals(minimumRequirement, o);
     }
 
     @Test
-    public void hashCodeNotEqualWhenObectsAreNotEqual() throws Exception {
+    public void hashCodeNotEqualWhenObjectsAreNotEqual() throws Exception {
         Policy.MinimumRequirement o = new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.ENABLED, 0, 2, 3, 4);
-        assertNotEquals(minumumRequirement, o);
+        assertNotEquals(minimumRequirement, o);
     }
 
     @Test
     public void toStringHasClassName() throws Exception {
-        assertThat(minumumRequirement.toString(), containsString(Policy.MinimumRequirement.class.getSimpleName()));
+        assertThat(minimumRequirement.toString(), containsString(Policy.MinimumRequirement.class.getSimpleName()));
     }
 
     @Test
     public void jsonEncode() throws Exception {
         String expected = "{" +
                     "\"requirement\":\"enabled\"," +
-                    "\"any\":1," +
+                    "\"all\":1," +
                     "\"knowledge\":2," +
                     "\"inherence\":3," +
                     "\"possession\":4" +
                 "}";
         ObjectMapper om = new ObjectMapper();
-        assertEquals(expected, om.writeValueAsString(minumumRequirement));
+        assertEquals(expected, om.writeValueAsString(minimumRequirement));
     }
 }

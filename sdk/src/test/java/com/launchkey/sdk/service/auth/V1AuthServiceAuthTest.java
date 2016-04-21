@@ -51,7 +51,8 @@ public class V1AuthServiceAuthTest {
     }
 
     @Test
-    public void testJSONParseable() throws Exception {
+    public void testJSONParsable() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         String json = "{\"response\": true," +
                 "\"auth_request\":\"dopkpq2oqhf9ej8uuud21geh6bwi9394\"," +
                 "\"device_id\":\"dsf67\"}";
@@ -61,17 +62,19 @@ public class V1AuthServiceAuthTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testJSONParseAllowsUnknown() throws Exception {
         String json = "{\"response\": true," +
                 "\"app_pins\" : \"8106,6367,2124,6585,2357\"," +
                 "\"auth_request\" : \"dopkpq2oqhf9ej8uuud21geh6bwi9394\"," +
-                "\"device_id\" : \"dsf67\"}";;
+                "\"device_id\" : \"dsf67\"}";
         ObjectMapper mapper = new ObjectMapper();
         AuthsResponse actual = mapper.readValue(json, AuthsResponse.class);
         assertNotNull(actual);
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testJSONParseSetsAuthRequestId() throws Exception {
         String json = "{\"response\": true," +
                 "\"auth_request\":\"dopkpq2oqhf9ej8uuud21geh6bwi9394\"," +
@@ -82,6 +85,7 @@ public class V1AuthServiceAuthTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testJSONParseSetsDeviceId() throws Exception {
         String json = "{\"response\": true," +
                 "\"auth_request\":\"dopkpq2oqhf9ej8uuud21geh6bwi9394\"," +
@@ -92,6 +96,7 @@ public class V1AuthServiceAuthTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testJSONParseSetsResponse() throws Exception {
         String json = "{\"response\": true," +
                 "\"auth_request\":\"dopkpq2oqhf9ej8uuud21geh6bwi9394\"," +

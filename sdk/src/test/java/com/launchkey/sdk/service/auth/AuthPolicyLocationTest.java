@@ -1,14 +1,14 @@
-package com.launchkey.sdk.service.error;
+package com.launchkey.sdk.service.auth;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
- * <p/>
+ * Copyright 2016 LaunchKey, Inc.  All rights reserved.
+ * <p>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
  * A copy of the License is located in the "LICENSE.txt" file accompanying
@@ -17,26 +17,32 @@ import static org.junit.Assert.assertEquals;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class LaunchKeyEngineErrorExceptionTest {
-    private ApiException x;
+public class AuthPolicyLocationTest {
+    private AuthPolicy.Location location;
 
     @Before
     public void setUp() throws Exception {
-        x = new ApiPlatformErrorException("error message", 111);
+        location = new AuthPolicy.Location(1.1, 2.2, 3.3);
     }
 
     @After
     public void tearDown() throws Exception {
-        x = null;
+        location = null;
     }
 
     @Test
-    public void testConstructorSetsMessage() throws Exception {
-        assertEquals("error message", x.getMessage());
+    public void getLongitude() throws Exception {
+        assertEquals(3.3, location.getLongitude(), 0.001);
     }
 
     @Test
-    public void testConstructorSetsCode() throws Exception {
-        assertEquals(111, x.getCode());
+    public void getLatitude() throws Exception {
+        assertEquals(2.2, location.getLatitude(), 0.001);
     }
+
+    @Test
+    public void getRadius() throws Exception {
+        assertEquals(1.1, location.getRadius(), 0.001);
+    }
+
 }

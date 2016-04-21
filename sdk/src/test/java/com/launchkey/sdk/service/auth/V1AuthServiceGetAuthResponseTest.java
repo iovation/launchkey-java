@@ -91,7 +91,7 @@ public class V1AuthServiceGetAuthResponseTest extends V1AuthServiceTestBase {
     }
 
     @Test
-    public void testPassesCorrectRocketIDInPollRequest() throws Exception {
+    public void testPassesCorrectAppKeyInPollRequest() throws Exception {
         service.getAuthResponse("Auth Request ID");
         ArgumentCaptor<PollRequest> argumentCaptor = ArgumentCaptor.forClass(PollRequest.class);
         verify(transport).poll(argumentCaptor.capture());
@@ -228,7 +228,7 @@ public class V1AuthServiceGetAuthResponseTest extends V1AuthServiceTestBase {
     }
 
     @Test(expected = InvalidResponseException.class)
-    public void testCatchesIOExceptionFromUnparseableAuthDataAndThrowsInvalidResponseException() throws Exception {
+    public void testCatchesIOExceptionFromAuthDataNotParsableAndThrowsInvalidResponseException() throws Exception {
         when(crypto.decryptRSA(any(byte[].class))).thenReturn("XXX".getBytes());
         service.getAuthResponse("Auth Request ID");
     }

@@ -21,6 +21,7 @@ public class PlatformSdkConfig {
     private Long appKey;
     private String secretKey;
     private String privateKeyLocation;
+    private String baseUrl;
 
     public Long getAppKey() {
         return appKey;
@@ -44,5 +45,13 @@ public class PlatformSdkConfig {
 
     public void setPrivateKeyLocation(String privateKeyLocation) {
         this.privateKeyLocation = privateKeyLocation;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
     }
 }

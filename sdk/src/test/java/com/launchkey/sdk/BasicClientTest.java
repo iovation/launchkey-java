@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
  * limitations under the License.
  */
 public class BasicClientTest {
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String PRIVATE_KEY =
             ("-----BEGIN RSA PRIVATE KEY-----\n" +
                     "MIIEogIBAAKCAQEAq2izh7NEarDdrdZLrplizezZG/JzW14XQ74IXkjEqkvxhZ1s\n" +

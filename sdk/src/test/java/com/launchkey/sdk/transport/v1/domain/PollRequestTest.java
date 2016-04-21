@@ -1,13 +1,11 @@
 package com.launchkey.sdk.transport.v1.domain;
 
-import com.launchkey.sdk.transport.v1.domain.PollRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertThat;
 
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
@@ -24,6 +22,7 @@ public class PollRequestTest {
     private PollRequest pollRequest;
 
     @Before
+    @SuppressWarnings("SpellCheckingInspection")
     public void setUp() throws Exception {
         pollRequest = new PollRequest(
                 "4yjuyyg59cqf2s890uhhhx3vmtgv115a",
@@ -41,6 +40,7 @@ public class PollRequestTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetAuthRequest() throws Exception {
         assertEquals("4yjuyyg59cqf2s890uhhhx3vmtgv115a", pollRequest.getAuthRequest());
     }
@@ -57,6 +57,7 @@ public class PollRequestTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetSecretKey() throws Exception {
         assertEquals(
                 "qGp+BP88k4Sh0CbD8L7ERsu4gKNOnCAt0IB3vB0EoWy44jJiZo5nGS6sTR2VSxJ00l7zRvOIRKYi8pgWqurLEx+3W0s7xOFvjJeonuomixDc7Y5CMx5fCNkM6i1KCM/hDNpIp93uSCYCYvzuo6Gw6cJx0peG6UUyV+6+vn/36bLq8fKn6WfKrywzTbBTh52ckvk2kiZiixIiWSyIDrkFDYrW3bwXJsgUrbzkC4vNLDaVGdN8JZYmerJ5fNFiEOUXuvt6mhHFgWfCRljgr3AZTN+smOfNyYCBWU4WPjENyZAUXPIURW5FqqSfyJBnf1Fcf/xA/QRwiEISVJrWi3scfQ==",
@@ -65,7 +66,9 @@ public class PollRequestTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetSignature() throws Exception {
+        //noinspection SpellCheckingInspection
         assertEquals(
                 "rk1mJeZ4GeqYZmpCZtZCW/D1qR5I69WxOeiLW5gELgSC5sFrsSzhxFdn+hkQvHWKWZr6gBAvmdDA63HFLdC9OHD9WxWjgClSUygxO/04RUFLS1mKaEfyf9DW8gLl7/dp5wuvrIqZ7DJxfLWOQOZKY0L6gopZ6dYF8szfVs+50z/3xcl24KQZ1yz13YKB6S2ud3nJsifnp0/pqVqB+M56Tj5sCqFtel1kJmdY5ayVYBvC5SkzKdqAePcYKxDJm9KSM1mjuXKZ4wD+C04kq7qZx2XPGQHC5xf6pmLlZgYwCuk+ynyWDDjxXAiVk5H1HZYKOmNbWJEQPk/IzfTazESFsg==",
                 pollRequest.getSignature()

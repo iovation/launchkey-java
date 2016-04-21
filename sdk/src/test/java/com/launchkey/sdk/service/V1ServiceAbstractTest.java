@@ -12,10 +12,9 @@ import org.junit.Test;
 
 import java.security.interfaces.RSAPublicKey;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -61,10 +60,10 @@ public class V1ServiceAbstractTest extends V1ServiceTestBase {
         public ConcreteV1Service(
                 Transport transport, Crypto crypto,
                 PingResponseCache pingResponseCache,
-                long rocketKey,
+                long appKey,
                 String secretKey
         ) {
-            super(transport, crypto, pingResponseCache, rocketKey, secretKey);
+            super(transport, crypto, pingResponseCache, appKey, secretKey);
         }
 
         public RSAPublicKey executeGetLaunchKeyPublicKey() throws ApiException {

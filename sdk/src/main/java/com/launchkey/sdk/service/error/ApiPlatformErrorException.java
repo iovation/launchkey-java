@@ -13,7 +13,7 @@
 package com.launchkey.sdk.service.error;
 
 /**
- * The exception thrown when the LaunchKey Engine incurs an error when processinf an API request
+ * The exception thrown when the LaunchKey Engine incurs an error when processing an API request
  */
 public class ApiPlatformErrorException extends ApiException {
     /**

@@ -75,7 +75,7 @@ public class PollRequest {
      */
     @Deprecated
     public long getRocketKey() {
-        return appKey;
+        return getAppKey();
     }
 
     /**

@@ -24,6 +24,7 @@ public class AuthsResponseTest {
     private AuthsResponse authsResponse;
 
     @Before
+    @SuppressWarnings("SpellCheckingInspection")
     public void setUp() throws Exception {
         this.authsResponse = new AuthsResponse("4yjuyyg59cqf2s890uhhhx3vmtgv115a");
     }
@@ -34,12 +35,14 @@ public class AuthsResponseTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetAuthRequestId() throws Exception {
         assertEquals("4yjuyyg59cqf2s890uhhhx3vmtgv115a", this.authsResponse.getAuthRequestId());
     }
 
     @Test
-    public void testJSONParseable() throws Exception {
+    public void testJSONParsable() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         String json = "{\"auth_request\": \"4yjuyyg59cqf2s890uhhhx3vmtgv115a\"}";
         ObjectMapper mapper = new ObjectMapper();
         AuthsResponse actual = mapper.readValue(json, AuthsResponse.class);
@@ -48,6 +51,7 @@ public class AuthsResponseTest {
 
     @Test
     public void testJSONParseAllowsUnknown() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         String json = "{\"auth_request\": \"4yjuyyg59cqf2s890uhhhx3vmtgv115a\", \"unknown\": \"Unknown Value\"}";
         ObjectMapper mapper = new ObjectMapper();
         AuthsResponse actual = mapper.readValue(json, AuthsResponse.class);

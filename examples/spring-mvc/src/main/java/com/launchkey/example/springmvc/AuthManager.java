@@ -14,6 +14,7 @@ package com.launchkey.example.springmvc;
 
 import com.launchkey.sdk.BasicClient;
 import com.launchkey.sdk.Client;
+import com.launchkey.sdk.Config;
 import com.launchkey.sdk.service.auth.*;
 import com.launchkey.sdk.service.error.ApiException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -30,19 +31,22 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 @Component
 public class AuthManager {
-    Logger log = LoggerFactory.getLogger(getClass());
+    final Logger log = LoggerFactory.getLogger(getClass());
     private final AuthService authService;
     private final Map<String, String> sessionAuthRequestMap;
     private final Map<String, Boolean> sessionAuthenticationMap;
     private final Map<String, List<String>> userHashSessionMap;
 
+    @SuppressWarnings("ThrowFromFinallyBlock")
     @Autowired
-    public AuthManager(PlatformSdkConfig config) throws ConfigurationException, IOException {
-        final Long appKey = config.getAppKey();
-        final String secretKey = config.getSecretKey();
-        final String privateKeyLocation = config.getPrivateKeyLocation();
+    public AuthManager(PlatformSdkConfig appConfig) throws ConfigurationException, IOException {
+        final Long appKey = appConfig.getAppKey();
+        final String secretKey = appConfig.getSecretKey();
+        final String privateKeyLocation = appConfig.getPrivateKeyLocation();
+        final String baseURL = appConfig.getBaseUrl();
 
         boolean halt = false;
         if (appKey == null) {
@@ -51,6 +55,10 @@ public class AuthManager {
         }
         if (secretKey == null) {
             log.error("mfa.secret-key property not provided");
+            halt = true;
+        }
+        if (privateKeyLocation == null) {
+            log.error("mfa.private-key-location property not provided");
             halt = true;
         }
         if (privateKeyLocation == null) {
@@ -73,12 +81,13 @@ public class AuthManager {
             br.close();
         }
         String privateKey = sb.toString();
-        Client client = BasicClient.factory(
-                appKey,
-                secretKey,
-                privateKey,
-                new BouncyCastleProvider()
-        );
+        Config clientConfig = new Config(appKey, secretKey);
+        clientConfig.setRSAPrivateKeyPEM(privateKey);
+        clientConfig.setJCEProvider(new BouncyCastleProvider());
+        if (baseURL != null) {
+            clientConfig.setAPIBaseURL(baseURL);
+        }
+        Client client = BasicClient.factory(clientConfig);
         this.authService = client.auth();
         this.sessionAuthenticationMap = Collections.synchronizedMap(new HashMap<String, Boolean>());
         this.sessionAuthRequestMap = new ConcurrentHashMap<String, String>();
@@ -106,7 +115,7 @@ public class AuthManager {
     }
 
     public void logout(String sessionId) throws AuthException {
-        if (true == sessionAuthenticationMap.get(sessionId)) {
+        if (sessionAuthenticationMap.get(sessionId)) {
             sessionAuthenticationMap.put(sessionId, false);
             if (sessionAuthRequestMap.containsKey(sessionId)) {
                 try {

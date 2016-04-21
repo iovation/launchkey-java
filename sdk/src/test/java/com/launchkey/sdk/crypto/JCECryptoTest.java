@@ -11,7 +11,6 @@ import org.junit.Test;
 import java.io.StringReader;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -19,10 +18,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 public class JCECryptoTest {
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String PRIVATE_KEY =
             ("-----BEGIN RSA PRIVATE KEY-----\n" +
                     "MIIEogIBAAKCAQEAq2izh7NEarDdrdZLrplizezZG/JzW14XQ74IXkjEqkvxhZ1s\n" +
@@ -53,10 +51,10 @@ public class JCECryptoTest {
                     "-----END RSA PRIVATE KEY-----\n");
 
 
-
     private static final String PRIVATE_KEY_CARRIAGE_RETURN = PRIVATE_KEY.replace('\n', '\r');
     private static final String PRIVATE_KEY_CARRIAGE_RETURN_NEWLINE = PRIVATE_KEY.replace("\n", "\r\n");
 
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String PUBLIC_KEY =
             ("-----BEGIN RSA PUBLIC KEY-----\n" +
                     "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq2izh7NEarDdrdZLrpli\n" +
@@ -101,7 +99,9 @@ public class JCECryptoTest {
     public void testDecryptAES() throws Exception {
         String expected = "This is the expected unencrypted value";
 
+        @SuppressWarnings("SpellCheckingInspection")
         String base64encodedEncrypted = "Uc7ZMWqCc6TfQU/KTdl1KHEkTIWQWSC+uuSyMU5Kg088E32HLePvHkwwxTdqzhgH";
+        @SuppressWarnings("SpellCheckingInspection")
         String actual = new String(
                 crypto.decryptAES(
                         base64.decode(base64encodedEncrypted.getBytes()),
@@ -115,6 +115,7 @@ public class JCECryptoTest {
     @Test
     public void testDecryptRSA() throws Exception {
         String expected = "This is the expected unencrypted value";
+        @SuppressWarnings("SpellCheckingInspection")
         String base64encodedEncrypted =
                 "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
                         "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
@@ -135,6 +136,7 @@ public class JCECryptoTest {
     @Test
     public void testDecryptAuthTypeDataWithNewLines() throws Exception {
         String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\", \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+        @SuppressWarnings("SpellCheckingInspection")
         String base64encodedEncrypted =
                 "MW7DckKE5IXFWkUN5liJeVo27Jhaq+XSeJSHci1/Qa0dvbhr4YRybxg2DiGlWLVZdZzPr5JaOzO8\n" +
                         "gBEOLJMMVtojFzttShacd6u6llw+trHaaYqL1so9QpyZ7OQJke4MP8lFx/83vi/jL4bOiMGBKaQB\n" +
@@ -147,11 +149,13 @@ public class JCECryptoTest {
 
     @Test
     public void testVerifySignatureReturnsTrueWhenSignatureValid() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         String base64encodedMessage = "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
                 "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
                 "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
                 "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
                 "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
+        @SuppressWarnings("SpellCheckingInspection")
         String base64encodedSignature = "BKOVrXZJVOobOQHpmgPnUpggaYtlZBuKsNv300MTg1fykvD7K6/HKl" +
                 "v27aJUOrtyPzVur+Jad5nz6JHhSrUy5dCVOyeGRnQ4nhrlvkhOcBn4/ctz2l6ZGK6bzOOR7gmUl/3Z" +
                 "nAtHqaTWNlFIlhOe+JEtaMEEvc2fB5rh87ibDGUI9ZtYENoEDkaN7UUq121qZWVCg7Nj3z0+yLhEji" +
@@ -167,12 +171,14 @@ public class JCECryptoTest {
 
     @Test
     public void testVerifySignatureReturnsFalseWhenSignatureInvalid() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         String base64encodedEncrypted =
                 "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
                         "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
                         "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
                         "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
                         "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
+        @SuppressWarnings("SpellCheckingInspection")
         String base64encodedSignature =
                 "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
                         "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +

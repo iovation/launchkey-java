@@ -18,16 +18,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.V1ServiceAbstract;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.service.error.InvalidCallbackException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
 import com.launchkey.sdk.service.error.InvalidSignatureException;
-import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.Transport;
 import com.launchkey.sdk.transport.v1.domain.*;
+import com.launchkey.sdk.transport.v1.domain.Policy.Factor;
+import com.launchkey.sdk.transport.v1.domain.Policy.Policy;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Auth service based on an API V1 transport
@@ -37,11 +38,11 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
     /**
      * Constructor
      *
-     * @param transport Transport service
-     * @param crypto Srypto service
-     * @param pingResponseCache Ping Response Cahce service
-     * @param appKey Application key for requests
-     * @param secretKey Secret key for requests
+     * @param transport         Transport service
+     * @param crypto            Crypto service
+     * @param pingResponseCache Ping Response Cache service
+     * @param appKey            Application key for requests
+     * @param secretKey         Secret key for requests
      */
     public V1AuthService(
             Transport transport, Crypto crypto, PingResponseCache pingResponseCache, long appKey, String secretKey
@@ -50,21 +51,29 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
     }
 
     @Override public String authorize(String username, String context) throws ApiException {
-        return auth(username, context, false);
+        return authorize(username, context, null);
+    }
+
+    @Override public String authorize(String username, String context, AuthPolicy policy) throws ApiException {
+        return auth(username, context, policy, false);
     }
 
     @Override
     public String authorize(String username) throws ApiException {
-        return authorize(username, null);
+        return authorize(username, null, null);
     }
 
     @Override public String login(String username, String context) throws ApiException {
-        return auth(username, context, true);
+        return login(username, context, null);
+    }
+
+    @Override public String login(String username, String context, AuthPolicy policy) throws ApiException {
+        return auth(username, context, policy, true);
     }
 
     @Override
     public String login(String username) throws ApiException {
-        return login(username, null);
+        return login(username, null, null);
     }
 
     @Override
@@ -211,6 +220,7 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
 
     /**
      * Handle a callback request
+     *
      * @param callbackData Callback data received
      * @return parsed callback
      * @throws ApiException when an error occurs handling the callback
@@ -219,10 +229,48 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
         return handleCallback(callbackData, 300);
     }
 
-    private String auth(String username, String context, boolean session) throws ApiException {
+    private String auth(String username, String context, AuthPolicy authPolicy, boolean session) throws ApiException {
         if (context != null && context.length() > 400) {
             throw new IllegalArgumentException("Context value cannot be more than 400 characters");
         }
+
+        Policy policy;
+        if (authPolicy == null) {
+            policy = null;
+        } else {
+            List<Policy.MinimumRequirement> minimumRequirements = new ArrayList<Policy.MinimumRequirement>();
+            minimumRequirements.add(new Policy.MinimumRequirement(
+                    Policy.MinimumRequirement.Type.AUTHENTICATED,
+                    authPolicy.getRequiredFactors(),
+                    authPolicy.isKnowledgeFactorRequired() ? 1 : 0,
+                    authPolicy.isInherenceFactorRequired() ? 1 : 0,
+                    authPolicy.isPossessionFactorRequired() ? 1 : 0
+            ));
+            List<Factor> factors;
+            if (authPolicy.getLocations().isEmpty()) {
+                factors = new ArrayList<Factor>();
+            } else {
+                List<Factor.Location> locations = new ArrayList<Factor.Location>();
+                for (AuthPolicy.Location location : authPolicy.getLocations()) {
+                    locations.add(new Factor.Location(
+                            location.getRadius(),
+                            location.getLatitude(),
+                            location.getLongitude()
+                    ));
+                }
+
+                factors = new ArrayList<Factor>();
+                factors.add(new Factor(
+                        Factor.Type.GEOFENCE,
+                        true,
+                        Factor.Requirement.FORCED,
+                        1,
+                        new Factor.Attributes(locations)
+                ));
+            }
+            policy = new Policy(minimumRequirements, factors);
+        }
+
         byte[] secret = getSecret();
         AuthsRequest request = new AuthsRequest(
                 username,
@@ -231,7 +279,8 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
                 base64.encodeAsString(crypto.sign(secret)),
                 session ? 1 : 0,
                 1,
-                context
+                context,
+                policy
         );
 
         AuthsResponse response = transport.auths(request);

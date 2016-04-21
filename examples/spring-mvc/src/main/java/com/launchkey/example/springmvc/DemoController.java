@@ -53,7 +53,7 @@ public class DemoController {
     public HttpEntity<Authorized> authorized(HttpSession session) throws AuthManager.AuthException {
         Authorized authorized = new Authorized();
         try {
-            authorized.authorized = (authManager.isAuthorized() == true);
+            authorized.authorized = authManager.isAuthorized();
         } catch (AuthManager.AuthException e) {
             authorized.authorized = false;
         }

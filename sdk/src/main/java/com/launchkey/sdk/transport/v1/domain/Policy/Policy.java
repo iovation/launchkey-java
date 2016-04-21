@@ -20,15 +20,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class Policy {
-    private List<MinimumRequirement> minimumRequirements;
-    private List<Factor> factors;
+    private final List<MinimumRequirement> minimumRequirements;
+    private final List<Factor> factors;
 
     public Policy(List<MinimumRequirement> minimumRequirements, List<Factor> factors) {
         this.minimumRequirements = Collections.unmodifiableList(new ArrayList<MinimumRequirement>(minimumRequirements));
         this.factors = Collections.unmodifiableList(new ArrayList<Factor>(factors));
     }
 
-    @JsonProperty("minimum requirement")
+    @JsonProperty("minimum_requirements")
     public List<MinimumRequirement> getMinimumRequirements() {
         return minimumRequirements;
     }
@@ -45,7 +45,9 @@ public class Policy {
 
         Policy policy = (Policy) o;
 
-        if (getMinimumRequirements() != null ? !getMinimumRequirements().equals(policy.getMinimumRequirements()) : policy.getMinimumRequirements() != null) {
+        if (getMinimumRequirements() != null
+                ? !getMinimumRequirements().equals(policy.getMinimumRequirements())
+                : policy.getMinimumRequirements() != null) {
             return false;
         }
         return getFactors() != null ? getFactors().equals(policy.getFactors()) : policy.getFactors() == null;
@@ -69,16 +71,14 @@ public class Policy {
 
     public static class MinimumRequirement {
         private final Type type;
-        private final int any;
+        private final int all;
         private final int knowledge;
         private final int inherence;
         private final int possession;
 
-        public MinimumRequirement(
-                Type type, int any, int knowledge, int inherence, int possession
-        ) {
+        public MinimumRequirement(Type type, int all, int knowledge, int inherence, int possession) {
             this.type = type;
-            this.any = any;
+            this.all = all;
             this.knowledge = knowledge;
             this.inherence = inherence;
             this.possession = possession;
@@ -89,9 +89,9 @@ public class Policy {
             return type;
         }
 
-        @JsonProperty("any")
-        public int getAny() {
-            return any;
+        @JsonProperty("all")
+        public int getAll() {
+            return all;
         }
 
         @JsonProperty("knowledge")
@@ -115,7 +115,7 @@ public class Policy {
 
             MinimumRequirement that = (MinimumRequirement) o;
 
-            if (any != that.any) return false;
+            if (all != that.all) return false;
             if (knowledge != that.knowledge) return false;
             if (inherence != that.inherence) return false;
             if (possession != that.possession) return false;
@@ -125,7 +125,7 @@ public class Policy {
 
         @Override public int hashCode() {
             int result = type != null ? type.hashCode() : 0;
-            result = 31 * result + any;
+            result = 31 * result + all;
             result = 31 * result + knowledge;
             result = 31 * result + inherence;
             result = 31 * result + possession;
@@ -135,7 +135,7 @@ public class Policy {
         @Override public String toString() {
             return "MinimumRequirements{" +
                     "type=" + type +
-                    ", any=" + any +
+                    ", all=" + all +
                     ", knowledge=" + knowledge +
                     ", inherence=" + inherence +
                     ", possession=" + possession +
@@ -143,8 +143,8 @@ public class Policy {
         }
 
         public enum Type {
-            AUTHENTICATED ("authenticated"),
-            ENABLED       ("enabled");
+            AUTHENTICATED("authenticated"),
+            ENABLED("enabled");
 
             private final String value;
 

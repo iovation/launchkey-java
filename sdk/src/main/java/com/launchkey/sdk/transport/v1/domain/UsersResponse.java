@@ -39,7 +39,7 @@ public class UsersResponse {
         }
 
         @JsonCreator
-        public UsersResponseResponse(String emptyData) {
+        public UsersResponseResponse(@SuppressWarnings("UnusedParameters") String emptyData) {
             this.cipher = null;
             this.data = null;
         }
@@ -77,6 +77,7 @@ public class UsersResponse {
      * "myciphermyciphermyciphermycipheriviviviviviviviv" would result in a cipher key of
      * "myciphermyciphermyciphermycipher" and a cipher IV of "iviviviviviviviv".
      */
+    @SuppressWarnings("SpellCheckingInspection")
     private final String cipher;
 
     /**
@@ -116,6 +117,7 @@ public class UsersResponse {
      * "myciphermyciphermyciphermycipheriviviviviviviviv" would result in a cipher key of
      * "myciphermyciphermyciphermycipher" and a cipher IV of "iviviviviviviviv".
      */
+    @SuppressWarnings("SpellCheckingInspection")
     public String getCipher() {
         return cipher;
     }

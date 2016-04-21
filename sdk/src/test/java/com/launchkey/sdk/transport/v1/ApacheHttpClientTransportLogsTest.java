@@ -43,7 +43,7 @@ import static org.mockito.Mockito.*;
 public class ApacheHttpClientTransportLogsTest {
 
     @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public final ExpectedException expectedException = ExpectedException.none();
     private HttpResponse response;
     private HttpClient httpClient;
     private Transport transport;
@@ -113,7 +113,7 @@ public class ApacheHttpClientTransportLogsTest {
     }
 
     @Test
-    public void testPassesRocketKey() throws Exception {
+    public void testPassesAppKey() throws Exception {
         ArgumentCaptor<HttpEntityEnclosingRequestBase> request = ArgumentCaptor.forClass(HttpEntityEnclosingRequestBase.class);
         transport.logs(new LogsRequest("Authenticate", true, null, 1234567890L, null, null));
         verify(httpClient).execute(request.capture());
@@ -215,7 +215,7 @@ public class ApacheHttpClientTransportLogsTest {
     }
 
     @Test
-    public void testResponseStatusCodeOf400ReturnsHttpValuesWhenBodyNotParseable() throws Exception {
+    public void testResponseStatusCodeOf400ReturnsHttpValuesWhenBodyNotParsable() throws Exception {
         expectedException.expect(CommunicationErrorException.class);
         expectedException.expectMessage("Expected Message");
 
@@ -223,11 +223,12 @@ public class ApacheHttpClientTransportLogsTest {
                 new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 400, "Expected Message")
         );
         when(response.getEntity()).thenReturn(
-                EntityBuilder.create().setStream(new ByteArrayInputStream("Unparseable".getBytes("UTF-8"))).build()
+                EntityBuilder.create().setStream(new ByteArrayInputStream("Not Parsable".getBytes("UTF-8"))).build()
         );
         transport.logs(new LogsRequest("Authenticate", true, null, 0L, null, null));
     }
 
+    @SuppressWarnings("Duplicates")
     private String getStringFromReader(InputStream content) throws Exception {
         StringBuilder sb = new StringBuilder();
         String line;

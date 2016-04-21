@@ -101,7 +101,7 @@ public class PolicyTest {
     @Test
     public void jsonEncode() throws Exception {
         String expected = "{" +
-                    "\"minimum requirement\":[]," +
+                    "\"minimum_requirements\":[]," +
                     "\"factors\":[]" +
                 "}";
         ObjectMapper mapper = new ObjectMapper();

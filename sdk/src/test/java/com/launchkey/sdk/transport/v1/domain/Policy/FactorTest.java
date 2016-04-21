@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static java.util.Collections.EMPTY_LIST;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 
@@ -32,7 +31,6 @@ public class FactorTest {
         locations.add(new Factor.Location(10.0, 11.1, 12.2));
         locations.add(new Factor.Location(20.0, 21.1, 22.2));
         factor = new Factor(
-                Factor.Category.INHERENCE,
                 Factor.Type.GEOFENCE,
                 true,
                 Factor.Requirement.FORCED,
@@ -52,18 +50,13 @@ public class FactorTest {
     }
 
     @Test
-    public void getCategory() throws Exception {
-        assertEquals(Factor.Category.INHERENCE, factor.getCategory());
-    }
-
-    @Test
     public void isQuickFail() throws Exception {
         assertTrue(factor.isQuickFail());
     }
 
     @Test
     public void getRequirement() throws Exception {
-        assertEquals(Factor.Requirement.FORCED, factor.getRequirement() );
+        assertEquals(Factor.Requirement.FORCED, factor.getRequirement());
     }
 
     @Test
@@ -78,13 +71,12 @@ public class FactorTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void attributesLocationsIsImmutable() throws Exception {
-        factor.getAttributes().getLocations().add(new Factor.Location(1,1,1));
+        factor.getAttributes().getLocations().add(new Factor.Location(1, 1, 1));
     }
 
     @Test
     public void equalsWithEqualObjectsReturnsTrue() throws Exception {
         Factor o = new Factor(
-                Factor.Category.INHERENCE,
                 Factor.Type.GEOFENCE,
                 true,
                 Factor.Requirement.FORCED,
@@ -97,8 +89,7 @@ public class FactorTest {
     @Test
     public void equalsWithUnequalObjectsReturnsFalse() throws Exception {
         Factor o = new Factor(
-                Factor.Category.KNOWLEDGE,
-                Factor.Type.GEOFENCE,
+                Factor.Type.COMBO_LOCK,
                 true,
                 Factor.Requirement.FORCED,
                 5,
@@ -110,7 +101,6 @@ public class FactorTest {
     @Test
     public void hashCodeOfEqualObjectsIsEqual() throws Exception {
         Factor o = new Factor(
-                Factor.Category.INHERENCE,
                 Factor.Type.GEOFENCE,
                 true,
                 Factor.Requirement.FORCED,
@@ -123,8 +113,7 @@ public class FactorTest {
     @Test
     public void hashCodeOfUnequalObjectsIsNotEqual() throws Exception {
         Factor o = new Factor(
-                Factor.Category.KNOWLEDGE,
-                Factor.Type.GEOFENCE,
+                Factor.Type.COMBO_LOCK,
                 true,
                 Factor.Requirement.FORCED,
                 5,
@@ -143,26 +132,24 @@ public class FactorTest {
     public void testJSONEncodeWithLocations() throws Exception {
         @SuppressWarnings("SpellCheckingInspection")
         String expected = "{" +
-                "\"category\":\"inherence\"," +
                 "\"factor\":\"geofence\"," +
                 "\"requirement\":\"forced requirement\"," +
                 "\"quickfail\":true," +
                 "\"priority\":5," +
                 "\"attributes\":{" +
-                    "\"locations\":[" +
-                        "{" +
-                            "\"radius\":10.0," +
-                            "\"latitude\":11.1," +
-                            "\"longitude\":12.2" +
-                        "},{" +
-                            "\"radius\":20.0," +
-                            "\"latitude\":21.1," +
-                            "\"longitude\":22.2" +
-                        "}" +
-                    "]" +
+                "\"locations\":[" +
+                "{" +
+                "\"radius\":10.0," +
+                "\"latitude\":11.1," +
+                "\"longitude\":12.2" +
+                "},{" +
+                "\"radius\":20.0," +
+                "\"latitude\":21.1," +
+                "\"longitude\":22.2" +
                 "}" +
-            "}"
-        ;
+                "]" +
+                "}" +
+                "}";
 
         ObjectMapper mapper = new ObjectMapper();
         String actual = mapper.writeValueAsString(factor);
@@ -174,19 +161,16 @@ public class FactorTest {
     public void testJSONEncodeWithoutLocations() throws Exception {
         @SuppressWarnings("SpellCheckingInspection")
         String expected = "{" +
-                "\"category\":\"knowledge\"," +
                 "\"factor\":\"pin lock\"," +
                 "\"requirement\":\"allowed\"," +
                 "\"quickfail\":false," +
                 "\"priority\":1," +
                 "\"attributes\":{" +
-                    "\"locations\":[]" +
+                "\"locations\":[]" +
                 "}" +
-            "}"
-        ;
+                "}";
 
         factor = new Factor(
-                Factor.Category.KNOWLEDGE,
                 Factor.Type.PIN_LOCK,
                 false,
                 Factor.Requirement.ALLOWED,

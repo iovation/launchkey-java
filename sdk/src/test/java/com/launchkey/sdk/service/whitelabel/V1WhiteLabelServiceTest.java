@@ -34,6 +34,7 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
     protected final String decryptedUsersResponse = "{\"qrcode\": \"https://dashboard.launchkey.com/qrcode/zje0ja5\"," +
             "\"code\":\"zje0ja5\"}";
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -63,8 +64,16 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
 
 
     @Test
+    public void testPairUserReturnsSameValuesAsLinkUser() throws Exception {
+        PairResponse pairResponse = service.pairUser("identifier");
+        LinkResponse linkResponse = service.linkUser("identifier");
+        assertEquals(new PairResponse(linkResponse), pairResponse);
+    }
+
+
+    @Test
     public void testChecksPingResponseCache() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         verifyChecksPingResponseCache();
     }
 
@@ -72,31 +81,31 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
     public void testDoesNotCallPingWhenPingResponseCacheReturnsResponse() throws Exception {
         when(pingResponseCache.getPingResponse()).thenReturn(pingResponse);
 
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         verifyDoesNotCallPingWhenPingResponseCacheReturnsResponse();
     }
 
     @Test
     public void testDoesCallPingWhenPingResponseCacheReturnsNull() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         verifyDoesCallPingWhenPingResponseCacheReturnsNull();
     }
 
     @Test
     public void testAddsPingResponseToPingResponseCacheWhenPingCallReturnsValue() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         verifyAddsPingResponseToPingResponseCacheWhenPingCallReturnsValue();
     }
 
     @Test
     public void testPassesAuthsRequestToTransportAuthsCall() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         verify(transport).users(any(UsersRequest.class));
     }
 
     @Test
-    public void testPassesCorrectRocketIdInPairRequest() throws Exception {
-        service.pairUser("identifier");
+    public void testPassesCorrectAppKeyInPairRequest() throws Exception {
+        service.linkUser("identifier");
         ArgumentCaptor<UsersRequest> argumentCaptor = ArgumentCaptor.forClass(UsersRequest.class);
         verify(transport).users(argumentCaptor.capture());
         assertEquals(appKey, argumentCaptor.getValue().getAppKey());
@@ -104,7 +113,7 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
 
     @Test
     public void testPassesCorrectRsaEncryptedSecretKeyInUsersRequest() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         ArgumentCaptor<UsersRequest> argumentCaptor = ArgumentCaptor.forClass(UsersRequest.class);
         verify(transport).users(argumentCaptor.capture());
         assertEquals(base64.encodeAsString("RSA Encrypted Value".getBytes()), argumentCaptor.getValue().getSecretKey());
@@ -112,20 +121,20 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
 
     @Test
     public void testUsesPemFromPingToCreatePublicKey() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         verifyUsesPemFromPingToCreatePublicKey();
     }
 
     @Test
     public void testRsaEncryptedWithCorrectPublicKeyToCreateSecretKeyInUsersRequest() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         verifyRsaEncryptedWithCorrectPublicKeyToCreateSecretKey();
     }
 
     @Test
     public void testRsaEncryptedJsonWithCorrectDataToCreateSecretKeyInUsersRequest() throws Exception {
         Date start = new Date();
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         Date end = new Date();
 
         verifyRsaEncryptedJsonWithCorrectDataToCreateSecretKey(start, end);
@@ -133,7 +142,7 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
 
     @Test
     public void testPassesIdentifierInUsersRequest() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         ArgumentCaptor<UsersRequest> argumentCaptor = ArgumentCaptor.forClass(UsersRequest.class);
         verify(transport).users(argumentCaptor.capture());
         assertEquals("identifier", argumentCaptor.getValue().getIdentifier());
@@ -141,15 +150,16 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
 
     @Test
     public void testDecryptsCipherInUsersResponseWithRSA() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
         ArgumentCaptor<byte[]> messageCaptor = ArgumentCaptor.forClass(byte[].class);
         verify(crypto).decryptRSA(messageCaptor.capture());
         assertEquals("Encoded encrypted cipher", new String(messageCaptor.getValue()));
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testUsesKeyAndIVFromDecryptedCipherToDecryptData() throws Exception {
-        service.pairUser("identifier");
+        service.linkUser("identifier");
 
         ArgumentCaptor<byte[]> keyCaptor = ArgumentCaptor.forClass(byte[].class);
         ArgumentCaptor<byte[]> ivCaptor = ArgumentCaptor.forClass(byte[].class);
@@ -170,13 +180,13 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
     @Test(expected = InvalidResponseException.class)
     public void testCatchesGeneralSecurityExceptionDecryptingAESAndThrowsInvalidResponseException() throws Exception {
         when(crypto.decryptAES(any(byte[].class), any(byte[].class), any(byte[].class))).thenThrow(new GeneralSecurityException());
-        service.pairUser("identifier");
+        service.linkUser("identifier");
 
     }
 
     @Test(expected = InvalidResponseException.class)
-    public void testCatchesIOErrorParsingUnparseableDataAndThrowsInvalidResponseException() throws Exception {
+    public void testCatchesIOErrorParsingDataThatIsNotParsableAndThrowsInvalidResponseException() throws Exception {
         when(crypto.decryptAES(any(byte[].class), any(byte[].class), any(byte[].class))).thenReturn("XXX".getBytes());
-        service.pairUser("identifier");
+        service.linkUser("identifier");
     }
 }

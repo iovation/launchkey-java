@@ -1,11 +1,8 @@
 package com.launchkey.sdk;
 
-import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
-import com.launchkey.sdk.crypto.JCECrypto;
 import com.launchkey.sdk.service.auth.AuthService;
 import com.launchkey.sdk.service.whitelabel.WhiteLabelService;
-import org.apache.http.client.HttpClient;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -15,9 +12,7 @@ import java.security.Provider;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
@@ -31,6 +26,7 @@ import static org.mockito.Mockito.when;
  * limitations under the License.
  */
 public class LaunchKeyClientTest {
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String PRIVATE_KEY =
             ("-----BEGIN RSA PRIVATE KEY-----\n" +
                     "MIIEogIBAAKCAQEAq2izh7NEarDdrdZLrplizezZG/JzW14XQ74IXkjEqkvxhZ1s\n" +
@@ -93,6 +89,7 @@ public class LaunchKeyClientTest {
         client = new LaunchKeyClient(auth, whiteLabel);
         assertSame(whiteLabel, client.whiteLabel());
     }
+
     @Test
     public void testClientConstructorAuth() throws Exception {
         when(this.targetClient.auth()).thenReturn(this.auth);

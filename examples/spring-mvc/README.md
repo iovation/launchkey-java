@@ -5,7 +5,7 @@
   * [Installation](#installation)
   * [Usage](#usage)
 
-# <a name="overvire"></a>Overview
+# <a name="overview"></a>Overview
 
 This example project utilizes Spring MVC and Spring Boot to provide a fully self-contained browser based example
 of implementing LaunchKey in a web application environment.  The example application hooks LaunchKey authentication

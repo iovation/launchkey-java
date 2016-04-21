@@ -48,7 +48,7 @@ public class ApacheHttpClientTransport implements Transport {
     private final HttpClient client;
     private final String baseUrl;
     private final Crypto crypto;
-    private Base64 base64 = new Base64(0);
+    private final Base64 base64 = new Base64(0);
 
     /**
      * @param client HTTP Client to use for requests

@@ -6,7 +6,7 @@ import com.launchkey.sdk.service.auth.AuthResponse;
 import com.launchkey.sdk.service.auth.AuthService;
 import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.service.error.ExpiredAuthRequestException;
-import com.launchkey.sdk.service.whitelabel.PairResponse;
+import com.launchkey.sdk.service.whitelabel.LinkResponse;
 import com.launchkey.sdk.service.whitelabel.WhiteLabelService;
 import com.martiansoftware.jsap.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -145,7 +145,7 @@ public class DemoApp {
     private static void handleWhiteLabelLinkUser(
             String identifier, WhiteLabelService whiteLabelService
     ) throws ApiException {
-        PairResponse result = whiteLabelService.pairUser(identifier);
+        LinkResponse result = whiteLabelService.linkUser(identifier);
         System.out.println();
         System.out.println("White label user link request successful");
         System.out.println("    QR Code URL: " + result.getQrCodeUrl());
@@ -215,7 +215,6 @@ public class DemoApp {
         jsap.registerParameter(
                 new UnflaggedOption("app_key")
                         .setUsageName("APP_KEY")
-//                        .setStringParser(JSAP.INTEGER_PARSER)
                         .setRequired(true)
                         .setHelp("Application Key for the application from Dashboard")
         );
@@ -250,6 +249,7 @@ public class DemoApp {
         return jsap;
     }
 
+    @SuppressWarnings("ThrowFromFinallyBlock")
     private static String readFile(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         StringBuilder sb = new StringBuilder();

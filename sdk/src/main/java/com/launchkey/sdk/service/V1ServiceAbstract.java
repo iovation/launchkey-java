@@ -30,7 +30,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 
 /**
- * Abstract V1 based service providing shared funcitonality between auth and whitelabel services
+ * Abstract V1 based service providing shared functionality between auth and whitelabel services
  */
 public abstract class V1ServiceAbstract {
     protected final Transport transport;
@@ -80,8 +80,7 @@ public abstract class V1ServiceAbstract {
                 log.error("Error placing ping response in cache", e);
             }
         }
-        RSAPublicKey publicKey = crypto.getRSAPublicKeyFromPEM(pingResponse.getPublicKey());
-        return publicKey;
+        return crypto.getRSAPublicKeyFromPEM(pingResponse.getPublicKey());
     }
 
     protected byte[] getSecret() throws ApiException {

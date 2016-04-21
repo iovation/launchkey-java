@@ -43,7 +43,12 @@ public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabel
     }
 
     @Override
+    @Deprecated
     public PairResponse pairUser(String identifier) throws ApiException {
+        return new PairResponse(linkUser(identifier));
+    }
+
+    @Override public LinkResponse linkUser(String identifier) throws ApiException {
         UsersResponse usersResponse = transport.users(
                 new UsersRequest(
                         identifier,
@@ -59,12 +64,11 @@ public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabel
 
         try {
             byte[] data = crypto.decryptAES(base64.decode(usersResponse.getData()), key, iv);
-            PairResponse response = objectMapper.readValue(data, PairResponse.class);
-            return response;
+            return objectMapper.readValue(data, LinkResponse.class);
         } catch (GeneralSecurityException e) {
-            throw new InvalidResponseException("Unable to decrypt pair response", e);
+            throw new InvalidResponseException("Unable to decrypt link response", e);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse pair response data", e);
+            throw new InvalidResponseException("Unable to parse link response data", e);
         }
     }
 }

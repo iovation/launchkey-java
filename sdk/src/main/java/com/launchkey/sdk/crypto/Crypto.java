@@ -12,9 +12,8 @@
 
 package com.launchkey.sdk.crypto;
 
-import javax.crypto.NoSuchPaddingException;
-import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
@@ -26,9 +25,8 @@ public interface Crypto {
      * Encrypt the provided message with the provided public key.  The message will be encrypted with the
      * RSA/ECB/OAEP with SHA1 cipher and MGF1 padding.
      *
-     * @param message Message to be encrypted
+     * @param message   Message to be encrypted
      * @param publicKey Public key with which to encrypt the message
-     *
      * @return encrypted message
      */
     byte[] encryptRSA(byte[] message, PublicKey publicKey);
@@ -56,7 +54,7 @@ public interface Crypto {
      * using the provided message.  The signature must have been generated with SHA256 with RSA.
      *
      * @param signature Signature to verify
-     * @param message Message to verify against
+     * @param message   Message to verify against
      * @param publicKey Public key paired with the private key used tpo generate the signature
      * @return true if valid an false if not valid
      */
@@ -64,9 +62,10 @@ public interface Crypto {
 
     /**
      * Decrypt AES/CBC
+     *
      * @param message Message to sign
-     * @param key Key for crypto
-     * @param iv Initialization Vector (IV) for crypto
+     * @param key     Key for crypto
+     * @param iv      Initialization Vector (IV) for crypto
      * @return decrypted message
      * @throws GeneralSecurityException When an error occurred decrypting the message
      */

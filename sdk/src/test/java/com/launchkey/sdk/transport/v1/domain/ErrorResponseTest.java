@@ -49,7 +49,7 @@ public class ErrorResponseTest {
 
 
     @Test
-    public void testJSONParseable() throws Exception {
+    public void testJSONParsable() throws Exception {
         String json = "{\"status_code\": 400, \"message\": \"Credentials incorrect for app and app secret\", \"message_code\": 40422}";
         ObjectMapper mapper = new ObjectMapper();
         ErrorResponse actual = ErrorResponse.factory(mapper.readTree(json));

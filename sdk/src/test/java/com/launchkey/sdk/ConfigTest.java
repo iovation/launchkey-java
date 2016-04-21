@@ -114,15 +114,16 @@ public class ConfigTest {
 
     @Test
     public void testGetHttpClientConnectionTTLSecsDefaultsToNull() throws Exception {
+        assertNull(config.getHttpClientConnectionTTLSecs());
+    }
+
+    @Test
+    public void testSetHttpClientConnectionTTLSecs() throws Exception {
         int expected = 12345;
         assertEquals(
                 (Integer) expected,
                 config.setHttpClientConnectionTTLSecs(expected).getHttpClientConnectionTTLSecs()
         );
-    }
-
-    @Test
-    public void testSetHttpClientConnectionTTLSecs() throws Exception {
     }
 
     @Test

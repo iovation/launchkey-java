@@ -13,24 +13,12 @@
 package com.launchkey.sdk.service.whitelabel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Response given for pair request
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class PairResponse {
-    /**
-     * Code to to be used by the mobile app to pair the user and device by manually entering the code.
-     */
-    private final String code;
-
-    /**
-     * URL for a QR code image to be used by the mobile app to pair the user and device by reading
-     * the QR code on the mobile device.
-     */
-    private final String qrCodeUrl;
+    private final LinkResponse linkResponse;
 
     /**
      * @param code      Code to to be used by the mobile app to pair the user and device by manually entering the code.
@@ -38,9 +26,12 @@ public class PairResponse {
      *                  the QR code on the mobile device.
      */
     @JsonCreator
-    public PairResponse(@JsonProperty("code") String code, @JsonProperty("qrcode") String qrCodeUrl) {
-        this.code = code;
-        this.qrCodeUrl = qrCodeUrl;
+    public PairResponse(String code, String qrCodeUrl) {
+        linkResponse = new LinkResponse(code, qrCodeUrl);
+    }
+
+    public PairResponse(LinkResponse linkResponse) {
+        this.linkResponse = linkResponse;
     }
 
     /**
@@ -49,7 +40,7 @@ public class PairResponse {
      * @return Code to to be used by the mobile app to pair the user and device by manually entering the code.
      */
     public String getCode() {
-        return code;
+        return linkResponse.getCode();
     }
 
     /**
@@ -59,13 +50,13 @@ public class PairResponse {
      * the QR code on the mobile device.
      */
     public String getQrCodeUrl() {
-        return qrCodeUrl;
+        return linkResponse.getQrCodeUrl();
     }
 
     @Override public String toString() {
         return "PairResponse{" +
-                "code='" + code + '\'' +
-                ", qrCodeUrl='" + qrCodeUrl + '\'' +
+                "code='" + linkResponse.getCode() + '\'' +
+                ", qrCodeUrl='" + linkResponse.getQrCodeUrl() + '\'' +
                 '}';
     }
 
@@ -75,14 +66,11 @@ public class PairResponse {
 
         PairResponse that = (PairResponse) o;
 
-        if (code != null ? !code.equals(that.code) : that.code != null) return false;
-        return !(qrCodeUrl != null ? !qrCodeUrl.equals(that.qrCodeUrl) : that.qrCodeUrl != null);
+        return linkResponse.equals(that.linkResponse);
 
     }
 
     @Override public int hashCode() {
-        int result = code != null ? code.hashCode() : 0;
-        result = 31 * result + (qrCodeUrl != null ? qrCodeUrl.hashCode() : 0);
-        return result;
+        return linkResponse.hashCode();
     }
 }
