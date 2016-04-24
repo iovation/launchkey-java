@@ -15,7 +15,7 @@ package com.launchkey.sdk.service.error;
 /**
  * This exception is thrown when the data sent to the API was not the correct data for the endpoint.
  */
-public class InvalidRequestException extends LaunchKeyException {
+public class InvalidRequestException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).

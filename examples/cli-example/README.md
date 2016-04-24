@@ -1,4 +1,4 @@
-# LaunchKey Java SDK - CLI Example
+# Java SDK - CLI Example
 
 
   * [Pre-Requisites](#prerequisites)
@@ -7,7 +7,7 @@
 
 # <a name="prerequisites"></a>Pre-Requisites
 
-Follow the pre-requisites instructions for the LaunchKey SDK: [SDK Instructions](../../sdk/README.md#prerequisites).
+Follow the pre-requisites instructions for the Platform SDK for Java: [SDK Instructions](../../sdk/README.md#prerequisites).
 The demo will utilize the Bouncy Castle JCE provider.  Make sure to install that provider in the instructions.
 
 # <a name="installation"></a>Installation
@@ -28,33 +28,6 @@ mvn clean package
     java -jar launchkey-java-cli-demo-1.0.0.jar -h
     ```
 
-  2. Ping
-   
-    Ping can be used to verify that you have properly installed the cryptography requirements.
-     
-    Example:
-
-    ```
-    java -jar launchkey-java-cli-demo-1.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key ping
-    ```
-    
-    After executing you should see a response similar to this:
-    
-    ```
-    Attempting ping request for app key 4152794039
-    Ping request successful
-        LaunchKey Time: 2015-02-04 18:12:52
-        Public Key: -----BEGIN PUBLIC KEY-----
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8zQos4iDSjmUVrFUAg5G
-    uhU6GehNKb8MCXFadRWiyLGjtbGZAk8fusQU0Uj9E3o0mne0SYESACkhyK+3M1Er
-    bHlwYJHN0PZHtpaPWqsRmNzui8PvPmhm9QduF4KBFsWu1sBw0ibBYsLrua67F/wK
-    PaagZRnUgrbRUhQuYt+53kQNH9nLkwG2aMVPxhxcLJYPzQCat6VjhHOX0bgiNt1i
-    HRHU2phxBcquOW2HpGSWcpzlYgFEhPPQFAxoDUBYZI3lfRj49gBhGQi32qQ1YiWp
-    aFxOB8GA0Ny5SfI67u6w9Nz9Z9cBhcZBfJKdq5uRWjZWslHjBN3emTAKBpAUPNET
-    nwIDAQAB
-    -----END PUBLIC KEY-----
-    ```
-
   3. Login
   
     Performing a login request is accomplished with the login command which is passed a username.
@@ -70,7 +43,7 @@ mvn clean package
 
     ```
     Login request successful
-        LaunchKey Time: 2015-02-04 18:29:27
+        Date Time: 2015-02-04 18:29:27
         Auth Request: wb9phc6kv2qg5ajplr13tpq8b5sx4ukn
     Checking for response from user
     ..............
@@ -136,10 +109,10 @@ mvn clean package
     
   6. Pair a white label user
   
-    White label apps are applications that use the LaunchKey WhiteLabel SDK to embed the functionality of the
-    LaunchKey Mobile Authenticator.  A separate process for pairing users and devices in the LaunchKey system is needed
-    for these users within a White Label Group.  __This command requires that the Rocket Key used in the command to
-    belong to a White Label Group.  If you are not using a White Label Rocket, the command will error.__
+    White label apps are applications that use the WhiteLabel SDK to embed the functionality of the
+    Mobile Authenticator.  A separate process for pairing users and devices in the Platform is needed
+    for these users within a White Label Group.  __This command requires that the Application Key used in the command to
+    belong to a White Label Group.  If you are not using a White Label Application, the command will error.__
     
     Pass a unique identifier for a user in your system to the white-label-pair-user command.  The example request
     below uses a GUID.
@@ -150,7 +123,7 @@ mvn clean package
     java -jar launchkey-java-cli-demo-2.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key white-label-pair-user 326335b0-8569-4aa3-90a3-ac4372104ea3
     ```
 
-    Response when the Rocket Key is not for a White Label Rocket:
+    Response when the Application Key is not for a White Label Application:
     
     ```
     There was an error creating your user: Unable to find app
@@ -161,7 +134,6 @@ mvn clean package
     ```
     White label user creation request successful
         QR Code URL: https://dashboard.launchkey.com/qrcode/5r53j9z
-        LaunchKey Identifier: 6IsYb4D5KiL8KJCQgBEkEjhOQaxsHtPNRDLEZjJjZLw
         Manual verification code: 5r53j9z
     ```
      

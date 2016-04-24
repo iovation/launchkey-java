@@ -12,8 +12,7 @@
 
 package com.launchkey.sdk.transport.v1;
 
-import com.launchkey.sdk.service.error.CommunicationErrorException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.domain.*;
 
 /**
@@ -25,38 +24,38 @@ public interface Transport {
      * Send a ping request
      * @param request Ping request data
      * @return Ping response
-     * @throws LaunchKeyException When an error occurs processing the request
+     * @throws ApiException When an error occurs processing the request
      */
-    PingResponse ping(PingRequest request) throws LaunchKeyException;
+    PingResponse ping(PingRequest request) throws ApiException;
 
     /**
      * Send an auths request
      * @param request Auths request data
      * @return Auths response
-     * @throws LaunchKeyException When an error occurs processing the request
+     * @throws ApiException When an error occurs processing the request
      */
-    AuthsResponse auths(AuthsRequest request) throws LaunchKeyException;
+    AuthsResponse auths(AuthsRequest request) throws ApiException;
 
     /**
      * Send a poll request
      * @param request Poll request data
      * @return Poll response data
-     * @throws LaunchKeyException When an error occurs processing the request
+     * @throws ApiException When an error occurs processing the request
      */
-    PollResponse poll(PollRequest request) throws LaunchKeyException;
+    PollResponse poll(PollRequest request) throws ApiException;
 
     /**
      * Perform a logs request
      * @param request Logs request data
-     * @throws LaunchKeyException When an error occurs processing the request
+     * @throws ApiException When an error occurs processing the request
      */
-    void logs(LogsRequest request) throws LaunchKeyException;
+    void logs(LogsRequest request) throws ApiException;
 
     /**
      * Perform a users request
      * @param request Users request data
      * @return Users response data
-     * @throws LaunchKeyException When an error occurs processing the request
+     * @throws ApiException When an error occurs processing the request
      */
-    UsersResponse users(UsersRequest request) throws LaunchKeyException;
+    UsersResponse users(UsersRequest request) throws ApiException;
 }

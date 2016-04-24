@@ -39,7 +39,7 @@ public class UsersResponse {
         }
 
         @JsonCreator
-        public UsersResponseResponse(String emptyData) {
+        public UsersResponseResponse(@SuppressWarnings("UnusedParameters") String emptyData) {
             this.cipher = null;
             this.data = null;
         }
@@ -70,13 +70,14 @@ public class UsersResponse {
 
     /**
      * Base64 encoded RSA encrypted JSON string. Once Base64 decoded, decrypt the result with the private key of RSA
-     * public/private key pair associated with the Rocket whose Rocket Key was included in the request. The decrypted
+     * public/private key pair associated with the Application whose Application Key was included in the request. The decrypted
      * string will be a forty-eight (48) character AES cipher string. The first thirty-two (32) characters of the
      * cipher string are the cipher key and the remaining sixteen (16) characters are the cipher IV. The cipher key
      * and IV will be used to decrypt the data attribute. For example, the decrypted cipher string of
      * "myciphermyciphermyciphermycipheriviviviviviviviv" would result in a cipher key of
      * "myciphermyciphermyciphermycipher" and a cipher IV of "iviviviviviviviv".
      */
+    @SuppressWarnings("SpellCheckingInspection")
     private final String cipher;
 
     /**
@@ -109,13 +110,14 @@ public class UsersResponse {
 
     /**
      * @return Base64 encoded RSA encrypted JSON string. Once Base64 decoded, decrypt the result with the private key of RSA
-     * public/private key pair associated with the Rocket whose Rocket Key was included in the request. The decrypted
+     * public/private key pair associated with the Application whose Application Key was included in the request. The decrypted
      * string will be a forty-eight (48) character AES cipher string. The first thirty-two (32) characters of the
      * cipher string are the cipher key and the remaining sixteen (16) characters are the cipher IV. The cipher key
      * and IV will be used to decrypt the data attribute. For example, the decrypted cipher string of
      * "myciphermyciphermyciphermycipheriviviviviviviviv" would result in a cipher key of
      * "myciphermyciphermyciphermycipher" and a cipher IV of "iviviviviviviviv".
      */
+    @SuppressWarnings("SpellCheckingInspection")
     public String getCipher() {
         return cipher;
     }

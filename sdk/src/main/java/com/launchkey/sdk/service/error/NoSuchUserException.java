@@ -15,7 +15,7 @@ package com.launchkey.sdk.service.error;
 /**
  * Exception thrown when an auth request is attempted against an unknown username
  */
-public class NoSuchUserException extends LaunchKeyException {
+public class NoSuchUserException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).

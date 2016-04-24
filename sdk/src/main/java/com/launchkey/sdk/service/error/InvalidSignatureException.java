@@ -16,7 +16,7 @@ package com.launchkey.sdk.service.error;
  * This exception is thrown when a signed data packet is received from the LaunchKey Engine API and the signature
  * is not valid or does not match the package data.
  */
-public class InvalidSignatureException extends LaunchKeyException {
+public class InvalidSignatureException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).

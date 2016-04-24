@@ -1,7 +1,5 @@
 package com.launchkey.sdk.service.error;
 
-import com.launchkey.sdk.service.error.LaunchKeyEngineErrorException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +17,12 @@ import static org.junit.Assert.assertEquals;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class LaunchKeyExceptionTest {
-    private LaunchKeyException x;
+public class ApiExceptionTest {
+    private ApiException x;
 
     @Before
     public void setUp() throws Exception {
-        x = new LaunchKeyEngineErrorException("message", 999);
+        x = new ApiPlatformErrorException("message", 999);
     }
 
     @After
@@ -44,7 +42,7 @@ public class LaunchKeyExceptionTest {
 
     @Test
     public void testDefaultConstructorSetsCodeToZero() throws Exception {
-        assertEquals(0, new LaunchKeyException().getCode());
+        assertEquals(0, new ApiException().getCode());
 
     }
 }

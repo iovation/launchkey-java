@@ -24,6 +24,7 @@ public class LogsRequestTest {
     private LogsRequest logsRequest;
 
     @Before
+    @SuppressWarnings("SpellCheckingInspection")
     public void setUp() throws Exception {
         logsRequest = new LogsRequest(
                 "Authenticate",
@@ -76,16 +77,23 @@ public class LogsRequestTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetAuthRequest() throws Exception {
         assertEquals("4yjuyyg59cqf2s890uhhhx3vmtgv115a", logsRequest.getAuthRequest());
     }
 
     @Test
-    public void testGetRocketKey() throws Exception {
-        assertEquals(9999999999L, logsRequest.getRocketKey());
+    public void testGetAppKey() throws Exception {
+        assertEquals(9999999999L, logsRequest.getAppKey());
     }
 
     @Test
+    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
+        assertEquals(logsRequest.getAppKey(), logsRequest.getRocketKey());
+    }
+
+    @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetSecretKey() throws Exception {
         assertEquals(
                 "qGp+BP88k4Sh0CbD8L7ERsu4gKNOnCAt0IB3vB0EoWy44jJiZo5nGS6sTR2VSxJ00l7zRvOIRKYi8pgWqurLEx+3W0s7xOFvjJeonuomixDc7Y5CMx5fCNkM6i1KCM/hDNpIp93uSCYCYvzuo6Gw6cJx0peG6UUyV+6+vn/36bLq8fKn6WfKrywzTbBTh52ckvk2kiZiixIiWSyIDrkFDYrW3bwXJsgUrbzkC4vNLDaVGdN8JZYmerJ5fNFiEOUXuvt6mhHFgWfCRljgr3AZTN+smOfNyYCBWU4WPjENyZAUXPIURW5FqqSfyJBnf1Fcf/xA/QRwiEISVJrWi3scfQ==",
@@ -94,6 +102,7 @@ public class LogsRequestTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetSignature() throws Exception {
         assertEquals(
                 "rk1mJeZ4GeqYZmpCZtZCW/D1qR5I69WxOeiLW5gELgSC5sFrsSzhxFdn+hkQvHWKWZr6gBAvmdDA63HFLdC9OHD9WxWjgClSUygxO/04RUFLS1mKaEfyf9DW8gLl7/dp5wuvrIqZ7DJxfLWOQOZKY0L6gopZ6dYF8szfVs+50z/3xcl24KQZ1yz13YKB6S2ud3nJsifnp0/pqVqB+M56Tj5sCqFtel1kJmdY5ayVYBvC5SkzKdqAePcYKxDJm9KSM1mjuXKZ4wD+C04kq7qZx2XPGQHC5xf6pmLlZgYwCuk+ynyWDDjxXAiVk5H1HZYKOmNbWJEQPk/IzfTazESFsg==",

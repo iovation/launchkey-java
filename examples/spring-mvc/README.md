@@ -5,7 +5,7 @@
   * [Installation](#installation)
   * [Usage](#usage)
 
-# <a name="overvire"></a>Overview
+# <a name="overview"></a>Overview
 
 This example project utilizes Spring MVC and Spring Boot to provide a fully self-contained browser based example
 of implementing LaunchKey in a web application environment.  The example application hooks LaunchKey authentication
@@ -36,7 +36,7 @@ mvn clean package
 1. Launch the Spring Boot application by running the packaged jar in the target directory.  The following Spring Boot
   environment properties are required for the example to work:
    
-  * launchkey.rocket-key
+  * launchkey.app-key
   * launchkey.secret-key
   * launchkey.private-key-location
   
@@ -45,7 +45,7 @@ mvn clean package
   of `2.0.0-SNAPSHOT`:
   
   ```
-  java -jar examples/spring-mvc/target/examples-spring-mvc-2.0.0-SNAPSHOT.jar --launchkey.rocket-key=1234567890 --launchkey.secret-key=xbv739jxzx63xrexdtrkcdkpksotctewk --launchkey.private-key-location=/tmp/private-key.pem
+  java -jar examples/spring-mvc/target/examples-spring-mvc-2.0.0-SNAPSHOT.jar --mfa.app-key=1234567890 --mfa.secret-key=xbv739jxzx63xrexdtrkcdkpksotctewk --mfa.private-key-location=/tmp/private-key.pem
   ```
 
 2. Verify the server is running by accessing the URL of your web server: [http://localhost:8080](http://localhost:8080).
@@ -99,13 +99,13 @@ GET /                          302 Found
 
 5. Now that your web server and reverse proxy are working, update your application with the callback URL.  This is done
    by placing the URL you just verified from Ngrok plus the path `/callback` into the callback field in the General
-   section of your LaunchKey application configuration in the [LaunchKey Dashboard](https://dashboard.launchkey.com).
+   section of your Application configuration in the Dashboard.
    Based ion the Ngrok example above the callback URL would be: `https://d5caea01.ngrok.com/callback`.
 
 6. Access the home page at [http://localhost:8080](http://localhost:8080).  You will be redirected to the `/login`
   page the first time you access the page.
 
-3. Enter your LaunchKey username or, if the Rocket Key is for a White Label Rocket, White Label identifier.
+3. Enter your LaunchKey username or, if the Application Key is for a White Label Application, White Label identifier.
 
 4. Authorize or deny the request.  Authorizing will redirect you to the home page.  Denying will redirect you to a
   login error page.  Not responding will also redirect you the login error page after the timeout of five (5)

@@ -15,7 +15,7 @@ package com.launchkey.sdk.service.error;
 /**
  * Abstract exception class from which all errors in the SDK are derived
  */
-public class LaunchKeyException extends Exception {
+public class ApiException extends Exception {
     /**
      * Code associated with an exception
      */
@@ -29,8 +29,8 @@ public class LaunchKeyException extends Exception {
      *         by the {@link #getMessage()} method).
      * @return Exception that properly correlates with the code
      */
-    public static LaunchKeyException fromCode(int code, String message) {
-        LaunchKeyException error;
+    public static ApiException fromCode(int code, String message) {
+        ApiException error;
 
         switch (code) {
             case 40421:
@@ -83,12 +83,12 @@ public class LaunchKeyException extends Exception {
                 error = new ExpiredAuthRequestException(message, code);
                 break;
             default:
-                error = new LaunchKeyException(message, code);
+                error = new ApiException(message, code);
         }
         return error;
     }
 
-    public LaunchKeyException() {
+    public ApiException() {
         code = 0;
     }
 
@@ -97,7 +97,7 @@ public class LaunchKeyException extends Exception {
      *         by the {@link #getMessage()} method).
      * @param  code HTTP status code or 0 if no HTTP status code was returned
      */
-    public LaunchKeyException(String message, int code) {
+    public ApiException(String message, int code) {
         super(message);
         this.code = code;
     }
@@ -111,7 +111,7 @@ public class LaunchKeyException extends Exception {
      *         unknown.)
      * @param  code HTTP status code or 0 if no HTTP status code was returned
      */
-    public LaunchKeyException(String message, Throwable cause, int code) {
+    public ApiException(String message, Throwable cause, int code) {
         super(message, cause);
         this.code = code;
     }

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
  */
 public class ApacheHttpClientTransportTest {
     @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public final ExpectedException expectedException = ExpectedException.none();
     private HttpClient httpClient;
     private Crypto crypto;
 
@@ -54,7 +54,7 @@ public class ApacheHttpClientTransportTest {
     }
 
     @Test
-    public void testConstructorWithInvalidUriThowsIllegalArgumentException() throws Exception {
+    public void testConstructorWithInvalidUriThrowsIllegalArgumentException() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
         new ApacheHttpClientTransport(httpClient, "Invalid URL", crypto);
     }

@@ -16,18 +16,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "launchkey")
-public class LaunchKeyConfig {
-    private Long rocketKey;
+@ConfigurationProperties(prefix = "mfa")
+public class PlatformSdkConfig {
+    private Long appKey;
     private String secretKey;
     private String privateKeyLocation;
+    private String baseUrl;
 
-    public Long getRocketKey() {
-        return rocketKey;
+    public Long getAppKey() {
+        return appKey;
     }
 
-    public void setRocketKey(Long rocketKey) {
-        this.rocketKey = rocketKey;
+    public void setAppKey(Long appKey) {
+        this.appKey = appKey;
     }
 
     public String getSecretKey() {
@@ -44,5 +45,13 @@ public class LaunchKeyConfig {
 
     public void setPrivateKeyLocation(String privateKeyLocation) {
         this.privateKeyLocation = privateKeyLocation;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
     }
 }

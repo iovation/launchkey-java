@@ -12,9 +12,11 @@
 
 package com.launchkey.example.springmvc;
 
-import com.launchkey.sdk.LaunchKeyClient;
+import com.launchkey.sdk.BasicClient;
+import com.launchkey.sdk.Client;
+import com.launchkey.sdk.Config;
 import com.launchkey.sdk.service.auth.*;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,34 +31,41 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 @Component
 public class AuthManager {
-    Logger log = LoggerFactory.getLogger(getClass());
+    final Logger log = LoggerFactory.getLogger(getClass());
     private final AuthService authService;
     private final Map<String, String> sessionAuthRequestMap;
     private final Map<String, Boolean> sessionAuthenticationMap;
     private final Map<String, List<String>> userHashSessionMap;
 
+    @SuppressWarnings("ThrowFromFinallyBlock")
     @Autowired
-    public AuthManager(LaunchKeyConfig config) throws ConfigurationException, IOException {
-        final Long rocketKey = config.getRocketKey();
-        final String secretKey = config.getSecretKey();
-        final String privateKeyLocation = config.getPrivateKeyLocation();
+    public AuthManager(PlatformSdkConfig appConfig) throws ConfigurationException, IOException {
+        final Long appKey = appConfig.getAppKey();
+        final String secretKey = appConfig.getSecretKey();
+        final String privateKeyLocation = appConfig.getPrivateKeyLocation();
+        final String baseURL = appConfig.getBaseUrl();
 
         boolean halt = false;
-        if (rocketKey == null) {
-            log.error("launchkey.rocket-key property not provided");
+        if (appKey == null) {
+            log.error("mfa.app-key property not provided");
             halt = true;
         }
         if (secretKey == null) {
-            log.error("launchkey.secret-key property not provided");
+            log.error("mfa.secret-key property not provided");
             halt = true;
         }
         if (privateKeyLocation == null) {
-            log.error("launchkey.private-key-location property not provided");
+            log.error("mfa.private-key-location property not provided");
             halt = true;
         }
-        if (halt) throw new ConfigurationException("Missing required LaunchKey configuration");
+        if (privateKeyLocation == null) {
+            log.error("mfa.private-key-location property not provided");
+            halt = true;
+        }
+        if (halt) throw new ConfigurationException("Missing required mfa configuration");
 
         BufferedReader br = new BufferedReader(new FileReader(privateKeyLocation));
         StringBuilder sb = new StringBuilder();
@@ -72,26 +81,27 @@ public class AuthManager {
             br.close();
         }
         String privateKey = sb.toString();
-        LaunchKeyClient launchKeyClient = LaunchKeyClient.factory(
-                rocketKey,
-                secretKey,
-                privateKey,
-                new BouncyCastleProvider()
-        );
-        this.authService = launchKeyClient.auth();
+        Config clientConfig = new Config(appKey, secretKey);
+        clientConfig.setRSAPrivateKeyPEM(privateKey);
+        clientConfig.setJCEProvider(new BouncyCastleProvider());
+        if (baseURL != null) {
+            clientConfig.setAPIBaseURL(baseURL);
+        }
+        Client client = BasicClient.factory(clientConfig);
+        this.authService = client.auth();
         this.sessionAuthenticationMap = Collections.synchronizedMap(new HashMap<String, Boolean>());
         this.sessionAuthRequestMap = new ConcurrentHashMap<String, String>();
         this.userHashSessionMap = new ConcurrentHashMap<String, List<String>>();
     }
 
-    public void login(String username) throws AuthException {
+    public void login(String username, String context) throws AuthException {
         try {
-            String authRequestId = this.authService.login(username);
+            String authRequestId = this.authService.login(username, context);
             String sessionId = getSessionId();
             sessionAuthRequestMap.put(sessionId, authRequestId);
             sessionAuthenticationMap.put(sessionId, null);
-        } catch (LaunchKeyException launchKeyException) {
-            throw new AuthException("Error logging in with username: " + username, launchKeyException);
+        } catch (ApiException apiException) {
+            throw new AuthException("Error logging in with username: " + username, apiException);
         }
     }
 
@@ -105,17 +115,17 @@ public class AuthManager {
     }
 
     public void logout(String sessionId) throws AuthException {
-        if (true == sessionAuthenticationMap.get(sessionId)) {
+        if (sessionAuthenticationMap.get(sessionId)) {
             sessionAuthenticationMap.put(sessionId, false);
             if (sessionAuthRequestMap.containsKey(sessionId)) {
                 try {
                     authService.logout(sessionAuthRequestMap.get(sessionId));
                     sessionAuthenticationMap.put(sessionId, false);
                     sessionAuthRequestMap.remove(sessionId);
-                } catch (LaunchKeyException launchKeyException) {
+                } catch (ApiException apiException) {
                     throw new AuthException(
                             "Error on logout for auth request: " + sessionAuthRequestMap.get(sessionId),
-                            launchKeyException
+                            apiException
                     );
                 }
             } else {
@@ -159,8 +169,8 @@ public class AuthManager {
                 }
                 userHashSessionMap.remove(userHash);
             }
-        } catch (LaunchKeyException launchKeyException) {
-            throw new AuthException("Error handling callback", launchKeyException);
+        } catch (ApiException apiException) {
+            throw new AuthException("Error handling callback", apiException);
         }
     }
 

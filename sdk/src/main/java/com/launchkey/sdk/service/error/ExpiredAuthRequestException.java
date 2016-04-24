@@ -16,7 +16,7 @@ package com.launchkey.sdk.service.error;
  * Exception thrown when an attempt is made to get the status of an expired request. This could be caused by
  * an unanswered request expiring or an auth request that was accepted being de-orbited.
  */
-public class ExpiredAuthRequestException extends LaunchKeyException {
+public class ExpiredAuthRequestException extends ApiException {
     /**
      * @param  message the detail message (which is saved for later retrieval
      *         by the {@link #getMessage()} method).

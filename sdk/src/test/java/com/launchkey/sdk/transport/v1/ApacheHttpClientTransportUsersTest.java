@@ -2,12 +2,10 @@ package com.launchkey.sdk.transport.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchkey.sdk.crypto.Crypto;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.service.error.CommunicationErrorException;
 import com.launchkey.sdk.service.error.InvalidRequestException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
-import com.launchkey.sdk.transport.v1.domain.PollRequest;
-import com.launchkey.sdk.transport.v1.domain.PollResponse;
 import com.launchkey.sdk.transport.v1.domain.UsersRequest;
 import com.launchkey.sdk.transport.v1.domain.UsersResponse;
 import org.apache.commons.codec.binary.Base64;
@@ -29,12 +27,10 @@ import org.mockito.ArgumentCaptor;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -51,13 +47,13 @@ import static org.mockito.Mockito.*;
 public class ApacheHttpClientTransportUsersTest {
 
     @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public final ExpectedException expectedException = ExpectedException.none();
     private HttpResponse response;
     private HttpClient httpClient;
     private Transport transport;
     private Crypto crypto;
-    private Base64 base64 = new Base64(0);
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final Base64 base64 = new Base64(0);
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Before
     public void setUp() throws Exception {
@@ -138,7 +134,7 @@ public class ApacheHttpClientTransportUsersTest {
     @Test
     public void testWrapsClientExceptionInLaunchKeyException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception processing users request");
         expectedException.expectCause(is(expectedCause));
 
@@ -181,7 +177,7 @@ public class ApacheHttpClientTransportUsersTest {
 
     @Test
     public void testResponseStatusCodeOf401ThrowsExpectedException() throws Exception {
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Expected Message");
 
         when(response.getStatusLine()).thenReturn(
@@ -219,7 +215,7 @@ public class ApacheHttpClientTransportUsersTest {
     }
 
     @Test
-    public void testResponseStatusCodeOf400ReturnsHttpValuesWhenBodyNotParseable() throws Exception {
+    public void testResponseStatusCodeOf400ReturnsHttpValuesWhenBodyNotParsable() throws Exception {
         expectedException.expect(CommunicationErrorException.class);
         expectedException.expectMessage("Expected Message");
 
@@ -227,18 +223,18 @@ public class ApacheHttpClientTransportUsersTest {
                 new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 400, "Expected Message")
         );
         when(response.getEntity()).thenReturn(
-                EntityBuilder.create().setStream(new ByteArrayInputStream("Unparseable".getBytes("UTF-8"))).build()
+                EntityBuilder.create().setStream(new ByteArrayInputStream("Not Parsable".getBytes("UTF-8"))).build()
         );
         transport.users(new UsersRequest(null, 0L, null));
     }
 
     @Test
-    public void testUnparseableBodyThrowsExpectedException() throws Exception {
+    public void testBodyNotParsableThrowsExpectedException() throws Exception {
         expectedException.expect(InvalidResponseException.class);
         expectedException.expectMessage("Error parsing response body");
 
         when(response.getEntity()).thenReturn(
-                EntityBuilder.create().setStream(new ByteArrayInputStream("Unparseable".getBytes("UTF-8"))).build()
+                EntityBuilder.create().setStream(new ByteArrayInputStream("Not Parsable".getBytes("UTF-8"))).build()
         );
         transport.users(new UsersRequest(null, 0L, null));
     }
@@ -248,11 +244,12 @@ public class ApacheHttpClientTransportUsersTest {
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(
                         new ByteArrayInputStream(
-                                "{\"successful\": false, \"message_code\": 1000, \"message\": \"Expected Special Message\", \"response\": \"\"}".getBytes("UTF-8")
+                                "{\"successful\": false, \"message_code\": 1000, \"message\": \"Expected Special Message\", \"response\": \"\"}"
+                                        .getBytes("UTF-8")
                         )
                 ).build()
         );
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Expected Special Message");
         transport.users(new UsersRequest(null, 0L, null));
     }

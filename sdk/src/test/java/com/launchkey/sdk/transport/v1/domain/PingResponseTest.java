@@ -1,7 +1,6 @@
 package com.launchkey.sdk.transport.v1.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.launchkey.sdk.transport.v1.domain.PingResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +9,6 @@ import java.util.Date;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertThat;
 
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
@@ -27,6 +25,7 @@ public class PingResponseTest {
 
     private PingResponse pingResponse;
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Before
     public void setUp() throws Exception {
         this.pingResponse = new PingResponse(
@@ -40,7 +39,8 @@ public class PingResponseTest {
                         "HRHU2phxBcquOW2HpGSWcpzlYgFEhPPQFAxoDUBYZI3lfRj49gBhGQi32qQ1YiWp\n" +
                         "aFxOB8GA0Ny5SfI67u6w9Nz9Z9cBhcZBfJKdq5uRWjZWslHjBN3emTAKBpAUPNET\n" +
                         "nwIDAQAB\n\n" +
-                        "-----END PUBLIC KEY-----\n");
+                        "-----END PUBLIC KEY-----\n"
+        );
     }
 
     @After
@@ -59,6 +59,7 @@ public class PingResponseTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetPublicKey() throws Exception {
         assertEquals(
                 "-----BEGIN PUBLIC KEY-----\n\n" +
@@ -70,11 +71,13 @@ public class PingResponseTest {
                         "aFxOB8GA0Ny5SfI67u6w9Nz9Z9cBhcZBfJKdq5uRWjZWslHjBN3emTAKBpAUPNET\n" +
                         "nwIDAQAB\n\n" +
                         "-----END PUBLIC KEY-----\n",
-                this.pingResponse.getPublicKey());
+                this.pingResponse.getPublicKey()
+        );
     }
 
     @Test
-    public void testJSONParseable() throws Exception {
+    @SuppressWarnings("SpellCheckingInspection")
+    public void testJSONParsable() throws Exception {
         String json = "{\"date_stamp\" : \"1970-01-01 00:00:00\"," +
                 "\"launchkey_time\" : \"1970-01-01 00:00:01\"," +
                 "\"key\" : \"-----BEGIN PUBLIC KEY-----\\n\\n" +
@@ -92,6 +95,7 @@ public class PingResponseTest {
     }
 
     @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testJSONParseAllowsUnknown() throws Exception {
         String json = "{\"date_stamp\" : \"1970-01-01 00:00:00\"," +
                 "\"launchkey_time\" : \"1970-01-01 00:00:01\"," +

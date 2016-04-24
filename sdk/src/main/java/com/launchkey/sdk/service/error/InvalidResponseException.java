@@ -13,10 +13,10 @@
 package com.launchkey.sdk.service.error;
 
 /**
- * Exception thrown when the response returned by the LaunchKey Engine API is not parseable or does not contain the
+ * Exception thrown when the response returned by the LaunchKey Engine API is not parsable or does not contain the
  * expected response data elements for the request that was made.
  */
-public class InvalidResponseException extends LaunchKeyException {
+public class InvalidResponseException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).

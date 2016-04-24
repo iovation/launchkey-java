@@ -16,7 +16,7 @@ package com.launchkey.sdk.service.error;
  * Exception thrown when the data passed to a Server Sent Event handler does not contain the data that will allow
  * for processing of any of the known callback methods.
  */
-public class InvalidCallbackException extends LaunchKeyException {
+public class InvalidCallbackException extends ApiException {
     /**
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.

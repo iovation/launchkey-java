@@ -6,6 +6,12 @@ To get the diff for a specific change, go to [https://github.com/LaunchKey/launc
 is the change hash To get the diff between two versions, go to
 [https://github.com/LaunchKey/launchkey-java/compare/launchkey-sdk-1.0.0...launchkey-sdk-1.1.0](https://github.com/LaunchKey/launchkey-java/compare/launchkey-sdk-1.0.0...launchkey-sdk-1.1.0)
 
+  * 2.1.0
+    * Refactor classes, interfaces, methods, attributes, and parameters for new terminology. Backwards compatibility
+        was maintained and old classes, interfaces, and methods were deprecated. They will be removed in version 3.0.
+    * Add context to authorize and login
+    * Add dynamic policy support
+
   * 2.0.3
     * Update users call in ApacheHttpTransport for proper handling of error responses
     * Update doc blocks for new build requirements

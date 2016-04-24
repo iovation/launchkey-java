@@ -24,6 +24,7 @@ public class UsersRequestTest {
     private UsersRequest usersRequest;
 
     @Before
+    @SuppressWarnings("SpellCheckingInspection")
     public void setUp() throws Exception {
         usersRequest = new UsersRequest(
                 "a714bb0c-526f-4100-9e45-b8297fb4cc3d",
@@ -46,11 +47,17 @@ public class UsersRequestTest {
     }
 
     @Test
-    public void testGetRocketKey() throws Exception {
-        assertEquals(9999999999L, usersRequest.getRocketKey());
+    public void testGetAppKey() throws Exception {
+        assertEquals(9999999999L, usersRequest.getAppKey());
     }
 
     @Test
+    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
+        assertEquals(usersRequest.getAppKey(), usersRequest.getRocketKey());
+    }
+
+    @Test
+    @SuppressWarnings("SpellCheckingInspection")
     public void testGetSecretKey() throws Exception {
         assertEquals("gJQw0unVnDkpSCFMmlAMuzcAP1HpmLQxecN7PyWpnbtlxEsCmWTconAZaZ5vjp+24gLX4A5SiFIT3srRNtg/v9gDfB2jaMZbXi" +
                 "oNJIiwG58uMaDKL7bNJenLn1Du9/TSFXuju3TALdgEeeH0SW0KW+w6A6Aa/PRhvUfCr4lJ0/AzByrMDkdaIWoP3sxp" +
@@ -61,6 +68,7 @@ public class UsersRequestTest {
 
     @Test
     public void testJSONEncode() throws Exception {
+        @SuppressWarnings("SpellCheckingInspection")
         String expected = "{\"app_key\":9999999999,\"secret_key\":\"gJQw0unVnDkpSCFMmlAMuzcAP1HpmLQxecN7PyWpnbtl" +
                 "xEsCmWTconAZaZ5vjp+24gLX4A5SiFIT3srRNtg/v9gDfB2jaMZbXioNJIiwG58uMaDKL7bNJenLn1Du9/TSFXuju3TALdgEee" +
                 "H0SW0KW+w6A6Aa/PRhvUfCr4lJ0/AzByrMDkdaIWoP3sxpzV8Bc+L2C2xw/J5tIs33ryzj+bYXIpvh8yrDhtJCyQZKKvSiVZWMl" +

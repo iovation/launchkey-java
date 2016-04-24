@@ -24,7 +24,7 @@ import java.security.Provider;
  */
 public class Config {
 
-    private final long rocketKey;
+    private final long appKey;
 
     private final String secretKey;
 
@@ -41,29 +41,39 @@ public class Config {
 
     /**
      *
-     * @param rocketKey Rocket Key for the Rocket that will used to make requests
-     * @param secretKey Secret Key for the Rocket that will used to make requests
+     * @param appKey Application Key for the Application that will used to make requests
+     * @param secretKey Secret Key for the Application that will used to make requests
      */
-    public Config(long rocketKey, String secretKey) {
+    public Config(long appKey, String secretKey) {
         if (secretKey == null) {
             throw new IllegalArgumentException("secretKey cannot be null");
         }
-        this.rocketKey = rocketKey;
+        this.appKey = appKey;
         this.secretKey = secretKey;
     }
 
+    /**
+     * Get the Application Key for the Application that will used to make requests
+     * @return Application Key for the Application that will used to make requests
+     * @deprecated Use {@link #getAppKey()}
+     */
+    @Deprecated
+    public long getRocketKey() {
+        return getAppKey();
+    }
+
 
     /**
-     * Get the Rocket Key for the Rocket that will used to make requests
-     * @return Rocket Key for the Rocket that will used to make requests
+     * Get the Application Key for the Application that will used to make requests
+     * @return Application Key for the Application that will used to make requests
      */
-    public long getRocketKey() {
-        return rocketKey;
+    public long getAppKey() {
+        return appKey;
     }
 
     /**
-     * Get the Secret Key for the Rocket that will used to make requests
-     * @return Secret Key for the Rocket that will used to make requests
+     * Get the Secret Key for the Application that will used to make requests
+     * @return Secret Key for the Application that will used to make requests
      */
     public String getSecretKey() {
         return secretKey;

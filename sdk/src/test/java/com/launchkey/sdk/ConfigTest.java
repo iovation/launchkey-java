@@ -43,8 +43,13 @@ public class ConfigTest {
     }
 
     @Test
-    public void testGetRocketKey() throws Exception {
-        assertEquals(12345, config.getRocketKey());
+    public void testGetAppKey() throws Exception {
+        assertEquals(12345, config.getAppKey());
+    }
+
+    @Test
+    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
+        assertEquals(config.getRocketKey(), config.getAppKey());
     }
 
     @Test
@@ -109,15 +114,16 @@ public class ConfigTest {
 
     @Test
     public void testGetHttpClientConnectionTTLSecsDefaultsToNull() throws Exception {
+        assertNull(config.getHttpClientConnectionTTLSecs());
+    }
+
+    @Test
+    public void testSetHttpClientConnectionTTLSecs() throws Exception {
         int expected = 12345;
         assertEquals(
                 (Integer) expected,
                 config.setHttpClientConnectionTTLSecs(expected).getHttpClientConnectionTTLSecs()
         );
-    }
-
-    @Test
-    public void testSetHttpClientConnectionTTLSecs() throws Exception {
     }
 
     @Test

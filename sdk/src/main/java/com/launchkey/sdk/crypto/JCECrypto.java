@@ -141,7 +141,7 @@ public class JCECrypto implements Crypto {
      *
      * @param provider Provider to generate the key
      * @param pem      PEM formatted key string
-     * @return RSA piblic key
+     * @return RSA public key
      */
     public static RSAPublicKey getRSAPublicKeyFromPEM(Provider provider, String pem) {
         try {

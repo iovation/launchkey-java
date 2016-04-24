@@ -4,7 +4,7 @@ import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.CommunicationErrorException;
 import com.launchkey.sdk.service.error.InvalidRequestException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.domain.PingRequest;
 import com.launchkey.sdk.transport.v1.domain.PingResponse;
 import org.apache.http.HttpResponse;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.*;
 public class ApacheHttpClientTransportPingTest {
 
     @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public final ExpectedException expectedException = ExpectedException.none();
     private HttpResponse response;
     private HttpClient httpClient;
     private Transport transport;
@@ -117,7 +117,7 @@ public class ApacheHttpClientTransportPingTest {
     @Test
     public void testPingWrapsClientExceptionInLaunchKeyException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception caught processing ping request");
         expectedException.expectCause(is(expectedCause));
 
@@ -160,7 +160,7 @@ public class ApacheHttpClientTransportPingTest {
 
     @Test
     public void testResponseStatusCodeOf401ThrowsExpectedException() throws Exception {
-        expectedException.expect(LaunchKeyException.class);
+        expectedException.expect(ApiException.class);
         expectedException.expectMessage("Expected Message");
 
         when(response.getStatusLine()).thenReturn(
@@ -198,7 +198,7 @@ public class ApacheHttpClientTransportPingTest {
     }
 
     @Test
-    public void testResponseStatusCodeOf400ReturnsHttpValuesWhenBodyNotParseable() throws Exception {
+    public void testResponseStatusCodeOf400ReturnsHttpValuesWhenBodyNotParsable() throws Exception {
         expectedException.expect(CommunicationErrorException.class);
         expectedException.expectMessage("Expected Message");
 
@@ -206,18 +206,18 @@ public class ApacheHttpClientTransportPingTest {
                 new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 400, "Expected Message")
         );
         when(response.getEntity()).thenReturn(
-                EntityBuilder.create().setStream(new ByteArrayInputStream("Unparseable".getBytes("UTF-8"))).build()
+                EntityBuilder.create().setStream(new ByteArrayInputStream("Not Parsable".getBytes("UTF-8"))).build()
         );
         transport.ping(new PingRequest());
     }
 
     @Test
-    public void testUnparseableBodyThrowsExpectedException() throws Exception {
+    public void testBodyNotParsableThrowsExpectedException() throws Exception {
         expectedException.expect(InvalidResponseException.class);
         expectedException.expectMessage("Error parsing response body");
 
         when(response.getEntity()).thenReturn(
-                EntityBuilder.create().setStream(new ByteArrayInputStream("Unparseable".getBytes("UTF-8"))).build()
+                EntityBuilder.create().setStream(new ByteArrayInputStream("Not Parsable".getBytes("UTF-8"))).build()
         );
         transport.ping(new PingRequest());
     }

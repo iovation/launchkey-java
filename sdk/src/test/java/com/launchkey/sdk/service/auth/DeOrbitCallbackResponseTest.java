@@ -1,7 +1,6 @@
 package com.launchkey.sdk.service.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.launchkey.sdk.transport.v1.domain.AuthsResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,14 +45,14 @@ public class DeOrbitCallbackResponseTest {
         assertEquals("User Hash", deOrbitCallbackResponse.getUserHash());
     }
 
-    @Test( expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidDateFormatThrowIllegalArgumentException() throws Exception {
         new DeOrbitCallbackResponse("1970-01-01+00:00:00", "User Hash");
     }
 
 
     @Test
-    public void testJSONParseable() throws Exception {
+    public void testJSONParsable() throws Exception {
         String json = "{\"launchkey_time\":\"1970-01-01 00:00:00\",\"user_hash\":\"User Hash\"}";
         ObjectMapper mapper = new ObjectMapper();
         DeOrbitCallbackResponse actual = mapper.readValue(json, DeOrbitCallbackResponse.class);

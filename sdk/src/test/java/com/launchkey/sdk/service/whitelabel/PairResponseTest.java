@@ -1,13 +1,11 @@
 package com.launchkey.sdk.service.whitelabel;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertThat;
 
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
@@ -45,24 +43,6 @@ public class PairResponseTest {
     }
 
     @Test
-    public void testJSONParseable() throws Exception {
-        String json = "{\"qrcode\": \"https://dashboard.launchkey.com/qrcode/zje0ja5\",\"code\":\"zje0ja5\"}";
-        ObjectMapper mapper = new ObjectMapper();
-        PairResponse actual = mapper.readValue(json, PairResponse.class);
-        assertEquals(pairResponse, actual);
-    }
-
-    @Test
-    public void testJSONParseAllowsUnknown() throws Exception {
-        String json = "{\"qrcode\": \"https://dashboard.launchkey.com/qrcode/zje0ja5\"," +
-                "\"code\":\"zje0ja5\"," +
-                "\"unknown\": \"Unknown Value\"}";
-        ObjectMapper mapper = new ObjectMapper();
-        PairResponse actual = mapper.readValue(json, PairResponse.class);
-        assertEquals(pairResponse, actual);
-    }
-
-    @Test
     public void testEqualsForEqualObjectsIsTrue() throws Exception {
         PairResponse left = new PairResponse("code", "url");
         PairResponse right = new PairResponse("code", "url");
@@ -93,5 +73,15 @@ public class PairResponseTest {
     @Test
     public void testToStringContainsClassName() throws Exception {
         assertThat(pairResponse.toString(), containsString(PairResponse.class.getSimpleName()));
+    }
+
+    @Test
+    public void testGetCodeLinkResponseConstructor() throws Exception {
+        assertEquals("zje0ja5", new PairResponse(new LinkResponse("zje0ja5", null)).getCode());
+    }
+
+    @Test
+    public void testGetQrCodeUrlLinkResponseConstructor() throws Exception {
+        assertEquals("url", new PairResponse(new LinkResponse(null, "url")).getQrCodeUrl());
     }
 }

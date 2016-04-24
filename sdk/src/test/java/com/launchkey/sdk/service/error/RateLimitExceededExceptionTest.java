@@ -1,7 +1,5 @@
 package com.launchkey.sdk.service.error;
 
-import com.launchkey.sdk.service.error.LaunchKeyException;
-import com.launchkey.sdk.service.error.RateLimitExceededException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  * limitations under the License.
  */
 public class RateLimitExceededExceptionTest {
-    private LaunchKeyException x;
+    private ApiException x;
 
     @Before
     public void setUp() throws Exception {

@@ -12,11 +12,9 @@
 
 package com.launchkey.sdk.transport.v1.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * Request data for a "users" call.
@@ -34,13 +32,13 @@ public class UsersRequest {
     private final String identifier;
 
     /**
-     * Rocket Key of your Rocket. This is found on the Keys tab of your Rocket details in the LaunchKey Dashboard.
+     * Application Key of your Application. This is found on the Keys tab of your Application details in the Dashboard.
      */
-    private final long rocketKey;
+    private final long appKey;
 
     /**
      * Base64 encoded secret JSON string containing these attributes:
-     *      secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     *      secret:   Secret Key of the Application whose key is included in the current request.
      *      stamped:  LaunchKey formatted Date representing the current time of the request.
      */
     private final String secretKey;
@@ -49,14 +47,14 @@ public class UsersRequest {
      * @param identifier Permanent and unique identifier of this user within your application. This identifier will be used to
      *                   authenticate the user as well as pair devices additional devices to the user's account within your white
      *                   label group.
-     * @param rocketKey  Rocket Key of your Rocket. This is found on the Keys tab of your Rocket details in the LaunchKey Dashboard.
+     * @param appKey  Application Key of your Application. This is found on the Keys tab of your Application details in the Dashboard.
      * @param secretKey  Base64 encoded secret JSON string containing these attributes:
-     *                      secret:   Rocket Secret Key of the rocket whose key is included in the current request.
+     *                      secret:   Secret Key of the Application whose key is included in the current request.
      *                      stamped:  LaunchKey formatted Date representing the current time of the request.
      */
-    public UsersRequest(String identifier, long rocketKey, String secretKey) {
+    public UsersRequest(String identifier, long appKey, String secretKey) {
         this.identifier = identifier;
-        this.rocketKey = rocketKey;
+        this.appKey = appKey;
         this.secretKey = secretKey;
     }
 
@@ -66,8 +64,18 @@ public class UsersRequest {
     }
 
     @JsonProperty("app_key")
+    public long getAppKey() {
+        return appKey;
+    }
+
+    /**
+     * @deprecated Use {@link #getAppKey()}
+     * @return Application Key
+     */
+    @Deprecated
+    @JsonIgnore
     public long getRocketKey() {
-        return rocketKey;
+        return getAppKey();
     }
 
     @JsonProperty("secret_key")

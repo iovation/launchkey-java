@@ -28,7 +28,7 @@ public class LocalMemoryPingResponseCache implements PingResponseCache {
     private final int ttlMillis;
 
     /**
-     * @param ttlMillis Time To Live for cvached ping responses in milliseconds
+     * @param ttlMillis Time To Live for cached ping responses in milliseconds
      */
     public LocalMemoryPingResponseCache(int ttlMillis) {
         this.ttlMillis = ttlMillis;

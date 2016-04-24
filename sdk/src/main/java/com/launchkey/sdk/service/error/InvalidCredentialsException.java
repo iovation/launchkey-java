@@ -16,7 +16,7 @@ package com.launchkey.sdk.service.error;
  * Exception for errors that occur due to API credentials being invalid when communicating with the LaunchKey Engine
  * API.
  */
-public class InvalidCredentialsException extends LaunchKeyException {
+public class InvalidCredentialsException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).

@@ -7,7 +7,6 @@ import com.launchkey.sdk.transport.v1.domain.PollResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Date;
@@ -88,15 +87,15 @@ public class V1AuthServiceGetAuthResponseTest extends V1AuthServiceTestBase {
         service.getAuthResponse("Auth Request ID");
         ArgumentCaptor<PollRequest> argumentCaptor = ArgumentCaptor.forClass(PollRequest.class);
         verify(transport).poll(argumentCaptor.capture());
-        assertEquals(rocketKey, argumentCaptor.getValue().getRocketKey());
+        assertEquals(appKey, argumentCaptor.getValue().getAppKey());
     }
 
     @Test
-    public void testPassesCorrectRocketIDInPollRequest() throws Exception {
+    public void testPassesCorrectAppKeyInPollRequest() throws Exception {
         service.getAuthResponse("Auth Request ID");
         ArgumentCaptor<PollRequest> argumentCaptor = ArgumentCaptor.forClass(PollRequest.class);
         verify(transport).poll(argumentCaptor.capture());
-        assertEquals(rocketKey, argumentCaptor.getValue().getRocketKey());
+        assertEquals(appKey, argumentCaptor.getValue().getAppKey());
     }
 
     @Test
@@ -229,7 +228,7 @@ public class V1AuthServiceGetAuthResponseTest extends V1AuthServiceTestBase {
     }
 
     @Test(expected = InvalidResponseException.class)
-    public void testCatchesIOExceptionFromUnparseableAuthDataAndThrowsInvalidResponseException() throws Exception {
+    public void testCatchesIOExceptionFromAuthDataNotParsableAndThrowsInvalidResponseException() throws Exception {
         when(crypto.decryptRSA(any(byte[].class))).thenReturn("XXX".getBytes());
         service.getAuthResponse("Auth Request ID");
     }

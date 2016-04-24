@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.CommunicationErrorException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.domain.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -48,7 +48,7 @@ public class ApacheHttpClientTransport implements Transport {
     private final HttpClient client;
     private final String baseUrl;
     private final Crypto crypto;
-    private Base64 base64 = new Base64(0);
+    private final Base64 base64 = new Base64(0);
 
     /**
      * @param client HTTP Client to use for requests
@@ -68,14 +68,14 @@ public class ApacheHttpClientTransport implements Transport {
         try {
             new URIBuilder(this.baseUrl);
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("baseURL must be be a valid parseable URI with URIBuilder", e);
+            throw new IllegalArgumentException("baseURL must be be a valid parsable URI with URIBuilder", e);
         }
     }
 
     /**
      * @see Transport#ping(PingRequest)
      */
-    public PingResponse ping(PingRequest request) throws LaunchKeyException {
+    public PingResponse ping(PingRequest request) throws ApiException {
         log.trace("Beginning ping request");
         PingResponse pingResponse;
         try {
@@ -87,12 +87,12 @@ public class ApacheHttpClientTransport implements Transport {
             HttpGet ping = new HttpGet(uriBuilder.build());
             HttpResponse httpResponse = client.execute(ping);
             pingResponse = getTransportObjectFromResponse(PingResponse.class, httpResponse);
-        } catch (LaunchKeyException e) {
+        } catch (ApiException e) {
             log.trace("Error encountered in response from LaunchKey engine", e);
             throw e;
         } catch (Exception e) {
             log.trace("Exception caught processing ping request", e);
-            throw new LaunchKeyException("Exception caught processing ping request", e, 0);
+            throw new ApiException("Exception caught processing ping request", e, 0);
         }
         log.trace("Completed ping request");
         log.trace(pingResponse);
@@ -102,7 +102,7 @@ public class ApacheHttpClientTransport implements Transport {
     /**
      * @see Transport#auths(AuthsRequest)
      */
-    public AuthsResponse auths(AuthsRequest request) throws LaunchKeyException {
+    public AuthsResponse auths(AuthsRequest request) throws ApiException {
         log.trace("Beginning auths request");
         AuthsResponse authsResponse;
         try {
@@ -110,15 +110,21 @@ public class ApacheHttpClientTransport implements Transport {
             HttpPost auths = new HttpPost(uri);
             List<NameValuePair> formData = new ArrayList<NameValuePair>();
             formData.add(new BasicNameValuePair("username", request.getUsername()));
-            formData.add(new BasicNameValuePair("app_key", Long.toString(request.getRocketKey())));
+            formData.add(new BasicNameValuePair("app_key", Long.toString(request.getAppKey())));
             formData.add(new BasicNameValuePair("secret_key", request.getSecretKey()));
             formData.add(new BasicNameValuePair("signature", request.getSignature()));
             formData.add(new BasicNameValuePair("session", Integer.toString(request.getSession())));
             formData.add(new BasicNameValuePair("user_push_id", Integer.toString(request.getUserPushID())));
+            if (request.getContext() != null && request.getContext().length() > 0) {
+                formData.add(new BasicNameValuePair("context", request.getContext()));
+            }
+            if (request.getPolicy() != null) {
+                formData.add(new BasicNameValuePair("policy", objectMapper.writeValueAsString(request.getPolicy())));
+            }
             auths.setEntity(new UrlEncodedFormEntity(formData));
             HttpResponse httpResponse = client.execute(auths);
             authsResponse = getTransportObjectFromResponse(AuthsResponse.class, httpResponse);
-        } catch (LaunchKeyException e) {
+        } catch (ApiException e) {
             log.trace("Error encountered in response from LaunchKey engine", e);
             throw e;
         } catch (Exception e) {
@@ -133,13 +139,13 @@ public class ApacheHttpClientTransport implements Transport {
     /**
      * @see Transport#poll(PollRequest)
      */
-    public PollResponse poll(PollRequest request) throws LaunchKeyException {
+    public PollResponse poll(PollRequest request) throws ApiException {
         log.trace("Beginning poll request");
         PollResponse pollResponse;
         try {
             URI uri = new URIBuilder(getUrlForPath("/poll"))
                     .setParameter("auth_request", request.getAuthRequest())
-                    .setParameter("app_key", Long.toString(request.getRocketKey()))
+                    .setParameter("app_key", Long.toString(request.getAppKey()))
                     .setParameter("secret_key", request.getSecretKey())
                     .setParameter("signature", request.getSignature())
                     .build();
@@ -147,7 +153,7 @@ public class ApacheHttpClientTransport implements Transport {
             HttpGet poll = new HttpGet(uri);
             HttpResponse httpResponse = client.execute(poll);
             pollResponse = getTransportObjectFromResponse(PollResponse.class, httpResponse);
-        } catch (LaunchKeyException e) {
+        } catch (ApiException e) {
             if (e.getCode() == 70403) {
                 log.trace("Pending response received", e);
                 pollResponse = null;
@@ -167,7 +173,7 @@ public class ApacheHttpClientTransport implements Transport {
     /**
      * @see Transport#logs(LogsRequest)
      */
-    public void logs(LogsRequest request) throws LaunchKeyException {
+    public void logs(LogsRequest request) throws ApiException {
         log.trace("Beginning logs request");
         try {
             URI uri = new URIBuilder(getUrlForPath("/logs")).build();
@@ -177,7 +183,7 @@ public class ApacheHttpClientTransport implements Transport {
             formData.add(new BasicNameValuePair("action", request.getAction()));
             formData.add(new BasicNameValuePair("status", request.getStatus()));
             formData.add(new BasicNameValuePair("auth_request", request.getAuthRequest()));
-            formData.add(new BasicNameValuePair("app_key", Long.toString(request.getRocketKey())));
+            formData.add(new BasicNameValuePair("app_key", Long.toString(request.getAppKey())));
             formData.add(new BasicNameValuePair("secret_key", request.getSecretKey()));
             formData.add(new BasicNameValuePair("signature", request.getSignature()));
 
@@ -185,7 +191,7 @@ public class ApacheHttpClientTransport implements Transport {
 
             HttpResponse httpResponse = client.execute(logs);
             validateResponse(httpResponse);
-        } catch (LaunchKeyException e) {
+        } catch (ApiException e) {
             log.trace("Error encountered in response from LaunchKey engine", e);
             throw e;
         } catch (Exception e) {
@@ -198,7 +204,7 @@ public class ApacheHttpClientTransport implements Transport {
     /**
      * @see Transport#users(UsersRequest)
      */
-    public UsersResponse users(UsersRequest request) throws LaunchKeyException {
+    public UsersResponse users(UsersRequest request) throws ApiException {
         log.trace("Beginning users request");
         UsersResponse usersResponse;
         try {
@@ -215,9 +221,9 @@ public class ApacheHttpClientTransport implements Transport {
             HttpResponse httpResponse = client.execute(logs);
             usersResponse = getTransportObjectFromResponse(UsersResponse.class, httpResponse);
             if (! usersResponse.isSuccessful()) {
-                throw LaunchKeyException.fromCode(usersResponse.getMessageCode(), usersResponse.getMessage());
+                throw ApiException.fromCode(usersResponse.getMessageCode(), usersResponse.getMessage());
             }
-        } catch (LaunchKeyException e) {
+        } catch (ApiException e) {
             log.trace("Error encountered in response from LaunchKey engine", e);
             throw e;
         } catch (Exception e) {
@@ -232,8 +238,8 @@ public class ApacheHttpClientTransport implements Transport {
         return baseUrl + path;
     }
 
-    private <T extends Object> T getTransportObjectFromResponse(Class<T> clazz, HttpResponse httpResponse)
-            throws LaunchKeyException {
+    private <T> T getTransportObjectFromResponse(Class<T> clazz, HttpResponse httpResponse)
+            throws ApiException {
         T response;
         validateResponse(httpResponse);
 
@@ -245,7 +251,7 @@ public class ApacheHttpClientTransport implements Transport {
         return response;
     }
 
-    private void validateResponse(HttpResponse httpResponse) throws LaunchKeyException {
+    private void validateResponse(HttpResponse httpResponse) throws ApiException {
         int code = httpResponse.getStatusLine().getStatusCode();
         String message;
         if (code < 200 || code >= 300) {
@@ -256,8 +262,8 @@ public class ApacheHttpClientTransport implements Transport {
                     ));
                     if (errorResponse.getMessageCode() != 0) code = errorResponse.getMessageCode();
                     message = (errorResponse.getMessage() == null) ? httpResponse.getStatusLine().getReasonPhrase() : errorResponse.getMessage();
-                    throw LaunchKeyException.fromCode(code, message);
-                } catch (LaunchKeyException e) {
+                    throw ApiException.fromCode(code, message);
+                } catch (ApiException e) {
                     throw e;
                 } catch (Exception e) {
                     message = httpResponse.getStatusLine().getReasonPhrase();

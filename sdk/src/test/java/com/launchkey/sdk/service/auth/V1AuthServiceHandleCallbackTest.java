@@ -78,7 +78,7 @@ public class V1AuthServiceHandleCallbackTest extends V1AuthServiceTestBase {
     }
 
     @Test(expected = InvalidSignatureException.class)
-    public void testDeOrbitThrowsInvalidSignatureExceptionWhenSignatureDoesNotVeify() throws Exception {
+    public void testDeOrbitThrowsInvalidSignatureExceptionWhenSignatureDoesNotVerify() throws Exception {
         when(crypto.verifySignature(any(byte[].class), any(byte[].class), any(RSAPublicKey.class))).thenReturn(false);
         service.handleCallback(deOrbitData);
     }
@@ -102,7 +102,7 @@ public class V1AuthServiceHandleCallbackTest extends V1AuthServiceTestBase {
     }
 
     @Test(expected = InvalidCallbackException.class)
-    public void testDeOrbitCatchesIOExceptionFromUnparseableDeOrbitDataAndThrowsInvalidResponseException() throws Exception {
+    public void testDeOrbitCatchesIOExceptionFromDeOrbitDataNotParsableAndThrowsInvalidResponseException() throws Exception {
         service.handleCallback(
                 new HashMap<String, String>() {{
                     put("deorbit", "XXX");
@@ -169,7 +169,7 @@ public class V1AuthServiceHandleCallbackTest extends V1AuthServiceTestBase {
     }
 
     @Test(expected = InvalidCallbackException.class)
-    public void testAuthResponseCatchesIOExceptionFromUnparseableAuthDataAndThrowsInvalidResponseException() throws Exception {
+    public void testAuthResponseCatchesIOExceptionFromAuthDataNotParsableAndThrowsInvalidResponseException() throws Exception {
         when(crypto.decryptRSA(any(byte[].class))).thenReturn("XXX".getBytes());
         service.handleCallback(authData);
     }

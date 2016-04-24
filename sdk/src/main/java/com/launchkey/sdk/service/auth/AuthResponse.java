@@ -27,22 +27,22 @@ public class AuthResponse {
     private final boolean authorized;
 
     /**
-     * Hashed user identifier to track a specific user across rockets. This value will be used by the
-     * De-Orbit Callback to identify the de-orbiting user.
+     * Hashed user identifier to track a specific user for an application. This value will be used by the
+     * Logout Callback to identify the user logging out. This value may
+     * be used in place of a username or White Label User identifier for authorization requests.
      */
     private final String userHash;
 
     /**
-     * A string that uniquely identifies the user across the entire Organization to which the Rocket whose Rocket Key
-     * was included in the request belongs. This will be returned if, and only if, the Rocket belongs to an
+     * A string that uniquely identifies the user across the entire Organization to which the Application whose Application Key
+     * was included in the request belongs. This will be returned if, and only if, the Application belongs to an
      * Organization.
      */
     private final String organizationUserId;
 
     /**
-     * A value uniquely and permanently identifying the User associated with the auth_request within the Rocket whose
-     * Rocket Key was included in the request belongs. This value may be used in place of a username or White Label
-     * User identifier for authorization requests.
+     * A value uniquely and permanently identifying the User associated with the auth_request within the Application whose
+     * Application Key was included in the request belongs.
      */
     private final String userPushId;
 
@@ -57,14 +57,13 @@ public class AuthResponse {
      *                           respectively.
      * @param authRequestId      Unique identifier for the authentication request for which this is the response.
      * @param userHash           Hashed identifier of the User that responded to the authentication request. This
-     *                           value will be used by the De-Orbit Callback to identify the de-orbiting User.
+     *                           value will be used by the De-Orbit Callback to identify the de-orbiting User. This value may
+     *                           be used in place of a username or White Label User identifier for authorization requests.
      * @param organizationUserId Unique identifier of the User that responded to the authentication request within the
-     *                           organization in which the Rocket for this request resides.  This will be returned if,
-     *                           and only if, the Rocket belongs to an Organization.
+     *                           organization in which the Application for this request resides.  This will be returned if,
+     *                           and only if, the Application belongs to an Organization.
      * @param userPushId         Unique identifier of the User that responded to the authentication request
-     *                           within the Rocket to which this authentication request was made. This value may
-     *                           be used in place of a username or White Label
-     *                           User identifier for authorization requests.
+     *                           within the Application to which this authentication request was made.
      * @param deviceId           Identifier for the device the User utilized to respond to the authentication request.
      *                           This value is unique to the User that responded to the authentication request and may
      *                           be duplicated in another User.
@@ -115,7 +114,7 @@ public class AuthResponse {
 
     /**
      * Get the unique identifier of the User that responded to the authentication request within the organization in
-     * which the Rocket for this request resides.  This will be returned if, and only if, the Rocket belongs to an
+     * which the Application for this request resides.  This will be returned if, and only if, the Application belongs to an
      * Organization.
      *
      * @return Organization-User ID
@@ -125,8 +124,8 @@ public class AuthResponse {
     }
 
     /**
-     * Get the unique identifier of the User that responded to the authentication request within the Rocket to
-     * which this authentication request was made. This value may be used in place of a username or White Label
+     * Get the unique identifier of the User that responded to the authentication request within the Application to
+     * which this authorization request was made. This value may be used in place of a username or White Label
      * User identifier for authorization requests.
      * .
      * @return User push ID

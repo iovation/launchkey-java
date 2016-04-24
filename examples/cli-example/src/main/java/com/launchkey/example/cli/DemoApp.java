@@ -1,11 +1,12 @@
 package com.launchkey.example.cli;
 
-import com.launchkey.sdk.LaunchKeyClient;
+import com.launchkey.sdk.BasicClient;
+import com.launchkey.sdk.Client;
 import com.launchkey.sdk.service.auth.AuthResponse;
 import com.launchkey.sdk.service.auth.AuthService;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.service.error.ExpiredAuthRequestException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
-import com.launchkey.sdk.service.whitelabel.PairResponse;
+import com.launchkey.sdk.service.whitelabel.LinkResponse;
 import com.launchkey.sdk.service.whitelabel.WhiteLabelService;
 import com.martiansoftware.jsap.*;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -14,12 +15,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.security.Security;
 import java.util.Date;
 
 /**
  * Copyright 2015 LaunchKey, Inc.  All rights reserved.
- *
+ * <p>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
  * A copy of the License is located in the "LICENSE.txt" file accompanying
@@ -28,7 +28,7 @@ import java.util.Date;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class LaunchKeySdkDemoApp {
+public class DemoApp {
 
     public static void main(String[] args) {
 
@@ -37,17 +37,17 @@ public class LaunchKeySdkDemoApp {
             JSAP jsap = getJSAP();
 
             JSAPResult commandLine = jsap.parse(args);
-            String rocketKey = commandLine.getString("rocket_key");
+            String appKey = commandLine.getString("app_key");
             String secretKey = commandLine.getString("secret_key");
             privateKeyFile = commandLine.getString("private_key_file");
 
-            if (commandLine.getBoolean("help") || rocketKey == null || secretKey == null || privateKeyFile == null) {
+            if (commandLine.getBoolean("help") || appKey == null || secretKey == null || privateKeyFile == null) {
                 printHelp(jsap);
                 return;
             }
 
-            LaunchKeyClient client = LaunchKeyClient.factory(
-                    Long.parseLong(rocketKey),
+            Client client = BasicClient.factory(
+                    Long.parseLong(appKey),
                     secretKey,
                     readFile(privateKeyFile),
                     new BouncyCastleProvider()
@@ -57,11 +57,15 @@ public class LaunchKeySdkDemoApp {
             String[] commandOptions = commandLine.getStringArray("command-options");
             if (command.equalsIgnoreCase("login")) {
                 if (commandOptions.length == 1) {
-                    handleLogin(commandOptions[0], client.auth());
+                    handleLogin(commandOptions[0], null, client.auth());
+                } else if (commandOptions.length == 2) {
+                    handleLogin(commandOptions[0], commandOptions[1], client.auth());
                 } else {
                     System.out.println();
                     System.out.println(
-                            "The login command takes a single command option which is the username with which to perform a login"
+                            "The login command requires a single command option which is the username and can " +
+                                    "optionally take a second command argument which is the \"context\" with which " +
+                                    "to perform a login"
                     );
                     printHelp(jsap);
                     System.out.println();
@@ -81,7 +85,8 @@ public class LaunchKeySdkDemoApp {
                 } else {
                     System.out.println();
                     System.out.println(
-                            "The authorized command takes a single command option which is the Auth Request value returned from a login command"
+                            "The authorized command takes a single command option which is the Auth Request value " +
+                                    "returned from a login command"
                     );
                     printHelp(jsap);
                     System.out.println();
@@ -95,18 +100,20 @@ public class LaunchKeySdkDemoApp {
                 } else {
                     System.out.println();
                     System.out.println(
-                            "The authorized command takes a single command option which is the Auth Request value returned from a login command"
+                            "The authorized command takes a single command option which is the Auth Request value "
+                                    + "returned from a login command"
                     );
                     printHelp(jsap);
                     System.out.println();
                 }
             } else if (command.equalsIgnoreCase("white-label-user-pair")) {
                 if (commandOptions.length == 1) {
-                    handleWhiteLabelPairUser(commandOptions[0], client.whiteLabel());
+                    handleWhiteLabelLinkUser(commandOptions[0], client.whiteLabel());
                 } else {
                     System.out.println();
                     System.out.println(
-                            "white-label-user-pair command requires a single argument of the unique ID for your application"
+                            "white-label-user-pair command requires a single argument of the unique ID for your " +
+                                    "application"
                     );
                     printHelp(jsap);
                     System.out.println();
@@ -120,7 +127,7 @@ public class LaunchKeySdkDemoApp {
             System.out.println();
             System.out.println("There was an error reading the private key file: " + privateKeyFile);
             System.out.println();
-        } catch (LaunchKeyException e) {
+        } catch (ApiException e) {
             System.out.println();
             System.out.println("There was an error executing your command: " + e.getMessage());
             System.out.println();
@@ -135,17 +142,21 @@ public class LaunchKeySdkDemoApp {
         }
     }
 
-    private static void handleWhiteLabelPairUser(String identifier, WhiteLabelService whiteLabelService) throws LaunchKeyException {
-        PairResponse result = whiteLabelService.pairUser(identifier);
+    private static void handleWhiteLabelLinkUser(
+            String identifier, WhiteLabelService whiteLabelService
+    ) throws ApiException {
+        LinkResponse result = whiteLabelService.linkUser(identifier);
         System.out.println();
-        System.out.println("White label user pair request successful");
+        System.out.println("White label user link request successful");
         System.out.println("    QR Code URL: " + result.getQrCodeUrl());
         System.out.println("    Manual verification code: " + result.getCode());
         System.out.println();
     }
 
-    private static void handleLogin(String username, AuthService authService) throws LaunchKeyException, InterruptedException {
-        String authRequest = authService.login(username);
+    private static void handleLogin(
+            String username, String context, AuthService authService
+    ) throws ApiException, InterruptedException {
+        String authRequest = authService.login(username, context);
         System.out.println();
         System.out.println("Login request successful");
         System.out.println("    Auth Request: " + authRequest);
@@ -176,7 +187,7 @@ public class LaunchKeySdkDemoApp {
     }
 
     private static void printHelp(JSAP jsap) {
-        String jar = new File(LaunchKeySdkDemoApp.class.getProtectionDomain().getCodeSource().getLocation().getPath())
+        String jar = new File(DemoApp.class.getProtectionDomain().getCodeSource().getLocation().getPath())
                 .getName();
         System.out.println();
         System.out.println();
@@ -202,24 +213,23 @@ public class LaunchKeySdkDemoApp {
                         .setHelp("Connect to the staging environment")
         );
         jsap.registerParameter(
-                new UnflaggedOption("rocket_key")
-                        .setUsageName("ROCKET_KEY")
-//                        .setStringParser(JSAP.INTEGER_PARSER)
+                new UnflaggedOption("app_key")
+                        .setUsageName("APP_KEY")
                         .setRequired(true)
-                        .setHelp("Rocket Key for the application from the LaunchKey dashboard")
+                        .setHelp("Application Key for the application from Dashboard")
         );
         jsap.registerParameter(
                 new UnflaggedOption("secret_key")
                         .setUsageName("SECRET_KEY")
                         .setRequired(true)
-                        .setHelp("Secret Key for the application from the LaunchKey dashboard")
+                        .setHelp("Secret Key for the application from the Dashboard")
         );
         jsap.registerParameter(
                 new UnflaggedOption("private_key_file")
                         .setUsageName("PRIVATE_KEY_FILE")
                         .setRequired(true)
                         .setHelp(
-                                "File location of the private key file for the application from the LaunchKey dashboard"
+                                "File location of the private key file for the application from the Dashboard"
                         )
         );
         jsap.registerParameter(
@@ -239,6 +249,7 @@ public class LaunchKeySdkDemoApp {
         return jsap;
     }
 
+    @SuppressWarnings("ThrowFromFinallyBlock")
     private static String readFile(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         StringBuilder sb = new StringBuilder();

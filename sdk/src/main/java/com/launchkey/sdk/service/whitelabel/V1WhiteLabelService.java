@@ -12,13 +12,11 @@
 
 package com.launchkey.sdk.service.whitelabel;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.V1ServiceAbstract;
 import com.launchkey.sdk.service.error.InvalidResponseException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.Transport;
 import com.launchkey.sdk.transport.v1.domain.UsersRequest;
 import com.launchkey.sdk.transport.v1.domain.UsersResponse;
@@ -35,21 +33,26 @@ public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabel
      * @param transport Transport service
      * @param crypto Crypto service
      * @param pingResponseCache Ping response cache
-     * @param rocketKey Rocket key for this implementation
+     * @param appKey Application key for this implementation
      * @param secretKey Secret key for this implementation
      */
     public V1WhiteLabelService(
-            Transport transport, Crypto crypto, PingResponseCache pingResponseCache, long rocketKey, String secretKey
+            Transport transport, Crypto crypto, PingResponseCache pingResponseCache, long appKey, String secretKey
     ) {
-       super(transport, crypto, pingResponseCache, rocketKey, secretKey);
+       super(transport, crypto, pingResponseCache, appKey, secretKey);
     }
 
     @Override
-    public PairResponse pairUser(String identifier) throws LaunchKeyException {
+    @Deprecated
+    public PairResponse pairUser(String identifier) throws ApiException {
+        return new PairResponse(linkUser(identifier));
+    }
+
+    @Override public LinkResponse linkUser(String identifier) throws ApiException {
         UsersResponse usersResponse = transport.users(
                 new UsersRequest(
                         identifier,
-                        rocketKey,
+                        appKey,
                         base64.encodeAsString(getSecret())
                 )
         );
@@ -61,12 +64,11 @@ public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabel
 
         try {
             byte[] data = crypto.decryptAES(base64.decode(usersResponse.getData()), key, iv);
-            PairResponse response = objectMapper.readValue(data, PairResponse.class);
-            return response;
+            return objectMapper.readValue(data, LinkResponse.class);
         } catch (GeneralSecurityException e) {
-            throw new InvalidResponseException("Unable to decrypt pair response", e);
+            throw new InvalidResponseException("Unable to decrypt link response", e);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse pair response data", e);
+            throw new InvalidResponseException("Unable to parse link response data", e);
         }
     }
 }

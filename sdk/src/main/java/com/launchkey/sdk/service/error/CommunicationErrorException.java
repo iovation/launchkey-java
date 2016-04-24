@@ -18,7 +18,7 @@ package com.launchkey.sdk.service.error;
  *      code: HTTP status code or 0 if no HTTP status code was returned
  *      message: Message from the underlying transport (HTTP, TLS, TCP, IP, etc)
  */
-public class CommunicationErrorException extends LaunchKeyException {
+public class CommunicationErrorException extends ApiException {
 
     /**
      * @param message the detail message (which is saved for later retrieval

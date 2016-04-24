@@ -18,16 +18,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.V1ServiceAbstract;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.service.error.InvalidCallbackException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
 import com.launchkey.sdk.service.error.InvalidSignatureException;
-import com.launchkey.sdk.service.error.LaunchKeyException;
 import com.launchkey.sdk.transport.v1.Transport;
 import com.launchkey.sdk.transport.v1.domain.*;
+import com.launchkey.sdk.transport.v1.domain.Policy.Factor;
+import com.launchkey.sdk.transport.v1.domain.Policy.Policy;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Auth service based on an API V1 transport
@@ -37,37 +38,53 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
     /**
      * Constructor
      *
-     * @param transport Transport service
-     * @param crypto Srypto service
-     * @param pingResponseCache Ping Response Cahce service
-     * @param rocketKey Rocket key for requests
-     * @param secretKey Secret key for requests
+     * @param transport         Transport service
+     * @param crypto            Crypto service
+     * @param pingResponseCache Ping Response Cache service
+     * @param appKey            Application key for requests
+     * @param secretKey         Secret key for requests
      */
     public V1AuthService(
-            Transport transport, Crypto crypto, PingResponseCache pingResponseCache, long rocketKey, String secretKey
+            Transport transport, Crypto crypto, PingResponseCache pingResponseCache, long appKey, String secretKey
     ) {
-        super(transport, crypto, pingResponseCache, rocketKey, secretKey);
+        super(transport, crypto, pingResponseCache, appKey, secretKey);
+    }
+
+    @Override public String authorize(String username, String context) throws ApiException {
+        return authorize(username, context, null);
+    }
+
+    @Override public String authorize(String username, String context, AuthPolicy policy) throws ApiException {
+        return auth(username, context, policy, false);
     }
 
     @Override
-    public String authorize(String username) throws LaunchKeyException {
-        return auth(username, false);
+    public String authorize(String username) throws ApiException {
+        return authorize(username, null, null);
+    }
+
+    @Override public String login(String username, String context) throws ApiException {
+        return login(username, context, null);
+    }
+
+    @Override public String login(String username, String context, AuthPolicy policy) throws ApiException {
+        return auth(username, context, policy, true);
     }
 
     @Override
-    public String login(String username) throws LaunchKeyException {
-        return auth(username, true);
+    public String login(String username) throws ApiException {
+        return login(username, null, null);
     }
 
     @Override
-    public void logout(String authRequestId) throws LaunchKeyException {
+    public void logout(String authRequestId) throws ApiException {
         byte[] secret = getSecret();
         transport.logs(
                 new LogsRequest(
                         "Revoke",
                         true,
                         authRequestId,
-                        rocketKey,
+                        appKey,
                         base64.encodeAsString(secret),
                         base64.encodeAsString(crypto.sign(secret))
                 )
@@ -75,13 +92,13 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
     }
 
     @Override
-    public AuthResponse getAuthResponse(String authRequestId) throws LaunchKeyException {
+    public AuthResponse getAuthResponse(String authRequestId) throws ApiException {
         AuthResponse authResponse = null;
         byte[] secret = getSecret();
         PollResponse response = transport.poll(
                 new PollRequest(
                         authRequestId,
-                        rocketKey,
+                        appKey,
                         base64.encodeAsString(secret),
                         base64.encodeAsString(crypto.sign(secret))
                 )
@@ -104,7 +121,7 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
                                 "Authenticate",
                                 auth.isAuthorized(),
                                 authRequestId,
-                                rocketKey,
+                                appKey,
                                 base64.encodeAsString(logsSecret),
                                 base64.encodeAsString(crypto.sign(logsSecret))
                         )
@@ -128,7 +145,7 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
     @Override
     public CallbackResponse handleCallback(
             Map<String, String> callbackData, int signatureTimeThreshold
-    ) throws LaunchKeyException {
+    ) throws ApiException {
         CallbackResponse callbackResponse;
         if (callbackData.containsKey("auth") &&
                 callbackData.containsKey("user_hash") &&
@@ -152,7 +169,7 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
                                 "Authenticate",
                                 auth.isAuthorized(),
                                 authRequestId,
-                                rocketKey,
+                                appKey,
                                 base64.encodeAsString(logsSecret),
                                 base64.encodeAsString(crypto.sign(logsSecret))
                         )
@@ -203,23 +220,67 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
 
     /**
      * Handle a callback request
+     *
      * @param callbackData Callback data received
      * @return parsed callback
-     * @throws LaunchKeyException when an error occurs handling the callback
+     * @throws ApiException when an error occurs handling the callback
      */
-    public CallbackResponse handleCallback(Map<String, String> callbackData) throws LaunchKeyException {
+    public CallbackResponse handleCallback(Map<String, String> callbackData) throws ApiException {
         return handleCallback(callbackData, 300);
     }
 
-    private String auth(String username, boolean session) throws LaunchKeyException {
+    private String auth(String username, String context, AuthPolicy authPolicy, boolean session) throws ApiException {
+        if (context != null && context.length() > 400) {
+            throw new IllegalArgumentException("Context value cannot be more than 400 characters");
+        }
+
+        Policy policy;
+        if (authPolicy == null) {
+            policy = null;
+        } else {
+            List<Policy.MinimumRequirement> minimumRequirements = new ArrayList<Policy.MinimumRequirement>();
+            minimumRequirements.add(new Policy.MinimumRequirement(
+                    Policy.MinimumRequirement.Type.AUTHENTICATED,
+                    authPolicy.getRequiredFactors(),
+                    authPolicy.isKnowledgeFactorRequired() ? 1 : 0,
+                    authPolicy.isInherenceFactorRequired() ? 1 : 0,
+                    authPolicy.isPossessionFactorRequired() ? 1 : 0
+            ));
+            List<Factor> factors;
+            if (authPolicy.getLocations().isEmpty()) {
+                factors = new ArrayList<Factor>();
+            } else {
+                List<Factor.Location> locations = new ArrayList<Factor.Location>();
+                for (AuthPolicy.Location location : authPolicy.getLocations()) {
+                    locations.add(new Factor.Location(
+                            location.getRadius(),
+                            location.getLatitude(),
+                            location.getLongitude()
+                    ));
+                }
+
+                factors = new ArrayList<Factor>();
+                factors.add(new Factor(
+                        Factor.Type.GEOFENCE,
+                        true,
+                        Factor.Requirement.FORCED,
+                        1,
+                        new Factor.Attributes(locations)
+                ));
+            }
+            policy = new Policy(minimumRequirements, factors);
+        }
+
         byte[] secret = getSecret();
         AuthsRequest request = new AuthsRequest(
                 username,
-                rocketKey,
+                appKey,
                 base64.encodeAsString(secret),
                 base64.encodeAsString(crypto.sign(secret)),
                 session ? 1 : 0,
-                1
+                1,
+                context,
+                policy
         );
 
         AuthsResponse response = transport.auths(request);

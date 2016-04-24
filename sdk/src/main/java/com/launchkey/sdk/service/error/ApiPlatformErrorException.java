@@ -13,15 +13,15 @@
 package com.launchkey.sdk.service.error;
 
 /**
- * The exception thrown when the LaunchKey Engine incurs an error when processinf an API request
+ * The exception thrown when the LaunchKey Engine incurs an error when processing an API request
  */
-public class LaunchKeyEngineErrorException extends LaunchKeyException {
+public class ApiPlatformErrorException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).
      * @param code    HTTP status code or 0 if no HTTP status code was returned
      */
-    public LaunchKeyEngineErrorException(String message, int code) {
+    public ApiPlatformErrorException(String message, int code) {
         super(message, code);
     }
 }

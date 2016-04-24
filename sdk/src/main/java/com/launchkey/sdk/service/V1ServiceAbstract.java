@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchkey.sdk.cache.CachePersistenceException;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
-import com.launchkey.sdk.service.error.LaunchKeyException;
+import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.Transport;
 import com.launchkey.sdk.transport.v1.domain.LaunchKeyDateFormat;
 import com.launchkey.sdk.transport.v1.domain.PingRequest;
@@ -30,13 +30,13 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 
 /**
- * Abstract V1 based service providing shared funcitonality between auth and whitelabel services
+ * Abstract V1 based service providing shared functionality between auth and whitelabel services
  */
 public abstract class V1ServiceAbstract {
     protected final Transport transport;
     protected final Crypto crypto;
     protected final PingResponseCache pingResponseCache;
-    protected final long rocketKey;
+    protected final long appKey;
     protected final String secretKey;
     protected final Base64 base64 = new Base64(0);
     protected final ObjectMapper objectMapper = new ObjectMapper();
@@ -47,25 +47,25 @@ public abstract class V1ServiceAbstract {
      * @param transport Transport service
      * @param crypto Crypto service
      * @param pingResponseCache Ping response cache service
-     * @param rocketKey Rocket key for the requests
+     * @param appKey Application key for the requests
      * @param secretKey Secret key for the requests
      */
     public V1ServiceAbstract(
             Transport transport,
             Crypto crypto,
             PingResponseCache pingResponseCache,
-            long rocketKey,
+            long appKey,
             String secretKey
     ) {
         this.transport = transport;
         this.secretKey = secretKey;
         this.pingResponseCache = pingResponseCache;
-        this.rocketKey = rocketKey;
+        this.appKey = appKey;
         this.crypto = crypto;
         this.log = LogFactory.getLog(getClass());
     }
 
-    protected RSAPublicKey getLaunchKeyPublicKey() throws LaunchKeyException {
+    protected RSAPublicKey getLaunchKeyPublicKey() throws ApiException {
         PingResponse pingResponse = null;
         try {
             pingResponse = pingResponseCache.getPingResponse();
@@ -80,11 +80,10 @@ public abstract class V1ServiceAbstract {
                 log.error("Error placing ping response in cache", e);
             }
         }
-        RSAPublicKey publicKey = crypto.getRSAPublicKeyFromPEM(pingResponse.getPublicKey());
-        return publicKey;
+        return crypto.getRSAPublicKeyFromPEM(pingResponse.getPublicKey());
     }
 
-    protected byte[] getSecret() throws LaunchKeyException {
+    protected byte[] getSecret() throws ApiException {
 
         try {
             String json = objectMapper.writeValueAsString(new Object() {
@@ -93,7 +92,7 @@ public abstract class V1ServiceAbstract {
             });
             return crypto.encryptRSA(json.getBytes(), getLaunchKeyPublicKey());
         } catch (JsonProcessingException e) {
-           throw new LaunchKeyException("Unable to create JSON from secret key", e, 0);
+           throw new ApiException("Unable to create JSON from secret key", e, 0);
         }
     }
 }

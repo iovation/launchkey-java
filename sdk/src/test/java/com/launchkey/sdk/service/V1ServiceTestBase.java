@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
-import com.launchkey.sdk.service.auth.V1AuthService;
 import com.launchkey.sdk.transport.v1.Transport;
 import com.launchkey.sdk.transport.v1.domain.LaunchKeyDateFormat;
 import com.launchkey.sdk.transport.v1.domain.PingRequest;
@@ -35,7 +34,6 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class V1ServiceTestBase {
@@ -44,7 +42,7 @@ public class V1ServiceTestBase {
     protected final Base64 base64 = new Base64(0);
     protected final ObjectMapper objectMapper = new ObjectMapper();
     protected final LaunchKeyDateFormat launchKeyDateFormat = new LaunchKeyDateFormat();
-    protected final long rocketKey = 12345674890L;
+    protected final long appKey = 12345674890L;
     protected final String secretKey = "ffd62938c9c42c471a440a44854f6b9a";
     protected Transport transport;
     protected Crypto crypto;
@@ -67,6 +65,7 @@ public class V1ServiceTestBase {
 
     }
 
+    @SuppressWarnings("Duplicates")
     @After
     public void tearDown() throws Exception {
         transport = null;
