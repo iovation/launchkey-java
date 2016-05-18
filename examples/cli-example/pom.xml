@@ -7,8 +7,8 @@
         <version>2.1.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>launchkey-examples-cli</artifactId>
-    <name>LaunchKey CLI Example Application</name>
+    <artifactId>examples-cli</artifactId>
+    <name>CLI Example Application</name>
     <description>Example application for using the Platform SDK in a CLI application</description>
 
     <dependencies>

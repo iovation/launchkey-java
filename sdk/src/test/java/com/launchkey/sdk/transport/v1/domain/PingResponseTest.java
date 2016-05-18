@@ -1,6 +1,7 @@
 package com.launchkey.sdk.transport.v1.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,13 +25,16 @@ import static org.junit.Assert.*;
 public class PingResponseTest {
 
     private PingResponse pingResponse;
+    private ObjectMapper mapper;
 
     @SuppressWarnings("SpellCheckingInspection")
     @Before
     public void setUp() throws Exception {
-        this.pingResponse = new PingResponse(
-                "1970-01-01 00:00:00",
-                "1970-01-01 00:00:01",
+        mapper = new ObjectMapper();
+        mapper.setDateFormat(new ISO8601DateFormat());
+        pingResponse = new PingResponse(
+                "Expected Fingerprint",
+                new Date(1000L),
                 "-----BEGIN PUBLIC KEY-----\n\n" +
                         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8zQos4iDSjmUVrFUAg5G\n" +
                         "uhU6GehNKb8MCXFadRWiyLGjtbGZAk8fusQU0Uj9E3o0mne0SYESACkhyK+3M1Er\n" +
@@ -45,12 +49,12 @@ public class PingResponseTest {
 
     @After
     public void tearDown() throws Exception {
-        this.pingResponse = null;
+        pingResponse = null;
     }
 
     @Test
     public void testGetDateStamp() throws Exception {
-        assertEquals(new Date(0L), this.pingResponse.getDateStamp());
+        assertNull(pingResponse.getDateStamp());
     }
 
     @Test
@@ -71,15 +75,15 @@ public class PingResponseTest {
                         "aFxOB8GA0Ny5SfI67u6w9Nz9Z9cBhcZBfJKdq5uRWjZWslHjBN3emTAKBpAUPNET\n" +
                         "nwIDAQAB\n\n" +
                         "-----END PUBLIC KEY-----\n",
-                this.pingResponse.getPublicKey()
+                pingResponse.getPublicKey()
         );
     }
 
     @Test
     @SuppressWarnings("SpellCheckingInspection")
     public void testJSONParsable() throws Exception {
-        String json = "{\"date_stamp\" : \"1970-01-01 00:00:00\"," +
-                "\"launchkey_time\" : \"1970-01-01 00:00:01\"," +
+        String json = "{\"fingerprint\" : \"Expected Fingerprint\"," +
+                "\"api_time\" : \"1970-01-01T00:00:01Z\"," +
                 "\"key\" : \"-----BEGIN PUBLIC KEY-----\\n\\n" +
                 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8zQos4iDSjmUVrFUAg5G\\n" +
                 "uhU6GehNKb8MCXFadRWiyLGjtbGZAk8fusQU0Uj9E3o0mne0SYESACkhyK+3M1Er\\n" +
@@ -89,16 +93,15 @@ public class PingResponseTest {
                 "aFxOB8GA0Ny5SfI67u6w9Nz9Z9cBhcZBfJKdq5uRWjZWslHjBN3emTAKBpAUPNET\\n" +
                 "nwIDAQAB\\n\\n" +
                 "-----END PUBLIC KEY-----\\n\"}";
-        ObjectMapper mapper = new ObjectMapper();
         PingResponse actual = mapper.readValue(json, PingResponse.class);
-        assertEquals(this.pingResponse, actual);
+        assertEquals(pingResponse, actual);
     }
 
     @Test
     @SuppressWarnings("SpellCheckingInspection")
     public void testJSONParseAllowsUnknown() throws Exception {
-        String json = "{\"date_stamp\" : \"1970-01-01 00:00:00\"," +
-                "\"launchkey_time\" : \"1970-01-01 00:00:01\"," +
+        String json = "{\"fingerprint\" : \"Expected Fingerprint\"," +
+                "\"api_time\" : \"1970-01-01T00:00:01Z\"," +
                 "\"key\" : \"-----BEGIN PUBLIC KEY-----\\n\\n" +
                 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8zQos4iDSjmUVrFUAg5G\\n" +
                 "uhU6GehNKb8MCXFadRWiyLGjtbGZAk8fusQU0Uj9E3o0mne0SYESACkhyK+3M1Er\\n" +
@@ -115,36 +118,36 @@ public class PingResponseTest {
 
     @Test
     public void testEqualObjectsReturnTrueForEquals() throws Exception {
-        PingResponse left = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "public key");
-        PingResponse right = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "public key");
+        PingResponse left = new PingResponse("Expected Fingerprint", new Date(0L), "public key");
+        PingResponse right = new PingResponse("Expected Fingerprint", new Date(0L), "public key");
         assertTrue(left.equals(right));
     }
 
     @Test
     public void testNotEqualObjectsReturnFalseForEquals() throws Exception {
-        PingResponse left = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "public key");
-        PingResponse right = new PingResponse("2001-01-01 01:01:02", "2002-02-02 02:02:02", "public key");
+        PingResponse left = new PingResponse("Expected Fingerprint", new Date(0L), "public key");
+        PingResponse right = new PingResponse("Expected Fingerprint", new Date(1L), "public key");
         assertFalse(left.equals(right));
     }
 
     @Test
     public void testEqualObjectsReturnSameHashCode() throws Exception {
-        PingResponse left = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "public key");
-        PingResponse right = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "public key");
+        PingResponse left = new PingResponse("Expected Fingerprint", new Date(0L), "public key");
+        PingResponse right = new PingResponse("Expected Fingerprint", new Date(0L), "public key");
         assertEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void testNotEqualObjectsReturnDifferentHashCode() throws Exception {
-        PingResponse left = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "public key");
-        PingResponse right = new PingResponse("2001-01-01 01:01:02", "2002-02-02 02:02:02", "public key");
+        PingResponse left = new PingResponse("Expected Fingerprint", new Date(0L), "public key");
+        PingResponse right = new PingResponse("Expected Fingerprint", new Date(1L), "public key");
         assertNotEquals(left.hashCode(), right.hashCode());
     }
 
 
     @Test
     public void testToStringContainsClassName() throws Exception {
-        PingResponse pingResponse = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "public key");
+        PingResponse pingResponse = new PingResponse("Expected Fingerprint", new Date(0L), "public key");
         assertThat(pingResponse.toString(), containsString(PingResponse.class.getSimpleName()));
     }
 }

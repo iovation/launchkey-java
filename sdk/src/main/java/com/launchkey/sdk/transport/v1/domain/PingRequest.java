@@ -23,17 +23,36 @@ public class PingRequest {
      */
     private final String dateStamp;
 
+    private final String fingerprint;
+
     /**
      * @param dateStamp When the current public key was generated. Returned only if a key is returned.
+     * @deprecated Use {@link PingRequest(String)} and {@link #getFingerprint()} instead
      */
+    @Deprecated
     public PingRequest(Date dateStamp) {
-        this.dateStamp = dateStamp == null ? null : LaunchKeyDateFormat.getInstance().format(dateStamp);
+        this.fingerprint = null;
+        this.dateStamp = dateStamp == null ? null : PlatformDateFormat.getInstance().format(dateStamp);
+    }
+
+    public PingRequest(String fingerprint) {
+        this.fingerprint = fingerprint;
+        this.dateStamp = null;
     }
 
     public PingRequest() {
-        this(null);
+        this((String) null);
     }
 
+    public String getFingerprint() {
+        return fingerprint;
+    }
+
+    /**
+     * @deprecated Use {@link PingRequest(String)} and {@link #getFingerprint()} instead
+     * @return
+     */
+    @Deprecated
     public String getDateStamp() {
         return this.dateStamp;
     }
@@ -51,7 +70,9 @@ public class PingRequest {
 
     @Override
     public int hashCode() {
-        return dateStamp != null ? dateStamp.hashCode() : 0;
+        int hash = dateStamp != null ? dateStamp.hashCode() : 0;
+        hash += fingerprint != null ? fingerprint.hashCode() : 0;
+        return hash;
     }
 
 
@@ -59,6 +80,7 @@ public class PingRequest {
     public String toString() {
         return "PingRequest{" +
                 "dateStamp='" + dateStamp + '\'' +
+                "fingerprint='" + fingerprint + '\'' +
                 '}';
     }
 }

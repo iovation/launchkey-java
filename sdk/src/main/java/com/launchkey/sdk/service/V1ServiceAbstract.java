@@ -14,12 +14,13 @@ package com.launchkey.sdk.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.launchkey.sdk.cache.CachePersistenceException;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.Transport;
-import com.launchkey.sdk.transport.v1.domain.LaunchKeyDateFormat;
+import com.launchkey.sdk.transport.v1.domain.PlatformDateFormat;
 import com.launchkey.sdk.transport.v1.domain.PingRequest;
 import com.launchkey.sdk.transport.v1.domain.PingResponse;
 import org.apache.commons.codec.binary.Base64;
@@ -41,7 +42,7 @@ public abstract class V1ServiceAbstract {
     protected final Base64 base64 = new Base64(0);
     protected final ObjectMapper objectMapper = new ObjectMapper();
     protected final Log log;
-    protected final LaunchKeyDateFormat launchKeyDateFormat = new LaunchKeyDateFormat();
+    protected final PlatformDateFormat launchKeyDateFormat = new PlatformDateFormat();
 
     /**
      * @param transport Transport service
@@ -63,6 +64,7 @@ public abstract class V1ServiceAbstract {
         this.appKey = appKey;
         this.crypto = crypto;
         this.log = LogFactory.getLog(getClass());
+        objectMapper.setDateFormat(new ISO8601DateFormat());
     }
 
     protected RSAPublicKey getLaunchKeyPublicKey() throws ApiException {

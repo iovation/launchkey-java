@@ -56,8 +56,8 @@ public class ApacheHttpClientTransportPingTest {
         response = mock(HttpResponse.class);
         crypto = mock(Crypto.class);
         when(response.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, "OK"));
-        String responseBody = "{\"date_stamp\" : \"2001-01-01 01:01:01\"," +
-                "\"launchkey_time\" : \"2002-02-02 02:02:02\"," +
+        String responseBody = "{\"fingerprint\" : \"Expected Fingerprint\"," +
+                "\"api_time\" : \"1970-01-01T00:00:00Z\"," +
                 "\"key\" : \"Expected Public Key\"}";
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream(responseBody.getBytes("UTF-8"))).build()
@@ -92,7 +92,7 @@ public class ApacheHttpClientTransportPingTest {
     }
 
     @Test
-    public void testPingDoesNotPassDateStampWhenNoneProvided() throws Exception {
+    public void testPingDoesNotPassDateStamp() throws Exception {
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
         transport.ping(new PingRequest());
         verify(httpClient).execute(request.capture());
@@ -100,16 +100,24 @@ public class ApacheHttpClientTransportPingTest {
     }
 
     @Test
-    public void testPingDoesPassDateStampWhenProvided() throws Exception {
+    public void testPingDoesNotPassFingerprintWhenNoneProvided() throws Exception {
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
-        transport.ping(new PingRequest(new Date(0L)));
+        transport.ping(new PingRequest());
         verify(httpClient).execute(request.capture());
-        assertThat(request.getValue().getURI().getRawQuery(), containsString("date_stamp=1970-01-01+00%3A00%3A00"));
+        assertThat(request.getValue().getURI().getRawQuery(), not(containsString("fingerprint")));
+    }
+
+    @Test
+    public void testPingDoesPassFingerprintWhenProvided() throws Exception {
+        ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
+        transport.ping(new PingRequest("Expected Fingerprint"));
+        verify(httpClient).execute(request.capture());
+        assertThat(request.getValue().getURI().getRawQuery(), containsString("fingerprint=Expected+Fingerprint"));
     }
 
     @Test
     public void testPingReturnsExpectedResponse() throws Exception {
-        PingResponse expected = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "Expected Public Key");
+        PingResponse expected = new PingResponse("Expected Fingerprint", new Date(0L), "Expected Public Key");
         PingResponse actual = transport.ping(new PingRequest());
         assertEquals(expected, actual);
     }

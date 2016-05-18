@@ -13,6 +13,7 @@
 package com.launchkey.sdk.transport.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.CommunicationErrorException;
 import com.launchkey.sdk.service.error.InvalidResponseException;
@@ -70,6 +71,7 @@ public class ApacheHttpClientTransport implements Transport {
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("baseURL must be be a valid parsable URI with URIBuilder", e);
         }
+        objectMapper.setDateFormat(new ISO8601DateFormat());
     }
 
     /**
@@ -80,9 +82,9 @@ public class ApacheHttpClientTransport implements Transport {
         PingResponse pingResponse;
         try {
             URIBuilder uriBuilder = new URIBuilder(getUrlForPath("/ping"));
-            String dateStamp = request.getDateStamp();
-            if (dateStamp != null) {
-                uriBuilder.setParameter("date_stamp", dateStamp);
+            String fingerprint = request.getFingerprint();
+            if (fingerprint != null) {
+                uriBuilder.setParameter("fingerprint", fingerprint);
             }
             HttpGet ping = new HttpGet(uriBuilder.build());
             HttpResponse httpResponse = client.execute(ping);
