@@ -199,16 +199,16 @@ public class V1AuthService extends V1ServiceAbstract implements AuthService {
             }
 
             try {
-                DeOrbitCallbackResponse cbr = objectMapper.readValue(
+                LogoutCallbackResponse cbr = objectMapper.readValue(
                         callbackData.get("deorbit"),
-                        DeOrbitCallbackResponse.class
+                        LogoutCallbackResponse.class
                 );
                 // Reduce current time to the second as seconds are hte precision of "LaunchKey Time"
                 long currentTime = new Date().getTime() / 1000 * 1000;
-                if (cbr.getDeOrbitTime().getTime() + (signatureTimeThreshold * 1000) < currentTime) {
+                if (cbr.getLogoutRequested().getTime() + (signatureTimeThreshold * 1000) < currentTime) {
                     throw new InvalidCallbackException("Message has expired");
                 }
-                callbackResponse = cbr;
+                callbackResponse = new DeOrbitCallbackResponse(cbr);
             } catch (IOException e) {
                 throw new InvalidCallbackException("Unable to parse deorbit data", e);
             }

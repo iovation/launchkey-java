@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.security.interfaces.RSAPublicKey;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,9 @@ import static org.mockito.Mockito.when;
  */
 public class V1AuthServiceHandleCallbackTest extends V1AuthServiceTestBase {
 
-    protected final String deOrbitMessage = "{\"launchkey_time\":\"" + launchKeyDateFormat.format(new Date()) +
+    protected final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    protected final Date logoutTime = new Date();
+    protected final String deOrbitMessage = "{\"api_time\":\"" + df.format(logoutTime) +
             "\",\"user_hash\":\"Expected User Hash\"}";
 
     protected final Map<String, String> authData = new HashMap<String, String>() {{
@@ -87,16 +91,16 @@ public class V1AuthServiceHandleCallbackTest extends V1AuthServiceTestBase {
     public void testDeOrbitThrowsInvalidCallbackExceptionWhenLaunchKeyTimeExceedsThreshold() throws Exception {
         service.handleCallback(
                 new HashMap<String, String>() {{
-                    put("deorbit", "{\"launchkey_time\":\"2001-01-01 01:01:01\",\"user_hash\":\"Expected User Hash\"}");
+                    put("deorbit", "{\"api_time\":\"2001-01-01 01:01:01\",\"user_hash\":\"Expected User Hash\"}");
                     put("signature", base64.encodeAsString("Signature".getBytes()));
                 }}
         );
     }
 
     @Test
-    public void testDeOrbitReturnsExpectedDeOrbitCallbackResponse() throws Exception {
-        final String launchKeyTime = launchKeyDateFormat.format(new Date());
-        DeOrbitCallbackResponse expected = new DeOrbitCallbackResponse(launchKeyTime, "Expected User Hash");
+    public void testLogoutReturnsExpectedDeOrbitCallbackResponse() throws Exception {
+        Date expectedTime = new Date((logoutTime.getTime() / 1000) * 1000);
+        CallbackResponse expected = new DeOrbitCallbackResponse(new LogoutCallbackResponse(expectedTime, "Expected User Hash"));
         CallbackResponse actual = service.handleCallback(deOrbitData);
         assertEquals(expected, actual);
     }

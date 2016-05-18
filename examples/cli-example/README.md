@@ -1,4 +1,4 @@
-# Java SDK - CLI Example
+# SDK for Java - CLI Example
 
 
   * [Pre-Requisites](#prerequisites)
@@ -20,12 +20,16 @@ mvn clean package
 
 #  <a name="usage"></a>Usage
 
+All of the supplied examples use the JAR of examples-cli-3.0.0.jar. Replace that value with the name and location
+of the JAR file you downloaded or built via Maven. If you build the package with Maven, it will be in the `target`
+directory directly under the directory where this file is located.
+
   1. Help
   
     Help can be obtained by either executing the application without any parameters or with -h
     
     ```
-    java -jar launchkey-java-cli-demo-1.0.0.jar -h
+    java -jar examples-cli-3.0.0.jar -h
     ```
 
   3. Login
@@ -35,7 +39,7 @@ mvn clean package
     Example: Execute a login request for user _myusername_.
      
     ```
-    java -jar launchkey-java-cli-demo-1.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key login myusername
+    java -jar examples-cli-3.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key login myusername
     ```
     
     The request will happen in two steps.  The application will make an authorization request and then poll for a user
@@ -80,7 +84,7 @@ mvn clean package
     Pass the _Auth Request_ value from the login request to the authorized command
 
     ```
-    java -jar launchkey-java-cli-demo-2.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key authorized wb9phc6kv2qg5ajplr13tpq8b5sx4ukn
+    java -jar examples-cli-3.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key authorized wb9phc6kv2qg5ajplr13tpq8b5sx4ukn
     ```
     
     One of two scenarios will occur, authorized or unauthorized.  Here are examples of each:
@@ -98,7 +102,7 @@ mvn clean package
     Pass the _Auth Request_ value from the login request to the logout command
     
     ```
-    java -jar launchkey-java-cli-demo-2.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key logout wb9phc6kv2qg5ajplr13tpq8b5sx4ukn
+    java -jar examples-cli-3.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key logout wb9phc6kv2qg5ajplr13tpq8b5sx4ukn
     ```
     
     You should receive the following response:
@@ -120,7 +124,7 @@ mvn clean package
     Request:
     
     ```
-    java -jar launchkey-java-cli-demo-2.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key white-label-pair-user 326335b0-8569-4aa3-90a3-ac4372104ea3
+    java -jar examples-cli-3.0.0.jar 123456789 abcdefghijklmnopqrst /tmp/private.key white-label-pair-user 326335b0-8569-4aa3-90a3-ac4372104ea3
     ```
 
     Response when the Application Key is not for a White Label Application:
@@ -133,7 +137,7 @@ mvn clean package
     
     ```
     White label user creation request successful
-        QR Code URL: https://dashboard.launchkey.com/qrcode/5r53j9z
+        QR Code URL: https://dashboard.com/qrcode/5r53j9z
         Manual verification code: 5r53j9z
     ```
      

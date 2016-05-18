@@ -6,7 +6,7 @@
         <groupId>com.launchkey.sdk</groupId>
         <version>2.1.1-SNAPSHOT</version>
     </parent>
-    <artifactId>launchkey-examples-spring-mvc</artifactId>
+    <artifactId>examples-spring-mvc</artifactId>
     <name>Spring MVC Example Application</name>
     <description>Example application for using the Platform SDK in a Spring MVC application</description>
 

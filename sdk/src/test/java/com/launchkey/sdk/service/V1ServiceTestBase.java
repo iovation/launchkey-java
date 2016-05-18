@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.transport.v1.Transport;
-import com.launchkey.sdk.transport.v1.domain.LaunchKeyDateFormat;
+import com.launchkey.sdk.transport.v1.domain.PlatformDateFormat;
 import com.launchkey.sdk.transport.v1.domain.PingRequest;
 import com.launchkey.sdk.transport.v1.domain.PingResponse;
 import org.apache.commons.codec.binary.Base64;
@@ -41,7 +41,7 @@ public class V1ServiceTestBase {
     protected final String rsaSignedValue = "RSA Signature";
     protected final Base64 base64 = new Base64(0);
     protected final ObjectMapper objectMapper = new ObjectMapper();
-    protected final LaunchKeyDateFormat launchKeyDateFormat = new LaunchKeyDateFormat();
+    protected final PlatformDateFormat launchKeyDateFormat = new PlatformDateFormat();
     protected final long appKey = 12345674890L;
     protected final String secretKey = "ffd62938c9c42c471a440a44854f6b9a";
     protected Transport transport;
@@ -120,7 +120,7 @@ public class V1ServiceTestBase {
         assertEquals("Expected only 2 elements, stamped and secret, in JSON: " + json, 2, actual.size());
         assertEquals("Unexpected secret value in JSON object", secretKey, actual.get("secret").textValue());
         String stamped = actual.get("stamped").asText();
-        Date actualDate = new LaunchKeyDateFormat().parseObject(stamped);
+        Date actualDate = new PlatformDateFormat().parseObject(stamped);
         assertThat(actualDate, greaterThanOrEqualTo(actualStart));
         assertThat(actualDate, lessThanOrEqualTo(actualEnd));
     }

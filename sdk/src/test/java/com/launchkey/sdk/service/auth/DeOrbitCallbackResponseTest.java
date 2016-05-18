@@ -27,7 +27,7 @@ public class DeOrbitCallbackResponseTest {
 
     @Before
     public void setUp() throws Exception {
-        deOrbitCallbackResponse = new DeOrbitCallbackResponse("1970-01-01 00:00:00", "User Hash");
+        deOrbitCallbackResponse = new DeOrbitCallbackResponse(new LogoutCallbackResponse(new Date(0L), "User Hash"));
     }
 
     @After
@@ -43,61 +43,5 @@ public class DeOrbitCallbackResponseTest {
     @Test
     public void testGetUserHash() throws Exception {
         assertEquals("User Hash", deOrbitCallbackResponse.getUserHash());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidDateFormatThrowIllegalArgumentException() throws Exception {
-        new DeOrbitCallbackResponse("1970-01-01+00:00:00", "User Hash");
-    }
-
-
-    @Test
-    public void testJSONParsable() throws Exception {
-        String json = "{\"launchkey_time\":\"1970-01-01 00:00:00\",\"user_hash\":\"User Hash\"}";
-        ObjectMapper mapper = new ObjectMapper();
-        DeOrbitCallbackResponse actual = mapper.readValue(json, DeOrbitCallbackResponse.class);
-        assertEquals(deOrbitCallbackResponse, actual);
-    }
-
-    @Test
-    public void testJSONParseAllowsUnknown() throws Exception {
-        String json = "{\"launchkey_time\":\"1970-01-01 00:00:00\",\"user_hash\":\"User Hash\"," +
-                "\"unknown\": \"Unknown Value\"}";
-        ObjectMapper mapper = new ObjectMapper();
-        DeOrbitCallbackResponse actual = mapper.readValue(json, DeOrbitCallbackResponse.class);
-        assertEquals(deOrbitCallbackResponse, actual);
-    }
-
-    @Test
-    public void testEqualsForEqualObjectsIsTrue() throws Exception {
-        DeOrbitCallbackResponse left = new DeOrbitCallbackResponse("2001-01-01 01:01:01", "User Hash");
-        DeOrbitCallbackResponse right = new DeOrbitCallbackResponse("2001-01-01 01:01:01", "User Hash");
-        assertTrue(left.equals(right));
-    }
-
-    @Test
-    public void testEqualsForUnEqualObjectsIsFalse() throws Exception {
-        DeOrbitCallbackResponse left = new DeOrbitCallbackResponse("2001-01-01 01:01:01", "User Hash");
-        DeOrbitCallbackResponse right = new DeOrbitCallbackResponse("2001-01-01 01:01:02", "User Hash");
-        assertFalse(left.equals(right));
-    }
-
-    @Test
-    public void testHashCodeForEqualObjectsAreEqual() throws Exception {
-        DeOrbitCallbackResponse left = new DeOrbitCallbackResponse("2001-01-01 01:01:01", "User Hash");
-        DeOrbitCallbackResponse right = new DeOrbitCallbackResponse("2001-01-01 01:01:01", "User Hash");
-        assertEquals(left.hashCode(), right.hashCode());
-    }
-
-    @Test
-    public void testHasCodeForUnEqualObjectsIsNotEqual() throws Exception {
-        DeOrbitCallbackResponse left = new DeOrbitCallbackResponse("2001-01-01 01:01:01", "User Hash");
-        DeOrbitCallbackResponse right = new DeOrbitCallbackResponse("2001-01-01 01:01:02", "User Hash");
-        assertNotEquals(left.hashCode(), right.hashCode());
-    }
-
-    @Test
-    public void testToStringContainsClassName() throws Exception {
-        assertThat(deOrbitCallbackResponse.toString(), containsString(DeOrbitCallbackResponse.class.getSimpleName()));
     }
 }

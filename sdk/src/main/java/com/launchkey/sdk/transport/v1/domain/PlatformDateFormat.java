@@ -17,19 +17,19 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class LaunchKeyDateFormat extends Format {
+public class PlatformDateFormat extends Format {
 
-    private static LaunchKeyDateFormat instance;
+    private static PlatformDateFormat instance;
     private final SimpleDateFormat formatter;
 
-    static LaunchKeyDateFormat getInstance() {
+    static PlatformDateFormat getInstance() {
         if (instance == null) {
-            instance = new LaunchKeyDateFormat();
+            instance = new PlatformDateFormat();
         }
         return instance;
     }
 
-    public LaunchKeyDateFormat() {
+    public PlatformDateFormat() {
         this.formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         this.formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
     }

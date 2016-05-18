@@ -1,10 +1,6 @@
-# CHANGELOG for LaunchKey Java SDK
+# CHANGELOG
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
-
-To get the diff for a specific change, go to [https://github.com/LaunchKey/launchkey-java/commit/XXX](https://github.com/LaunchKey/launchkey-java/commit/XXX) where XXX
-is the change hash To get the diff between two versions, go to
-[https://github.com/LaunchKey/launchkey-java/compare/launchkey-sdk-1.0.0...launchkey-sdk-1.1.0](https://github.com/LaunchKey/launchkey-java/compare/launchkey-sdk-1.0.0...launchkey-sdk-1.1.0)
 
   * 2.1.0
     * Refactor classes, interfaces, methods, attributes, and parameters for new terminology. Backwards compatibility
@@ -32,7 +28,7 @@ is the change hash To get the diff between two versions, go to
     * Move examples and SDK into one code base
 
   * 1.2.1
-    * Update AuthenticationManager.createWhiteLabelUser() to allow for no lk_identifier in response to enable forwards
+    * Update AuthenticationManager.createWhiteLabelUser() to allow for no identifier in response to enable forwards
         compatibility with new API change forthcoming.
 
   * 1.2.0
@@ -42,10 +38,10 @@ is the change hash To get the diff between two versions, go to
     * Mark Bouncy Castle as provided in POM.  Can't be used in the unsigned JAR anyway.
 
   * 1.1.1
-    * Remove requirement for providing LaunchKey time for isAuthorized method in authentication manager.  It will use
-        the LaunchKey time from the ping call it performs before it checks authorization. Authentication manager method
+    * Remove requirement for providing time for isAuthorized method in authentication manager.  It will use
+        the time from the ping call it performs before it checks authorization. Authentication manager method
         isAuthorized(String, String) is now deprecated.  It will simply call the isAuthorized(String) and ignore the
-        LaunchKey time provided.
+        time provided.
 
   * 1.1.0
     * Added white label user create method
