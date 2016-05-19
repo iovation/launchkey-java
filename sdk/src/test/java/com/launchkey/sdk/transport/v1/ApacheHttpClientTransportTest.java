@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -43,13 +43,13 @@ public class ApacheHttpClientTransportTest {
 
     @Test
     public void testConstructorWithValidUriDoesNotError() throws Exception {
-        ApacheHttpClientTransport actual = new ApacheHttpClientTransport(httpClient, "https://launchkey.com", crypto);
+        ApacheHttpClientTransport actual = new ApacheHttpClientTransport(httpClient, "https://test.com", crypto);
         assertThat(actual, instanceOf(ApacheHttpClientTransport.class));
     }
 
     @Test
     public void testConstructorWithValidUriAndTrailingSlashDoesNotError() throws Exception {
-        ApacheHttpClientTransport actual = new ApacheHttpClientTransport(httpClient, "https://launchkey.com/", crypto);
+        ApacheHttpClientTransport actual = new ApacheHttpClientTransport(httpClient, "https://test.com/", crypto);
         assertThat(actual, instanceOf(ApacheHttpClientTransport.class));
     }
 

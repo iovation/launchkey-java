@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -40,12 +40,6 @@ public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabel
             Transport transport, Crypto crypto, PingResponseCache pingResponseCache, long appKey, String secretKey
     ) {
        super(transport, crypto, pingResponseCache, appKey, secretKey);
-    }
-
-    @Override
-    @Deprecated
-    public PairResponse pairUser(String identifier) throws ApiException {
-        return new PairResponse(linkUser(identifier));
     }
 
     @Override public LinkResponse linkUser(String identifier) throws ApiException {

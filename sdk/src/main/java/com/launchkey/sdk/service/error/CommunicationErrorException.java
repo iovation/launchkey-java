@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 package com.launchkey.sdk.service.error;
 
 /**
- * This exception is thrown when an error occurs communicating with the LaunchKey Engine API.  In this error the
+ * This exception is thrown when an error occurs communicating with the Platform API.  In this error the
  * code and message will be re-purposed to the following:
  *      code: HTTP status code or 0 if no HTTP status code was returned
  *      message: Message from the underlying transport (HTTP, TLS, TCP, IP, etc)

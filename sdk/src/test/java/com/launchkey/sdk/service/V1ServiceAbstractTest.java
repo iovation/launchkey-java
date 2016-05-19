@@ -18,7 +18,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -44,15 +44,15 @@ public class V1ServiceAbstractTest extends V1ServiceTestBase {
     }
 
     @Test
-    public void testGetLaunchKeyPublicKeySwallowsCachePersistenceErrorOnCacheGet() throws Exception {
+    public void testGetPublicKeySwallowsCachePersistenceErrorOnCacheGet() throws Exception {
         when(pingResponseCache.getPingResponse()).thenThrow(new CachePersistenceException("Duh"));
-        assertEquals(publicKey, service.executeGetLaunchKeyPublicKey());
+        assertEquals(publicKey, service.executeGetPublicKey());
     }
 
     @Test
-    public void testGetLaunchKeyPublicKeySwallowsCachePersistenceErrorOnCacheSet() throws Exception {
+    public void testGetPublicKeySwallowsCachePersistenceErrorOnCacheSet() throws Exception {
         doThrow(new CachePersistenceException("Duh")).when(pingResponseCache).setPingResponse(any(PingResponse.class));
-        assertEquals(publicKey, service.executeGetLaunchKeyPublicKey());
+        assertEquals(publicKey, service.executeGetPublicKey());
     }
 
     private static class ConcreteV1Service extends V1ServiceAbstract {
@@ -66,8 +66,8 @@ public class V1ServiceAbstractTest extends V1ServiceTestBase {
             super(transport, crypto, pingResponseCache, appKey, secretKey);
         }
 
-        public RSAPublicKey executeGetLaunchKeyPublicKey() throws ApiException {
-            return getLaunchKeyPublicKey();
+        public RSAPublicKey executeGetPublicKey() throws ApiException {
+            return getPublicKey();
         }
     }
 }

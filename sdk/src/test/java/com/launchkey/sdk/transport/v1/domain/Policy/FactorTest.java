@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 
 /**
- * Copyright 2016 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.

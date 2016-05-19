@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class V1ServiceTestBase {
     protected final String rsaSignedValue = "RSA Signature";
     protected final Base64 base64 = new Base64(0);
     protected final ObjectMapper objectMapper = new ObjectMapper();
-    protected final PlatformDateFormat launchKeyDateFormat = new PlatformDateFormat();
+    protected final PlatformDateFormat platformDateFormat = new PlatformDateFormat();
     protected final long appKey = 12345674890L;
     protected final String secretKey = "ffd62938c9c42c471a440a44854f6b9a";
     protected Transport transport;
@@ -57,7 +57,7 @@ public class V1ServiceTestBase {
         pingResponseCache = mock(PingResponseCache.class);
         publicKey = mock(RSAPublicKey.class);
 
-        pingResponse = new PingResponse("2001-01-01 01:01:01", "2002-02-02 02:02:02", "Expected Key");
+        pingResponse = new PingResponse("Fingerprint", new Date(0L), "Expected Key");
         when(transport.ping(any(PingRequest.class))).thenReturn(pingResponse);
         when(crypto.encryptRSA(any(byte[].class), any(PublicKey.class))).thenReturn(rsaEncryptedValue.getBytes());
         when(crypto.sign(any(byte[].class))).thenReturn(rsaSignedValue.getBytes());
@@ -109,7 +109,7 @@ public class V1ServiceTestBase {
     }
 
     public void verifyRsaEncryptedJsonWithCorrectDataToCreateSecretKey(Date start, Date end) throws Exception {
-        // "LaunchKey time" precision is in seconds, Java is milliseconds, round down to the second
+        // "API time" precision is in seconds, Java is milliseconds, round down to the second
         Date actualStart = new Date((start.getTime() / 1000) * 1000);
         Date actualEnd = new Date((end.getTime() / 1000) * 1000);
 

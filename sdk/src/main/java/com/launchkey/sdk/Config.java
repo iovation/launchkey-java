@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  *
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.security.PrivateKey;
 import java.security.Provider;
 
 /**
- * Configuration object for building LaunchKeyClient objects with the factory
+ * Configuration object for building Client objects with the factory
  */
 public class Config {
 
@@ -51,17 +51,6 @@ public class Config {
         this.appKey = appKey;
         this.secretKey = secretKey;
     }
-
-    /**
-     * Get the Application Key for the Application that will used to make requests
-     * @return Application Key for the Application that will used to make requests
-     * @deprecated Use {@link #getAppKey()}
-     */
-    @Deprecated
-    public long getRocketKey() {
-        return getAppKey();
-    }
-
 
     /**
      * Get the Application Key for the Application that will used to make requests
@@ -158,8 +147,8 @@ public class Config {
     }
 
     /**
-     * Set the Apache HTTP client that will be utilized for making requests of teh LaunchKey API
-     * @param apacheHttpClient Apache HTTP client that will be utilized for making requests of the LaunchKey API
+     * Set the Apache HTTP client that will be utilized for making requests of the Platform API
+     * @param apacheHttpClient Apache HTTP client that will be utilized for making requests of the Platform API
      * @return this
      */
     public Config setApacheHttpClient(HttpClient apacheHttpClient) {
@@ -168,8 +157,8 @@ public class Config {
     }
 
     /**
-     * Get the Apache HTTP client that will be utilized for making requests of teh LaunchKey API
-     * @return Apache HTTP client that will be utilized for making requests of teh LaunchKey API
+     * Get the Apache HTTP client that will be utilized for making requests of the Platform API
+     * @return Apache HTTP client that will be utilized for making requests of the Platform API
      */
     public HttpClient getApacheHttpClient() {
         return apacheHttpClient;
@@ -233,8 +222,8 @@ public class Config {
     }
 
     /**
-     * Set the base URL for the LaunchKey Engine API. e.g.: https://api.launchkey.com/v1
-     * @param APIBaseURL Base URL for the LaunchKey Engine API. e.g.: https://api.launchkey.com/v1
+     * Set the base URL for the Platform API. e.g.: https://api.example.com/v1
+     * @param APIBaseURL Base URL for the Platform API. e.g.: https://api.example.com/v1
      * @return this
      */
     public Config setAPIBaseURL(String APIBaseURL) {
@@ -243,16 +232,16 @@ public class Config {
     }
 
     /**
-     * Get the base URL for the LaunchKey Engine API. e.g.: https://api.launchkey.com/v1
-     * @return Base URL for the LaunchKey Engine API. e.g.: https://api.launchkey.com/v1
+     * Get the base URL for the Platform API. e.g.: https://api.example.com/v1
+     * @return Base URL for the Platform API. e.g.: https://api.example.com/v1
      */
     public String getAPIBaseURL() {
         return APIBaseURL;
     }
 
     /**
-     * Set the ping response cache to be used for caching LaunchKey Engine API /ping calls
-     * @param pingResponseCache Ping response cache to be used for caching LaunchKey Engine API /ping calls
+     * Set the ping response cache to be used for caching Platform API /ping calls
+     * @param pingResponseCache Ping response cache to be used for caching Platform API /ping calls
      * @return this
      */
     public Config setPingResponseCache(PingResponseCache pingResponseCache) {
@@ -261,8 +250,8 @@ public class Config {
     }
 
     /**
-     * Get the ping response cache to be used for caching LaunchKey Engine API /ping calls
-     * @return Ping response cache to be used for caching LaunchKey Engine API /ping calls
+     * Get the ping response cache to be used for caching Platform API /ping calls
+     * @return Ping response cache to be used for caching Platform API /ping calls
      */
     public PingResponseCache getPingResponseCache() {
         return pingResponseCache;

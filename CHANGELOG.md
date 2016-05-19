@@ -1,7 +1,9 @@
 # CHANGELOG
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
-
+  * 3.0.0
+    * Remove deprecated methods and classes
+    * Update all documentation for new terminology
   * 2.1.0
     * Refactor classes, interfaces, methods, attributes, and parameters for new terminology. Backwards compatibility
         was maintained and old classes, interfaces, and methods were deprecated. They will be removed in version 3.0.

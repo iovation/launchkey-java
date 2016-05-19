@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -45,11 +45,6 @@ public class ConfigTest {
     @Test
     public void testGetAppKey() throws Exception {
         assertEquals(12345, config.getAppKey());
-    }
-
-    @Test
-    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
-        assertEquals(config.getRocketKey(), config.getAppKey());
     }
 
     @Test

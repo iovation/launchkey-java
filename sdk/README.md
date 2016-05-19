@@ -1,4 +1,4 @@
-# LaunchKey SDK for Java
+# SDK for Java
 
 Documentation can be found here:
 

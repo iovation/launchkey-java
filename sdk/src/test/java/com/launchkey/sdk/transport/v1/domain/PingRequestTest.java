@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  *
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -23,47 +23,46 @@ public class PingRequestTest {
 
     @Test
     public void testEmptyConstructorGetterReturnsNull() throws Exception {
-        assertEquals(null, new PingRequest().getDateStamp());
+        assertEquals(null, new PingRequest().getFingerprint());
     }
 
     @Test
-    public void testDateStampConstructorReturnsExpectedStringInGetter() throws Exception {
-        assertEquals("1970-01-01 00:00:00", new PingRequest(new Date(0L)).getDateStamp());
+    public void testFingerprintConstructorReturnsExpectedStringInGetter() throws Exception {
+        assertEquals("Fingerprint", new PingRequest("Fingerprint").getFingerprint());
     }
 
     @Test
     public void testEqualObjectsReturnTrueForEquals() throws Exception {
-        PingRequest left = new PingRequest(new Date(0L));
-        PingRequest right = new PingRequest(new Date(0L));
+        PingRequest left = new PingRequest("Fingerprint");
+        PingRequest right = new PingRequest("Fingerprint");
         assertTrue(left.equals(right));
     }
 
     @Test
     public void testNotEqualObjectsReturnFalseForEquals() throws Exception {
-        PingRequest left = new PingRequest(new Date(0L));
-        PingRequest right = new PingRequest(new Date(1000L));
+        PingRequest left = new PingRequest("Fingerprint");
+        PingRequest right = new PingRequest("Other Fingerprint");
         assertFalse(left.equals(right));
     }
 
     @Test
     public void testEqualObjectsReturnSameHashCode() throws Exception {
-        PingRequest left = new PingRequest(new Date(0L));
-        PingRequest right = new PingRequest(new Date(0L));
+        PingRequest left = new PingRequest("Fingerprint");
+        PingRequest right = new PingRequest("Fingerprint");
         assertEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void testNotEqualObjectsReturnDifferentHashCode() throws Exception {
-        PingRequest left = new PingRequest(new Date(0L));
-        PingRequest right = new PingRequest(new Date(1000L));
+        PingRequest left = new PingRequest("Fingerprint");
+        PingRequest right = new PingRequest("Other Fingerprint");
 
         assertNotEquals(left.hashCode(), right.hashCode());
     }
 
-
     @Test
     public void testToStringContainsClassName() throws Exception {
-        PingRequest pingRequest = new PingRequest(new Date(0L));
+        PingRequest pingRequest = new PingRequest("Fingerprint");
         assertThat(pingRequest.toString(), containsString(PingRequest.class.getSimpleName()));
     }
 }

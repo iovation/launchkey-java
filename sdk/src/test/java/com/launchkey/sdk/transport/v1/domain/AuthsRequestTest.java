@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -86,11 +86,6 @@ public class AuthsRequestTest {
     @Test
     public void testGetAppKey() throws Exception {
         assertEquals(9999999999L, authsRequest.getAppKey());
-    }
-
-    @Test
-    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
-        assertEquals(authsRequest.getAppKey(), authsRequest.getRocketKey());
     }
 
     @SuppressWarnings("SpellCheckingInspection")

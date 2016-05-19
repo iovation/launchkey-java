@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import com.launchkey.sdk.service.error.ApiException;
 import com.launchkey.sdk.transport.v1.domain.*;
 
 /**
- * Interface for interacting with the LaunchKey API v1
+ * Interface for interacting with the Platform API v1
  */
 public interface Transport {
 

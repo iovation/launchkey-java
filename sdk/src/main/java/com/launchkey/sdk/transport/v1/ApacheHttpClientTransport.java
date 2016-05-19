@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Apache HTTP client based LaunchKey API v1
+ * Apache HTTP client based Platform API v1
  */
 public class ApacheHttpClientTransport implements Transport {
 
@@ -90,7 +90,7 @@ public class ApacheHttpClientTransport implements Transport {
             HttpResponse httpResponse = client.execute(ping);
             pingResponse = getTransportObjectFromResponse(PingResponse.class, httpResponse);
         } catch (ApiException e) {
-            log.trace("Error encountered in response from LaunchKey engine", e);
+            log.trace("Error encountered in response from Platform API", e);
             throw e;
         } catch (Exception e) {
             log.trace("Exception caught processing ping request", e);
@@ -127,7 +127,7 @@ public class ApacheHttpClientTransport implements Transport {
             HttpResponse httpResponse = client.execute(auths);
             authsResponse = getTransportObjectFromResponse(AuthsResponse.class, httpResponse);
         } catch (ApiException e) {
-            log.trace("Error encountered in response from LaunchKey engine", e);
+            log.trace("Error encountered in response from Platform API", e);
             throw e;
         } catch (Exception e) {
             log.trace("Exception caught processing auths request", e);
@@ -160,7 +160,7 @@ public class ApacheHttpClientTransport implements Transport {
                 log.trace("Pending response received", e);
                 pollResponse = null;
             } else {
-                log.trace("Error encountered in response from LaunchKey engine", e);
+                log.trace("Error encountered in response from Platform API", e);
                 throw e;
             }
         } catch (Exception e) {
@@ -194,7 +194,7 @@ public class ApacheHttpClientTransport implements Transport {
             HttpResponse httpResponse = client.execute(logs);
             validateResponse(httpResponse);
         } catch (ApiException e) {
-            log.trace("Error encountered in response from LaunchKey engine", e);
+            log.trace("Error encountered in response from Platform API", e);
             throw e;
         } catch (Exception e) {
             log.trace("Exception caught processing logs request", e);
@@ -226,7 +226,7 @@ public class ApacheHttpClientTransport implements Transport {
                 throw ApiException.fromCode(usersResponse.getMessageCode(), usersResponse.getMessage());
             }
         } catch (ApiException e) {
-            log.trace("Error encountered in response from LaunchKey engine", e);
+            log.trace("Error encountered in response from Platform API", e);
             throw e;
         } catch (Exception e) {
             log.trace("Exception processing users request", e);

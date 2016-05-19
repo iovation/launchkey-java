@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 package com.launchkey.sdk.service.error;
 
 /**
- * This exception is thrown when a signed data packet is received from the LaunchKey Engine API and the signature
+ * This exception is thrown when a signed data packet is received from the Platform API and the signature
  * is not valid or does not match the package data.
  */
 public class InvalidSignatureException extends ApiException {

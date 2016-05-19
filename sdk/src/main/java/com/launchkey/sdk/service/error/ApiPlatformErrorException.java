@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 package com.launchkey.sdk.service.error;
 
 /**
- * The exception thrown when the LaunchKey Engine incurs an error when processing an API request
+ * The exception thrown when the Platform incurs an error when processing an API request
  */
 public class ApiPlatformErrorException extends ApiException {
     /**

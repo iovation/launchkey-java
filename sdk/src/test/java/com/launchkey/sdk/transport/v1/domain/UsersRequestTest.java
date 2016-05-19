@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -49,11 +49,6 @@ public class UsersRequestTest {
     @Test
     public void testGetAppKey() throws Exception {
         assertEquals(9999999999L, usersRequest.getAppKey());
-    }
-
-    @Test
-    public void testGetRocketKeyEqualsGetAppKey() throws Exception {
-        assertEquals(usersRequest.getAppKey(), usersRequest.getRocketKey());
     }
 
     @Test
