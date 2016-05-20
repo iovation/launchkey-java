@@ -4,7 +4,7 @@
     <parent>
         <artifactId>launchkey-examples-parent</artifactId>
         <groupId>com.launchkey.sdk</groupId>
-        <version>3.0.0</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>examples-cli</artifactId>
