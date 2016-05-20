@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -53,13 +53,13 @@ public class PingResponseTest {
     }
 
     @Test
-    public void testGetDateStamp() throws Exception {
-        assertNull(pingResponse.getDateStamp());
+    public void testGetFingerprint() throws Exception {
+        assertEquals("Expected Fingerprint", pingResponse.getFingerprint());
     }
 
     @Test
-    public void testGetLaunchKeyTime() throws Exception {
-        assertEquals(new Date(1000L), this.pingResponse.getLaunchKeyTime());
+    public void testGetApiTime() throws Exception {
+        assertEquals(new Date(1000L), this.pingResponse.getApiTime());
     }
 
     @Test

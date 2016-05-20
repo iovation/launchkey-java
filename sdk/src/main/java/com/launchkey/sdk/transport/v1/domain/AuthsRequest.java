@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  *
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import com.launchkey.sdk.transport.v1.domain.Policy.Policy;
 public class AuthsRequest {
 
     /**
-     * LaunchKey username, user push ID, or white label user identifier for the user being authenticated
+     * Platform username, user push ID, or white label user identifier for the user being authenticated
      */
     private final String username;
 
@@ -32,7 +32,7 @@ public class AuthsRequest {
     /**
      * Base64 encoded secret JSON string containing these attributes:
      *      secret:   Secret Key of the Application whose key is included in the current request.
-     *      stamped:  LaunchKey formatted Date representing the current time of the request.
+     *      stamped:  Platform formatted Date representing the current time of the request.
      */
     private final String secretKey;
 
@@ -64,30 +64,12 @@ public class AuthsRequest {
     private final Policy policy;
 
     /**
-     * @deprecated Context is now available to better identify the request for the user. It is recommended to always
-     * use context. Use {@link AuthsRequest#AuthsRequest(String, long, String, String, int, int, String, Policy)}
-     * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
+     * @param username Platform username, user push ID, or white label user identifier for the user being authenticated
      * @param appKey Application Key of your Application. This is found on the Keys tab of your Application details
-     *                  in the LaunchKey Dashboard.
+     *                  in the Dashboard.
      * @param secretKey Base64 encoded secret JSON string containing these attributes:
      *                      secret:   Secret Key of the Application whose key is included in the current request.
-     *                      stamped:  LaunchKey formatted Date representing the current time of the request.
-     * @param signature Base64 encoded RSA Signature of the base64 decoded secretKey value.
-     * @param session Should this authentication request be designated as a session. Set the value to 1 for yes and 0 for no.
-     * @param userPushID Request a User Push ID be returned in the AuthsResponse by setting this value to 1.
-     */
-    @Deprecated
-    public AuthsRequest(String username, long appKey, String secretKey, String signature, int session, int userPushID) {
-        this(username, appKey, secretKey, signature, session, userPushID, null, null);
-    }
-
-    /**
-     * @param username LaunchKey username, user push ID, or white label user identifier for the user being authenticated
-     * @param appKey Application Key of your Application. This is found on the Keys tab of your Application details
-     *                  in the LaunchKey Dashboard.
-     * @param secretKey Base64 encoded secret JSON string containing these attributes:
-     *                      secret:   Secret Key of the Application whose key is included in the current request.
-     *                      stamped:  LaunchKey formatted Date representing the current time of the request.
+     *                      stamped:  Platform formatted Date representing the current time of the request.
      * @param signature Base64 encoded RSA Signature of the base64 decoded secretKey value.
      * @param session Should this authentication request be designated as a session. Set the value to 1 for yes and 0 for no.
      * @param userPushID Request a User Push ID be returned in the AuthsResponse by setting this value to 1.
@@ -114,21 +96,11 @@ public class AuthsRequest {
     }
 
     /**
-     * Get the LaunchKey username, user push ID, or white label user identifier for the user being authenticated
-     * @return LaunchKey username, user push ID, or white label user identifier
+     * Get the Platform username, user push ID, or white label user identifier for the user being authenticated
+     * @return Platform username, user push ID, or white label user identifier
      */
     public String getUsername() {
         return username;
-    }
-
-    /**
-     * Get the Application Key of the Application associate with this request
-     * @return Application Key
-     * @deprecated Use {@link #getAppKey()}
-     */
-    @Deprecated
-    public long getRocketKey() {
-        return getAppKey();
     }
 
     /**
@@ -142,7 +114,7 @@ public class AuthsRequest {
     /**
      * Get the Base64 encoded secret JSON string containing these attributes:
      *      secret:   Secret Key of the Application whose key is included in the current request.
-     *      stamped:  LaunchKey formatted Date representing the current time of the request.
+     *      stamped:  Platform formatted Date representing the current time of the request.
      * @return Base64 encoded secret JSON string
      */
     public String getSecretKey() {

@@ -31,7 +31,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public class ApacheHttpClientTransportPollTest {
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream(responseBody.getBytes("UTF-8"))).build()
         );
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://test.com/v1", crypto);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(response);
     }
 
@@ -82,7 +82,7 @@ public class ApacheHttpClientTransportPollTest {
 
     @Test
     public void testPollUsesCorrectURL() throws Exception {
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://test.com/v1", crypto);
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
         transport.poll(new PollRequest(null, 0L, null, null));
         verify(httpClient).execute(request.capture());
@@ -129,7 +129,7 @@ public class ApacheHttpClientTransportPollTest {
     }
 
     @Test
-    public void testPollWrapsClientExceptionInLaunchKeyException() throws Exception {
+    public void testPollWrapsClientExceptionInClientProtocolException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
         expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception caught processing poll request");

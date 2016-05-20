@@ -1,4 +1,4 @@
-# Java SDK
+# SDK for Java
 
   * [Modules](#modules)
   * [Support](#support)

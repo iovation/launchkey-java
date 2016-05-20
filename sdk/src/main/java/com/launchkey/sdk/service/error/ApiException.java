@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ public class ApiException extends Exception {
     private final int code;
 
     /**
-     * Get the proper exception for the provided LaunchKey message code and message
+     * Get the proper exception for the provided message code and message
      *
      * @param  code HTTP status code or 0 if no HTTP status code was returned
      * @param  message the detail message (which is saved for later retrieval

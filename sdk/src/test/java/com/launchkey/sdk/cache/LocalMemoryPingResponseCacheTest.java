@@ -3,10 +3,12 @@ package com.launchkey.sdk.cache;
 import com.launchkey.sdk.transport.v1.domain.PingResponse;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static org.junit.Assert.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -23,14 +25,14 @@ public class LocalMemoryPingResponseCacheTest {
     @Test
     public void testBelowReturnsCachedPingResponse() throws Exception {
         cache = new LocalMemoryPingResponseCache(Integer.MAX_VALUE);
-        cache.setPingResponse(new PingResponse("2000-01-01 00:00:00", "2000-02-02 00:00:00", "Public Key"));
-        assertEquals(new PingResponse("2000-01-01 00:00:00", "2000-02-02 00:00:00", "Public Key"), cache.getPingResponse());
+        cache.setPingResponse(new PingResponse("Fingerprint", new Date(), "Public Key"));
+        assertEquals(new PingResponse("Fingerprint", new Date(), "Public Key"), cache.getPingResponse());
     }
 
     @Test
     public void testAboveReturnsNull() throws Exception {
         cache = new LocalMemoryPingResponseCache(-1);
-        cache.setPingResponse(new PingResponse("2000-01-01 00:00:00", "2000-02-02 00:00:00", "Public Key"));
+        cache.setPingResponse(new PingResponse("Fingerprint", new Date(), "Public Key"));
         assertNull(cache.getPingResponse());
     }
  }

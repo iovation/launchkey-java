@@ -3,10 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.launchkey.sdk</groupId>
     <artifactId>launchkey-root</artifactId>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>LaunchKey Root Module</name>
-    <description>Java SDK for interacting with the LaunchKey passwordless multi-factor authentication API</description>
     <url>https://github.com/LaunchKey/launchkey-java</url>
 
     <organization>
@@ -15,7 +14,7 @@
     </organization>
     
     <issueManagement>
-        <system>GitHib</system>
+        <system>GitHub</system>
         <url>https://github.com/LaunchKey/launchkey-java/issues</url>
     </issueManagement>
 
@@ -151,6 +150,19 @@
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>

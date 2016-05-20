@@ -34,7 +34,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public class ApacheHttpClientTransportUsersTest {
                 EntityBuilder.create().setStream(new ByteArrayInputStream(responseBody.getBytes("UTF-8"))).build()
         );
         when(crypto.sign(any(byte[].class))).thenReturn("Expected Signature".getBytes());
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://api.test.com/v1", crypto);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(response);
     }
 
@@ -88,7 +88,7 @@ public class ApacheHttpClientTransportUsersTest {
 
     @Test
     public void testUsesCorrectURL() throws Exception {
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://api.test.com/v1", crypto);
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
         transport.users(new UsersRequest(null, 0L, null));
         verify(httpClient).execute(request.capture());
@@ -132,7 +132,7 @@ public class ApacheHttpClientTransportUsersTest {
     }
 
     @Test
-    public void testWrapsClientExceptionInLaunchKeyException() throws Exception {
+    public void testWrapsClientExceptionInClientProtocolException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
         expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception processing users request");

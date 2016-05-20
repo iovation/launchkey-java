@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -33,16 +33,6 @@ public class LogoutCallbackResponse implements CallbackResponse {
      */
     private final Date logoutRequested;
 
-    @Deprecated
-    public LogoutCallbackResponse(String deOrbitTime, String userHash) {
-        try {
-            this.logoutRequested = new PlatformDateFormat().parseObject(deOrbitTime);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid LaunchKey Date format for deOrbitTime");
-        }
-        this.userHash = userHash;
-    }
-
     @JsonCreator
     public LogoutCallbackResponse(
             @JsonProperty("api_time") Date logoutRequested,
@@ -50,11 +40,6 @@ public class LogoutCallbackResponse implements CallbackResponse {
     ) {
         this.logoutRequested = logoutRequested;
         this.userHash = userHash;
-    }
-
-    @Deprecated
-    public Date getDeOrbitTime() {
-        return logoutRequested;
     }
 
     public Date getLogoutRequested() {

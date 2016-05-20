@@ -31,7 +31,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public class ApacheHttpClientTransportPingTest {
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream(responseBody.getBytes("UTF-8"))).build()
         );
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://test.com/v1", crypto);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(response);
     }
 
@@ -84,7 +84,7 @@ public class ApacheHttpClientTransportPingTest {
 
     @Test
     public void testPingUsesCorrectURL() throws Exception {
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://test.com/v1", crypto);
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
         transport.ping(new PingRequest());
         verify(httpClient).execute(request.capture());
@@ -123,7 +123,7 @@ public class ApacheHttpClientTransportPingTest {
     }
 
     @Test
-    public void testPingWrapsClientExceptionInLaunchKeyException() throws Exception {
+    public void testPingWrapsClientExceptionClientProtocolException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
         expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception caught processing ping request");

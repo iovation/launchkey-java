@@ -4,7 +4,7 @@
     <parent>
         <artifactId>launchkey-root</artifactId>
         <groupId>com.launchkey.sdk</groupId>
-        <version>2.1.1-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>launchkey-examples-parent</artifactId>

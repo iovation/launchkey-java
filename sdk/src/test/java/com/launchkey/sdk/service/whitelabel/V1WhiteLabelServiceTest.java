@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
 
     protected V1WhiteLabelService service;
-    protected final String decryptedUsersResponse = "{\"qrcode\": \"https://dashboard.launchkey.com/qrcode/zje0ja5\"," +
+    protected final String decryptedUsersResponse = "{\"qrcode\": \"https://test.com/qrcode/zje0ja5\"," +
             "\"code\":\"zje0ja5\"}";
 
     @SuppressWarnings("SpellCheckingInspection")
@@ -61,15 +61,6 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
         super.tearDown();
         service = null;
     }
-
-
-    @Test
-    public void testPairUserReturnsSameValuesAsLinkUser() throws Exception {
-        PairResponse pairResponse = service.pairUser("identifier");
-        LinkResponse linkResponse = service.linkUser("identifier");
-        assertEquals(new PairResponse(linkResponse), pairResponse);
-    }
-
 
     @Test
     public void testChecksPingResponseCache() throws Exception {
@@ -168,13 +159,6 @@ public class V1WhiteLabelServiceTest extends V1ServiceTestBase {
         assertEquals("Unexpected message value", "Encoded encrypted data", new String(messageCaptor.getValue()));
         assertEquals("Unexpected key value", "myciphermyciphermyciphermycipher", new String(keyCaptor.getValue()));
         assertEquals("Unexpected IV value", "iviviviviviviviv", new String(ivCaptor.getValue()));
-    }
-
-    @Test
-    public void testReturnsExpectedDataInPairResponse() throws Exception {
-        PairResponse expected = new PairResponse("zje0ja5", "https://dashboard.launchkey.com/qrcode/zje0ja5");
-        PairResponse actual = service.pairUser("identifier");
-        assertEquals(expected, actual);
     }
 
     @Test(expected = InvalidResponseException.class)

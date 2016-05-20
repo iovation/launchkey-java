@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ public abstract class V1ServiceAbstract {
     protected final Base64 base64 = new Base64(0);
     protected final ObjectMapper objectMapper = new ObjectMapper();
     protected final Log log;
-    protected final PlatformDateFormat launchKeyDateFormat = new PlatformDateFormat();
+    protected final PlatformDateFormat platformDateFormat = new PlatformDateFormat();
 
     /**
      * @param transport Transport service
@@ -67,7 +67,7 @@ public abstract class V1ServiceAbstract {
         objectMapper.setDateFormat(new ISO8601DateFormat());
     }
 
-    protected RSAPublicKey getLaunchKeyPublicKey() throws ApiException {
+    protected RSAPublicKey getPublicKey() throws ApiException {
         PingResponse pingResponse = null;
         try {
             pingResponse = pingResponseCache.getPingResponse();
@@ -90,9 +90,9 @@ public abstract class V1ServiceAbstract {
         try {
             String json = objectMapper.writeValueAsString(new Object() {
                 public final String secret = secretKey;
-                public final String stamped = launchKeyDateFormat.format(new Date());
+                public final String stamped = platformDateFormat.format(new Date());
             });
-            return crypto.encryptRSA(json.getBytes(), getLaunchKeyPublicKey());
+            return crypto.encryptRSA(json.getBytes(), getPublicKey());
         } catch (JsonProcessingException e) {
            throw new ApiException("Unable to create JSON from secret key", e, 0);
         }

@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public class ApacheHttpClientTransportLogsTest {
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream(responseBody.getBytes("UTF-8"))).build()
         );
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://test.com/v1", crypto);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(response);
     }
 
@@ -81,7 +81,7 @@ public class ApacheHttpClientTransportLogsTest {
 
     @Test
     public void testUsesCorrectURL() throws Exception {
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://test.com/v1", crypto);
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
         transport.logs(new LogsRequest("Authenticate", true, null, 0L, null, null));
         verify(httpClient).execute(request.capture());
@@ -137,7 +137,7 @@ public class ApacheHttpClientTransportLogsTest {
     }
 
     @Test
-    public void testWrapsClientExceptionInLaunchKeyException() throws Exception {
+    public void testWrapsClientExceptionInCommunicationErrorException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
         expectedException.expect(CommunicationErrorException.class);
         expectedException.expectMessage("Exception caught processing logs request");

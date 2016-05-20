@@ -39,7 +39,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class ApacheHttpClientTransportAuthsTest {
         when(response.getEntity()).thenReturn(
                 EntityBuilder.create().setStream(new ByteArrayInputStream(responseBody.getBytes("UTF-8"))).build()
         );
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://test.com/v1", crypto);
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(response);
         objectMapper = new ObjectMapper();
     }
@@ -94,7 +94,7 @@ public class ApacheHttpClientTransportAuthsTest {
 
     @Test
     public void testAuthsUsesCorrectURL() throws Exception {
-        transport = new ApacheHttpClientTransport(httpClient, "https://api.launchkey.com/v1", crypto);
+        transport = new ApacheHttpClientTransport(httpClient, "https://test.com/v1", crypto);
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
         transport.auths(new AuthsRequest(null, 0L, null, null, 0, 0, null, null));
         verify(httpClient).execute(request.capture());
@@ -217,7 +217,7 @@ public class ApacheHttpClientTransportAuthsTest {
     }
 
     @Test
-    public void testAuthsWrapsClientExceptionInLaunchKeyException() throws Exception {
+    public void testAuthsWrapsClientExceptionInApiException() throws Exception {
         ClientProtocolException expectedCause = new ClientProtocolException();
         expectedException.expect(ApiException.class);
         expectedException.expectMessage("Exception caught processing auths request");

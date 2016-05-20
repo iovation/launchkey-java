@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ public class ErrorResponse {
     private final int statusCode;
 
     /**
-     * The LaunchKey message code for the response.
+     * The message code for the response.
      */
     private final int messageCode;
 
@@ -65,16 +65,16 @@ public class ErrorResponse {
     }
 
     /**
-     * Get the LaunchKey message code for the response.
-     * @return LaunchKey message code
+     * Get the message code for the response.
+     * @return Message code
      */
     public int getMessageCode() {
         return messageCode;
     }
 
     /**
-     * Get the message associated with the LaunchKey message code for the response.
-     * @return message0
+     * Get the message associated with the message code for the response.
+     * @return message
      */
     public String getMessage() {
         return message;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class LogsRequest {
     /**
      * Base64 encoded secret JSON string containing these attributes:
      * secret:   Secret Key of the Application whose key is included in the current request.
-     * stamped:  LaunchKey formatted Date representing the current time of the request.
+     * stamped:  Platform formatted Date representing the current time of the request.
      */
     private final String secretKey;
 
@@ -57,7 +57,7 @@ public class LogsRequest {
      *                    details in the Dashboard.
      * @param secretKey   Base64 encoded secret JSON string containing these attributes:
      *                    secret:   Secret Key of the Application whose key is included in the current request.
-     *                    stamped:  LaunchKey formatted Date representing the current time of the request.
+     *                    stamped:  Platform formatted Date representing the current time of the request.
      * @param signature   Base64 encoded RSA Signature of the base64 decoded secretKey value.
      * @throws IllegalArgumentException when arguments have unacceptable values
      */
@@ -107,17 +107,6 @@ public class LogsRequest {
      * Get the Application Key of the Application associated with this request
      *
      * @return Application Key
-     * @deprecated Use {@link #getAppKey()}
-     */
-    @Deprecated
-    public long getRocketKey() {
-        return getAppKey();
-    }
-
-    /**
-     * Get the Application Key of the Application associated with this request
-     *
-     * @return Application Key
      */
     public long getAppKey() {
         return appKey;
@@ -126,7 +115,7 @@ public class LogsRequest {
     /**
      * Get the Base64 encoded secret JSON string containing these attributes:
      * secret:   Secret Key of the Application whose key is included in the current request.
-     * stamped:  LaunchKey formatted Date representing the current time of the request.
+     * stamped:  Platform formatted Date representing the current time of the request.
      *
      * @return Base64 encoded secret JSON string
      */

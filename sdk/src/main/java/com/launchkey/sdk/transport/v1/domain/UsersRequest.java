@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class UsersRequest {
     /**
      * Base64 encoded secret JSON string containing these attributes:
      *      secret:   Secret Key of the Application whose key is included in the current request.
-     *      stamped:  LaunchKey formatted Date representing the current time of the request.
+     *      stamped:  Platform formatted Date representing the current time of the request.
      */
     private final String secretKey;
 
@@ -50,7 +50,7 @@ public class UsersRequest {
      * @param appKey  Application Key of your Application. This is found on the Keys tab of your Application details in the Dashboard.
      * @param secretKey  Base64 encoded secret JSON string containing these attributes:
      *                      secret:   Secret Key of the Application whose key is included in the current request.
-     *                      stamped:  LaunchKey formatted Date representing the current time of the request.
+     *                      stamped:  Platform formatted Date representing the current time of the request.
      */
     public UsersRequest(String identifier, long appKey, String secretKey) {
         this.identifier = identifier;
@@ -66,16 +66,6 @@ public class UsersRequest {
     @JsonProperty("app_key")
     public long getAppKey() {
         return appKey;
-    }
-
-    /**
-     * @deprecated Use {@link #getAppKey()}
-     * @return Application Key
-     */
-    @Deprecated
-    @JsonIgnore
-    public long getRocketKey() {
-        return getAppKey();
     }
 
     @JsonProperty("secret_key")

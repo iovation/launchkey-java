@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Date;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -106,13 +106,13 @@ public class DemoApp {
                     printHelp(jsap);
                     System.out.println();
                 }
-            } else if (command.equalsIgnoreCase("white-label-user-pair")) {
+            } else if (command.equalsIgnoreCase("white-label-user-link")) {
                 if (commandOptions.length == 1) {
                     handleWhiteLabelLinkUser(commandOptions[0], client.whiteLabel());
                 } else {
                     System.out.println();
                     System.out.println(
-                            "white-label-user-pair command requires a single argument of the unique ID for your " +
+                            "white-label-user-link command requires a single argument of the unique ID for your " +
                                     "application"
                     );
                     printHelp(jsap);
@@ -236,7 +236,7 @@ public class DemoApp {
                 new UnflaggedOption("command")
                         .setUsageName("COMMAND")
                         .setRequired(true)
-                        .setHelp("Command to execute.  [login, authorized, logout, white-label-pair-user]")
+                        .setHelp("Command to execute.  [login, authorized, logout, white-label-user-link]")
         );
         jsap.registerParameter(
                 new UnflaggedOption("command-options")

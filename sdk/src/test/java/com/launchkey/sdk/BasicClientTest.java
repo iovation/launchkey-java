@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ public class BasicClientTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFactoryLongStringStringProviderReturnsLaunchKeyClient() throws Exception {
+    public void testFactoryLongStringStringProviderReturnsBasicClient() throws Exception {
         Client actual = BasicClient.factory(12345, "secret key", PRIVATE_KEY, null);
         assertNotNull(actual);
     }
@@ -167,7 +167,7 @@ public class BasicClientTest {
     public void testFactoryConfigAllowsProvidingApiBaseUrl() throws Exception {
         Config config = new Config(12345, "secret key")
                 .setCrypto(mock(Crypto.class))
-                .setAPIBaseURL("https://api.launchkey.com/xxx");
+                .setAPIBaseURL("https://test.com/xxx");
         assertNotNull(BasicClient.factory(config));
     }
 

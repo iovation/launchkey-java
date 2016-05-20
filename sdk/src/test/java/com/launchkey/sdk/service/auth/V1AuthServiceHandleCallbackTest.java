@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p/>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ public class V1AuthServiceHandleCallbackTest extends V1AuthServiceTestBase {
     }
 
     @Test(expected = InvalidCallbackException.class)
-    public void testDeOrbitThrowsInvalidCallbackExceptionWhenLaunchKeyTimeExceedsThreshold() throws Exception {
+    public void testDeOrbitThrowsInvalidCallbackExceptionWhenApiTimeExceedsThreshold() throws Exception {
         service.handleCallback(
                 new HashMap<String, String>() {{
                     put("deorbit", "{\"api_time\":\"2001-01-01 01:01:01\",\"user_hash\":\"Expected User Hash\"}");
@@ -100,7 +100,7 @@ public class V1AuthServiceHandleCallbackTest extends V1AuthServiceTestBase {
     @Test
     public void testLogoutReturnsExpectedDeOrbitCallbackResponse() throws Exception {
         Date expectedTime = new Date((logoutTime.getTime() / 1000) * 1000);
-        CallbackResponse expected = new DeOrbitCallbackResponse(new LogoutCallbackResponse(expectedTime, "Expected User Hash"));
+        CallbackResponse expected = new LogoutCallbackResponse(expectedTime, "Expected User Hash");
         CallbackResponse actual = service.handleCallback(deOrbitData);
         assertEquals(expected, actual);
     }

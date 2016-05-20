@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 LaunchKey, Inc.  All rights reserved.
+ * Copyright 2016 LaunchKey, Inc. All rights reserved.
  * <p>
  * Licensed under the MIT License.
  * You may not use this file except in compliance with the License.
@@ -18,26 +18,11 @@ import java.util.Date;
  * Request data for a "ping" call
  */
 public class PingRequest {
-    /**
-     * When the current public key was generated. Returned only if a key is returned.
-     */
-    private final String dateStamp;
 
     private final String fingerprint;
 
-    /**
-     * @param dateStamp When the current public key was generated. Returned only if a key is returned.
-     * @deprecated Use {@link PingRequest(String)} and {@link #getFingerprint()} instead
-     */
-    @Deprecated
-    public PingRequest(Date dateStamp) {
-        this.fingerprint = null;
-        this.dateStamp = dateStamp == null ? null : PlatformDateFormat.getInstance().format(dateStamp);
-    }
-
     public PingRequest(String fingerprint) {
         this.fingerprint = fingerprint;
-        this.dateStamp = null;
     }
 
     public PingRequest() {
@@ -48,15 +33,6 @@ public class PingRequest {
         return fingerprint;
     }
 
-    /**
-     * @deprecated Use {@link PingRequest(String)} and {@link #getFingerprint()} instead
-     * @return
-     */
-    @Deprecated
-    public String getDateStamp() {
-        return this.dateStamp;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,22 +40,19 @@ public class PingRequest {
 
         PingRequest that = (PingRequest) o;
 
-        return !(dateStamp != null ? !dateStamp.equals(that.dateStamp) : that.dateStamp != null);
+        return !(fingerprint != null ? !fingerprint.equals(that.fingerprint) : that.fingerprint != null);
 
     }
 
     @Override
     public int hashCode() {
-        int hash = dateStamp != null ? dateStamp.hashCode() : 0;
-        hash += fingerprint != null ? fingerprint.hashCode() : 0;
-        return hash;
+        return fingerprint != null ? fingerprint.hashCode() : 0;
     }
 
 
     @Override
     public String toString() {
         return "PingRequest{" +
-                "dateStamp='" + dateStamp + '\'' +
                 "fingerprint='" + fingerprint + '\'' +
                 '}';
     }
