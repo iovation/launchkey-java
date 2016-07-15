@@ -8,13 +8,13 @@ import com.launchkey.sdk.transport.v3.domain.WhiteLabelDeviceAddRequest;
 import com.launchkey.sdk.transport.v3.domain.WhiteLabelDeviceAddResponse;
 import com.launchkey.sdk.transport.v3.domain.WhiteLabelDeviceDeleteRequest;
 import com.launchkey.sdk.transport.v3.domain.WhiteLabelDeviceListRequest;
-import com.sun.javafx.collections.ImmutableObservableList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.security.interfaces.RSAPrivateKey;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -101,10 +101,9 @@ public class V3WhiteLabelServiceTest {
                 new com.launchkey.sdk.transport.v3.domain.Device("name2", DeviceStatus.LINK_PENDING.getStatusCode(), "type2", created2, updated2)
         };
         when(transport.whiteLabelUserDeviceList(any(WhiteLabelDeviceListRequest.class))).thenReturn(devices);
-        List<Device> actual = new ImmutableObservableList<Device>(
-                new Device("name1", DeviceStatus.LINKED, "type1", created1, updated1),
-                new Device("name2", DeviceStatus.LINK_PENDING, "type2", created2, updated2)
-        );
+        List<Device> actual = new ArrayList<Device>();
+        actual.add(new Device("name1", DeviceStatus.LINKED, "type1", created1, updated1));
+        actual.add(new Device("name2", DeviceStatus.LINK_PENDING, "type2", created2, updated2));
         List<Device> expected = service.getLinkedDevices("identifier");
         assertEquals("Unexpected number of devices returned", 2, actual.size());
         assertTrue(
