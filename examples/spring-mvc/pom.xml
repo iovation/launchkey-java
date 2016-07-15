@@ -4,7 +4,7 @@
     <parent>
         <artifactId>launchkey-examples-parent</artifactId>
         <groupId>com.launchkey.sdk</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>3.1.0</version>
     </parent>
     <artifactId>examples-spring-mvc</artifactId>
     <name>Spring MVC Example Application</name>
