@@ -12,5 +12,10 @@
 
 package com.launchkey.sdk.service.auth;
 
+/**
+ * @deprecated Replaced by {@link com.launchkey.sdk.domain.auth.CallbackResponse} used by
+ * {@link com.launchkey.sdk.service.application.auth.V1AuthService}.
+ */
+@Deprecated
 public interface CallbackResponse {
 }

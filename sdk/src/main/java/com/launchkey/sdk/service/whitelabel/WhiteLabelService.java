@@ -14,6 +14,12 @@ package com.launchkey.sdk.service.whitelabel;
 
 import com.launchkey.sdk.service.error.ApiException;
 
+import java.util.List;
+
+/**
+ * @deprecated in favor of {@link com.launchkey.sdk.service.organization.whitelabel.WhiteLabelService}
+ */
+@Deprecated
 public interface WhiteLabelService {
     /**
      * Link a device with a White Label user.  If the user does not exist in the White Label Group, the user will
@@ -26,6 +32,7 @@ public interface WhiteLabelService {
      * @return {@link LinkResponse} object containing information for linking a device with a user.
      *
      * @throws ApiException when an error occurs pairing the user
+     *
      */
     LinkResponse linkUser(String identifier) throws ApiException;
 }

@@ -13,6 +13,7 @@
 package com.launchkey.sdk.crypto;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -116,6 +117,12 @@ public class JCECrypto implements Crypto {
     @Override
     public RSAPublicKey getRSAPublicKeyFromPEM(String publicKey) {
         return getRSAPublicKeyFromPEM(provider, publicKey);
+    }
+
+    @Override public byte[] sha256(byte[] input) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256", this.provider);
+        byte[] response = digest.digest(input);
+        return response;
     }
 
     /**

@@ -15,7 +15,10 @@ package com.launchkey.sdk.service.error;
 /**
  * Exception thrown when an auth request is made and the user exists but does not have a paired device with which
  * to respond.
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.error.NoLinkedDevicesException}
  */
+@Deprecated
 public class NoPairedDevicesException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval

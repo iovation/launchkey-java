@@ -20,7 +20,7 @@ import java.security.PrivateKey;
 import java.security.Provider;
 
 /**
- * Configuration object for building Client objects with the factory
+ * Configuration object for building {@link Client} objects.
  */
 public class Config {
 
@@ -43,7 +43,10 @@ public class Config {
      *
      * @param appKey Application Key for the Application that will used to make requests
      * @param secretKey Secret Key for the Application that will used to make requests
+     * @deprecated As there are now multiple sets of credentials, this is deprecated and the new clients
+     * require passing the credentials directly
      */
+    @Deprecated
     public Config(long appKey, String secretKey) {
         if (secretKey == null) {
             throw new IllegalArgumentException("secretKey cannot be null");
@@ -56,6 +59,7 @@ public class Config {
      * Get the Application Key for the Application that will used to make requests
      * @return Application Key for the Application that will used to make requests
      */
+    @Deprecated
     public long getAppKey() {
         return appKey;
     }
@@ -64,6 +68,7 @@ public class Config {
      * Get the Secret Key for the Application that will used to make requests
      * @return Secret Key for the Application that will used to make requests
      */
+    @Deprecated
     public String getSecretKey() {
         return secretKey;
     }
@@ -110,6 +115,7 @@ public class Config {
      * @param privateKey Private Key to be used by the crypto service for decrypting and signing via RSA
      * @return this
      */
+    @Deprecated
     public Config setPrivateKey(PrivateKey privateKey) {
         this.privateKey = privateKey;
         return this;
@@ -119,6 +125,7 @@ public class Config {
      * Get the Private Key to be used by the crypto service for decrypting and signing via RSA
      * @return Private Key to be used by the crypto service for decrypting and signing via RSA
      */
+    @Deprecated
     public PrivateKey getPrivateKey() {
         return privateKey;
     }
@@ -131,6 +138,7 @@ public class Config {
      * crypto service for decrypting and signing via RSA
      * @return this
      */
+    @Deprecated
     public Config setRSAPrivateKeyPEM(String rsaPrivateKeyPEM) {
         this.rsaPrivateKeyPEM = rsaPrivateKeyPEM;
         return this;
@@ -142,6 +150,7 @@ public class Config {
      * @return Private Key PEM formatted string that will be used to generate a {@link PrivateKey} to be used by the
      * crypto service for decrypting and signing via RSA
      */
+    @Deprecated
     public String getRSAPrivateKeyPEM() {
         return rsaPrivateKeyPEM;
     }
@@ -255,5 +264,62 @@ public class Config {
      */
     public PingResponseCache getPingResponseCache() {
         return pingResponseCache;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Config)) return false;
+
+        Config config = (Config) o;
+
+        if (getAppKey() != config.getAppKey()) return false;
+        if (getSecretKey() != null ? !getSecretKey().equals(config.getSecretKey()) : config.getSecretKey() != null) {
+            return false;
+        }
+        if (getPrivateKey() != null ? !getPrivateKey().equals(config.getPrivateKey()) : config.getPrivateKey() != null) {
+            return false;
+        }
+        if (getCrypto() != null ? !getCrypto().equals(config.getCrypto()) : config.getCrypto() != null) return false;
+        if (getJCEProvider() != null ? !getJCEProvider().equals(config.getJCEProvider()) : config.getJCEProvider() != null) {
+            return false;
+        }
+        if (rsaPrivateKeyPEM != null ? !rsaPrivateKeyPEM.equals(config.rsaPrivateKeyPEM) : config.rsaPrivateKeyPEM != null) {
+            return false;
+        }
+        if (getApacheHttpClient() != null ? !getApacheHttpClient().equals(config.getApacheHttpClient()) : config.getApacheHttpClient() != null) {
+            return false;
+        }
+        if (getHttpClientConnectionTTLSecs() != null ? !getHttpClientConnectionTTLSecs().equals(config.getHttpClientConnectionTTLSecs()) : config
+                .getHttpClientConnectionTTLSecs() != null) {
+            return false;
+        }
+        if (getHttpMaxClients() != null ? !getHttpMaxClients().equals(config.getHttpMaxClients()) : config.getHttpMaxClients() != null) {
+            return false;
+        }
+        if (getPingResponseCacheTTL() != null ? !getPingResponseCacheTTL().equals(config.getPingResponseCacheTTL()) : config
+                .getPingResponseCacheTTL() != null) {
+            return false;
+        }
+        if (getAPIBaseURL() != null ? !getAPIBaseURL().equals(config.getAPIBaseURL()) : config.getAPIBaseURL() != null) {
+            return false;
+        }
+        return getPingResponseCache() != null ? getPingResponseCache().equals(config.getPingResponseCache()) : config.getPingResponseCache() == null;
+
+    }
+
+    @Override public int hashCode() {
+        int result = (int) (getAppKey() ^ (getAppKey() >>> 32));
+        result = 31 * result + (getSecretKey() != null ? getSecretKey().hashCode() : 0);
+        result = 31 * result + (getPrivateKey() != null ? getPrivateKey().hashCode() : 0);
+        result = 31 * result + (getCrypto() != null ? getCrypto().hashCode() : 0);
+        result = 31 * result + (getJCEProvider() != null ? getJCEProvider().hashCode() : 0);
+        result = 31 * result + (rsaPrivateKeyPEM != null ? rsaPrivateKeyPEM.hashCode() : 0);
+        result = 31 * result + (getApacheHttpClient() != null ? getApacheHttpClient().hashCode() : 0);
+        result = 31 * result + (getHttpClientConnectionTTLSecs() != null ? getHttpClientConnectionTTLSecs().hashCode() : 0);
+        result = 31 * result + (getHttpMaxClients() != null ? getHttpMaxClients().hashCode() : 0);
+        result = 31 * result + (getPingResponseCacheTTL() != null ? getPingResponseCacheTTL().hashCode() : 0);
+        result = 31 * result + (getAPIBaseURL() != null ? getAPIBaseURL().hashCode() : 0);
+        result = 31 * result + (getPingResponseCache() != null ? getPingResponseCache().hashCode() : 0);
+        return result;
     }
 }

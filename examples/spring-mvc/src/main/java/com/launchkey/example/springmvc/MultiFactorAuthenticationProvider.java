@@ -1,5 +1,6 @@
 package com.launchkey.example.springmvc;
 
+import com.launchkey.sdk.error.BaseException;
 import com.launchkey.sdk.service.error.ApiException;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -51,7 +52,7 @@ public class MultiFactorAuthenticationProvider implements AuthenticationProvider
         } catch (InterruptedException e) {
             throw new AuthenticationServiceException("Sleep error");
         } catch (AuthManager.AuthException e) {
-            if (e.getCause() instanceof ApiException) {
+            if (e.getCause() instanceof BaseException) {
                 throw new BadCredentialsException("Login failure", e.getCause());
             }
         }

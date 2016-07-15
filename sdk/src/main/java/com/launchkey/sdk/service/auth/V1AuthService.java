@@ -32,7 +32,10 @@ import java.util.*;
 
 /**
  * Auth service based on an API V1 transport
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.service.application.auth.V1AuthService}.
  */
+@Deprecated
 public class V1AuthService extends V1ServiceAbstract implements AuthService {
 
     /**

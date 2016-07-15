@@ -29,6 +29,5 @@ public class CachePersistenceExceptionTest {
         Exception e = new CachePersistenceException("Message", c);
         assertEquals("Message", e.getMessage());
         assertSame(c, e.getCause());
-
     }
 }

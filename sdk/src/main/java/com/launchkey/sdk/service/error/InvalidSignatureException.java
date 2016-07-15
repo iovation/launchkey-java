@@ -15,7 +15,10 @@ package com.launchkey.sdk.service.error;
 /**
  * This exception is thrown when a signed data packet is received from the Platform API and the signature
  * is not valid or does not match the package data.
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.error.InvalidSignatureException}
  */
+@Deprecated
 public class InvalidSignatureException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval

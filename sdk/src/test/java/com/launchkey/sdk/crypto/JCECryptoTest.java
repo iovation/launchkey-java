@@ -2,6 +2,7 @@ package com.launchkey.sdk.crypto;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.junit.After;
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -235,5 +237,12 @@ public class JCECryptoTest {
     public void testGetRSAPrivateKeyFromPEM_CarriageReturnNewline() throws Exception {
         RSAPrivateKey actual = JCECrypto.getRSAPrivateKeyFromPEM(provider, PRIVATE_KEY_CARRIAGE_RETURN_NEWLINE);
         assertNotNull(actual);
+    }
+
+    @Test
+    public void testSha256() throws Exception {
+        String expected = "e806a291cfc3e61f83b98d344ee57e3e8933cccece4fb45e1481f1f560e70eb1";
+        String actual = Hex.toHexString(crypto.sha256("Testing".getBytes()));
+        assertEquals(expected, actual);
     }
 }

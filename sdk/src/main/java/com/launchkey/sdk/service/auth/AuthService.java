@@ -18,6 +18,9 @@ import com.launchkey.sdk.service.error.ApiException;
 
 import java.util.Map;
 
+/**
+ * @deprecated Replaced by {@link com.launchkey.sdk.service.application.auth.AuthService}.
+ */
 public interface AuthService {
     /**
      * Authorize a transaction for the provided username.  This auth method would be utilized if you are using this

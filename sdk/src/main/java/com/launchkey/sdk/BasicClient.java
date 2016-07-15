@@ -32,7 +32,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Basic client for interacting with the Platform API.
+ *
+ * @deprecated Replaced with {@link AppClient} and {@link OrgClient} implementations
  */
+@Deprecated
 public class BasicClient implements Client {
     private static final String DEFAULT_API_BASE_URL = "https://api.launchkey.com/v1";
     private static final int DEFAULT_HTTP_CLIENT_MAX_CLIENTS = 200;
@@ -45,7 +48,7 @@ public class BasicClient implements Client {
     /**
      * Basic client with all services
      *
-     * @param auth auth service
+     * @param auth       auth service
      * @param whiteLabel white label service
      */
     public BasicClient(AuthService auth, WhiteLabelService whiteLabel) {
@@ -63,9 +66,11 @@ public class BasicClient implements Client {
 
     /**
      * Build a basic client from the provided config data
+     *
      * @param config Config object for the factory
      * @return a basic client
      */
+    @Deprecated
     public static BasicClient factory(Config config) {
         long appKey = config.getAppKey();
 
@@ -94,6 +99,7 @@ public class BasicClient implements Client {
      * @param provider JCE provider to be used to build a {@link JCECrypto} service
      * @return a basic client
      */
+    @Deprecated
     public static BasicClient factory(long appKey, String secretKey, String privateKeyPEM, Provider provider) {
         Config config = new Config(appKey, secretKey);
         config.setRSAPrivateKeyPEM(privateKeyPEM);

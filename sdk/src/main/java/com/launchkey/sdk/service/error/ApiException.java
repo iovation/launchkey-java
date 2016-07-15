@@ -12,8 +12,12 @@
 
 package com.launchkey.sdk.service.error;
 
+import com.launchkey.sdk.error.BaseException;
+
 /**
  * Abstract exception class from which all errors in the SDK are derived
+ *
+ * @deprecated Replaced by {@link BaseException}.
  */
 public class ApiException extends Exception {
     /**
@@ -24,7 +28,7 @@ public class ApiException extends Exception {
     /**
      * Get the proper exception for the provided message code and message
      *
-     * @param  code HTTP status code or 0 if no HTTP status code was returned
+     * @param  code Error code or 0 if no HTTP status code was returned
      * @param  message the detail message (which is saved for later retrieval
      *         by the {@link #getMessage()} method).
      * @return Exception that properly correlates with the code
@@ -89,7 +93,7 @@ public class ApiException extends Exception {
     }
 
     public ApiException() {
-        code = 0;
+        this(null, null, 0);
     }
 
     /**
@@ -98,8 +102,7 @@ public class ApiException extends Exception {
      * @param  code HTTP status code or 0 if no HTTP status code was returned
      */
     public ApiException(String message, int code) {
-        super(message);
-        this.code = code;
+        this(message, null, code);
     }
 
     /**

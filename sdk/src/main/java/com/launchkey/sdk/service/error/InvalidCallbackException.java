@@ -15,7 +15,10 @@ package com.launchkey.sdk.service.error;
 /**
  * Exception thrown when the data passed to a Server Sent Event handler does not contain the data that will allow
  * for processing of any of the known callback methods.
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.error.InvalidCallbackException}
  */
+@Deprecated
 public class InvalidCallbackException extends ApiException {
     /**
      * @param message the detail message. The detail message is saved for

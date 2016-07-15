@@ -49,14 +49,16 @@ public class PingResponse {
 
     /**
      * Get the finger print of the public key in the response. Returned only if a key is returned.
-     * @return
+     *
+     * @return The finger print of the public key in the response. Returned only if a key is returned.
      */
     public String getFingerprint() {
         return fingerprint;
     }
 
     /**
-     * @return RSA Public key string returned bye the Ping call.
+     * Get the RSA Public key string returned by the Ping call.
+     * @return RSA Public key string returned by the Ping call.
      */
     public final String getPublicKey() {
         return publicKey;

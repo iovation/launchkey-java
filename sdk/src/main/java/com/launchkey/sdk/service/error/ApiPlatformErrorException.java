@@ -14,7 +14,10 @@ package com.launchkey.sdk.service.error;
 
 /**
  * The exception thrown when the Platform incurs an error when processing an API request
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.error.PlatformErrorException}
  */
+@Deprecated
 public class ApiPlatformErrorException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval

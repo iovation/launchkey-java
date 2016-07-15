@@ -17,7 +17,10 @@ package com.launchkey.sdk.service.error;
  * code and message will be re-purposed to the following:
  *      code: HTTP status code or 0 if no HTTP status code was returned
  *      message: Message from the underlying transport (HTTP, TLS, TCP, IP, etc)
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.error.CommunicationErrorException}
  */
+@Deprecated
 public class CommunicationErrorException extends ApiException {
 
     /**

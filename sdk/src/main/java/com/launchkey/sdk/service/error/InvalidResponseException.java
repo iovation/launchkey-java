@@ -15,7 +15,10 @@ package com.launchkey.sdk.service.error;
 /**
  * Exception thrown when the response returned by the Platform API is not parsable or does not contain the
  * expected response data elements for the request that was made.
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.error.InvalidResponseException}
  */
+@Deprecated
 public class InvalidResponseException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval

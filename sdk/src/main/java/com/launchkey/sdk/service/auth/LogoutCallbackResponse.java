@@ -20,7 +20,12 @@ import com.launchkey.sdk.transport.v1.domain.PlatformDateFormat;
 import java.text.ParseException;
 import java.util.Date;
 
+/**
+ * @deprecated Replaced by {@link com.launchkey.sdk.domain.auth.LogoutCallbackResponse} used by
+ * {@link com.launchkey.sdk.service.application.auth.V1AuthService}.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Deprecated
 public class LogoutCallbackResponse implements CallbackResponse {
     /**
      * Unique user identifier that will match the user hash in {@link AuthResponse}

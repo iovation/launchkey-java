@@ -18,7 +18,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Response given for link request
+ * @deprecated {@link WhiteLabelService} is deprecated in favor of
+ * {@link com.launchkey.sdk.service.organization.whitelabel.WhiteLabelService}}
  */
+@Deprecated
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LinkResponse {
     /**

@@ -17,17 +17,22 @@ import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.V1ServiceAbstract;
 import com.launchkey.sdk.service.error.InvalidResponseException;
 import com.launchkey.sdk.service.error.ApiException;
+import com.launchkey.sdk.service.organization.whitelabel.V3WhiteLabelService;
 import com.launchkey.sdk.transport.v1.Transport;
 import com.launchkey.sdk.transport.v1.domain.UsersRequest;
 import com.launchkey.sdk.transport.v1.domain.UsersResponse;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 /**
  * White Label service based on an API V1 transport
+ * @deprecated in favor of {@link V3WhiteLabelService}
  */
-public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabelService{
+@Deprecated
+public class V1WhiteLabelService extends V1ServiceAbstract implements WhiteLabelService {
 
     /**
      * @param transport Transport service

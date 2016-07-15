@@ -13,6 +13,7 @@
 package com.launchkey.sdk.crypto;
 
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -78,4 +79,12 @@ public interface Crypto {
      * @return RSA Public Key object
      */
     RSAPublicKey getRSAPublicKeyFromPEM(String publicKey);
+
+    /**
+     * Generate a 256 bit hash with the Secure Hash Algorithm
+     * @param input Data to hash
+     * @return Hashed data
+     * @throws NoSuchAlgorithmException When the provider does not support SHA-256
+     */
+    byte[] sha256(byte[] input) throws NoSuchAlgorithmException;
 }

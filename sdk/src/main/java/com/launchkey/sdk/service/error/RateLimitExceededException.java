@@ -14,7 +14,10 @@ package com.launchkey.sdk.service.error;
 
 /**
  * Exception is thrown when the number of calls allowed for the request data has been exceeded for the time limit.
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.error.RateLimitExceededException}
  */
+@Deprecated
 public class RateLimitExceededException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval

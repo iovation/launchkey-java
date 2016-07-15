@@ -18,6 +18,9 @@ import java.util.List;
 
 /**
  * Class to represent an authentication policy which will be utilized for providing dynamic policies per request.
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.domain.auth.AuthPolicy} used by
+ * {@link com.launchkey.sdk.service.application.auth.V1AuthService}.
  */
 public class AuthPolicy {
     private final int requiredFactors;
@@ -82,7 +85,7 @@ public class AuthPolicy {
 
     /**
      * Get the number of auth factors required by this policy
-     * @return
+     * @return The number of auth factors required by this policy
      */
     public int getRequiredFactors() {
         return requiredFactors;
@@ -90,23 +93,23 @@ public class AuthPolicy {
 
     /**
      * Is a knowledge factor required by this policy
-     * @return
+     * @return Is a knowledge factor required by this policy
      */
     public boolean isKnowledgeFactorRequired() {
         return requireKnowledgeFactor;
     }
 
     /**
-     * Is an inherence factore required by this policy
-     * @return
+     * Is an inherence factor required by this policy
+     * @return Is an inherence factor required by this policy
      */
     public boolean isInherenceFactorRequired() {
         return requireInherenceFactor;
     }
 
     /**
-     * Is a posession factor required by this policy
-     * @return
+     * Is a possession factor required by this policy
+     * @return Is an possession factor required by this policy
      */
     public boolean isPossessionFactorRequired() {
         return requirePossessionFactor;
@@ -114,7 +117,7 @@ public class AuthPolicy {
 
     /**
      * Which geofence locations are acceptable for this policy
-     * @return
+     * @return The geofence locations that are acceptable for this policy
      */
     public List<Location> getLocations() {
         return locations;
@@ -141,7 +144,7 @@ public class AuthPolicy {
 
         /**
          * Get the longitude of the geolocation
-         * @return
+         * @return The longitude of the geolocation
          */
         public double getLongitude() {
             return longitude;
@@ -149,7 +152,7 @@ public class AuthPolicy {
 
         /**
          * Get the latitude of the geolocation
-         * @return
+         * @return The latitude of the geolocation
          */
         public double getLatitude() {
             return latitude;
@@ -157,7 +160,7 @@ public class AuthPolicy {
 
         /**
          * Get the radius in meters
-         * @return
+         * @return The radius in meters
          */
         public double getRadius() {
             return radius;

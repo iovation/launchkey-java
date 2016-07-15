@@ -15,6 +15,10 @@ package com.launchkey.sdk;
 import com.launchkey.sdk.service.auth.AuthService;
 import com.launchkey.sdk.service.whitelabel.WhiteLabelService;
 
+/**
+ * @deprecated Replaced with {@link AppClient} and {@link OrgClient}
+ */
+@Deprecated
 public interface Client {
     /**
      * Get an auth service

@@ -12,11 +12,13 @@
 
 package com.launchkey.example.springmvc;
 
-import com.launchkey.sdk.BasicClient;
-import com.launchkey.sdk.Client;
-import com.launchkey.sdk.Config;
-import com.launchkey.sdk.service.auth.*;
-import com.launchkey.sdk.service.error.ApiException;
+import com.launchkey.sdk.AppClient;
+import com.launchkey.sdk.ClientFactoryBuilder;
+import com.launchkey.sdk.domain.auth.AuthResponse;
+import com.launchkey.sdk.domain.auth.AuthResponseCallbackResponse;
+import com.launchkey.sdk.domain.auth.CallbackResponse;
+import com.launchkey.sdk.domain.auth.LogoutCallbackResponse;
+import com.launchkey.sdk.error.BaseException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class AuthManager {
     final Logger log = LoggerFactory.getLogger(getClass());
-    private final AuthService authService;
+    private final com.launchkey.sdk.service.application.auth.AuthService authService;
     private final Map<String, String> sessionAuthRequestMap;
     private final Map<String, Boolean> sessionAuthenticationMap;
     private final Map<String, List<String>> userHashSessionMap;
@@ -61,10 +63,6 @@ public class AuthManager {
             log.error("mfa.private-key-location property not provided");
             halt = true;
         }
-        if (privateKeyLocation == null) {
-            log.error("mfa.private-key-location property not provided");
-            halt = true;
-        }
         if (halt) throw new ConfigurationException("Missing required mfa configuration");
 
         BufferedReader br = new BufferedReader(new FileReader(privateKeyLocation));
@@ -81,13 +79,14 @@ public class AuthManager {
             br.close();
         }
         String privateKey = sb.toString();
-        Config clientConfig = new Config(appKey, secretKey);
-        clientConfig.setRSAPrivateKeyPEM(privateKey);
-        clientConfig.setJCEProvider(new BouncyCastleProvider());
+
+        ClientFactoryBuilder builder = new ClientFactoryBuilder()
+                .setJCEProvider(new BouncyCastleProvider());
         if (baseURL != null) {
-            clientConfig.setAPIBaseURL(baseURL);
+            builder.setAPIBaseURL(baseURL);
         }
-        Client client = BasicClient.factory(clientConfig);
+        AppClient client = builder.build().makeAppClient(appKey, secretKey, privateKey);
+
         this.authService = client.auth();
         this.sessionAuthenticationMap = Collections.synchronizedMap(new HashMap<String, Boolean>());
         this.sessionAuthRequestMap = new ConcurrentHashMap<String, String>();
@@ -100,7 +99,7 @@ public class AuthManager {
             String sessionId = getSessionId();
             sessionAuthRequestMap.put(sessionId, authRequestId);
             sessionAuthenticationMap.put(sessionId, null);
-        } catch (ApiException apiException) {
+        } catch (BaseException apiException) {
             throw new AuthException("Error logging in with username: " + username, apiException);
         }
     }
@@ -122,7 +121,7 @@ public class AuthManager {
                     authService.logout(sessionAuthRequestMap.get(sessionId));
                     sessionAuthenticationMap.put(sessionId, false);
                     sessionAuthRequestMap.remove(sessionId);
-                } catch (ApiException apiException) {
+                } catch (BaseException apiException) {
                     throw new AuthException(
                             "Error on logout for auth request: " + sessionAuthRequestMap.get(sessionId),
                             apiException
@@ -169,7 +168,7 @@ public class AuthManager {
                 }
                 userHashSessionMap.remove(userHash);
             }
-        } catch (ApiException apiException) {
+        } catch (BaseException apiException) {
             throw new AuthException("Error handling callback", apiException);
         }
     }

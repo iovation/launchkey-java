@@ -14,7 +14,10 @@ package com.launchkey.sdk.service.error;
 
 /**
  * Exception for errors that occur due to API credentials being invalid when communicating with the Platform API.
+ *
+ * @deprecated Replaced by {@link com.launchkey.sdk.error.InvalidCredentialsException}
  */
+@Deprecated
 public class InvalidCredentialsException extends ApiException {
     /**
      * @param message the detail message (which is saved for later retrieval
