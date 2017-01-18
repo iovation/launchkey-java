@@ -1,6 +1,7 @@
 package com.launchkey.sdk;
 
 import com.launchkey.sdk.cache.PingResponseCache;
+import com.launchkey.sdk.crypto.JCECrypto;
 import com.launchkey.sdk.service.token.TokenIdService;
 import org.apache.http.client.HttpClient;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -9,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.security.KeyPairGenerator;
 import java.security.Provider;
 import java.security.interfaces.RSAPrivateKey;
 
@@ -56,12 +58,18 @@ public class ClientFactoryTest {
                     "mo5GzkQVT4GyetA0hQJoJorT2Rfx9KSCCQ6cdNKnhvxjEYgbJuRKfw==\n" +
                     "-----END RSA PRIVATE KEY-----";
 
+    private KeyPairGenerator keyPairGenerator;
+
+
     private ClientFactory clientFactory;
 
     @Before
     public void setUp() throws Exception {
+        Provider provider = new BouncyCastleProvider();
+        keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
+
         clientFactory = new ClientFactory(
-                new BouncyCastleProvider(),
+                provider,
                 mock(PingResponseCache.class),
                 mock(HttpClient.class),
                 mock(TokenIdService.class),
@@ -87,7 +95,7 @@ public class ClientFactoryTest {
     @Test
     public void makeAppClient1() throws Exception {
         assertThat(
-                clientFactory.makeAppClient(0L, "secret key", mock(RSAPrivateKey.class)),
+                clientFactory.makeAppClient(0L, "secret key", (RSAPrivateKey) keyPairGenerator.generateKeyPair().getPrivate()),
                 new IsInstanceOf(AppClient.class)
         );
     }
@@ -103,7 +111,7 @@ public class ClientFactoryTest {
     @Test
     public void makeOrgClient1() throws Exception {
         assertThat(
-                clientFactory.makeOrgClient(0L, mock(RSAPrivateKey.class)),
+                clientFactory.makeOrgClient(0L, (RSAPrivateKey) keyPairGenerator.generateKeyPair().getPrivate()),
                 new IsInstanceOf(OrgClient.class)
         );
     }
