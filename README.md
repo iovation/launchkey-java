@@ -1,5 +1,7 @@
 # SDK for Java
 
+[![Build Status](https://travis-ci.org/iovation/launchkey-java.svg?branch=master)](https://travis-ci.org/iovation/launchkey-java)
+
   * [Modules](#modules)
   * [Support](#support)
 
