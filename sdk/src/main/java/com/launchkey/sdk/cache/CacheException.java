@@ -16,12 +16,12 @@ package com.launchkey.sdk.cache;
  * Named exception specifically to be thrown when the cache implementation cannot read or write to its persistence
  * provider.
  */
-public class CachePersistenceException extends Exception {
+public class CacheException extends Exception {
     /**
      * @param  message the detail message. The detail message is saved for
      *         later retrieval by the {@link #getMessage()} method.
      */
-    public CachePersistenceException(String message) {
+    public CacheException(String message) {
         super(message);
     }
 
@@ -33,7 +33,7 @@ public class CachePersistenceException extends Exception {
      *         permitted, and indicates that the cause is nonexistent or
      *         unknown.)
      */
-    public CachePersistenceException(String message, Throwable cause) {
+    public CacheException(String message, Throwable cause) {
         super(message, cause);
     }
 }

@@ -87,9 +87,8 @@ public class Jose4jJWTServiceTest {
 
         jwtService = new Jose4jJWTService(
                 PLATFORM_IDENTIFIER,
-                ENTITY_IDENTIFIER,
-                (RSAPrivateKey) keyPair.getPrivate(),
-                pingService,
+                null,
+                null,
                 EXPIRE_SECONDS
         );
     }
@@ -111,6 +110,9 @@ public class Jose4jJWTServiceTest {
 
         String encoded = jwtService.encode(
                 (String) expected.get("jti"),
+                null,
+                null,
+                null,
                 (String) expected.get("Method"),
                 (String) expected.get("Path"),
                 (String) expected.get("Content-Hash-Alg"),
@@ -152,12 +154,11 @@ public class Jose4jJWTServiceTest {
         when(pingService.getPlatformTime()).thenReturn(then);
         JWTService jwtService = new Jose4jJWTService(
                 "application:1000000000",
-                "organization:9770924838",
-                (RSAPrivateKey) keyPair.getPrivate(),
-                pingService,
+                null,
+                null,
                 EXPIRE_SECONDS
         );
-        JWTClaims actual = jwtService.decode(TOKEN);
+        JWTClaims actual = jwtService.decode(null, null, null, null, TOKEN);
         assertEquals(expected, actual);
     }
 
@@ -171,19 +172,19 @@ public class Jose4jJWTServiceTest {
 
         jwtService = new Jose4jJWTService(
                 PLATFORM_IDENTIFIER,
-                ENTITY_IDENTIFIER,
-                (RSAPrivateKey) kp.getPrivate(),
-                pingService,
+                null,
+                null,
                 EXPIRE_SECONDS
         );
 
 
-        jwtService.encode(null, null, null, null, null);
+        jwtService.encode(null, null, null, null, null, null, null, null);
     }
 
     @Test(expected = JWTError.class)
     public void decodeInvalidJwtThrowsJwtError() throws Exception {
-        jwtService.decode("aksjfhaslkhf");
+        JWTClaims actual = jwtService.decode(null, null, null, null, "aksjfhaslkhf");
+
     }
 
     @Test(expected = JWTError.class)
@@ -192,23 +193,22 @@ public class Jose4jJWTServiceTest {
         when(pingService.getPublicKey()).thenReturn(publicKey);
         JWTService jwtService = new Jose4jJWTService(
                 "Invalid provider identity",
-                "Invalid recipient identity",
-                (RSAPrivateKey) keyPair.getPrivate(),
-                pingService,
+                null,
+                null,
                 EXPIRE_SECONDS
         );
-        jwtService.decode(TOKEN);
+        jwtService.decode(null, null, null, null, TOKEN);
     }
 
     @Test(expected = JWTError.class)
     public void decodePingServiceExceptionThrowsJwtError() throws Exception {
         when(pingService.getPublicKey()).thenThrow(new CommunicationErrorException(null, null, null));
-        jwtService.decode(TOKEN);
+        jwtService.decode(null, null, null, null, TOKEN);
     }
 
     @Test(expected = JWTError.class)
     public void decodePingServiceGetPlatformTImeExceptionThrowsJwtError() throws Exception {
         when(pingService.getPlatformTime()).thenThrow(new CommunicationErrorException(null, null, null));
-        jwtService.decode(TOKEN);
+        jwtService.decode(null, null, null, null, TOKEN);
     }
 }

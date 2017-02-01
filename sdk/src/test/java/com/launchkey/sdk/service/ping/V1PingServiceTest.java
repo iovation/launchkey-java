@@ -1,6 +1,6 @@
 package com.launchkey.sdk.service.ping;
 
-import com.launchkey.sdk.cache.CachePersistenceException;
+import com.launchkey.sdk.cache.CacheException;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.error.BaseException;
@@ -14,7 +14,6 @@ import com.launchkey.sdk.transport.v1.domain.PingResponse;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.number.IsCloseTo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,7 +88,7 @@ public class V1PingServiceTest {
 
     @Test
     public void getPublicKeyCallsPingOnTransportWhenExceptionThrownBYCache() throws Exception {
-        when(pingResponseCache.getPingResponse()).thenThrow(new CachePersistenceException(null));
+        when(pingResponseCache.getPingResponse()).thenThrow(new CacheException(null));
         pingService.getPublicKey();
         InOrder inOrder = inOrder(pingResponseCache, transport);
         inOrder.verify(pingResponseCache).getPingResponse();
@@ -114,7 +113,7 @@ public class V1PingServiceTest {
 
     @Test
     public void getPublicKeyDoesNotErrorWhenExceptionThrownByCachePersist() throws Exception {
-        doThrow(new CachePersistenceException(null)).when(pingResponseCache).setPingResponse(any(PingResponse.class));
+        doThrow(new CacheException(null)).when(pingResponseCache).setPingResponse(any(PingResponse.class));
         pingService.getPublicKey();
         InOrder inOrder = inOrder(pingResponseCache, transport);
         inOrder.verify(pingResponseCache).getPingResponse();

@@ -25,15 +25,15 @@ import java.util.Date;
 
 import static org.junit.Assert.*;
 
-public class PublicPingGetResponseTest {
-    private PublicPingGetResponse publicPingGetResponse;
+public class PublicV3PingGetResponseTest {
+    private PublicV3PingGetResponse publicPingGetResponse;
 
     @Rule public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
         Date apiTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").parse("2010-01-01T00:00:00Z");
-        publicPingGetResponse = new PublicPingGetResponse(apiTime);
+        publicPingGetResponse = new PublicV3PingGetResponse(apiTime);
     }
 
     @After
@@ -46,7 +46,7 @@ public class PublicPingGetResponseTest {
         Date expected = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").parse("2010-01-01T00:00:00Z");
         Date actual = new ObjectMapper().readValue(
                 "{\"api_time\": \"2010-01-01T00:00:00Z\"}",
-                PublicPingGetResponse.class
+                PublicV3PingGetResponse.class
         ).getApiTime();
         assertEquals(expected, actual);
     }
@@ -54,14 +54,14 @@ public class PublicPingGetResponseTest {
     @Test
     public void jsonParseWithNoApiTimeErrors() throws Exception {
         thrown.expect(JsonMappingException.class);
-        new ObjectMapper().readValue("{}", PublicPingGetResponse.class);
+        new ObjectMapper().readValue("{}", PublicV3PingGetResponse.class);
     }
 
     @Test
     public void jsonParseWithExtraAttributeDoesNotError() throws Exception {
         new ObjectMapper().readValue(
                 "{\"api_time\": \"2000-01-01T00:00:00Z\", \"extra\": true}",
-                PublicPingGetResponse.class
+                PublicV3PingGetResponse.class
         );
     }
 

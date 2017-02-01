@@ -12,19 +12,17 @@
 
 package com.launchkey.sdk.transport.domain;
 
-import java.security.PublicKey;
-
-public class PublicPublicKeyGetResponse {
-    public final PublicKey publicKey;
+public class PublicV3PublicKeyGetResponse {
+    public final String publicKey;
 
     public final String publicKeyFingerprint;
 
-    public PublicPublicKeyGetResponse(PublicKey publicKey, String publicKeyFingerprint) {
+    public PublicV3PublicKeyGetResponse(String publicKey, String publicKeyFingerprint) {
         this.publicKey = publicKey;
         this.publicKeyFingerprint = publicKeyFingerprint;
     }
 
-    public PublicKey getPublicKey() {
+    public String getPublicKey() {
         return publicKey;
     }
 

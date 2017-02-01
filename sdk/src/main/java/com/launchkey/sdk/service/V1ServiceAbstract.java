@@ -15,7 +15,7 @@ package com.launchkey.sdk.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import com.launchkey.sdk.cache.CachePersistenceException;
+import com.launchkey.sdk.cache.CacheException;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.ApiException;
@@ -71,14 +71,14 @@ public abstract class V1ServiceAbstract {
         PingResponse pingResponse = null;
         try {
             pingResponse = pingResponseCache.getPingResponse();
-        } catch (CachePersistenceException e) {
+        } catch (CacheException e) {
             log.error("Error getting ping response from cache", e);
         }
         if (pingResponse == null) {
             pingResponse = transport.ping(new PingRequest());
             try {
                 pingResponseCache.setPingResponse(pingResponse);
-            } catch (CachePersistenceException e) {
+            } catch (CacheException e) {
                 log.error("Error placing ping response in cache", e);
             }
         }

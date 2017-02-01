@@ -12,7 +12,7 @@
 
 package com.launchkey.sdk.service.auth;
 
-import com.launchkey.sdk.cache.CachePersistenceException;
+import com.launchkey.sdk.cache.CacheException;
 import com.launchkey.sdk.transport.v1.domain.AuthsRequest;
 import com.launchkey.sdk.transport.v1.domain.AuthsResponse;
 import com.launchkey.sdk.transport.v1.domain.PingResponse;
@@ -43,13 +43,13 @@ public class V1AuthServicePingCacheTest extends V1AuthServiceTestBase {
 
     @Test
     public void testGetPublicKeySwallowsCachePersistenceErrorOnCacheGet() throws Exception {
-        when(pingResponseCache.getPingResponse()).thenThrow(new CachePersistenceException("Duh"));
+        when(pingResponseCache.getPingResponse()).thenThrow(new CacheException("Duh"));
         assertEquals(authResponse.getAuthRequestId(), service.authorize("username"));
     }
 
     @Test
     public void testGetPublicKeySwallowsCachePersistenceErrorOnCacheSet() throws Exception {
-        doThrow(new CachePersistenceException("Duh")).when(pingResponseCache).setPingResponse(any(PingResponse.class));
+        doThrow(new CacheException("Duh")).when(pingResponseCache).setPingResponse(any(PingResponse.class));
         assertEquals(authResponse.getAuthRequestId(), service.authorize("username"));
     }
 }

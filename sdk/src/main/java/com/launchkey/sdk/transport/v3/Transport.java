@@ -84,4 +84,7 @@ public interface Transport {
     Device[] whiteLabelUserDeviceList(WhiteLabelDeviceListRequest request)
             throws PlatformErrorException, UnknownEntityException, InvalidRequestException, InvalidStateException,
             InvalidResponseException, InvalidCredentialsException, CommunicationErrorException;
+
+
 }
+

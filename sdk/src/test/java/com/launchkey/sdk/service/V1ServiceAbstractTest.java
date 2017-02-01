@@ -1,6 +1,6 @@
 package com.launchkey.sdk.service;
 
-import com.launchkey.sdk.cache.CachePersistenceException;
+import com.launchkey.sdk.cache.CacheException;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.service.error.ApiException;
@@ -45,13 +45,13 @@ public class V1ServiceAbstractTest extends V1ServiceTestBase {
 
     @Test
     public void testGetPublicKeySwallowsCachePersistenceErrorOnCacheGet() throws Exception {
-        when(pingResponseCache.getPingResponse()).thenThrow(new CachePersistenceException("Duh"));
+        when(pingResponseCache.getPingResponse()).thenThrow(new CacheException("Duh"));
         assertEquals(publicKey, service.executeGetPublicKey());
     }
 
     @Test
     public void testGetPublicKeySwallowsCachePersistenceErrorOnCacheSet() throws Exception {
-        doThrow(new CachePersistenceException("Duh")).when(pingResponseCache).setPingResponse(any(PingResponse.class));
+        doThrow(new CacheException("Duh")).when(pingResponseCache).setPingResponse(any(PingResponse.class));
         assertEquals(publicKey, service.executeGetPublicKey());
     }
 

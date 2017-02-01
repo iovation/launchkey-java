@@ -109,14 +109,14 @@
 
     <repositories>
         <repository>
-            <id>spring-milestone</id>
+            <deviceId>spring-milestone</deviceId>
             <url>https://repo.spring.io/libs-release</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
-            <id>spring-milestone</id>
+            <deviceId>spring-milestone</deviceId>
             <url>https://repo.spring.io/libs-release</url>
         </pluginRepository>
     </pluginRepositories>

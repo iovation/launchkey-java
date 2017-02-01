@@ -50,18 +50,18 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
+            <deviceId>ossrh</deviceId>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>ossrh</id>
+            <deviceId>ossrh</deviceId>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
     </distributionManagement>
     
     <profiles>
         <profile>
-            <id>release</id>
+            <deviceId>release</deviceId>
             <build>
                 <plugins>
                     <plugin>
@@ -70,7 +70,7 @@
                         <version>2.4</version>
                         <executions>
                             <execution>
-                                <id>attach-sources</id>
+                                <deviceId>attach-sources</deviceId>
                                 <goals>
                                     <goal>jar-no-fork</goal>
                                 </goals>
@@ -83,7 +83,7 @@
                         <version>2.10.1</version>
                         <executions>
                             <execution>
-                                <id>attach-javadocs</id>
+                                <deviceId>attach-javadocs</deviceId>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
@@ -96,7 +96,7 @@
                         <version>1.6</version>
                         <executions>
                             <execution>
-                                <id>sign-artifacts</id>
+                                <deviceId>sign-artifacts</deviceId>
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
@@ -117,7 +117,7 @@
                 <version>2.10</version>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
+                        <deviceId>copy-dependencies</deviceId>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
@@ -148,7 +148,7 @@
                 <version>2.4</version>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
+                        <deviceId>attach-sources</deviceId>
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
@@ -161,7 +161,7 @@
                 <version>2.10.1</version>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <deviceId>attach-javadocs</deviceId>
                         <goals>
                             <goal>jar</goal>
                         </goals>

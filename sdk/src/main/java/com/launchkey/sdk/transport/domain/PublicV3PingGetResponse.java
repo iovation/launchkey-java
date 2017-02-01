@@ -22,14 +22,14 @@ import java.util.Date;
  * The response object for the /public/v3/ping call.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PublicPingGetResponse {
+public class PublicV3PingGetResponse {
     private final Date apiTime;
 
     /**
      * @param apiTime The current time of the LaunchKey API as reported.
      */
     @JsonCreator
-    public PublicPingGetResponse(@JsonProperty(value = "api_time", required = true) Date apiTime) {
+    public PublicV3PingGetResponse(@JsonProperty(value = "api_time", required = true) Date apiTime) {
         this.apiTime = apiTime;
     }
 

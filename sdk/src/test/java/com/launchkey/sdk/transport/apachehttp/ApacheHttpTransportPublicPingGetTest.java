@@ -1,4 +1,4 @@
-package com.launchkey.sdk.transport; /**
+package com.launchkey.sdk.transport.apachehttp; /**
  * Copyright 2017 iovation, Inc.
  * <p>
  * Licensed under the MIT License.
@@ -12,24 +12,14 @@ package com.launchkey.sdk.transport; /**
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchkey.sdk.error.CommunicationErrorException;
 import com.launchkey.sdk.error.InvalidResponseException;
-import com.launchkey.sdk.transport.domain.PublicPingGetResponse;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.HttpClient;
+import com.launchkey.sdk.transport.domain.PublicV3PingGetResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.message.BasicStatusLine;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -38,11 +28,11 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTest {
+public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTestBase {
 
     @Test
     public void publicPingGetCallsHttpClientWithProperHttpRequestMethod() throws Exception {
-        transport.publicPingGet();
+        transport.publicV3PingGet();
         ArgumentCaptor<HttpUriRequest> actual = ArgumentCaptor.forClass(HttpUriRequest.class);
         verify(httpClient).execute(actual.capture());
         assertEquals("GET", actual.getValue().getMethod());
@@ -51,7 +41,7 @@ public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTes
     @Test
     public void publicPingGetCallsHttpClientWithProperHttpRequestUri() throws Exception {
         URI expected = URI.create(baseUrl.concat("/public/v3/ping"));
-        transport.publicPingGet();
+        transport.publicV3PingGet();
         ArgumentCaptor<HttpUriRequest> actual = ArgumentCaptor.forClass(HttpUriRequest.class);
         verify(httpClient).execute(actual.capture());
         assertEquals(expected, actual.getValue().getURI());
@@ -63,21 +53,21 @@ public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTes
         BasicHttpEntity entity = new BasicHttpEntity();
         entity.setContent(expected);
         when(httpResponse.getEntity()).thenReturn(entity);
-        transport.publicPingGet();
+        transport.publicV3PingGet();
         verify(objectMapper).readValue(eq(expected), any(Class.class));
     }
 
     @Test
     public void publicPingGetParsesResponseWithProperClass() throws Exception {
-        transport.publicPingGet();
-        verify(objectMapper).readValue(any(InputStream.class), eq(PublicPingGetResponse.class));
+        transport.publicV3PingGet();
+        verify(objectMapper).readValue(any(InputStream.class), eq(PublicV3PingGetResponse.class));
     }
 
     @Test
     public void publicPingGetReturnsParsedJson() throws Exception {
-        PublicPingGetResponse expected = new PublicPingGetResponse(new Date());
+        PublicV3PingGetResponse expected = new PublicV3PingGetResponse(new Date());
         when(objectMapper.readValue(any(InputStream.class), any(Class.class))).thenReturn(expected);
-        PublicPingGetResponse actual = transport.publicPingGet();
+        PublicV3PingGetResponse actual = transport.publicV3PingGet();
         assertEquals(expected, actual);
     }
 
@@ -85,14 +75,14 @@ public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTes
     public void publicPingThrowsCommunicationErrorExceptionWhenHttpClientThrowsIOError() throws Exception {
         when(httpClient.execute(any(HttpUriRequest.class))).thenThrow(new IOException());
         thrown.expect(CommunicationErrorException.class);
-        transport.publicPingGet();
+        transport.publicV3PingGet();
     }
 
     @Test
     public void publicPingThrowsInvalidResponseExceptionWhenObjectParserThrowsJsonMappingException() throws Exception {
         when(objectMapper.readValue(any(InputStream.class), any(Class.class))).thenThrow(mock(JsonMappingException.class));
         thrown.expect(InvalidResponseException.class);
-        transport.publicPingGet();
+        transport.publicV3PingGet();
     }
 
     @Test
@@ -100,6 +90,6 @@ public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTes
         when(objectMapper.readValue(any(InputStream.class), any(Class.class)))
                 .thenThrow(mock(JsonParseException.class));
         thrown.expect(InvalidResponseException.class);
-        transport.publicPingGet();
+        transport.publicV3PingGet();
     }
 }

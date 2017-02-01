@@ -12,7 +12,7 @@
 
 package com.launchkey.sdk.service.ping;
 
-import com.launchkey.sdk.cache.CachePersistenceException;
+import com.launchkey.sdk.cache.CacheException;
 import com.launchkey.sdk.cache.PingResponseCache;
 import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.error.*;
@@ -45,7 +45,7 @@ public class V1PingService implements PingService {
         PingResponse pingResponse;
         try {
             pingResponse = pingResponseCache.getPingResponse();
-        } catch (CachePersistenceException e) {
+        } catch (CacheException e) {
             log.trace("An error occurred retrieving the ping response from cache", e);
             pingResponse = null;
         }
@@ -86,7 +86,7 @@ public class V1PingService implements PingService {
 
         try {
             pingResponseCache.setPingResponse(pingResponse);
-        } catch (CachePersistenceException e) {
+        } catch (CacheException e) {
             log.trace("An error occurred persisting the ping response in cache", e);
         }
         return pingResponse;

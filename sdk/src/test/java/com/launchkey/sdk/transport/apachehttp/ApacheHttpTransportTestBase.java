@@ -1,4 +1,4 @@
-package com.launchkey.sdk.transport; /**
+package com.launchkey.sdk.transport.apachehttp; /**
  * Copyright 2017 iovation, Inc.
  * <p>
  * Licensed under the MIT License.
@@ -11,6 +11,7 @@ package com.launchkey.sdk.transport; /**
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.launchkey.sdk.transport.domain.EntityIdentifier;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
@@ -24,12 +25,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
+import javax.cache.spi.CachingProvider;
 import java.io.ByteArrayInputStream;
 import java.security.Provider;
 
 import static org.mockito.Mockito.*;
 
-public class ApacheHttpTransportTest {
+public class ApacheHttpTransportTestBase {
 
     ApacheHttpTransport transport;
     HttpClient httpClient;
@@ -38,6 +40,8 @@ public class ApacheHttpTransportTest {
     String audience;
     HttpResponse httpResponse;
     ObjectMapper objectMapper;
+    CachingProvider cachingProvider;
+    EntityIdentifier issuer;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -59,9 +63,11 @@ public class ApacheHttpTransportTest {
         when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
         provider = new BouncyCastleProvider();
         objectMapper = mock(ObjectMapper.class);
+        cachingProvider = mock(CachingProvider.class);
         baseUrl = "https://base.url";
+        issuer = mock(EntityIdentifier.class);
         audience = "Expected Audience";
-        transport = new ApacheHttpTransport(httpClient, provider, objectMapper, baseUrl, audience);
+//        transport = new ApacheHttpTransport(httpClient, provider, objectMapper, cachingProvider, baseUrl, issuer, audience, jwtService, jweService);
     }
 
     @After
@@ -71,7 +77,9 @@ public class ApacheHttpTransportTest {
         provider = null;
         httpResponse = null;
         objectMapper = null;
+        cachingProvider = null;
         baseUrl = null;
         audience = null;
+        issuer = null;
     }
 }

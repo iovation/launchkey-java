@@ -1,15 +1,3 @@
-/**
- * Copyright 2016 LaunchKey, Inc. All rights reserved.
- * <p>
- * Licensed under the MIT License.
- * You may not use this file except in compliance with the License.
- * A copy of the License is located in the "LICENSE.txt" file accompanying
- * this file. This file is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.launchkey.sdk.transport.v3;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -31,7 +19,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.GzipCompressingEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -92,7 +79,8 @@ public class ApacheHttpTransport implements Transport {
         );
     }
 
-    @Override public void whiteLabelUserDeviceDelete(WhiteLabelDeviceDeleteRequest request) throws PlatformErrorException, UnknownEntityException, InvalidRequestException, InvalidStateException, InvalidResponseException, CommunicationErrorException, InvalidCredentialsException {
+    @Override
+    public void whiteLabelUserDeviceDelete(WhiteLabelDeviceDeleteRequest request) throws PlatformErrorException, UnknownEntityException, InvalidRequestException, InvalidStateException, InvalidResponseException, CommunicationErrorException, InvalidCredentialsException {
         processRequest(
                 request,
                 HttpDelete.METHOD_NAME,
@@ -101,7 +89,8 @@ public class ApacheHttpTransport implements Transport {
         );
     }
 
-    @Override public Device[] whiteLabelUserDeviceList(WhiteLabelDeviceListRequest request) throws PlatformErrorException, UnknownEntityException, InvalidRequestException, InvalidStateException, InvalidResponseException, CommunicationErrorException, InvalidCredentialsException {
+    @Override
+    public Device[] whiteLabelUserDeviceList(WhiteLabelDeviceListRequest request) throws PlatformErrorException, UnknownEntityException, InvalidRequestException, InvalidStateException, InvalidResponseException, CommunicationErrorException, InvalidCredentialsException {
         return processRequest(
                 request,
                 HttpPost.METHOD_NAME,
@@ -119,7 +108,7 @@ public class ApacheHttpTransport implements Transport {
         String nonce = tokenIdService.getTokenId();
         try {
             String data = objectMapper.writeValueAsString(request);
-            String jwe = jweService.encrypt(data);
+            String jwe = jweService.encrypt(data, null, null, "application/json");
             HttpEntity entity = getRequestEntity(jwe);
 
             String contentHashAlgorithm;
@@ -133,7 +122,7 @@ public class ApacheHttpTransport implements Transport {
                 contentHash = Hex.encodeHexString(crypto.sha256(os.toByteArray()));
                 contentHashAlgorithm = "SHA256";
             }
-            String jwt = jwtService.encode(nonce, method, path, contentHashAlgorithm, contentHash);
+            String jwt = jwtService.encode(nonce, null, null, null, method, path, contentHashAlgorithm, contentHash);
             String authHeader = "Bearer " + jwt;
             URI uri = uriBuilder.setPath(path).build();
             HttpUriRequest httpRequest = RequestBuilder.create(method)
@@ -217,7 +206,7 @@ public class ApacheHttpTransport implements Transport {
         // Decode the JWT (3rd segment)
         JWTClaims claims;
         try {
-            claims = jwtService.decode(jwtText);
+            claims = jwtService.decode(null, null, null, null, jwtText);
         } catch (JWTError jwtError) {
             // If the JWT fails validation, throw invalid credentials
             throw new InvalidResponseException("Validation of the JWT failed", jwtError, null);
@@ -271,7 +260,7 @@ public class ApacheHttpTransport implements Transport {
             final char[] buffer = new char[2048];
             final StringBuilder out = new StringBuilder();
             Reader in = new InputStreamReader(content);
-            for (;;) {
+            for (; ; ) {
                 int rsz = in.read(buffer, 0, buffer.length);
                 if (rsz < 0)
                     break;

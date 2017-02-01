@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.Provider;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
@@ -34,27 +35,28 @@ import static org.mockito.Mockito.when;
 public class Jose4jJWEServiceTest {
 
     private final Provider provider = new BouncyCastleProvider();
-    private PingService pingService;
     private Jose4jJWEService jweService;
     private KeyPair keyPair;
+    private PublicKey publicKey;
+    private String publicKeyFingerprint;
 
 
     @Before
     public void setUp() throws Exception {
-        pingService = mock(PingService.class);
-
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
         keyPairGenerator.initialize(2048);
         keyPair = keyPairGenerator.generateKeyPair();
 
-        when(pingService.getPublicKey()).thenReturn((RSAPublicKey) keyPair.getPublic());
+        publicKey = keyPair.getPublic();
+        publicKeyFingerprint = "Public Key Fingerprint";
 
-        jweService = new Jose4jJWEService((RSAPrivateKey) keyPair.getPrivate(), pingService);
+        jweService = new Jose4jJWEService((RSAPrivateKey) keyPair.getPrivate());
     }
 
     @After
     public void tearDown() throws Exception {
-        pingService = null;
+        publicKey = null;
+        publicKeyFingerprint = null;
         keyPair = null;
         jweService = null;
     }
@@ -104,7 +106,7 @@ public class Jose4jJWEServiceTest {
 
 
         final RSAPrivateKey privateKey = JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKeyPEM);
-        final JWEService jweService = new Jose4jJWEService(privateKey, pingService);
+        final JWEService jweService = new Jose4jJWEService(privateKey);
 
         String expected = "{\"test\": \"response\"}";
         String actual = jweService.decrypt(jwe);
@@ -114,29 +116,17 @@ public class Jose4jJWEServiceTest {
     @Test
     public void encryptCanBeDecrypted() throws Exception {
         String expected = "{\"test\": \"response\"}";
-        assertEquals(expected, jweService.decrypt(jweService.encrypt(expected)));
+        assertEquals(expected, jweService.decrypt(jweService.encrypt(expected, publicKey, publicKeyFingerprint, "application/json")));
+    }
+
+    @Test
+    public void encryptSetsKeyId() throws Exception {
+        String expected = "{\"test\": \"response\"}";
+        assertEquals(expected, jweService.decrypt(jweService.encrypt(expected, publicKey, publicKeyFingerprint, "application/json")));
     }
 
     @Test(expected = JWEFailure.class)
     public void decryptJoseExceptionThrowsJweFailure() throws Exception {
         jweService.decrypt("kjsdhflskd");
-    }
-
-    @Test(expected = JWEFailure.class)
-    public void testEncryptPingServiceFailureThrowsJweFailure() throws Exception {
-        when(pingService.getPublicKey()).thenThrow(new CommunicationErrorException(null, null, null));
-        jweService.encrypt("Unencrypted");
-    }
-
-    @Test(expected = JWEFailure.class)
-    public void testEncryptJoseExceptionThrowsJweFailure() throws Exception {
-        // Build and set the Ping service to return a key that is too small
-        // see: org.jose4j.jwx.KeyValidationSupport#MIN_RSA_KEY_LENGTH
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", provider);
-        kpg.initialize(1024);
-        KeyPair kp = kpg.generateKeyPair();
-        when(pingService.getPublicKey()).thenReturn((RSAPublicKey) kp.getPublic());
-
-        jweService.encrypt("data");
     }
 }

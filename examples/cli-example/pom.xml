@@ -46,7 +46,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
+                        <deviceId>make-assembly</deviceId>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>

@@ -137,8 +137,8 @@ public class ClientFactory {
                 httpClient,
                 apiBaseURL,
                 apiIdentifier,
-                new Jose4jJWTService(apiIdentifier, entityIdentifier, privateKey, pingService, requestExpireSeconds),
-                new Jose4jJWEService(privateKey, pingService),
+                new Jose4jJWTService(apiIdentifier, null, null, requestExpireSeconds),
+                new Jose4jJWEService(privateKey),
                 crypto,
                 pingService,
                 tokenIdService

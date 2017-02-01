@@ -12,6 +12,8 @@
 
 package com.launchkey.sdk.crypto.jwe;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -29,10 +31,18 @@ public interface JWEService {
     String decrypt(String data) throws JWEFailure;
 
     /**
+     * Decrypt the provided JWE data using the provided private key
+     * @param data JWE data
+     * @param privateKey Private key for decryption
+     * @return Decrypted value
+     */
+    String decrypt(String data, PrivateKey privateKey) throws JWEFailure;
+
+    /**
      * Encrypt the data and serialize compact serialization
      * @param data Data to encrypt
      * @return Compact serialized JWE
      * @throws JWEFailure When an issue arises while attempting to encrypt the data
      */
-    String encrypt(String data) throws JWEFailure;
+    String encrypt(String data, PublicKey publicKey, String keyId, String contentType) throws JWEFailure;
 }

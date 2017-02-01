@@ -21,14 +21,14 @@ public interface PingResponseCache {
     /**
      * Set the ping response in the cache
      * @param pingResponse Ping response to cache
-     * @throws CachePersistenceException When an error occurred saving the cached response in a persistence engine
+     * @throws CacheException When an error occurred saving the cached response in a persistence engine
      */
-    void setPingResponse(PingResponse pingResponse) throws CachePersistenceException;
+    void setPingResponse(PingResponse pingResponse) throws CacheException;
 
     /**
      * Get the cached ping response.  If no valid response is available, null will be returned
      * @return The cached ping response or null if no response is cached
-     * @throws CachePersistenceException When an error occurred fetching the cached response from a persistence engine
+     * @throws CacheException When an error occurred fetching the cached response from a persistence engine
      */
-    PingResponse getPingResponse() throws CachePersistenceException;
+    PingResponse getPingResponse() throws CacheException;
 }
