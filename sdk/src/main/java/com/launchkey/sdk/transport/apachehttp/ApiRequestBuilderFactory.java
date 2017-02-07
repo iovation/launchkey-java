@@ -13,6 +13,7 @@
 package com.launchkey.sdk.transport.apachehttp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.crypto.jwe.JWEService;
 import com.launchkey.sdk.crypto.jwt.JWTService;
 
@@ -24,21 +25,21 @@ class ApiRequestBuilderFactory {
     private final String issuer;
     private final String baseUrl;
     private final ObjectMapper objectMapper;
-    private final Provider provider;
+    private final Crypto crypto;
     private final JWTService jwtService;
     private JWEService jweService;
 
-    public ApiRequestBuilderFactory(String issuer, String baseUrl, ObjectMapper objectMapper, Provider provider, JWTService jwtService, JWEService jweService) {
+    public ApiRequestBuilderFactory(String issuer, String baseUrl, ObjectMapper objectMapper, Crypto crypto, JWTService jwtService, JWEService jweService) {
         this.issuer = issuer;
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;
-        this.provider = provider;
+        this.crypto = crypto;
         this.jwtService = jwtService;
         this.jweService = jweService;
     }
 
     public ApiRequestBuilder create(PublicKey publicKey, String publicKeyFingerprint, Date currentDate) {
-        return new ApiRequestBuilder(publicKey, publicKeyFingerprint, currentDate, issuer, baseUrl, objectMapper, jwtService, jweService, provider);
+        return new ApiRequestBuilder(publicKey, publicKeyFingerprint, currentDate, issuer, baseUrl, objectMapper, jwtService, jweService, crypto);
     }
 }
 

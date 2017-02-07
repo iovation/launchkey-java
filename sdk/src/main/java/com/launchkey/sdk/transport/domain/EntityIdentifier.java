@@ -66,7 +66,7 @@ public class EntityIdentifier {
 
         public static EntityType fromValue(String value) {
             for (EntityType type : EnumSet.allOf(EntityType.class)) {
-                if (type.getValue() == value) {
+                if (type.getValue().equals(value)) {
                     return type;
                 }
             }

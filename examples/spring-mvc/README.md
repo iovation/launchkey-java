@@ -36,16 +36,15 @@ mvn clean package
 1. Launch the Spring Boot application by running the packaged jar in the target directory.  The following Spring Boot
   environment properties are required for the example to work:
    
-  * mfa.app-key
-  * mfa.secret-key
-  * mfa.private-key-location
+  * lk.service-id
+  * lk.private-key-location
   
   There are numerous ways to set those properties but the simplest way is usually to pass arguments to the JAR
   execution.  This is an example of how to run the example app from the main project root with the project version
   of `3.0.0-SNAPSHOT`:
   
   ```
-  java -jar examples/spring-mvc/target/examples-spring-mvc-3.0.0-SNAPSHOT.jar --mfa.app-key=1234567890 --mfa.secret-key=xbv739jxzx63xrexdtrkcdkpksotctewk --mfa.private-key-location=/tmp/private-key.pem
+  java -jar examples/spring-mvc/target/examples-spring-mvc-3.0.0-SNAPSHOT.jar --lk.service-id=1234567890 --lk.private-key-location=/tmp/private-key.pem
   ```
 
 The name and location of the JAR file are subject to change. If you downloaded the JAR, substitute that name. If you 

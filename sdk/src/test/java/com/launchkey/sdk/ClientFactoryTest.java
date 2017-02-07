@@ -1,8 +1,7 @@
 package com.launchkey.sdk;
 
-import com.launchkey.sdk.cache.PingResponseCache;
-import com.launchkey.sdk.crypto.JCECrypto;
-import com.launchkey.sdk.service.token.TokenIdService;
+import com.launchkey.sdk.cache.Cache;
+import com.launchkey.sdk.transport.domain.EntityKeyMap;
 import org.apache.http.client.HttpClient;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.hamcrest.core.IsInstanceOf;
@@ -13,8 +12,10 @@ import org.junit.Test;
 import java.security.KeyPairGenerator;
 import java.security.Provider;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.HashMap;
+import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -70,12 +71,14 @@ public class ClientFactoryTest {
 
         clientFactory = new ClientFactory(
                 provider,
-                mock(PingResponseCache.class),
                 mock(HttpClient.class),
-                mock(TokenIdService.class),
+                mock(Cache.class),
                 "https://base/url",
-                null,
-                0
+                "id",
+                0,
+                0,
+                0,
+                new EntityKeyMap()
         );
     }
 
@@ -85,34 +88,50 @@ public class ClientFactoryTest {
     }
 
     @Test
-    public void makeAppClient() throws Exception {
+    public void makeServiceClient() throws Exception {
         assertThat(
-                clientFactory.makeAppClient(0L, "secret key", privateKeyPEM),
-                new IsInstanceOf(AppClient.class)
+                clientFactory.makeServiceClient(UUID.randomUUID().toString(), privateKeyPEM),
+                new IsInstanceOf(ServiceClient.class)
         );
     }
 
     @Test
-    public void makeAppClient1() throws Exception {
+    public void makeServiceClient1() throws Exception {
         assertThat(
-                clientFactory.makeAppClient(0L, "secret key", (RSAPrivateKey) keyPairGenerator.generateKeyPair().getPrivate()),
-                new IsInstanceOf(AppClient.class)
+                clientFactory.makeServiceClient(UUID.randomUUID().toString(), new HashMap<String, RSAPrivateKey>(), "Current key"),
+                new IsInstanceOf(ServiceClient.class)
+        );
+    }
+
+    @Test
+    public void makeDirectoryClient() throws Exception {
+        assertThat(
+                clientFactory.makeDirectoryClient(UUID.randomUUID().toString(), privateKeyPEM),
+                new IsInstanceOf(DirectoryClient.class)
+        );
+    }
+
+    @Test
+    public void makeDirectoryClient1() throws Exception {
+        assertThat(
+                clientFactory.makeDirectoryClient(UUID.randomUUID().toString(), new HashMap<String, RSAPrivateKey>(), "Current key"),
+                new IsInstanceOf(DirectoryClient.class)
         );
     }
 
     @Test
     public void makeOrgClient() throws Exception {
         assertThat(
-                clientFactory.makeOrgClient(0L, privateKeyPEM),
-                new IsInstanceOf(OrgClient.class)
+                clientFactory.makeOrganizationClient(UUID.randomUUID().toString(), privateKeyPEM),
+                new IsInstanceOf(OrganizationClient.class)
         );
     }
 
     @Test
     public void makeOrgClient1() throws Exception {
         assertThat(
-                clientFactory.makeOrgClient(0L, (RSAPrivateKey) keyPairGenerator.generateKeyPair().getPrivate()),
-                new IsInstanceOf(OrgClient.class)
+                clientFactory.makeOrganizationClient(UUID.randomUUID().toString(), new HashMap<String, RSAPrivateKey>(), "Current key"),
+                new IsInstanceOf(OrganizationClient.class)
         );
     }
 

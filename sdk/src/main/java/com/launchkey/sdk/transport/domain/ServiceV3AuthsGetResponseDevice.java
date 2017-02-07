@@ -24,21 +24,21 @@ public class ServiceV3AuthsGetResponseDevice {
     private final boolean response;
     private final UUID authorizationRequestId;
     private final String deviceId;
-    private final String[] app_pins;
+    private final String[] servicePins;
 
     @JsonCreator
     public ServiceV3AuthsGetResponseDevice(
             @JsonProperty(value = "response") boolean response,
             @JsonProperty(value = "auth_request") UUID authorizationRequestId,
             @JsonProperty(value = "device_id") String deviceId,
-            @JsonProperty(value = "app_pins") String[] app_pins) {
+            @JsonProperty(value = "service_pins") String[] servicePins) {
         this.response = response;
         this.authorizationRequestId = authorizationRequestId;
         this.deviceId = deviceId;
-        this.app_pins = app_pins;
+        this.servicePins = servicePins;
     }
 
-    public boolean isResponse() {
+    public boolean getResponse() {
         return response;
     }
 
@@ -50,8 +50,8 @@ public class ServiceV3AuthsGetResponseDevice {
         return deviceId;
     }
 
-    public String[] getApp_pins() {
-        return app_pins;
+    public String[] getServicePins() {
+        return servicePins;
     }
 
     @Override
@@ -61,21 +61,20 @@ public class ServiceV3AuthsGetResponseDevice {
 
         ServiceV3AuthsGetResponseDevice that = (ServiceV3AuthsGetResponseDevice) o;
 
-        if (isResponse() != that.isResponse()) return false;
+        if (getResponse() != that.getResponse()) return false;
         if (getAuthorizationRequestId() != null ? !getAuthorizationRequestId().equals(that.getAuthorizationRequestId()) : that.getAuthorizationRequestId() != null)
             return false;
         if (getDeviceId() != null ? !getDeviceId().equals(that.getDeviceId()) : that.getDeviceId() != null)
             return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(getApp_pins(), that.getApp_pins());
+        return Arrays.equals(getServicePins(), that.getServicePins());
     }
 
     @Override
     public int hashCode() {
-        int result = (isResponse() ? 1 : 0);
+        int result = (getResponse() ? 1 : 0);
         result = 31 * result + (getAuthorizationRequestId() != null ? getAuthorizationRequestId().hashCode() : 0);
         result = 31 * result + (getDeviceId() != null ? getDeviceId().hashCode() : 0);
-        result = 31 * result + Arrays.hashCode(getApp_pins());
+        result = 31 * result + Arrays.hashCode(getServicePins());
         return result;
     }
 
@@ -85,7 +84,7 @@ public class ServiceV3AuthsGetResponseDevice {
                 "response=" + response +
                 ", authorizationRequestId=" + authorizationRequestId +
                 ", deviceId='" + deviceId + '\'' +
-                ", app_pins=" + Arrays.toString(app_pins) +
+                ", servicePins=" + Arrays.toString(servicePins) +
                 '}';
     }
 }

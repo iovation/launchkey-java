@@ -12,17 +12,18 @@
 
 package com.launchkey.sdk.crypto.jwe;
 
-import com.launchkey.sdk.error.BaseException;
-import com.launchkey.sdk.service.ping.PingService;
+import org.jose4j.json.JsonUtil;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
+import org.jose4j.jwx.Headers;
 import org.jose4j.lang.JoseException;
 
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Jose4jJWEService implements JWEService {
     private final RSAPrivateKey privateKey;
@@ -69,5 +70,23 @@ public class Jose4jJWEService implements JWEService {
             throw new JWEFailure("An error occurred attempting to decrypt a JWE", e);
         }
         return encrypted;
+    }
+
+    @Override
+    public Map<String, String> getHeaders(String data) throws JWEFailure {
+        try {
+            String headerSegment = data.split("\\.")[0];
+            JsonWebEncryption jwe = new JsonWebEncryption();
+            jwe.setCompactSerialization(data);
+            String headersJSON = jwe.getHeaders().getFullHeaderAsJsonString();
+            Map<String, Object> objectMap = JsonUtil.parseJson(headersJSON);
+            Map<String, String> headers = new LinkedHashMap<String, String>(objectMap.size());
+            for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
+                headers.put(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+            return headers;
+        } catch (Exception e) {
+            throw new JWEFailure("Unable to parse data for JWE Header!", e);
+        }
     }
 }

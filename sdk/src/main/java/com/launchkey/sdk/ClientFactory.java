@@ -1,173 +1,136 @@
-/**
- * Copyright 2016 LaunchKey, Inc. All rights reserved.
- * <p>
- * Licensed under the MIT License.
- * You may not use this file except in compliance with the License.
- * A copy of the License is located in the "LICENSE.txt" file accompanying
- * this file. This file is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.launchkey.sdk;
 
-import com.launchkey.sdk.cache.PingResponseCache;
-import com.launchkey.sdk.crypto.Crypto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.launchkey.sdk.cache.Cache;
 import com.launchkey.sdk.crypto.JCECrypto;
 import com.launchkey.sdk.crypto.jwe.Jose4jJWEService;
-import com.launchkey.sdk.crypto.jwt.JWTClaims;
 import com.launchkey.sdk.crypto.jwt.Jose4jJWTService;
-import com.launchkey.sdk.service.application.auth.AuthService;
-import com.launchkey.sdk.service.application.auth.V1AuthService;
-import com.launchkey.sdk.service.organization.whitelabel.V3WhiteLabelServiceFactory;
-import com.launchkey.sdk.service.organization.whitelabel.WhiteLabelServiceFactory;
-import com.launchkey.sdk.service.ping.PingService;
-import com.launchkey.sdk.service.ping.V1PingService;
-import com.launchkey.sdk.service.token.TokenIdService;
-import com.launchkey.sdk.transport.v1.ApacheHttpClientTransport;
-import com.launchkey.sdk.transport.v1.Transport;
+import com.launchkey.sdk.transport.Transport;
+import com.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.launchkey.sdk.transport.domain.EntityIdentifier.EntityType;
+import com.launchkey.sdk.transport.domain.EntityKeyMap;
 import org.apache.http.client.HttpClient;
 
 import java.security.Provider;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Factory for building {@link AppClient} and {@link OrgClient} objects.
+ * Factory for building {@link ServiceClient} and {@link OrganizationClient} objects.
  */
 public class ClientFactory {
     private final HttpClient httpClient;
+    private final Cache keyCache;
     private final Provider provider;
-    private final PingResponseCache pingResponseCache;
     private final String apiBaseURL;
     private final String apiIdentifier;
     private final int requestExpireSeconds;
-    private final TokenIdService tokenIdService;
-
-    private V1PingService pingService;
+    private final int offsetTTL;
+    private final int currentPublicKeyTTL;
+    private final EntityKeyMap entityKeyMap;
 
     /**
      * @param provider JCE provider
-     * @param pingResponseCache Cache to cache Ping responses
      * @param httpClient HTTP client
-     * @param tokenIdService Service to generate Token IDs
      * @param apiBaseURL Base URL for the Platform API
      * @param apiIdentifier JWT identifier for the API. Used to send requests with the proper ID and validate
-     *                      responses and server sent events.
+*                      responses and server sent events.
      * @param requestExpireSeconds The number of seconds until a request JWT should expire.
+     * @param offsetTTL The number of seconds the API time offset will live before obtaining another using a ping call.
+     * @param currentPublicKeyTTL The number of seconds to current public key as reported by a public key call will
+     * live before obtaining the value again from the API.
+     * @param entityKeyMap Mapping of entity private keys to allow for parsing Server Sent Events from entities
      */
     public ClientFactory(
-            Provider provider, PingResponseCache pingResponseCache, HttpClient httpClient,
-            TokenIdService tokenIdService, String apiBaseURL, String apiIdentifier, int requestExpireSeconds
-    ) {
+            Provider provider, HttpClient httpClient, Cache keyCache,
+            String apiBaseURL, String apiIdentifier, int requestExpireSeconds,
+            int offsetTTL, int currentPublicKeyTTL, EntityKeyMap entityKeyMap) {
         this.provider = provider;
-        this.pingResponseCache = pingResponseCache;
         this.httpClient = httpClient;
-        this.tokenIdService = tokenIdService;
         this.apiBaseURL = apiBaseURL;
         this.apiIdentifier = apiIdentifier;
         this.requestExpireSeconds = requestExpireSeconds;
+        this.keyCache = keyCache;
+        this.offsetTTL = offsetTTL;
+        this.currentPublicKeyTTL = currentPublicKeyTTL;
+        this.entityKeyMap = entityKeyMap;
     }
 
-    /**
-     * Make an {@link AppClient} with the provided data
-     * @param appKey Application key from the keys section of the Application's page in Dashboard
-     * @param secretKey Secret key from the keys section of the Application's page in Dashboard
-     * @param privateKeyPEM PEM formatted string containing the RSA Private Key of the RSA public/private
-     *                      key pair whose public key is associated with the Application.
-     * @return App client
-     */
-    public AppClient makeAppClient(long appKey, String secretKey, String privateKeyPEM) {
+    public ServiceClient makeServiceClient(String serviceId, String privateKeyPEM) {
         RSAPrivateKey privateKey = makePrivateKeyFromPEM(privateKeyPEM);
-        return this.makeAppClient(appKey, secretKey, privateKey);
+        String publicKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(privateKey);
+        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<String, RSAPrivateKey>();
+        keys.put(publicKeyFingerprint, privateKey);
+        return makeServiceClient(serviceId, keys, publicKeyFingerprint);
     }
 
-    /**
-     * Make an {@link AppClient} with the provided data
-     * @param appKey Application key from the keys section of the Application's page in Dashboard
-     * @param secretKey Secret key from the keys section of the Application's page in Dashboard
-     * @param privateKey RSA Private Key of the RSA public/private key pair whose public key is associated
-     *                   with the Application.
-     * @return App client
-     */
-    public AppClient makeAppClient(long appKey, String secretKey, RSAPrivateKey privateKey) {
-        Crypto crypto = new JCECrypto(privateKey, provider);
-        Transport transport = new ApacheHttpClientTransport(httpClient, getV1BaseUrl(), crypto);
-        PingService pingService = getPingService(crypto);
-        AuthService authService = new V1AuthService(transport, crypto, pingService, appKey, secretKey);
-        AppClient appClient = new BasicAppClient(authService);
-        return appClient;
+    public ServiceClient makeServiceClient(String directoryId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
+        UUID serviceUUID = UUID.fromString(directoryId);
+        EntityIdentifier serviceEntity = new EntityIdentifier(EntityType.SERVICE, serviceUUID);
+        Transport transport = getTransport(serviceEntity, privateKeys, currentPrivateKey);
+        ServiceClient serviceClient = new BasicServiceClient(transport, serviceUUID);
+        return serviceClient;
     }
 
-    /**
-     * Make an {@link OrgClient} with the provided data.
-     * @param orgKey Organization key from the keys section of the Organizations's page in Dashboard
-     * @param privateKeyPEM PEM formatted string containing the RSA Private Key of the RSA public/private
-     *                      key pair whose public key is associated with the Organization.
-     * @return Org client
-     */
-    public synchronized OrgClient makeOrgClient(long orgKey, String privateKeyPEM) {
+    public DirectoryClient makeDirectoryClient(String directoryId, String privateKeyPEM) {
         RSAPrivateKey privateKey = makePrivateKeyFromPEM(privateKeyPEM);
-        return this.makeOrgClient(orgKey, privateKey);
+        String publicKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(privateKey);
+        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<String, RSAPrivateKey>();
+        keys.put(publicKeyFingerprint, privateKey);
+        return makeDirectoryClient(directoryId, keys, publicKeyFingerprint);
     }
 
-    /**
-     * Make an {@link OrgClient} with the provided data.
-     * @param orgKey Organization key from the keys section of the Organizations's page in Dashboard
-     * @param privateKey RSA Private Key of the RSA public/private key pair whose public key is associated
-     *                   with the Organization.
-     * @return org Client
-     */
-    public synchronized OrgClient makeOrgClient(long orgKey, RSAPrivateKey privateKey) {
-        com.launchkey.sdk.transport.v3.Transport transport = getV3Transport(
-                privateKey,
-                "organization: ".concat(String.valueOf(orgKey))
-        );
-        WhiteLabelServiceFactory wlsFactory = new V3WhiteLabelServiceFactory(
-                transport, privateKey, orgKey
-        );
-        OrgClient orgClient = new BasicOrgClient(wlsFactory);
-        return orgClient;
+    public DirectoryClient makeDirectoryClient(String serviceId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
+        UUID directoryUUID = UUID.fromString(serviceId);
+        EntityIdentifier directoryEntity = new EntityIdentifier(EntityType.DIRECTORY, directoryUUID);
+        Transport transport = getTransport(directoryEntity, privateKeys, currentPrivateKey);
+        DirectoryClient directoryClient = new BasicDirectoryClient(transport, directoryUUID);
+        return directoryClient;
     }
 
-    private com.launchkey.sdk.transport.v3.Transport getV3Transport(RSAPrivateKey privateKey, String entityIdentifier) {
-        Crypto crypto = new JCECrypto(privateKey, provider);
-        PingService pingService = getPingService(crypto);
-        return new com.launchkey.sdk.transport.v3.ApacheHttpTransport(
-                httpClient,
-                apiBaseURL,
-                apiIdentifier,
-                new Jose4jJWTService(apiIdentifier, null, null, requestExpireSeconds),
-                new Jose4jJWEService(privateKey),
-                crypto,
-                pingService,
-                tokenIdService
-        );
+    public synchronized OrganizationClient makeOrganizationClient(String organizationId, String privateKeyPEM) {
+        RSAPrivateKey privateKey = makePrivateKeyFromPEM(privateKeyPEM);
+        String publicKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(privateKey);
+        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<String, RSAPrivateKey>();
+        keys.put(publicKeyFingerprint, privateKey);
+        return makeOrganizationClient(organizationId, keys, publicKeyFingerprint);
     }
 
-    private PingService getPingService(Crypto crypto) {
-        if (pingService == null) {
-            Transport transport = new ApacheHttpClientTransport(httpClient, getV1BaseUrl(), crypto);
-            pingService = new V1PingService(
-                    pingResponseCache,
-                    transport,
-                    crypto
-            );
+    public synchronized OrganizationClient makeOrganizationClient(String organizationId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
+        UUID organizationUUID = UUID.fromString(organizationId);
+        EntityIdentifier organizationEntity = new EntityIdentifier(EntityType.ORGANIZATION, organizationUUID);
+        Transport transport = getTransport(organizationEntity, privateKeys, currentPrivateKey);
+        OrganizationClient serviceClient = new BasicOrganizationClient(transport, organizationUUID);
+        return serviceClient;
+    }
+
+    private com.launchkey.sdk.transport.Transport getTransport(
+            EntityIdentifier entityIdentifier, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKeyId) {
+        for (Map.Entry<String, RSAPrivateKey> entry : privateKeys.entrySet()) {
+            entityKeyMap.addKey(entityIdentifier, entry.getKey(), entry.getValue());
         }
-        return pingService;
+        return new com.launchkey.sdk.transport.apachehttp.ApacheHttpTransport(
+                httpClient,
+                new JCECrypto(provider),
+                new ObjectMapper(),
+                keyCache,
+                apiBaseURL,
+                entityIdentifier,
+                new Jose4jJWTService(apiIdentifier, privateKeys, currentPrivateKeyId, requestExpireSeconds),
+                new Jose4jJWEService(privateKeys.get(currentPrivateKeyId)),
+                offsetTTL,
+                currentPublicKeyTTL,
+                entityKeyMap
+        );
     }
 
     private RSAPrivateKey makePrivateKeyFromPEM(String privateKeyPEM) {
         return JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKeyPEM);
     }
 
-    private String getV1BaseUrl() {
-        String v1BaseUrl;
-        if (apiBaseURL.endsWith("/")) {
-            v1BaseUrl = apiBaseURL.substring(0, apiBaseURL.length() - 1);
-        } else {
-            v1BaseUrl = apiBaseURL;
-        }
-        return v1BaseUrl.concat("/v1");
+    private String getPublicKeyFingerprintFromPrivateKey(RSAPrivateKey privateKey) {
+        return JCECrypto.getRsaPublicKeyFingerprint(provider, privateKey);
     }
 }

@@ -13,9 +13,9 @@
 package com.launchkey.sdk.error;
 
 /**
- * Exception thrown when the auth request with which you attempted to interact is no longer active. This can be due to
- * the user not responding to the auth request and it has expired, the user has denied the auth request, or the user
- * had approved the auth request and then ended the session.
+ * Exception thrown when the service request with which you attempted to interact is no longer active. This can be due to
+ * the user not responding to the getServiceService request and it has expired, the user has denied the getServiceService request, or the user
+ * had approved the service request and then ended the session.
  */
 public class ExpiredAuthRequestException extends BaseException {
 

@@ -11,23 +11,39 @@ package com.launchkey.sdk.transport.apachehttp; /**
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.launchkey.sdk.cache.Cache;
+import com.launchkey.sdk.crypto.Crypto;
+import com.launchkey.sdk.crypto.jwe.JWEService;
+import com.launchkey.sdk.crypto.jwt.JWTService;
 import com.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.launchkey.sdk.transport.domain.EntityKeyMap;
+import com.launchkey.sdk.transport.domain.PublicV3PingGetResponse;
+import com.launchkey.sdk.transport.domain.PublicV3PublicKeyGetResponse;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseFactory;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import javax.cache.spi.CachingProvider;
 import java.io.ByteArrayInputStream;
 import java.security.Provider;
+import java.util.Date;
 
 import static org.mockito.Mockito.*;
 
@@ -40,18 +56,24 @@ public class ApacheHttpTransportTestBase {
     String audience;
     HttpResponse httpResponse;
     ObjectMapper objectMapper;
-    CachingProvider cachingProvider;
     EntityIdentifier issuer;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    private JWTService jwtService;
+    private JWEService jweService;
+    private Crypto crypto;
+    private Cache publicKeyCache;
+    private EntityKeyMap entityKeyMap;
 
     @Before
     public void setUp() throws Exception {
         httpClient = mock(HttpClient.class);
+        crypto = mock(Crypto.class);
+        publicKeyCache = mock(Cache.class);
+        jwtService = mock(JWTService.class);
+        jweService = mock(JWEService.class);
+        entityKeyMap = mock(EntityKeyMap.class);
         httpResponse = mock(HttpResponse.class);
         when(httpResponse.getFirstHeader("Content-Type"))
-                .thenReturn(new BasicHeader("Content-Type", "application/json"));
+                .thenReturn(new BasicHeader("Content-Type", "application/jose"));
         BasicHttpEntity entity = new BasicHttpEntity();
         entity.setContent(new ByteArrayInputStream("Hello World!".getBytes()));
         when(httpResponse.getEntity()).thenReturn(entity);
@@ -60,14 +82,28 @@ public class ApacheHttpTransportTestBase {
                 200,
                 "OK"
         ));
-        when(httpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
+
+        when(httpClient.execute(any(HttpUriRequest.class)))
+                .thenReturn(httpResponse);
+
         provider = new BouncyCastleProvider();
         objectMapper = mock(ObjectMapper.class);
-        cachingProvider = mock(CachingProvider.class);
         baseUrl = "https://base.url";
         issuer = mock(EntityIdentifier.class);
         audience = "Expected Audience";
-//        transport = new ApacheHttpTransport(httpClient, provider, objectMapper, cachingProvider, baseUrl, issuer, audience, jwtService, jweService);
+        transport = new ApacheHttpTransport(
+                httpClient,
+                crypto,
+                objectMapper,
+                publicKeyCache,
+                baseUrl,
+                issuer,
+                jwtService,
+                jweService,
+                0,
+                0,
+                entityKeyMap
+        );
     }
 
     @After
@@ -75,9 +111,13 @@ public class ApacheHttpTransportTestBase {
         transport = null;
         httpClient = null;
         provider = null;
+        entityKeyMap = null;
         httpResponse = null;
         objectMapper = null;
-        cachingProvider = null;
+        publicKeyCache = null;
+        jweService = null;
+        jwtService = null;
+        crypto = null;
         baseUrl = null;
         audience = null;
         issuer = null;

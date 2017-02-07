@@ -28,6 +28,7 @@ public class JWTClaimsTest {
         jwtClaims = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -98,35 +99,35 @@ public class JWTClaimsTest {
 
     @Test
     public void jsonEncode() throws Exception {
-        String expected = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash-Alg\":\"Body Hash Alg\",\"Content-Hash\":\"Body Hash\",\"Method\":\"Method\",\"Path\":\"Path\"}";
+        String expected = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash-Alg\":\"Body Hash Alg\",\"Content-Hash\":\"Body Hash\",\"Method\":\"Method\",\"Path\":\"Path\"}";
         String actual = OBJECT_MAPPER.writeValueAsString(jwtClaims);
         assertEquals(expected, actual);
     }
 
     @Test
     public void jsonEncodeSkipsNullItems() throws Exception {
-        String expected = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"aud\":\"Audience\",\"Method\":\"Method\",\"Path\":\"Path\"}";
-        String actual = OBJECT_MAPPER.writeValueAsString(new JWTClaims("Token ID", "Issuer", "Audience", null, null, null, null, null, "Method", "Path"));
+        String expected = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"Method\":\"Method\",\"Path\":\"Path\"}";
+        String actual = OBJECT_MAPPER.writeValueAsString(new JWTClaims("Token ID", "Issuer", "Subject", "Audience", null, null, null, null, null, "Method", "Path"));
         assertEquals(expected, actual);
     }
 
     @Test
     public void jsonDecode() throws Exception {
-        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Method\":\"Method\",\"Path\":\"Path\"}";
+        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Method\":\"Method\",\"Path\":\"Path\"}";
         JWTClaims actual = OBJECT_MAPPER.readValue(json, JWTClaims.class);
         assertEquals(jwtClaims, actual);
     }
 
     @Test
     public void jsonDecodeWithNoMethod() throws Exception {
-        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Path\":\"Path\"}";
+        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Path\":\"Path\"}";
         JWTClaims actual = OBJECT_MAPPER.readValue(json, JWTClaims.class);
         assertNull(actual.getMethod());
     }
 
     @Test
     public void jsonDecodeWithNoPath() throws Exception {
-        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Method\":\"Method\"}";
+        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Method\":\"Method\"}";
         JWTClaims actual = OBJECT_MAPPER.readValue(json, JWTClaims.class);
         assertNull(actual.getPath());
     }
@@ -154,6 +155,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -171,6 +173,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Other Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -188,6 +191,25 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Other Issuer",
+                "Subject",
+                "Audience",
+                11111,
+                22222,
+                33333,
+                "Body Hash Alg",
+                "Body Hash",
+                "Method",
+                "Path"
+        );
+        assertFalse(jwtClaims.equals(other));
+    }
+
+    @Test
+    public void equalsIsFalseWhenSubjectDifferent() throws Exception {
+        JWTClaims other = new JWTClaims(
+                "Token ID",
+                "Issuer",
+                "Other Subject",
                 "Audience",
                 11111,
                 22222,
@@ -205,6 +227,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Other Audience",
                 11111,
                 22222,
@@ -222,6 +245,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11112,
                 22222,
@@ -239,6 +263,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22223,
@@ -256,6 +281,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -273,6 +299,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -290,6 +317,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -307,6 +335,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -324,6 +353,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -346,6 +376,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -363,6 +394,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Other Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -380,6 +412,25 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Other Issuer",
+                "Subject",
+                "Audience",
+                11111,
+                22222,
+                33333,
+                "Body Hash Alg",
+                "Body Hash",
+                "Method",
+                "Path"
+        );
+        assertNotEquals(jwtClaims.hashCode(), other.hashCode());
+    }
+
+    @Test
+    public void hashcodeIsNotEqualWhenSubjectDifferent() throws Exception {
+        JWTClaims other = new JWTClaims(
+                "Token ID",
+                "Issuer",
+                "Other Subject",
                 "Audience",
                 11111,
                 22222,
@@ -397,6 +448,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Other Audience",
                 11111,
                 22222,
@@ -414,6 +466,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11112,
                 22222,
@@ -431,6 +484,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22223,
@@ -448,6 +502,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -465,6 +520,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -482,6 +538,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -499,6 +556,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,
@@ -516,6 +574,7 @@ public class JWTClaimsTest {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
+                "Subject",
                 "Audience",
                 11111,
                 22222,

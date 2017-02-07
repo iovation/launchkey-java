@@ -12,6 +12,8 @@
 
 package com.launchkey.sdk.transport.domain;
 
+import com.launchkey.sdk.error.NoKeyFoundException;
+
 import java.security.interfaces.RSAPrivateKey;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,12 +35,17 @@ public class EntityKeyMap {
         entityKeys.put(publicKeyFingerprint, privateKey);
     }
 
-    public RSAPrivateKey getKey(EntityIdentifier entityIdentifier, String publicKeyFingerprint) {
+    public RSAPrivateKey getKey(EntityIdentifier entityIdentifier, String publicKeyFingerprint) throws NoKeyFoundException {
         RSAPrivateKey privateKey;
         if (store.containsKey(entityIdentifier)) {
             privateKey = store.get(entityIdentifier).get(publicKeyFingerprint);
         } else {
             privateKey = null;
+        }
+        if (privateKey == null) {
+            throw new NoKeyFoundException(
+                    "Np key found for entity " + entityIdentifier.toString() + " and key ID " + publicKeyFingerprint);
+
         }
         return privateKey;
     }

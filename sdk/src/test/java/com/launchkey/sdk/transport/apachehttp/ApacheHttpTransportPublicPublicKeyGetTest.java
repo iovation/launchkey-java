@@ -13,6 +13,8 @@ package com.launchkey.sdk.transport.apachehttp; /**
 import com.launchkey.sdk.crypto.JCECrypto;
 import com.launchkey.sdk.error.CommunicationErrorException;
 import com.launchkey.sdk.error.InvalidResponseException;
+import com.launchkey.sdk.transport.domain.PublicV3PingGetResponse;
+import com.launchkey.sdk.transport.domain.PublicV3PublicKeyGetResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.BasicHttpEntity;
@@ -23,6 +25,7 @@ import org.mockito.ArgumentCaptor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import static org.junit.Assert.assertEquals;
@@ -49,7 +52,7 @@ public class ApacheHttpTransportPublicPublicKeyGetTest extends ApacheHttpTranspo
 
     @Test
     public void publicPublicKeyGetCallsHttpClientWithProperHttpRequestMethod() throws Exception {
-        transport.publicV3PublicKeyGet(null);
+        transport.publicV3PublicKeyGet("fingerprint");
         ArgumentCaptor<HttpUriRequest> actual = ArgumentCaptor.forClass(HttpUriRequest.class);
         verify(httpClient).execute(actual.capture());
         assertEquals("GET", actual.getValue().getMethod());
@@ -75,46 +78,35 @@ public class ApacheHttpTransportPublicPublicKeyGetTest extends ApacheHttpTranspo
 
     @Test
     public void publicPublicKeyGetReturnsExpectedPublicKeyValue() throws Exception {
-        RSAPublicKey expected = JCECrypto.getRSAPublicKeyFromPEM(provider, publicKeyPEM);
-//        PublicKey actual = transport.publicV3PublicKeyGet(null).getPublicKey();
-//        assertEquals(expected, actual);
+        String actual = transport.publicV3PublicKeyGet("fingerprint").getPublicKey();
+        assertEquals(publicKeyPEM, actual);
     }
 
     @Test
     public void publicPublicKeyGetReturnsExpectedFingerprint() throws Exception {
         String expected = "Expected Fingerprint";
         when(httpResponse.getFirstHeader("X-IOV-KEY-ID")).thenReturn(new BasicHeader("X-IOV-KEY-ID", expected));
-        String actual = transport.publicV3PublicKeyGet(null).getPublicKeyFingerprint();
+        String actual = transport.publicV3PublicKeyGet("fingerprint").getPublicKeyFingerprint();
         assertEquals(expected, actual);
     }
 
-    @Test
+    @Test(expected = CommunicationErrorException.class)
     public void publicPublicKeyGetThrowsInvalidResponseExceptionWhenEntityGetContentThrowsIOError() throws Exception {
         HttpEntity entity = mock(HttpEntity.class);
         when(entity.getContent()).thenThrow(new IOException());
         when(httpResponse.getEntity()).thenReturn(entity);
-        thrown.expect(CommunicationErrorException.class);
-        transport.publicV3PublicKeyGet(null);
+        transport.publicV3PublicKeyGet("fingerprint");
     }
 
-    @Test
+    @Test(expected = CommunicationErrorException.class)
     public void publicPublicKeyGetThrowsInvalidResponseExceptionWhenHttpClientThrowsIOError() throws Exception {
         when(httpClient.execute(any(HttpUriRequest.class))).thenThrow(new IOException());
-        thrown.expect(CommunicationErrorException.class);
-        transport.publicV3PublicKeyGet(null);
+        transport.publicV3PublicKeyGet("fingerprint");
     }
 
-    @Test
-    public void publicPublicKeyThrowsInvalidResponseExceptionWhenJceCryptoThrowsIllegalArgumentException() throws Exception {
-        ((BasicHttpEntity) httpResponse.getEntity()).setContent(new ByteArrayInputStream("Invalid key".getBytes()));
-        thrown.expect(InvalidResponseException.class);
-        transport.publicV3PublicKeyGet(null);
-    }
-
-    @Test
+    @Test(expected = InvalidResponseException.class)
     public void publicPublicKeyThrowsInvalidResponseExceptionWhenNoFingerprintHeaderExists() throws Exception {
         when(httpResponse.getFirstHeader("X-IOV-KEY-ID")).thenReturn(null);
-        thrown.expect(InvalidResponseException.class);
-        transport.publicV3PublicKeyGet(null);
+        transport.publicV3PublicKeyGet("fingerprint");
     }
 }

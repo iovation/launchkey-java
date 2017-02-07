@@ -18,6 +18,8 @@ package com.launchkey.sdk.crypto.jwt;
 public class JWTError extends Exception {
     /**
      * @see Exception#Exception(String, Throwable)
+     * @param message Error message
+     * @param cause Underlying cause of the error
      */
     public JWTError(String message, Throwable cause) {
         super(message, cause);

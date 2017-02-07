@@ -14,6 +14,7 @@ package com.launchkey.sdk.transport.apachehttp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.crypto.jwe.JWEFailure;
 import com.launchkey.sdk.crypto.jwe.JWEService;
 import com.launchkey.sdk.crypto.jwt.JWTError;
@@ -44,14 +45,14 @@ class ApiRequestBuilder {
     private final ObjectMapper objectMapper;
     private final JWTService jwtService;
     private final JWEService jweService;
-    private final Provider provider;
+    private final Crypto crypto;
     private final Date currentDate;
     private String method = "GET";
     private String path = "/";
     private Object transportObject = null;
     private String subject = null;
 
-    ApiRequestBuilder(PublicKey publicKey, String publicKeyFingerprint, Date currentDate, String issuer, String baseUrl, ObjectMapper objectMapper, JWTService jwtService, JWEService jweService, Provider provider) {
+    ApiRequestBuilder(PublicKey publicKey, String publicKeyFingerprint, Date currentDate, String issuer, String baseUrl, ObjectMapper objectMapper, JWTService jwtService, JWEService jweService, Crypto crypto) {
         this.publicKey = publicKey;
         this.publicKeyFingerprint = publicKeyFingerprint;
         this.currentDate = currentDate;
@@ -60,7 +61,7 @@ class ApiRequestBuilder {
         this.objectMapper = objectMapper;
         this.jwtService = jwtService;
         this.jweService = jweService;
-        this.provider = provider;
+        this.crypto = crypto;
     }
 
     public ApiRequestBuilder setMethod(String method) {
@@ -110,7 +111,7 @@ class ApiRequestBuilder {
             rb.setEntity(entity);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             entity.writeTo(stream);
-            hash = Hex.encodeHexString(MessageDigest.getInstance("SHA-256", this.provider).digest(stream.toByteArray()));
+            hash = Hex.encodeHexString(crypto.sha256(stream.toByteArray()));
             func = "S256";
         } else {
             hash = null;

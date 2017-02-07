@@ -14,8 +14,8 @@ package com.launchkey.sdk.transport.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sun.tools.jdi.LinkedHashMap;
-
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,16 +23,20 @@ import java.util.Map;
 
 @JsonIgnoreProperties(value = {"geoFenceLocations"})
 public class ServiceV3AuthsPostRequestPolicy {
-    private final Map<String, Object> minimumRequirements;
+    private final static int ZERO = Integer.valueOf(0);
+    private final static int ONE = Integer.valueOf(1);
+    private final List<MinimumRequirement> minimumRequirements;
     private final List<Map<String, Double>> geoFenceLocations;
 
     public ServiceV3AuthsPostRequestPolicy(int any, boolean knowledge, boolean inherence, boolean possession) {
-        this.minimumRequirements = new LinkedHashMap();
-        this.minimumRequirements.put("requirement", "authenticated");
-        this.minimumRequirements.put("any", Integer.valueOf(any));
-        this.minimumRequirements.put("knowledge", knowledge ? Integer.valueOf(1) : Integer.valueOf(0));
-        this.minimumRequirements.put("inherence", inherence ? Integer.valueOf(1) : Integer.valueOf(0));
-        this.minimumRequirements.put("possession", possession ? Integer.valueOf(1) : Integer.valueOf(0));
+        MinimumRequirement minimumRequirement = new MinimumRequirement(
+                MinimumRequirement.Type.AUTHENTICATED,
+                any,
+                knowledge ? ONE : ZERO,
+                inherence ? ONE : ZERO,
+                possession ? ONE : ZERO
+        );
+        minimumRequirements = Arrays.asList(minimumRequirement);
 
         this.geoFenceLocations = new ArrayList<Map<String, Double>>();
     }
@@ -47,20 +51,24 @@ public class ServiceV3AuthsPostRequestPolicy {
 
 
     @JsonProperty(value = "minimum_requirements")
-    public Map<String, Object> getMinimumRequirements() {
+    public List<MinimumRequirement> getMinimumRequirements() {
         return minimumRequirements;
     }
 
     @JsonProperty(value = "factors")
     public List<Map<String, Object>> getFactors() {
-        Map<String, Object> factor = new LinkedHashMap();
-        factor.put("factor", "geofence");
-        factor.put("requirement", "forced requirement");
-        factor.put("priority", Integer.valueOf(1));
-        Map<String, Object> attributes = new LinkedHashMap();
-        factor.put("attributes", attributes);
-        attributes.put("locations", geoFenceLocations);
-        return Arrays.asList(factor);
+        List<Map<String, Object>> factors = new ArrayList<Map<String, Object>>();
+        if (geoFenceLocations.size() > 0) {
+            Map<String, Object> factor = new LinkedHashMap();
+            factor.put("factor", "geofence");
+            factor.put("requirement", "forced requirement");
+            factor.put("priority", Integer.valueOf(1));
+            Map<String, Object> attributes = new LinkedHashMap();
+            factor.put("attributes", attributes);
+            attributes.put("locations", geoFenceLocations);
+            factors.add(factor);
+        }
+        return factors;
     }
 
     @Override
@@ -88,5 +96,99 @@ public class ServiceV3AuthsPostRequestPolicy {
                 "minimumRequirements=" + minimumRequirements +
                 ", geoFenceLocations=" + geoFenceLocations +
                 '}';
+    }
+
+    public static class MinimumRequirement {
+        private final Type type;
+        private final int any;
+        private final int knowledge;
+        private final int inherence;
+        private final int possession;
+
+        public MinimumRequirement(Type type, int any, int knowledge, int inherence, int possession) {
+            this.type = type;
+            this.any = any;
+            this.knowledge = knowledge;
+            this.inherence = inherence;
+            this.possession = possession;
+        }
+
+        @JsonProperty("requirement")
+        public Type getType() {
+            return type;
+        }
+
+        @JsonProperty("any")
+        public int getAny() {
+            return any;
+        }
+
+        @JsonProperty("knowledge")
+        public int getKnowledge() {
+            return knowledge;
+        }
+
+        @JsonProperty("inherence")
+        public int getInherence() {
+            return inherence;
+        }
+
+        @JsonProperty("possession")
+        public int getPossession() {
+            return possession;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof MinimumRequirement)) return false;
+
+            MinimumRequirement that = (MinimumRequirement) o;
+
+            if (any != that.any) return false;
+            if (knowledge != that.knowledge) return false;
+            if (inherence != that.inherence) return false;
+            if (possession != that.possession) return false;
+            return type == that.type;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = type != null ? type.hashCode() : 0;
+            result = 31 * result + any;
+            result = 31 * result + knowledge;
+            result = 31 * result + inherence;
+            result = 31 * result + possession;
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "MinimumRequirements{" +
+                    "type=" + type +
+                    ", any=" + any +
+                    ", knowledge=" + knowledge +
+                    ", inherence=" + inherence +
+                    ", possession=" + possession +
+                    '}';
+        }
+
+        public enum Type {
+            AUTHENTICATED("authenticated"),
+            ENABLED("enabled");
+
+            private final String value;
+
+            Type(String value) {
+                this.value = value;
+            }
+
+            @JsonValue
+            @Override
+            public String toString() {
+                return value;
+            }
+        }
     }
 }

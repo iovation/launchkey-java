@@ -20,13 +20,13 @@ public class ServiceV3AuthsPostRequestPolicyTest {
     public void objectMapperMapsAsExpected() throws Exception {
         String expected =
                 "{" +
-                    "\"minimum_requirements\":{" +
+                    "\"minimum_requirements\":[{" +
                         "\"requirement\":\"authenticated\"," +
                         "\"any\":2," +
                         "\"knowledge\":1," +
                         "\"inherence\":1," +
                         "\"possession\":1" +
-                    "}," +
+                    "}]," +
                     "\"factors\":[" +
                         "{" +
                             "\"factor\":\"geofence\"," +

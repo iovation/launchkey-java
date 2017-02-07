@@ -1,15 +1,14 @@
 package com.launchkey.example.cli;
 
-import com.launchkey.sdk.AppClient;
 import com.launchkey.sdk.ClientFactory;
 import com.launchkey.sdk.ClientFactoryBuilder;
-import com.launchkey.sdk.domain.Device;
-import com.launchkey.sdk.domain.WhiteLabelDeviceLinkData;
-import com.launchkey.sdk.domain.auth.AuthResponse;
+import com.launchkey.sdk.ServiceClient;
+import com.launchkey.sdk.domain.directory.Device;
+import com.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
+import com.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.launchkey.sdk.error.BaseException;
-import com.launchkey.sdk.error.ExpiredAuthRequestException;
-import com.launchkey.sdk.service.application.auth.AuthService;
-import com.launchkey.sdk.service.organization.whitelabel.WhiteLabelService;
+import com.launchkey.sdk.service.DirectoryService;
+import com.launchkey.sdk.service.ServiceService;
 import com.martiansoftware.jsap.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.config.Registry;
@@ -35,23 +34,15 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Copyright 2016 LaunchKey, Inc. All rights reserved.
- * <p>
- * Licensed under the MIT License.
- * You may not use this file except in compliance with the License.
- * A copy of the License is located in the "LICENSE.txt" file accompanying
- * this file. This file is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 public class DemoApp {
 
     public static void main(String[] args) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
@@ -69,26 +60,27 @@ public class DemoApp {
 
             boolean help = commandLine.getBoolean("help");
             String[] commandArgs = commandLine.getStringArray("command-args");
+            Provider provider = new BouncyCastleProvider();
             ClientFactory clientFactory = getClientFactory(
                     commandLine.getURL("base-url").toString(),
-                    !commandLine.getBoolean("no-verify")
-            );
+                    !commandLine.getBoolean("no-verify"),
+                    provider);
 
-            if (command.equalsIgnoreCase("application")) {
-                JSAP appJsap = getApplicationJSAP();
+            if (command.equalsIgnoreCase("service")) {
+                JSAP serviceJsap = getServiceJSAP();
                 if (help) {
-                    printHelp(appJsap);
+                    printHelp(serviceJsap);
                 } else {
-                    JSAPResult result = appJsap.parse(commandArgs);
-                    processAppCommand(clientFactory, result);
+                    JSAPResult result = serviceJsap.parse(commandArgs);
+                    processServiceCommand(clientFactory, result);
                 }
-            } else if (command.equalsIgnoreCase("white-label")) {
-                JSAP orgJsap = getWhiteLabelJSAP();
+            } else if (command.equalsIgnoreCase("directory")) {
+                JSAP orgJsap = getDirectoryJSAP();
                 if (help) {
                     printHelp(orgJsap);
                 } else {
                     JSAPResult result = orgJsap.parse(commandArgs);
-                    processWhiteLabelCommand(clientFactory, result);
+                    processDirectoryCommand(clientFactory, result);
                 }
             } else {
                 System.out.println();
@@ -96,7 +88,7 @@ public class DemoApp {
                 printHelp(jsap);
             }
 
-       } catch (IOException e) {
+        } catch (IOException e) {
             System.out.println();
             System.out.println("There was an error reading the private key file");
             System.out.println();
@@ -118,15 +110,14 @@ public class DemoApp {
         }
     }
 
-    private static void processWhiteLabelCommand(ClientFactory clientFactory, JSAPResult commandData) throws IOException, BaseException, JSAPException {
-        Long orgKey = commandData.getLong("org-key", 0L);
-        String privateKeyLocation = commandData.getString("private-key-file");
-        String sdkKey = commandData.getString("sdk-key");
+    private static void processDirectoryCommand(ClientFactory clientFactory, JSAPResult commandData) throws IOException, BaseException, JSAPException {
+        String directoryId = commandData.getString("directory-id");
+        String privateKeyLocation = commandData.getString("key-file");
         String action = commandData.getString("action");
         String[] actionOptions = commandData.getStringArray("action-args");
         if (action != null && action.equalsIgnoreCase("device-link")) {
             if (actionOptions.length == 1) {
-                handleWhiteLabelDeviceLink(actionOptions[0], getWhiteLabelService(clientFactory, orgKey, sdkKey, privateKeyLocation));
+                handleDirectoryUserDeviceLink(actionOptions[0], getDirectoryService(clientFactory, directoryId, privateKeyLocation));
             } else {
                 System.out.println();
                 System.out.println(
@@ -137,7 +128,7 @@ public class DemoApp {
             }
         } else if (action != null && action.equalsIgnoreCase("devices-list")) {
             if (actionOptions.length == 1) {
-                handleWhiteLabelDevicesList(actionOptions[0], getWhiteLabelService(clientFactory, orgKey, sdkKey, privateKeyLocation));
+                handleDirectoryUserDevicesList(actionOptions[0], getDirectoryService(clientFactory, directoryId, privateKeyLocation));
             } else {
                 System.out.println();
                 System.out.println(
@@ -148,7 +139,7 @@ public class DemoApp {
             }
         } else if (action != null && action.equalsIgnoreCase("device-unlink")) {
             if (actionOptions.length == 2) {
-                handleWhiteLabelDeviceUnlink(actionOptions[0], actionOptions[1], getWhiteLabelService(clientFactory, orgKey, sdkKey, privateKeyLocation));
+                handleDirectoryUserDeviceUnlink(actionOptions[0], actionOptions[1], getDirectoryService(clientFactory, directoryId, privateKeyLocation));
             } else {
                 System.out.println();
                 System.out.println(
@@ -162,81 +153,68 @@ public class DemoApp {
                 System.out.println();
                 System.out.println("Error: Unknown action");
             }
-            printHelp(getWhiteLabelJSAP());
+            printHelp(getDirectoryJSAP());
         }
     }
 
-    private static WhiteLabelService getWhiteLabelService(
-            ClientFactory clientFactory, Long orgKey, String sdkKey, String privateKeyLocation
+    private static DirectoryService getDirectoryService(
+            ClientFactory clientFactory, String directoryId, String privateKeyLocation
     ) throws IOException {
-        return clientFactory.makeOrgClient(orgKey, readFile(privateKeyLocation))
-                    .whiteLabel(sdkKey);
+        return clientFactory.makeDirectoryClient(directoryId, readFile(privateKeyLocation))
+                .getDirectoryService();
     }
 
-    private static void processAppCommand(ClientFactory clientFactory, JSAPResult commandData) throws JSAPException, IOException, BaseException, InterruptedException {
-        Long appKey = commandData.getLong("app-key", 0L);
-        String secretKey = commandData.getString("secret-key");
-        String privateKeyLocation = commandData.getString("private-key-file");
+    private static void processServiceCommand(ClientFactory clientFactory, JSAPResult commandData) throws JSAPException, IOException, BaseException, InterruptedException {
+        String serviceId = commandData.getString("svc-id");
+        String privateKeyLocation = commandData.getString("key-file");
         String action = commandData.getString("action");
         String[] actionOptions = commandData.getStringArray("action-args");
-        if (action != null && action.equalsIgnoreCase("login")) {
+        if (action != null && action.equalsIgnoreCase("authorize")) {
             if (actionOptions.length == 1) {
-                handleLogin(
+                handleAuthorize(
                         actionOptions[0],
                         null,
-                        getAppClient(clientFactory, appKey, secretKey, privateKeyLocation).auth()
+                        getServiceClient(clientFactory, serviceId, privateKeyLocation).getServiceService()
                 );
             } else if (actionOptions.length == 2) {
-                handleLogin(
+                handleAuthorize(
                         actionOptions[0],
                         actionOptions[1],
-                        getAppClient(clientFactory, appKey, secretKey, privateKeyLocation).auth()
+                        getServiceClient(clientFactory, serviceId, privateKeyLocation).getServiceService()
                 );
             } else {
                 System.out.println();
                 System.out.println(
-                        "The login action requires a single action argument which is the username and can " +
+                        "The authorize action requires a single action argument which is the End User's username and can " +
                                 "optionally take a second action argument which is the \"context\" with which " +
-                                "to perform a login"
+                                "to perform the request"
                 );
                 System.out.println();
             }
-        } else if (action != null && action.equalsIgnoreCase("authorized")) {
+        } else if (action != null && action.equalsIgnoreCase("session-start")) {
             if (actionOptions.length == 1) {
-                Boolean authorized;
-                try {
-                    AuthResponse authResponse = getAppClient(
-                            clientFactory,
-                            appKey,
-                            secretKey,
-                            privateKeyLocation
-                    ).auth().getAuthResponse(actionOptions[0]);
-                    authorized = (authResponse == null) ? false : authResponse.isAuthorized();
-                } catch (ExpiredAuthRequestException e) { // If the auth has an expired status, it has been logged out
-                    authorized = false;
-                }
+                getServiceClient(clientFactory, serviceId, privateKeyLocation).getServiceService().sessionStart(actionOptions[0]);
                 System.out.println();
-                System.out.println("User is " + (authorized ? "still" : "not") + " authorized");
+                System.out.println("User session is started.");
                 System.out.println();
             } else {
                 System.out.println();
                 System.out.println(
-                        "The authorized action takes a single action argument which is the Auth Request value " +
-                                "returned from a login action"
+                        "The session-start action takes a single action argument which is the End User's username"
                 );
                 System.out.println();
             }
-        } else if (action != null && action.equalsIgnoreCase("logout")) {
+
+        } else if (action != null && action.equalsIgnoreCase("session-end")) {
             if (actionOptions.length == 1) {
-                getAppClient(clientFactory, appKey, secretKey, privateKeyLocation).auth().logout(actionOptions[0]);
+                getServiceClient(clientFactory, serviceId, privateKeyLocation).getServiceService().sessionEnd(actionOptions[0]);
                 System.out.println();
-                System.out.println("User is logged out.");
+                System.out.println("User session is ended.");
                 System.out.println();
             } else {
                 System.out.println();
                 System.out.println(
-                        "The authorized action takes a single action argument which is the Auth Request value "
-                                + "returned from a login action"
+                        "The session-end action takes a single action argument which is the End User's username"
                 );
                 System.out.println();
             }
@@ -246,21 +224,21 @@ public class DemoApp {
                 System.out.println();
                 System.out.println("Error: Unknown action");
             }
-            printHelp(getApplicationJSAP());
+            printHelp(getServiceJSAP());
         }
     }
 
-    private static AppClient getAppClient(
-            ClientFactory clientFactory, Long appKey, String secretKey, String privateKeyLocation
+    private static ServiceClient getServiceClient(
+            ClientFactory clientFactory, String serviceId, String privateKeyLocation
     ) throws IOException {
-        return clientFactory.makeAppClient(appKey, secretKey, readFile(privateKeyLocation));
+        return clientFactory.makeServiceClient(serviceId, readFile(privateKeyLocation));
     }
 
     private static ClientFactory getClientFactory(
-            String baseUrl, boolean verifySSL
-    ) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+            String baseUrl, boolean verifySSL,
+            Provider provider) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         ClientFactoryBuilder builder = new ClientFactoryBuilder()
-                .setJCEProvider(new BouncyCastleProvider())
+                .setJCEProvider(provider)
                 .setAPIBaseURL(baseUrl);
 
         if (!verifySSL) {
@@ -272,7 +250,7 @@ public class DemoApp {
     }
 
     private static HttpClient getHttpClientWithoutSslVerify() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        SSLContextBuilder builder = SSLContexts.custom();
+        final SSLContextBuilder builder = SSLContexts.custom();
         builder.loadTrustMaterial(null, new TrustStrategy() {
             @Override
             public boolean isTrusted(X509Certificate[] chain, String authType)
@@ -280,37 +258,15 @@ public class DemoApp {
                 return true;
             }
         });
-        SSLContext sslContext = builder.build();
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                sslContext, new X509HostnameVerifier() {
-            @Override
-            public void verify(String host, SSLSocket ssl)
-                    throws IOException {
-            }
+        final SSLContext sslContext = builder.build();
+        final SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(
+                builder.build());
 
-            @Override
-            public void verify(String host, X509Certificate cert)
-                    throws SSLException {
-            }
-
-            @Override
-            public void verify(
-                    String host, String[] cns,
-                    String[] subjectAlts
-            ) throws SSLException {
-            }
-
-            @Override
-            public boolean verify(String s, SSLSession sslSession) {
-                return true;
-            }
-        });
-
-        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-                .<ConnectionSocketFactory>create().register("https", sslsf)
+        final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
+                .<ConnectionSocketFactory>create().register("https", socketFactory)
                 .build();
 
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
+        final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(
                 socketFactoryRegistry, null, null, null, 30, TimeUnit.SECONDS
         );
 
@@ -322,37 +278,35 @@ public class DemoApp {
                 .build();
     }
 
-    private static void handleWhiteLabelDeviceUnlink(
-            String identifier, String deviceName, WhiteLabelService whiteLabelService
+    private static void handleDirectoryUserDeviceUnlink(
+            String identifier, String deviceName, DirectoryService directoryService
     ) throws BaseException {
         System.out.println();
-        whiteLabelService.unlinkDevice(identifier, deviceName);
+        directoryService.unlinkDevice(identifier, deviceName);
         System.out.println("Device unlinked");
         System.out.println();
     }
 
-    private static void handleWhiteLabelDevicesList(
-            String identifier, WhiteLabelService whiteLabelService
+    private static void handleDirectoryUserDevicesList(
+            String identifier, DirectoryService directoryService
     ) throws BaseException {
-        List<Device> devices = whiteLabelService.getLinkedDevices(identifier);
+        List<Device> devices = directoryService.getLinkedDevices(identifier);
         System.out.println();
         System.out.println("Devices:");
         for (Device device : devices) {
             System.out.println("  " + device.getName() + ":");
             System.out.println("    Type:    " + device.getType());
             System.out.println("    Status:  " + device.getStatus());
-            System.out.println("    Created: " + device.getCreated());
-            System.out.println("    Updated: " + device.getUpdated());
         }
         System.out.println();
 
 
     }
 
-    private static void handleWhiteLabelDeviceLink(
-            String identifier, WhiteLabelService whiteLabelService
+    private static void handleDirectoryUserDeviceLink(
+            String identifier, DirectoryService directoryService
     ) throws BaseException {
-        WhiteLabelDeviceLinkData result = whiteLabelService.linkDevice(identifier);
+        DirectoryUserDeviceLinkData result = directoryService.linkDevice(identifier);
         System.out.println();
         System.out.println("Device link request successful");
         System.out.println("    QR Code URL: " + result.getQrCodeUrl());
@@ -360,36 +314,36 @@ public class DemoApp {
         System.out.println();
     }
 
-    private static void handleLogin(
-            String username, String context, AuthService authService
+    private static void handleAuthorize(
+            String username, String context, ServiceService serviceService
     ) throws BaseException, InterruptedException {
-        String authRequest = authService.login(username, context);
+        String authRequest = serviceService.authorize(username, context);
         System.out.println();
         System.out.println("Login request successful");
         System.out.println("    Auth Request: " + authRequest);
-        System.out.print("Checking for response from user");
+        System.out.print("Checking for response from the End User");
         System.out.println();
-        AuthResponse authResponse;
+        AuthorizationResponse authorizationResponse;
         long started = new Date().getTime();
         while (new Date().getTime() - started < 30000) {
             Thread.sleep(1000L);
             System.out.print(".");
-            authResponse = authService.getAuthResponse(authRequest);
-            if (authResponse != null) {
+            authorizationResponse = serviceService.getAuthorizationResponse(authRequest);
+            if (authorizationResponse != null) {
                 System.out.println();
-                System.out.println("Login request " + (authResponse.isAuthorized() ? "accepted" : "denied") + " by user");
-                System.out.println("    Auth Request: " + authResponse.getAuthRequestId());
-                System.out.println("    Device ID:    " + authResponse.getDeviceId());
-                System.out.println("    user Hash:    " + authResponse.getUserHash());
-                System.out.println("    User Push ID: " + authResponse.getUserPushId());
-                String orgUserId = authResponse.getOrganizationUserId() == null ? "N/A" : authResponse.getOrganizationUserId();
-                System.out.println("    Org User ID:  " + orgUserId);
+                System.out.println("Login request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
+                System.out.println("    Auth Request: " + authorizationResponse.getAuthorizationRequestId());
+                System.out.println("    Device ID:    " + authorizationResponse.getDeviceId());
+                System.out.println("    Svc User Hash:    " + authorizationResponse.getServiceUserHash());
+                System.out.println("    User Push ID: " + authorizationResponse.getUserPushId());
+                String orgHash = authorizationResponse.getOrganizationUserHash() == null ? "N/A" : authorizationResponse.getOrganizationUserHash();
+                System.out.println("    Org User Hash:  " + orgHash);
                 System.out.println();
                 return;
             }
         }
         System.out.println();
-        System.out.println("Login request timed out");
+        System.out.println("Authorization request timed out");
         System.out.println();
     }
 
@@ -417,7 +371,7 @@ public class DemoApp {
                 .setStringParser(JSAP.URL_PARSER)
                 .setShortFlag('u')
                 .setLongFlag("base-url")
-                .setHelp("Base URL to the Platform API");
+                .setHelp("Base URL to the iovation LaunchKey API");
         baseUrl.addDefault("https://api.launchkey.com");
         jsap.registerParameter(
                 baseUrl
@@ -433,7 +387,7 @@ public class DemoApp {
                 new UnflaggedOption("command")
                         .setUsageName("COMMAND")
                         .setRequired(true)
-                        .setHelp("Command to execute.  [application, white-label]")
+                        .setHelp("Command to execute.  [service, directory]")
         );
         jsap.registerParameter(
                 new UnflaggedOption("command-args")
@@ -447,35 +401,27 @@ public class DemoApp {
         return jsap;
     }
 
-    private static JSAP getApplicationJSAP() throws JSAPException {
+    private static JSAP getServiceJSAP() throws JSAPException {
         JSAP jsap = new JSAP();
         jsap.registerParameter(
-                new UnflaggedOption("app-key")
-                        .setUsageName("APP_KEY")
+                new UnflaggedOption("svc-id")
+                        .setUsageName("SVC_ID")
                         .setRequired(true)
-                        .setStringParser(JSAP.LONG_PARSER)
-                        .setHelp("Application Key for the Application. It is found in the Keys section of " +
-                                "the Application's page in Dashboard.")
+                        .setHelp("Service ID. It is found in the Keys section of " +
+                                "the Service's profile page in Dashboard.")
         );
         jsap.registerParameter(
-                new UnflaggedOption("secret-key")
-                        .setUsageName("SECRET_KEY")
-                        .setRequired(true)
-                        .setHelp("Secret Key for the application. It is found in the Keys section of " +
-                                "the Application's page in Dashboard.")
-        );
-        jsap.registerParameter(
-                new UnflaggedOption("private-key-file")
-                        .setUsageName("PRIVATE_KEY_FILE")
+                new UnflaggedOption("key-file")
+                        .setUsageName("KEY_FILE")
                         .setRequired(true)
                         .setHelp("File location of the RSA Private Key of the RSA public/private " +
-                                "key pair whose public key is associated with the Application.")
+                                "key pair whose public key is associated with the Service.")
         );
         jsap.registerParameter(
                 new UnflaggedOption("action")
                         .setUsageName("ACTION")
                         .setRequired(true)
-                        .setHelp("Action to execute.  [login, authorized, logout]")
+                        .setHelp("Action to execute.  [authorize, session-start, session-end]")
         );
         jsap.registerParameter(
                 new UnflaggedOption("action-args")
@@ -488,26 +434,18 @@ public class DemoApp {
         return jsap;
     }
 
-    private static JSAP getWhiteLabelJSAP() throws JSAPException {
+    private static JSAP getDirectoryJSAP() throws JSAPException {
         JSAP jsap = new JSAP();
         jsap.registerParameter(
-                new UnflaggedOption("org-key")
-                        .setUsageName("ORG_KEY")
-                        .setStringParser(JSAP.LONG_PARSER)
+                new UnflaggedOption("dir-id")
+                        .setUsageName("DIR_ID")
                         .setRequired(true)
-                        .setHelp("Organization Key for the Organization. It is found in the Keys section of " +
-                                "the Organization's page in Dashboard.")
+                        .setHelp("Directory ID. It is found in the Keys section of " +
+                                "the Directory's page in Dashboard.")
         );
         jsap.registerParameter(
-                new UnflaggedOption("sdk-key")
-                        .setUsageName("SDK_KEY")
-                        .setRequired(true)
-                        .setHelp("SDK Key for the White Label Group. It is found in the General section of the " +
-                                "White Label Groups's page in Dashboard.")
-        );
-        jsap.registerParameter(
-                new UnflaggedOption("private-key-file")
-                        .setUsageName("PRIVATE_KEY_FILE")
+                new UnflaggedOption("key-file")
+                        .setUsageName("KEY_FILE")
                         .setRequired(true)
                         .setHelp("File location of the RSA Private Key of the RSA public/private key pair " +
                                 "whose public key is associated with the Organization.")

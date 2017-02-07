@@ -18,31 +18,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.UUID;
 
 /**
- * Transport object with the information required to end a user service session.
+ * Transport object with the information required to end a user getServiceService session.
  */
 public class ServiceV3SessionsDeleteRequest {
-    private final UUID serviceId;
     private final String endUserIdentifier;
 
     /**
-     * @param serviceId ID of the service for which the user session has ended.
      * @param endUserIdentifier LaunchKey username, User Push ID, or White
-     * Label Directory Identifier for the end user starting a service session.
+     * Label Directory Identifier for the end user starting a getServiceService session.
      */
     public ServiceV3SessionsDeleteRequest(
-            UUID serviceId, String endUserIdentifier
+            String endUserIdentifier
     ) {
-        this.serviceId = serviceId;
         this.endUserIdentifier = endUserIdentifier;
-    }
-
-    /**
-     * Get the ID for the service.
-     * @return ID id the service.
-     */
-    @JsonIgnore
-    public UUID getServiceId() {
-        return serviceId;
     }
 
     /**
@@ -62,23 +50,18 @@ public class ServiceV3SessionsDeleteRequest {
 
         ServiceV3SessionsDeleteRequest that = (ServiceV3SessionsDeleteRequest) o;
 
-        if (getServiceId() != null ? !getServiceId().equals(that.getServiceId()) : that.getServiceId() != null)
-            return false;
         return getEndUserIdentifier() != null ? getEndUserIdentifier().equals(that.getEndUserIdentifier()) : that.getEndUserIdentifier() == null;
     }
 
     @Override
     public int hashCode() {
-        int result = getServiceId() != null ? getServiceId().hashCode() : 0;
-        result = 31 * result + (getEndUserIdentifier() != null ? getEndUserIdentifier().hashCode() : 0);
-        return result;
+        return getEndUserIdentifier() != null ? getEndUserIdentifier().hashCode() : 0;
     }
 
     @Override
     public String toString() {
-        return "ServiceSessionsDeleteRequest{" +
-                "serviceId=" + serviceId +
-                ", endUserIdentifier='" + endUserIdentifier + '\'' +
+        return "ServiceV3SessionsDeleteRequest{" +
+                "endUserIdentifier='" + endUserIdentifier + '\'' +
                 '}';
     }
 }

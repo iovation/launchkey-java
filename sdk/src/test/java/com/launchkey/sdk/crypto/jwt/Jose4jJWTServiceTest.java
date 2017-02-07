@@ -1,9 +1,6 @@
 package com.launchkey.sdk.crypto.jwt;
 
 import com.launchkey.sdk.crypto.JCECrypto;
-import com.launchkey.sdk.error.BaseException;
-import com.launchkey.sdk.error.CommunicationErrorException;
-import com.launchkey.sdk.service.ping.PingService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -22,8 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Copyright 2016 LaunchKey, Inc. All rights reserved.
@@ -45,10 +40,11 @@ public class Jose4jJWTServiceTest {
 
     private final Provider provider = new BouncyCastleProvider();
 
-    private PingService pingService;
     private Jose4jJWTService jwtService;
     private Date platformDate;
     private KeyPair keyPair;
+    private String currentPrivateKeyId;
+
     @SuppressWarnings("SpellCheckingInspection")
     private static final String PUBLIC_KEY_PEM = "-----BEGIN PUBLIC KEY-----\n" +
             "\n" +
@@ -73,22 +69,21 @@ public class Jose4jJWTServiceTest {
             "9DJ29M7fkKvtbyBA36ca6e8-bcVLcJWlPzNZsJddkc-kcwRFV0yn8EsQKTrM_sbofMZS39NPZJYOcf7gGbo402hw2tj1HgP2wIH0uZW" +
             "F1YnOW0nk6GA4UrMQgurkmsyISIaY6n8smTGk9OH3nXIiaHLDqoc7uDsFJ38OHXcoYKovevsEb9IX0jR2FcgJlgsCGBL9xuzNCyALQd" +
             "ajMkeH5b5BMmIUjJ8LPlbBJsfj0wUj20A";
+    private HashMap<String, RSAPrivateKey> privateKeys;
 
     @Before
     public void setUp() throws Exception {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
         keyPairGenerator.initialize(2048);
         keyPair = keyPairGenerator.generateKeyPair();
-
-        pingService = mock(PingService.class);
-        when(pingService.getPublicKey()).thenReturn((RSAPublicKey) keyPair.getPublic());
         platformDate = new Date();
-        when(pingService.getPlatformTime()).thenReturn(platformDate);
-
+        privateKeys = new HashMap<String, RSAPrivateKey>();
+        currentPrivateKeyId = JCECrypto.getRsaPublicKeyFingerprint(provider, (RSAPrivateKey) keyPair.getPrivate());
+        privateKeys.put(currentPrivateKeyId, (RSAPrivateKey) keyPair.getPrivate());
         jwtService = new Jose4jJWTService(
                 PLATFORM_IDENTIFIER,
-                null,
-                null,
+                privateKeys,
+                currentPrivateKeyId,
                 EXPIRE_SECONDS
         );
     }
@@ -99,24 +94,27 @@ public class Jose4jJWTServiceTest {
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("jti", "Expected JTI");
         expected.put("iss", ENTITY_IDENTIFIER);
+        expected.put("sub", null);
         expected.put("aud", PLATFORM_IDENTIFIER);
         expected.put("iat", Long.valueOf(platformDate.getTime() / 1000));
         expected.put("nbf", Long.valueOf(platformDate.getTime() / 1000));
         expected.put("exp", Long.valueOf(platformDate.getTime() / 1000) + EXPIRE_SECONDS);
-        expected.put("Content-Hash-Alg", "SHA256");
-        expected.put("Content-Hash", "Hash Value");
-        expected.put("Path", "/path/to/resource");
-        expected.put("Method", "OPTIONS");
+        Map<String, String> request = new HashMap<String, String>();
+        request.put("func", "S256");
+        request.put("hash", "Hash Value");
+        request.put("path", "/path/to/resource");
+        request.put("meth", "OPTIONS");
+        expected.put("request", request);
 
         String encoded = jwtService.encode(
-                (String) expected.get("jti"),
+                "Expected JTI",
+                ENTITY_IDENTIFIER,
                 null,
-                null,
-                null,
-                (String) expected.get("Method"),
-                (String) expected.get("Path"),
-                (String) expected.get("Content-Hash-Alg"),
-                (String) expected.get("Content-Hash")
+                platformDate,
+                "OPTIONS",
+                "/path/to/resource",
+                "S256",
+                "Hash Value"
         );
         JwtConsumer jwtConsumer = new JwtConsumerBuilder()
                 .setVerificationKey(keyPair.getPublic())
@@ -131,39 +129,8 @@ public class Jose4jJWTServiceTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    public void decodeCanDecodeProperly() throws Exception {
-
-        final RSAPublicKey publicKey = JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY_PEM);
-        when(pingService.getPublicKey()).thenReturn(publicKey);
-
-        JWTClaims expected = new JWTClaims(
-                "3ab9236f-375a-4b70-b064-e5c4570d4a7c",
-                "application:1000000000",
-                "organization:9770924838",
-                1467915940,
-                1467915940,
-                1467916240,
-                "SHA512",
-                "2e67b030f0217787cb7557ea5fd7de2384e5bc76e229717afb4fd4fa8a9c4f7517517fcaf3dc2485e9acc4f98d4aad9210b4e8219191a061f9a03c7dc4cffbdb",
-                null,
-                null
-        );
-
-        Date then = new Date(1467915940L * 1000L);
-        when(pingService.getPlatformTime()).thenReturn(then);
-        JWTService jwtService = new Jose4jJWTService(
-                "application:1000000000",
-                null,
-                null,
-                EXPIRE_SECONDS
-        );
-        JWTClaims actual = jwtService.decode(null, null, null, null, TOKEN);
-        assertEquals(expected, actual);
-    }
-
     @Test(expected = JWTError.class)
-    public void encodeJoseErrorThrowsJwtError() throws Exception {
+    public void encodeJoseErrorThrowsJwtErrorWhenCannotSign() throws Exception {
         // Build and set the Ping service to return a key that is too small
         // see: org.jose4j.jwx.KeyValidationSupport#MIN_RSA_KEY_LENGTH
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", provider);
@@ -172,43 +139,30 @@ public class Jose4jJWTServiceTest {
 
         jwtService = new Jose4jJWTService(
                 PLATFORM_IDENTIFIER,
-                null,
-                null,
+                new HashMap<String, RSAPrivateKey>(),
+                "Current Private Key",
                 EXPIRE_SECONDS
         );
 
 
-        jwtService.encode(null, null, null, null, null, null, null, null);
+        jwtService.encode("JTI", "issuer", "subject", new Date(), "Method", "Path", "HashAlg", "Hash");
     }
 
     @Test(expected = JWTError.class)
     public void decodeInvalidJwtThrowsJwtError() throws Exception {
-        JWTClaims actual = jwtService.decode(null, null, null, null, "aksjfhaslkhf");
-
+        final RSAPublicKey publicKey = JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY_PEM);
+        jwtService.decode(publicKey, "audience", "token ID", new Date(), "aksjfhaslkhf");
     }
 
     @Test(expected = JWTError.class)
     public void decodeMalformedClaimExceptionThrowsJwtError() throws Exception {
         final RSAPublicKey publicKey = JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY_PEM);
-        when(pingService.getPublicKey()).thenReturn(publicKey);
         JWTService jwtService = new Jose4jJWTService(
                 "Invalid provider identity",
-                null,
-                null,
+                new HashMap<String, RSAPrivateKey>(),
+                "Current Key ID",
                 EXPIRE_SECONDS
         );
-        jwtService.decode(null, null, null, null, TOKEN);
-    }
-
-    @Test(expected = JWTError.class)
-    public void decodePingServiceExceptionThrowsJwtError() throws Exception {
-        when(pingService.getPublicKey()).thenThrow(new CommunicationErrorException(null, null, null));
-        jwtService.decode(null, null, null, null, TOKEN);
-    }
-
-    @Test(expected = JWTError.class)
-    public void decodePingServiceGetPlatformTImeExceptionThrowsJwtError() throws Exception {
-        when(pingService.getPlatformTime()).thenThrow(new CommunicationErrorException(null, null, null));
-        jwtService.decode(null, null, null, null, TOKEN);
+        jwtService.decode(publicKey, "audience", "token ID", new Date(), TOKEN);
     }
 }

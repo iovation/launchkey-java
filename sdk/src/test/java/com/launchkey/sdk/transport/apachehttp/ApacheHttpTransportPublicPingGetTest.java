@@ -16,7 +16,6 @@ import com.launchkey.sdk.error.CommunicationErrorException;
 import com.launchkey.sdk.error.InvalidResponseException;
 import com.launchkey.sdk.transport.domain.PublicV3PingGetResponse;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.BasicHttpEntity;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -29,7 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTestBase {
-
     @Test
     public void publicPingGetCallsHttpClientWithProperHttpRequestMethod() throws Exception {
         transport.publicV3PingGet();
@@ -48,16 +46,6 @@ public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTes
     }
 
     @Test
-    public void publicPingGetParsesResponseWithResponseBody() throws Exception {
-        InputStream expected = httpResponse.getEntity().getContent();
-        BasicHttpEntity entity = new BasicHttpEntity();
-        entity.setContent(expected);
-        when(httpResponse.getEntity()).thenReturn(entity);
-        transport.publicV3PingGet();
-        verify(objectMapper).readValue(eq(expected), any(Class.class));
-    }
-
-    @Test
     public void publicPingGetParsesResponseWithProperClass() throws Exception {
         transport.publicV3PingGet();
         verify(objectMapper).readValue(any(InputStream.class), eq(PublicV3PingGetResponse.class));
@@ -71,25 +59,22 @@ public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTes
         assertEquals(expected, actual);
     }
 
-    @Test
+    @Test(expected = CommunicationErrorException.class)
     public void publicPingThrowsCommunicationErrorExceptionWhenHttpClientThrowsIOError() throws Exception {
         when(httpClient.execute(any(HttpUriRequest.class))).thenThrow(new IOException());
-        thrown.expect(CommunicationErrorException.class);
         transport.publicV3PingGet();
     }
 
-    @Test
+    @Test(expected = InvalidResponseException.class)
     public void publicPingThrowsInvalidResponseExceptionWhenObjectParserThrowsJsonMappingException() throws Exception {
         when(objectMapper.readValue(any(InputStream.class), any(Class.class))).thenThrow(mock(JsonMappingException.class));
-        thrown.expect(InvalidResponseException.class);
         transport.publicV3PingGet();
     }
 
-    @Test
+    @Test(expected = InvalidResponseException.class)
     public void publicPingThrowsInvalidResponseExceptionWhenObjectParserThrowsJsonParseException() throws Exception {
         when(objectMapper.readValue(any(InputStream.class), any(Class.class)))
                 .thenThrow(mock(JsonParseException.class));
-        thrown.expect(InvalidResponseException.class);
         transport.publicV3PingGet();
     }
 }

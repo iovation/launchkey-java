@@ -27,7 +27,7 @@ public interface JWTService {
      * @param contentHashAlgorithm Hashing algorithm used to create the contentHash from the content
      * @param contentHash Content hashed using the contentHashingAlgorithm
      * @return Compact serialization encoded JWT
-     * @throws JWTError
+     * @throws JWTError When an error occurs encoding the JWT
      */
     String encode(String jti, String issuer, String subject, Date currentTime, String method, String path,
                   String contentHashAlgorithm, String contentHash) throws JWTError;
@@ -40,14 +40,15 @@ public interface JWTService {
      * @param expectedTokenId Expected Token ID
      * @param jwt Compact serialization encoded JWT
      * @return Claims object
-     * @throws JWTError
+     * @throws JWTError When an error occurs decoding the JWT
      */
     JWTClaims decode(PublicKey publicKey, String expectedAudience, String expectedTokenId, Date currentTime, String jwt) throws JWTError;
 
     /**
      * Get the kid value from the header of the JWT
-     * @param jwt
+     * @param jwt Get the data from the JWT without verifying or validating
      * @return JWT data from claims and header
+     * @throws JWTError When an error occurs parsing the JWT
      */
     JWTData getJWTData(String jwt) throws JWTError;
 }

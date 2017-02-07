@@ -1,7 +1,6 @@
 package com.launchkey.sdk;
 
-import com.launchkey.sdk.cache.PingResponseCache;
-import com.launchkey.sdk.service.token.TokenIdService;
+import com.launchkey.sdk.cache.Cache;
 import org.apache.http.client.HttpClient;
 import org.junit.After;
 import org.junit.Before;
@@ -10,7 +9,8 @@ import org.mockito.internal.matchers.InstanceOf;
 
 import java.security.Provider;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -68,13 +68,13 @@ public class ClientFactoryBuilderTest {
     }
 
     @Test
-    public void setPingResponseCacheReturnsBuilder() throws Exception {
-        assertSame(builder, builder.setPingResponseCache(mock(PingResponseCache.class)));
+    public void setCurrentPublicKeyTTLReturnsBuilder() throws Exception {
+        assertSame(builder, builder.setCurrentPublicKeyTTL(0));
     }
 
     @Test
-    public void setPingResponseCacheTTLReturnsBuilder() throws Exception {
-        assertSame(builder, builder.setPingResponseCacheTTL(10));
+    public void setOffsetTTLReturnsBuilder() throws Exception {
+        assertSame(builder, builder.setOffsetTTL(10));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ClientFactoryBuilderTest {
     }
 
     @Test
-    public void setTokenIdServiceReturnsBuilder() throws Exception {
-        assertSame(builder, builder.setTokenIdService(mock(TokenIdService.class)));
+    public void setKeyCacheReturnsBuilder() throws Exception {
+        assertSame(builder, builder.setKeyCache(mock(Cache.class)));
     }
 }

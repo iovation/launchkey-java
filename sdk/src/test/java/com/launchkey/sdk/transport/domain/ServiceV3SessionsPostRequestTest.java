@@ -18,31 +18,24 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 
 public class ServiceV3SessionsPostRequestTest {
-    @Test
-    public void getServiceId() throws Exception {
-        UUID expected = UUID.randomUUID();
-        UUID actual = new ServiceV3SessionsPostRequest(expected, null, null).getServiceId();
-        assertEquals(expected, actual);
-    }
 
     @Test
     public void getEndUserIdentifier() throws Exception {
         String expected = "Expected User Identifier";
-        String actual = new ServiceV3SessionsPostRequest(null, expected, null).getEndUserIdentifier();
+        String actual = new ServiceV3SessionsPostRequest(expected, null).getEndUserIdentifier();
         assertEquals(expected, actual);
     }
 
     @Test
     public void getAuthorizationRequestId() throws Exception {
         UUID expected = UUID.randomUUID();
-        UUID actual = new ServiceV3SessionsPostRequest(null, null, expected).getAuthorizationRequestId();
+        UUID actual = new ServiceV3SessionsPostRequest(null, expected).getAuthorizationRequestId();
         assertEquals(expected, actual);
     }
 
     @Test
     public void marshalsFullJsonAsExpected() throws Exception {
         ServiceV3SessionsPostRequest request = new ServiceV3SessionsPostRequest(
-                UUID.randomUUID(),
                 "USER IDENTIFIER",
                 UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d")
         );
@@ -56,7 +49,6 @@ public class ServiceV3SessionsPostRequestTest {
     @Test
     public void marshalLeavesOutAuthRequestWhenAuthorizationRequestIdIsNull() throws Exception {
         ServiceV3SessionsPostRequest request = new ServiceV3SessionsPostRequest(
-                UUID.randomUUID(),
                 "USER IDENTIFIER",
                 null
         );
@@ -69,12 +61,10 @@ public class ServiceV3SessionsPostRequestTest {
     public void equalObjectsAreEqual() throws Exception {
         assertEquals(
                 new ServiceV3SessionsPostRequest(
-                        UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d"),
                         "UserName",
                         UUID.fromString("baa53338-ff66-4d27-a3bb-5bdd3b5f2890")
                 ),
                 new ServiceV3SessionsPostRequest(
-                        UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d"),
                         "UserName",
                         UUID.fromString("baa53338-ff66-4d27-a3bb-5bdd3b5f2890")
                 )
@@ -85,12 +75,10 @@ public class ServiceV3SessionsPostRequestTest {
     public void equalObjectsHaveSameHashcode() throws Exception {
         assertEquals(
                 new ServiceV3SessionsPostRequest(
-                        UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d"),
                         "UserName",
                         UUID.fromString("baa53338-ff66-4d27-a3bb-5bdd3b5f2890")
                 ).hashCode(),
                 new ServiceV3SessionsPostRequest(
-                        UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d"),
                         "UserName",
                         UUID.fromString("baa53338-ff66-4d27-a3bb-5bdd3b5f2890")
                 ).hashCode()

@@ -37,6 +37,7 @@ public class PublicV3PingGetResponse {
      * Get the current time of the LaunchKey API as reported.
      * @return The current time of the LaunchKey API as reported.
      */
+    @JsonProperty("api_time")
     public Date getApiTime() {
         return apiTime;
     }

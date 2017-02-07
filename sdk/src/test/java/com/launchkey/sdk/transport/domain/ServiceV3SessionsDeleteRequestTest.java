@@ -19,25 +19,15 @@ import static org.junit.Assert.assertEquals;
 
 public class ServiceV3SessionsDeleteRequestTest {
     @Test
-    public void getServiceId() throws Exception {
-        UUID expected = UUID.randomUUID();
-        UUID actual = new ServiceV3SessionsDeleteRequest(expected, null).getServiceId();
-        assertEquals(expected, actual);
-    }
-
-    @Test
     public void getEndUserIdentifier() throws Exception {
         String expected = "Expected User Identifier";
-        String actual = new ServiceV3SessionsDeleteRequest(null, expected).getEndUserIdentifier();
+        String actual = new ServiceV3SessionsDeleteRequest(expected).getEndUserIdentifier();
         assertEquals(expected, actual);
     }
 
     @Test
     public void marshalsFullJsonAsExpected() throws Exception {
-        ServiceV3SessionsDeleteRequest request = new ServiceV3SessionsDeleteRequest(
-                UUID.randomUUID(),
-                "USER IDENTIFIER"
-        );
+        ServiceV3SessionsDeleteRequest request = new ServiceV3SessionsDeleteRequest("USER IDENTIFIER");
         String expected = "{\"username\":\"USER IDENTIFIER\"}";
         String actual = new ObjectMapper().writeValueAsString(request);
         assertEquals(expected, actual);
@@ -46,28 +36,16 @@ public class ServiceV3SessionsDeleteRequestTest {
     @Test
     public void equalObjectsAreEqual() throws Exception {
         assertEquals(
-                new ServiceV3SessionsDeleteRequest(
-                        UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d"),
-                        "UserName"
-                ),
-                new ServiceV3SessionsDeleteRequest(
-                        UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d"),
-                        "UserName"
-                )
+                new ServiceV3SessionsDeleteRequest("UserName"),
+                new ServiceV3SessionsDeleteRequest("UserName")
         );
     }
 
     @Test
     public void equalObjectsHaveSameHashcode() throws Exception {
         assertEquals(
-                new ServiceV3SessionsDeleteRequest(
-                        UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d"),
-                        "UserName"
-                ).hashCode(),
-                new ServiceV3SessionsDeleteRequest(
-                        UUID.fromString("319d2db1-3965-4f2e-89a0-26572ddbf31d"),
-                        "UserName"
-                ).hashCode()
+                new ServiceV3SessionsDeleteRequest("UserName").hashCode(),
+                new ServiceV3SessionsDeleteRequest("UserName").hashCode()
         );
     }
 }

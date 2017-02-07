@@ -25,13 +25,10 @@ import java.util.UUID;
 @JsonPropertyOrder({"username", "auth_request"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ServiceV3SessionsPostRequest {
-    private final UUID serviceId;
     private final String endUserIdentifier;
     private final UUID authorizationRequestId;
 
     /**
-     * @param serviceId ID of the service for which the user session has
-     * started.
      * @param endUserIdentifier LaunchKey username, User Push ID, or White
      * Label Directory Identifier for the end user starting a service session.
      * @param authorizationRequestId Identifier of the authorization request
@@ -39,22 +36,11 @@ public class ServiceV3SessionsPostRequest {
      * if no authorization request was utilized.
      */
     public ServiceV3SessionsPostRequest(
-            UUID serviceId,
             String endUserIdentifier,
             UUID authorizationRequestId
     ) {
-        this.serviceId = serviceId;
         this.endUserIdentifier = endUserIdentifier;
         this.authorizationRequestId = authorizationRequestId;
-    }
-
-    /**
-     * Get the ID for the service.
-     * @return ID id the service.
-     */
-    @JsonIgnore
-    public UUID getServiceId() {
-        return serviceId;
     }
 
     /**
@@ -83,8 +69,6 @@ public class ServiceV3SessionsPostRequest {
 
         ServiceV3SessionsPostRequest that = (ServiceV3SessionsPostRequest) o;
 
-        if (getServiceId() != null ? !getServiceId().equals(that.getServiceId()) : that.getServiceId() != null)
-            return false;
         if (getEndUserIdentifier() != null ? !getEndUserIdentifier().equals(that.getEndUserIdentifier()) : that.getEndUserIdentifier() != null)
             return false;
         return getAuthorizationRequestId() != null ? getAuthorizationRequestId().equals(that.getAuthorizationRequestId()) : that.getAuthorizationRequestId() == null;
@@ -92,17 +76,15 @@ public class ServiceV3SessionsPostRequest {
 
     @Override
     public int hashCode() {
-        int result = getServiceId() != null ? getServiceId().hashCode() : 0;
-        result = 31 * result + (getEndUserIdentifier() != null ? getEndUserIdentifier().hashCode() : 0);
+        int result = getEndUserIdentifier() != null ? getEndUserIdentifier().hashCode() : 0;
         result = 31 * result + (getAuthorizationRequestId() != null ? getAuthorizationRequestId().hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "ServiceSessionsPostRequest{" +
-                "serviceId=" + serviceId +
-                ", endUserIdentifier='" + endUserIdentifier + '\'' +
+        return "ServiceV3SessionsPostRequest{" +
+                "endUserIdentifier='" + endUserIdentifier + '\'' +
                 ", authorizationRequestId=" + authorizationRequestId +
                 '}';
     }

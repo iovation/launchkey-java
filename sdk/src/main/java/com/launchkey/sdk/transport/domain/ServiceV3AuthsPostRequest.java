@@ -33,16 +33,42 @@ public class ServiceV3AuthsPostRequest {
     }
 
     @JsonProperty("policy")
-    public String getPolicy() {
-        try {
-            return new ObjectMapper().writeValueAsString(policy);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
+    public ServiceV3AuthsPostRequestPolicy getPolicy() {
+        return policy;
     }
 
     @JsonProperty("context")
     public String getContext() {
         return context;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ServiceV3AuthsPostRequest)) return false;
+
+        ServiceV3AuthsPostRequest that = (ServiceV3AuthsPostRequest) o;
+
+        if (getUsername() != null ? !getUsername().equals(that.getUsername()) : that.getUsername() != null)
+            return false;
+        if (getPolicy() != null ? !getPolicy().equals(that.getPolicy()) : that.getPolicy() != null) return false;
+        return getContext() != null ? getContext().equals(that.getContext()) : that.getContext() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getUsername() != null ? getUsername().hashCode() : 0;
+        result = 31 * result + (getPolicy() != null ? getPolicy().hashCode() : 0);
+        result = 31 * result + (getContext() != null ? getContext().hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceV3AuthsPostRequest{" +
+                "username='" + username + '\'' +
+                ", policy=" + policy +
+                ", context='" + context + '\'' +
+                '}';
     }
 }

@@ -3,26 +3,26 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.launchkey.sdk</groupId>
     <artifactId>launchkey-root</artifactId>
-    <version>3.2.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>LaunchKey Root Module</name>
-    <description>Root module for all LaunchKey Java Modules</description>
+    <description>Root module for all modules related to the iovation LaunchKey SDK for Java</description>
     <url>https://github.com/LaunchKey/launchkey-java</url>
 
     <organization>
-        <name>LaunchKey</name>
-        <url>https://launchkey.com</url>
+        <name>iovation</name>
+        <url>https://www.iovation.com</url>
     </organization>
     
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/LaunchKey/launchkey-java/issues</url>
+        <url>https://github.com/iovation/launchkey-java/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:LaunchKey/launchkey-java.git</connection>
-        <developerConnection>scm:git:git@github.com:LaunchKey/launchkey-java.git</developerConnection>
-        <url>https://github.com/LaunchKey/launchkey-java</url>
+        <connection>scm:git:git@github.com:iovation/launchkey-java.git</connection>
+        <developerConnection>scm:git:git@github.com:iovation/launchkey-java.git</developerConnection>
+        <url>https://github.com/iovation/launchkey-java</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -37,9 +37,9 @@
     <developers>
         <developer>
             <name>Adam Englander</name>
-            <email>adam@launchkey.com</email>
-            <organization>LaunchKey</organization>
-            <organizationUrl>https://launchkey.com</organizationUrl>
+            <email>adam.englander@iovatiom.com</email>
+            <organization>iovation</organization>
+            <organizationUrl>https://www.iovation.com</organizationUrl>
         </developer>
     </developers>
 
@@ -50,18 +50,18 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <deviceId>ossrh</deviceId>
+            <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <deviceId>ossrh</deviceId>
+            <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
     </distributionManagement>
     
     <profiles>
         <profile>
-            <deviceId>release</deviceId>
+            <id>release</id>
             <build>
                 <plugins>
                     <plugin>
@@ -70,7 +70,7 @@
                         <version>2.4</version>
                         <executions>
                             <execution>
-                                <deviceId>attach-sources</deviceId>
+                                <id>attach-sources</id>
                                 <goals>
                                     <goal>jar-no-fork</goal>
                                 </goals>
@@ -83,7 +83,7 @@
                         <version>2.10.1</version>
                         <executions>
                             <execution>
-                                <deviceId>attach-javadocs</deviceId>
+                                <id>attach-javadocs</id>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
@@ -96,7 +96,7 @@
                         <version>1.6</version>
                         <executions>
                             <execution>
-                                <deviceId>sign-artifacts</deviceId>
+                                <id>sign-artifacts</id>
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
@@ -117,7 +117,7 @@
                 <version>2.10</version>
                 <executions>
                     <execution>
-                        <deviceId>copy-dependencies</deviceId>
+                        <id>copy-dependencies</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
@@ -148,7 +148,7 @@
                 <version>2.4</version>
                 <executions>
                     <execution>
-                        <deviceId>attach-sources</deviceId>
+                        <id>attach-sources</id>
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
@@ -161,7 +161,7 @@
                 <version>2.10.1</version>
                 <executions>
                     <execution>
-                        <deviceId>attach-javadocs</deviceId>
+                        <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -173,8 +173,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>

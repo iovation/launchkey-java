@@ -10,31 +10,35 @@ package com.launchkey.sdk.transport.domain; /**
  * limitations under the License.
  */
 
+import com.launchkey.sdk.error.NoKeyFoundException;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import com.launchkey.sdk.transport.domain.EntityIdentifier.EntityType;
+import org.junit.rules.ExpectedException;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.util.UUID;
 
 public class EntityKeyMapTest {
-    @Test
-    public void getKeyReturnsNullWithNoKeys() throws Exception {
+
+    @Test(expected = NoKeyFoundException.class)
+    public void getKeyThrowsNoKeyFoundWithNoKeys() throws Exception {
         assertNull(new EntityKeyMap().getKey(new EntityIdentifier(EntityType.DIRECTORY, UUID.randomUUID()), null));
     }
 
-    @Test
-    public void getKeyReturnsNullWhenWrongEntityIdentifierGiven() throws Exception {
+    @Test( expected = NoKeyFoundException.class)
+    public void getKeyThrowsNoKeyFoundWhenWrongEntityIdentifierGiven() throws Exception {
         EntityKeyMap map = new EntityKeyMap();
         map.addKey(new EntityIdentifier(EntityType.DIRECTORY, UUID.randomUUID()), "bar", mock(RSAPrivateKey.class));
         assertNull(map.getKey(new EntityIdentifier(EntityType.DIRECTORY, UUID.randomUUID()), "bar"));
     }
 
-    @Test
-    public void getKeyReturnsNullWhenWrongPublicKeyFingerprintGiven() throws Exception {
+    @Test(expected = NoKeyFoundException.class)
+    public void getKeyThrowsNoKeyFoundWhenWrongPublicKeyFingerprintGiven() throws Exception {
         EntityKeyMap map = new EntityKeyMap();
         UUID uuid = UUID.randomUUID();
         map.addKey(new EntityIdentifier(EntityType.DIRECTORY,uuid ), "bar", mock(RSAPrivateKey.class));

@@ -22,18 +22,21 @@ public class ServiceV3AuthsGetResponseCore {
     private final String serviceUserHash;
     private final String orgUserHash;
     private final String userPushId;
+    private final String publicKeyId;
 
     @JsonCreator
     public ServiceV3AuthsGetResponseCore(
-            @JsonProperty(value = "auth") String encryptedDeviceResponse,
-            @JsonProperty(value = "service_user_hash") String serviceUserHash,
+            @JsonProperty(value = "auth", required = true) String encryptedDeviceResponse,
+            @JsonProperty(value = "service_user_hash", required = true) String serviceUserHash,
             @JsonProperty(value = "org_user_hash") String orgUserHash,
-            @JsonProperty(value = "user_push_id") String userPushId
+            @JsonProperty(value = "user_push_id", required = true) String userPushId,
+            @JsonProperty(value = "public_key_id", required = true) String publicKeyId
     ) {
         this.encryptedDeviceResponse = encryptedDeviceResponse;
         this.serviceUserHash = serviceUserHash;
         this.orgUserHash = orgUserHash;
         this.userPushId = userPushId;
+        this.publicKeyId = publicKeyId;
     }
 
     public String getEncryptedDeviceResponse() {
@@ -52,6 +55,10 @@ public class ServiceV3AuthsGetResponseCore {
         return userPushId;
     }
 
+    public String getPublicKeyId() {
+        return publicKeyId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,7 +72,9 @@ public class ServiceV3AuthsGetResponseCore {
             return false;
         if (getOrgUserHash() != null ? !getOrgUserHash().equals(that.getOrgUserHash()) : that.getOrgUserHash() != null)
             return false;
-        return getUserPushId() != null ? getUserPushId().equals(that.getUserPushId()) : that.getUserPushId() == null;
+        if (getUserPushId() != null ? !getUserPushId().equals(that.getUserPushId()) : that.getUserPushId() != null)
+            return false;
+        return getPublicKeyId() != null ? getPublicKeyId().equals(that.getPublicKeyId()) : that.getPublicKeyId() == null;
     }
 
     @Override
@@ -74,6 +83,7 @@ public class ServiceV3AuthsGetResponseCore {
         result = 31 * result + (getServiceUserHash() != null ? getServiceUserHash().hashCode() : 0);
         result = 31 * result + (getOrgUserHash() != null ? getOrgUserHash().hashCode() : 0);
         result = 31 * result + (getUserPushId() != null ? getUserPushId().hashCode() : 0);
+        result = 31 * result + (getPublicKeyId() != null ? getPublicKeyId().hashCode() : 0);
         return result;
     }
 
@@ -84,6 +94,7 @@ public class ServiceV3AuthsGetResponseCore {
                 ", serviceUserHash='" + serviceUserHash + '\'' +
                 ", orgUserHash='" + orgUserHash + '\'' +
                 ", userPushId='" + userPushId + '\'' +
+                ", publicKeyId='" + publicKeyId + '\'' +
                 '}';
     }
 }

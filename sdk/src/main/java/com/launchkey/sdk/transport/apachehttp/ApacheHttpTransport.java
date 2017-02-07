@@ -1,15 +1,3 @@
-/**
- * Copyright 2017 iovation, Inc.
- * <p>
- * Licensed under the MIT License.
- * You may not use this file except in compliance with the License.
- * A copy of the License is located in the "LICENSE.txt" file accompanying
- * this file. This file is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.launchkey.sdk.transport.apachehttp;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -17,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchkey.sdk.cache.Cache;
 import com.launchkey.sdk.cache.CacheException;
-import com.launchkey.sdk.crypto.JCECrypto;
+import com.launchkey.sdk.crypto.Crypto;
 import com.launchkey.sdk.crypto.jwe.JWEFailure;
 import com.launchkey.sdk.crypto.jwe.JWEService;
 import com.launchkey.sdk.crypto.jwt.JWTData;
@@ -26,7 +14,8 @@ import com.launchkey.sdk.crypto.jwt.JWTService;
 import com.launchkey.sdk.error.*;
 import com.launchkey.sdk.transport.Transport;
 import com.launchkey.sdk.transport.domain.*;
-import com.launchkey.sdk.transport.domain.EntityIdentifier.EntityType;
+import com.launchkey.sdk.transport.domain.Error;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -34,18 +23,20 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.HeaderGroup;
 import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.*;
 
 public class ApacheHttpTransport implements Transport {
 
+    private static final Base64 BASE_64 = new Base64(0);
+    private static final String IOV_JWT_HEADER = "X-IOV-JWT";
     private static int serverTimeOffset = 0;
     private static Date serverTimeOffsetExpires = null;
     private final Log logger;
@@ -55,7 +46,7 @@ public class ApacheHttpTransport implements Transport {
 
     private final ApiRequestBuilderFactory rbf;
     private final ObjectMapper objectMapper;
-    private final Provider provider;
+    private final Crypto crypto;
     private final HttpClient httpClient;
     private final JWTService jwtService;
     private final JWEService jweService;
@@ -64,13 +55,14 @@ public class ApacheHttpTransport implements Transport {
     private final int currentPublicKeyTTL;
     private final EntityIdentifier issuer;
 
-    public ApacheHttpTransport(HttpClient httpClient, Provider provider, ObjectMapper objectMapper,
+
+    public ApacheHttpTransport(HttpClient httpClient, Crypto crypto, ObjectMapper objectMapper,
                                Cache publicKeyCache, String baseUrl, EntityIdentifier issuer,
                                JWTService jwtService, JWEService jweService,
                                int offsetTTL, int currentPublicKeyTTL, EntityKeyMap entityKeyMap
     ) {
         this.objectMapper = objectMapper;
-        this.provider = provider;
+        this.crypto = crypto;
         this.httpClient = httpClient;
         this.jwtService = jwtService;
         this.jweService = jweService;
@@ -80,7 +72,7 @@ public class ApacheHttpTransport implements Transport {
         this.currentPublicKeyTTL = currentPublicKeyTTL;
         this.issuer = issuer;
         logger = LogFactory.getLog(getClass());
-        rbf = new ApiRequestBuilderFactory(issuer.toString(), baseUrl, objectMapper, provider, jwtService, jweService);
+        rbf = new ApiRequestBuilderFactory(issuer.toString(), baseUrl, objectMapper, crypto, jwtService, jweService);
     }
 
     @Override
@@ -130,7 +122,7 @@ public class ApacheHttpTransport implements Transport {
     @Override
     public ServiceV3AuthsGetResponse serviceV3AuthsGet(UUID authRequestId, EntityIdentifier subject)
             throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException, AuthorizationRequestTimedOutError {
+            InvalidRequestException, InvalidCredentialsException, AuthorizationRequestTimedOutError, NoKeyFoundException {
         ServiceV3AuthsGetResponse response;
         String path = "/service/v3/auths/" + authRequestId.toString();
         HttpResponse httpResponse = getHttpResponse("GET", path, subject, null, true, Arrays.asList(408));
@@ -144,22 +136,35 @@ public class ApacheHttpTransport implements Transport {
             try {
                 JWTData jwtData = jwtService.getJWTData(getJWT(httpResponse));
                 EntityIdentifier audience = EntityIdentifier.fromString(jwtData.getAudience());
-                String publicKeyId = jwtData.getKeyId();
-                RSAPrivateKey key = entityKeyMap.getKey(audience, publicKeyId);
-                String decrypted = jweService.decrypt(apiResponse.getEncryptedDeviceResponse(), key);
+                RSAPrivateKey key = entityKeyMap.getKey(audience, apiResponse.getPublicKeyId());
+                byte[] decrypted;
+                try {
+                    byte[] encrypted = Base64.decodeBase64(apiResponse.getEncryptedDeviceResponse().getBytes());
+                    decrypted = crypto.decryptRSA(encrypted, key);
+                } catch (Exception e) {
+                    throw new CryptographyError("Unable to decrypt device response!", e);
+                }
                 ServiceV3AuthsGetResponseDevice deviceResponse =
                         objectMapper.readValue(decrypted, ServiceV3AuthsGetResponseDevice.class);
-                response = new ServiceV3AuthsGetResponse(audience, publicKeyId, subject.getId(), apiResponse);
+                response = new ServiceV3AuthsGetResponse(
+                        audience,
+                        subject.getId(),
+                        apiResponse.getServiceUserHash(),
+                        apiResponse.getOrgUserHash(),
+                        apiResponse.getUserPushId(),
+                        deviceResponse.getAuthorizationRequestId(),
+                        deviceResponse.getResponse(),
+                        deviceResponse.getDeviceId(),
+                        deviceResponse.getServicePins()
+                );
             } catch (JWTError jwtError) {
                 throw new CryptographyError("Unable to parse JWT to get key info!", jwtError);
-            } catch (JWEFailure jweFailure) {
-                throw new CryptographyError("Unable to decrypt the device response!", jweFailure);
             } catch (JsonParseException e) {
                 throw new MarshallingError("Unable to parse the decrypted device response!", e);
             } catch (JsonMappingException e) {
                 throw new MarshallingError("Unable to map the decrypted device response data!", e);
             } catch (IOException e) {
-               throw new CommunicationErrorException("An I/O error occurred!", e, null);
+                throw new CommunicationErrorException("An I/O error occurred!", e, null);
             }
         }
         return response;
@@ -203,6 +208,57 @@ public class ApacheHttpTransport implements Transport {
         getHttpResponse("DELETE", "/directory/v3/sessions", subject, request, true, null);
     }
 
+    @Override
+    public ServerSentEvent handleServerSentEvent(Map<String, List<String>> headers, String body) throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException, InvalidCredentialsException, CryptographyError, NoKeyFoundException {
+        ServerSentEvent response;
+        HeaderGroup headerGroup = new HeaderGroup();
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            for (String item : entry.getValue()) {
+                headerGroup.addHeader(new BasicHeader(entry.getKey(), item));
+            }
+        }
+        String jwt = headerGroup.getFirstHeader(IOV_JWT_HEADER).getValue();
+        try {
+            validateJWT(null, jwt);
+            JWTData jwtData = jwtService.getJWTData(jwt);
+            if (headerGroup.getFirstHeader("Content-Type").getValue().startsWith("application/jose")) {
+                // Auths response is encrypted
+                final EntityIdentifier requestingEntity = EntityIdentifier.fromString(jwtData.getAudience());
+                final String encryptionKeyId = jweService.getHeaders(body).get("kid");
+                final RSAPrivateKey privateKey = entityKeyMap.getKey(requestingEntity, encryptionKeyId);
+                final String decrypted = jweService.decrypt(body, privateKey);
+                final ServerSentEventAuthorizationResponseCore core = objectMapper.readValue(decrypted, ServerSentEventAuthorizationResponseCore.class);
+                final byte[] decryptedDeviceResponse = crypto.decryptRSA(BASE_64.decode(core.getAuth().getBytes()), privateKey);
+                final ServiceV3AuthsGetResponseDevice deviceResponse = objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDevice.class);
+                response = new ServerSentEventAuthorizationResponse(
+                        requestingEntity,
+                        EntityIdentifier.fromString(jwtData.getSubject()).getId(),
+                        core.getServiceUserHash(),
+                        core.getOrgUserHash(),
+                        core.getUserPushId(),
+                        deviceResponse.getAuthorizationRequestId(),
+                        deviceResponse.getResponse(),
+                        deviceResponse.getDeviceId(),
+                        deviceResponse.getServicePins()
+                );
+            } else {
+                // Session end is not encrypted
+                response = objectMapper.readValue(body, ServerSentEventUserServiceSessionEnd.class);
+            }
+        } catch (JWTError jwtError) {
+            throw new InvalidRequestException("Invalid JWT in the headers!", jwtError, null);
+        } catch (JWEFailure jweFailure) {
+            throw new InvalidRequestException("Unable to decrypt the body!", jweFailure, null);
+        } catch (JsonParseException e) {
+            throw new InvalidRequestException("Unable to parse the decrypted body as JSON!", e, null);
+        } catch (JsonMappingException e) {
+            throw new InvalidRequestException("Unable to map the decrypted body JSON to a Map<String, Object>!", e, null);
+        } catch (IOException e) {
+            throw new InvalidRequestException("Unable to read the body due to an I/O error!", e, null);
+        }
+        return response;
+    }
+
     private HttpResponse getHttpResponse(
             String method, String path, EntityIdentifier subjectEntity, Object transportObject, boolean signRequest, List<Integer> httpStatusCodeWhiteList)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException, CryptographyError,
@@ -236,7 +292,7 @@ public class ApacheHttpTransport implements Transport {
             HttpResponse response = httpClient.execute(request);
             throwForStatus(response, requestId, httpStatusCodeWhiteList == null ? new ArrayList<Integer>() : httpStatusCodeWhiteList);
             if (signRequest) {
-                validateJWT(response, requestId);
+                validateResponseJWT(response, requestId);
             }
             return response;
         } catch (IOException e) {
@@ -260,7 +316,7 @@ public class ApacheHttpTransport implements Transport {
                 );
             } else {
                 try {
-                    validateJWT(response, requestId);
+                    validateResponseJWT(response, requestId);
                     Error error = decryptResponse(response, Error.class);
                     Object detail = error.getErrorDetail();
                     throw new InvalidResponseException(
@@ -321,22 +377,26 @@ public class ApacheHttpTransport implements Transport {
         }
     }
 
-    private void validateJWT(HttpResponse response, String expectedTokenId)
+    private void validateResponseJWT(HttpResponse response, String expectedTokenId)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException, CryptographyError,
             InvalidRequestException, InvalidCredentialsException {
         try {
 
             final String jwt = getJWT(response);
-            String keyId = jwtService.getJWTData(jwt).getKeyId();
-            jwtService.decode(
-                    getPublicKeyData(keyId).getKey(), issuer.toString(), expectedTokenId, getCurrentDate(), jwt);
+            validateJWT(expectedTokenId, jwt);
         } catch (JWTError jwtError) {
             throw new InvalidResponseException("Invalid JWT in response!", jwtError, null);
         }
     }
 
+    private void validateJWT(String expectedTokenId, String jwt) throws JWTError, MarshallingError, InvalidResponseException, CommunicationErrorException, CryptographyError, InvalidRequestException, InvalidCredentialsException {
+        String keyId = jwtService.getJWTData(jwt).getKeyId();
+        jwtService.decode(
+                getPublicKeyData(keyId).getKey(), issuer.toString(), expectedTokenId, getCurrentDate(), jwt);
+    }
+
     private String getJWT(HttpResponse response) {
-        return response.getFirstHeader("X-IOV-JWT").getValue();
+        return response.getFirstHeader(IOV_JWT_HEADER).getValue();
     }
 
 
@@ -376,7 +436,7 @@ public class ApacheHttpTransport implements Transport {
             if (publicKey != null) {
                 try {
                     publicKeyData = new PublicKeyData(
-                            JCECrypto.getRSAPublicKeyFromPEM(provider, publicKey),
+                            crypto.getRSAPublicKeyFromPEM(publicKey),
                             fingerprint
                     );
                 } catch (IllegalArgumentException e) {
@@ -391,8 +451,7 @@ public class ApacheHttpTransport implements Transport {
         if (publicKeyData == null) {
             PublicV3PublicKeyGetResponse apiKey = publicV3PublicKeyGet(fingerprint);
             publicKeyData = new PublicKeyData(
-                    JCECrypto.getRSAPublicKeyFromPEM(provider,
-                            apiKey.getPublicKey()), apiKey.getPublicKeyFingerprint());
+                    crypto.getRSAPublicKeyFromPEM(apiKey.getPublicKey()), apiKey.getPublicKeyFingerprint());
             try {
                 publicKeyCache.put(apiKey.getPublicKeyFingerprint(), apiKey.getPublicKey());
             } catch (CacheException e) {

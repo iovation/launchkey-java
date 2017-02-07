@@ -7,27 +7,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-/**
- * Copyright 2016 LaunchKey, Inc. All rights reserved.
- *
- * Licensed under the MIT License.
- * You may not use this file except in compliance with the License.
- * A copy of the License is located in the "LICENSE.txt" file accompanying
- * this file. This file is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 @Controller
 public class DemoController {
     private static final Logger LOG = LoggerFactory.getLogger(DemoController.class);
@@ -65,12 +50,14 @@ public class DemoController {
 
     @RequestMapping(value = "/callback", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void callback (WebRequest request) throws AuthManager.AuthException {
-        Map<String, String> callbackData = new HashMap<String, String>();
-        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-            callbackData.put(entry.getKey(), entry.getValue()[0]);
+    public void callback (WebRequest request, @RequestBody String body) throws AuthManager.AuthException {
+        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Iterator<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasNext()) {
+            String headerName = headerNames.next();
+            headers.put(headerName, Arrays.asList(request.getHeaderValues(headerName)));
         }
-        authManager.handleCallback(callbackData);
+        authManager.handleCallback(headers, body);
     }
 
 

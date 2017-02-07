@@ -4,7 +4,7 @@
     <parent>
         <artifactId>launchkey-examples-parent</artifactId>
         <groupId>com.launchkey.sdk</groupId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>examples-cli</artifactId>
@@ -46,7 +46,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <deviceId>make-assembly</deviceId>
+                        <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>

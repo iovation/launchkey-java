@@ -126,17 +126,19 @@ public class Jose4jJWTService implements JWTService {
             JwtConsumer jwtConsumer = builder.build();
 
             JwtClaims libraryClaims = jwtConsumer.processToClaims(jwt);
+            Map<String, String> requestClaims = libraryClaims.getClaimValue("request", Map.class);
             claims = new JWTClaims(
                     libraryClaims.getJwtId(),
                     libraryClaims.getIssuer(),
+                    libraryClaims.getSubject(),
                     libraryClaims.getAudience().get(0),
                     (int) libraryClaims.getIssuedAt().getValue(),
                     (int) libraryClaims.getNotBefore().getValue(),
                     (int) libraryClaims.getExpirationTime().getValue(),
-                    libraryClaims.getStringClaimValue("Content-Hash-Alg"),
-                    libraryClaims.getStringClaimValue("Content-Hash"),
-                    libraryClaims.getStringClaimValue("Method"),
-                    libraryClaims.getStringClaimValue("Path")
+                    requestClaims == null ? null : requestClaims.get("func"),
+                    requestClaims == null ? null : requestClaims.get("hash"),
+                    requestClaims == null ? null : requestClaims.get("meth"),
+                    requestClaims == null ? null : requestClaims.get("path")
             );
         } catch (InvalidJwtException e) {
             throw new JWTError("An error occurred parsing the JWT", e);
