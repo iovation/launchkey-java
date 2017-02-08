@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class CachePersistenceExceptionTest {
     @Test
     public void testMessageConstructor() throws Exception {
-        Exception e = new CachePersistenceException("Message");
+        Exception e = new CacheException("Message");
         assertEquals("Message", e.getMessage());
 
     }
@@ -26,7 +26,7 @@ public class CachePersistenceExceptionTest {
     @Test
     public void testMessageCauseConstructor() throws Exception {
         Exception c = new Exception();
-        Exception e = new CachePersistenceException("Message", c);
+        Exception e = new CacheException("Message", c);
         assertEquals("Message", e.getMessage());
         assertSame(c, e.getCause());
     }

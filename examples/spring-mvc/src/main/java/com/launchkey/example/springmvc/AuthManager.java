@@ -1,24 +1,13 @@
-/**
- * Copyright 2016 LaunchKey, Inc. All rights reserved.
- * <p/>
- * Licensed under the MIT License.
- * You may not use this file except in compliance with the License.
- * A copy of the License is located in the "LICENSE.txt" file accompanying
- * this file. This file is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.launchkey.example.springmvc;
 
-import com.launchkey.sdk.AppClient;
+import com.launchkey.sdk.ServiceClient;
 import com.launchkey.sdk.ClientFactoryBuilder;
-import com.launchkey.sdk.domain.auth.AuthResponse;
-import com.launchkey.sdk.domain.auth.AuthResponseCallbackResponse;
-import com.launchkey.sdk.domain.auth.CallbackResponse;
-import com.launchkey.sdk.domain.auth.LogoutCallbackResponse;
+import com.launchkey.sdk.domain.service.AuthorizationResponse;
+import com.launchkey.sdk.domain.sse.AuthorizationResponseServerSentEventPackage;
+import com.launchkey.sdk.domain.sse.ServerSentEventPackage;
+import com.launchkey.sdk.domain.sse.ServiceUserSessionServerSentEventPackage;
 import com.launchkey.sdk.error.BaseException;
+import com.launchkey.sdk.service.ServiceService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,33 +26,29 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class AuthManager {
     final Logger log = LoggerFactory.getLogger(getClass());
-    private final com.launchkey.sdk.service.application.auth.AuthService authService;
+    private final ServiceService serviceService;
     private final Map<String, String> sessionAuthRequestMap;
     private final Map<String, Boolean> sessionAuthenticationMap;
     private final Map<String, List<String>> userHashSessionMap;
+    private final Map<String, String> sessionUserNameMap;
 
     @SuppressWarnings("ThrowFromFinallyBlock")
     @Autowired
-    public AuthManager(PlatformSdkConfig appConfig) throws ConfigurationException, IOException {
-        final Long appKey = appConfig.getAppKey();
-        final String secretKey = appConfig.getSecretKey();
+    public AuthManager(LaunchkeySdkConfig appConfig) throws ConfigurationException, IOException {
+        final String serviceId = appConfig.getServiceId();
         final String privateKeyLocation = appConfig.getPrivateKeyLocation();
         final String baseURL = appConfig.getBaseUrl();
 
         boolean halt = false;
-        if (appKey == null) {
-            log.error("mfa.app-key property not provided");
-            halt = true;
-        }
-        if (secretKey == null) {
-            log.error("mfa.secret-key property not provided");
+        if (serviceId == null) {
+            log.error("lk.service-id property not provided");
             halt = true;
         }
         if (privateKeyLocation == null) {
-            log.error("mfa.private-key-location property not provided");
+            log.error("lk.private-key-location property not provided");
             halt = true;
         }
-        if (halt) throw new ConfigurationException("Missing required mfa configuration");
+        if (halt) throw new ConfigurationException("Missing required lk configuration");
 
         BufferedReader br = new BufferedReader(new FileReader(privateKeyLocation));
         StringBuilder sb = new StringBuilder();
@@ -85,19 +70,21 @@ public class AuthManager {
         if (baseURL != null) {
             builder.setAPIBaseURL(baseURL);
         }
-        AppClient client = builder.build().makeAppClient(appKey, secretKey, privateKey);
+        ServiceClient client = builder.build().makeServiceClient(serviceId, privateKey);
 
-        this.authService = client.auth();
-        this.sessionAuthenticationMap = Collections.synchronizedMap(new HashMap<String, Boolean>());
-        this.sessionAuthRequestMap = new ConcurrentHashMap<String, String>();
-        this.userHashSessionMap = new ConcurrentHashMap<String, List<String>>();
+        serviceService = client.getServiceService();
+        sessionAuthenticationMap = Collections.synchronizedMap(new HashMap<String, Boolean>());
+        sessionAuthRequestMap = new ConcurrentHashMap<String, String>();
+        userHashSessionMap = new ConcurrentHashMap<String, List<String>>();
+        sessionUserNameMap = new ConcurrentHashMap<String, String>();
     }
 
     public void login(String username, String context) throws AuthException {
         try {
-            String authRequestId = this.authService.login(username, context);
+            String authRequestId = this.serviceService.authorize(username, context);
             String sessionId = getSessionId();
             sessionAuthRequestMap.put(sessionId, authRequestId);
+            sessionUserNameMap.put(sessionId, username);
             sessionAuthenticationMap.put(sessionId, null);
         } catch (BaseException apiException) {
             throw new AuthException("Error logging in with username: " + username, apiException);
@@ -109,36 +96,37 @@ public class AuthManager {
         if (sessionAuthenticationMap.containsKey(sessionId)) {
             return sessionAuthenticationMap.get(sessionId);
         } else {
-            throw new AuthException("No auth request found for this session");
+            throw new AuthException("No getServiceService request found for this session");
         }
     }
 
     public void logout(String sessionId) throws AuthException {
         if (sessionAuthenticationMap.get(sessionId)) {
             sessionAuthenticationMap.put(sessionId, false);
-            if (sessionAuthRequestMap.containsKey(sessionId)) {
+            if (sessionUserNameMap.containsKey(sessionId)) {
                 try {
-                    authService.logout(sessionAuthRequestMap.get(sessionId));
+                    serviceService.sessionEnd(sessionUserNameMap.get(sessionId));
                     sessionAuthenticationMap.put(sessionId, false);
                     sessionAuthRequestMap.remove(sessionId);
+                    sessionUserNameMap.remove(sessionId);
                 } catch (BaseException apiException) {
                     throw new AuthException(
-                            "Error on logout for auth request: " + sessionAuthRequestMap.get(sessionId),
+                            "Error on logout for getServiceService request: " + sessionAuthRequestMap.get(sessionId),
                             apiException
                     );
                 }
             } else {
-                throw new AuthException("No auth request found for this session");
+                throw new AuthException("No getServiceService request found for this session");
             }
         }
     }
 
-    public void handleCallback(Map<String, String> callbackData) throws AuthException {
+    public void handleCallback(Map<String, List<String>> headers, String body) throws AuthException {
         try {
-            CallbackResponse callbackResponse = authService.handleCallback(callbackData, 300);
-            if (callbackResponse instanceof AuthResponseCallbackResponse) {
-                AuthResponse authResponse = ((AuthResponseCallbackResponse) callbackResponse).getAuthResponse();
-                String authRequestId = authResponse.getAuthRequestId();
+            ServerSentEventPackage serverSentEventPackage = serviceService.handleServerSentEvent(headers, body);
+            if (serverSentEventPackage instanceof AuthorizationResponseServerSentEventPackage) {
+                AuthorizationResponse authorizationResponse = ((AuthorizationResponseServerSentEventPackage) serverSentEventPackage).getAuthorizationResponse();
+                String authRequestId = authorizationResponse.getAuthorizationRequestId();
                 String sessionId = null;
                 for (Map.Entry<String, String> entry : sessionAuthRequestMap.entrySet()) {
                     if (entry.getValue().equals(authRequestId)) {
@@ -147,22 +135,23 @@ public class AuthManager {
                     }
                 }
                 if (null == sessionId) {
-                    throw new AuthException("No session found for auth request: " + authRequestId);
+                    throw new AuthException("No session found for getServiceService request: " + authRequestId);
                 }
-                sessionAuthenticationMap.put(sessionId, authResponse.isAuthorized());
-                List<String> sessionList = userHashSessionMap.get(authResponse.getUserHash());
+                sessionAuthenticationMap.put(sessionId, authorizationResponse.isAuthorized());
+                List<String> sessionList = userHashSessionMap.get(authorizationResponse.getServiceUserHash());
 
                 if (null == sessionList) { // If no session list exists for the user hash, create one in the map
                     sessionList = Collections.synchronizedList(new ArrayList<String>());
-                    userHashSessionMap.put(authResponse.getUserHash(), sessionList);
+                    userHashSessionMap.put(authorizationResponse.getServiceUserHash(), sessionList);
                 }
 
                 // If the session does not already exist in the session list add it
                 if (!sessionList.contains(sessionId)) {
                     sessionList.add(sessionId);
                 }
-            } else if (callbackResponse instanceof LogoutCallbackResponse) {
-                String userHash = ((LogoutCallbackResponse) callbackResponse).getUserHash();
+                serviceService.sessionStart(sessionUserNameMap.get(sessionId));
+            } else if (serverSentEventPackage instanceof ServiceUserSessionServerSentEventPackage) {
+                String userHash = ((ServiceUserSessionServerSentEventPackage) serverSentEventPackage).getServiceUserHash();
                 for (String sessionId : userHashSessionMap.get(userHash)) {
                     logout(sessionId);
                 }

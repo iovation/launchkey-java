@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.*;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"tid", "iss", "aud", "iat", "nbf", "exp", "Content-Hash-Alg", "Content-Hash", "Method", "Path"})
+@JsonPropertyOrder({"tid", "iss", "sub", "aud", "iat", "nbf", "exp", "Content-Hash-Alg", "Content-Hash", "Method", "Path"})
 public class JWTClaims {
 
     private final String tokenId;
@@ -42,6 +42,8 @@ public class JWTClaims {
 
     private final String path;
 
+    private final String subject;
+
     /**
      * @param tokenId              "tid" claim. Globally unique identifier for this token. This is similar no a nonce
      *                             and is meant to be utilized to protect against replay attacks. It will be the echo
@@ -49,6 +51,8 @@ public class JWTClaims {
      *                             See: <a href="https://tools.ietf.org/html/rfc7519#section-4.1.7">RFC</a>
      * @param issuer               "iss" claim. This identifies the originator of the claim.
      *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.1">RFC</a>
+     * @param subject             "aud" claim. This identifies the subject of the claim.
+     *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.2">RFC</a>
      * @param audience             "aud" claim. This identifies the intended audience of the claim.
      *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.3">RFC</a>
      * @param issuedAt             "iat" claim. This is the number of seconds past the EPOC at which time the claim
@@ -74,6 +78,7 @@ public class JWTClaims {
     public JWTClaims(
             @JsonProperty("tid") String tokenId,
             @JsonProperty("iss") String issuer,
+            @JsonProperty("sub") String subject,
             @JsonProperty("aud") String audience,
             @JsonProperty("iat") Integer issuedAt,
             @JsonProperty("nbf") Integer notBefore,
@@ -85,6 +90,7 @@ public class JWTClaims {
     ) {
         this.tokenId = tokenId;
         this.issuer = issuer;
+        this.subject = subject;
         this.audience = audience;
         this.issuedAt = issuedAt;
         this.notBefore = notBefore;
@@ -111,6 +117,15 @@ public class JWTClaims {
     @JsonProperty("iss")
     public String getIssuer() {
         return issuer;
+    }
+
+    /**
+     * Get the claim's subject
+     * @return The subject
+     */
+    @JsonProperty("sub")
+    public String getSubject() {
+        return subject;
     }
 
     /**
@@ -185,45 +200,37 @@ public class JWTClaims {
         return path;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof JWTClaims)) return false;
 
         JWTClaims jwtClaims = (JWTClaims) o;
 
-        if (getIssuedAt() != null ? !getIssuedAt().equals(jwtClaims.getIssuedAt()) : jwtClaims.getIssuedAt() != null) {
+        if (getTokenId() != null ? !getTokenId().equals(jwtClaims.getTokenId()) : jwtClaims.getTokenId() != null)
             return false;
-        }
-        if (getNotBefore() != null ? !getNotBefore().equals(jwtClaims.getNotBefore()) : jwtClaims.getNotBefore() != null) {
+        if (getIssuer() != null ? !getIssuer().equals(jwtClaims.getIssuer()) : jwtClaims.getIssuer() != null)
             return false;
-        }
-        if (getExpiresAt() != null ? !getExpiresAt().equals(jwtClaims.getExpiresAt()) : jwtClaims.getExpiresAt() != null) {
+        if (getAudience() != null ? !getAudience().equals(jwtClaims.getAudience()) : jwtClaims.getAudience() != null)
             return false;
-        }
-        if (getTokenId() != null ? !getTokenId().equals(jwtClaims.getTokenId()) : jwtClaims.getTokenId() != null) {
+        if (getIssuedAt() != null ? !getIssuedAt().equals(jwtClaims.getIssuedAt()) : jwtClaims.getIssuedAt() != null)
             return false;
-        }
-        if (getIssuer() != null ? !getIssuer().equals(jwtClaims.getIssuer()) : jwtClaims.getIssuer() != null) {
+        if (getNotBefore() != null ? !getNotBefore().equals(jwtClaims.getNotBefore()) : jwtClaims.getNotBefore() != null)
             return false;
-        }
-        if (getAudience() != null ? !getAudience().equals(jwtClaims.getAudience()) : jwtClaims.getAudience() != null) {
+        if (getExpiresAt() != null ? !getExpiresAt().equals(jwtClaims.getExpiresAt()) : jwtClaims.getExpiresAt() != null)
             return false;
-        }
-        if (getContentHash() != null ? !getContentHash().equals(jwtClaims.getContentHash()) : jwtClaims.getContentHash() != null) {
+        if (getContentHashAlgorithm() != null ? !getContentHashAlgorithm().equals(jwtClaims.getContentHashAlgorithm()) : jwtClaims.getContentHashAlgorithm() != null)
             return false;
-        }
-        if (getContentHashAlgorithm() != null ? !getContentHashAlgorithm().equals(jwtClaims.getContentHashAlgorithm()) : jwtClaims
-                .getContentHashAlgorithm() != null) {
+        if (getContentHash() != null ? !getContentHash().equals(jwtClaims.getContentHash()) : jwtClaims.getContentHash() != null)
             return false;
-        }
-        if (getMethod() != null ? !getMethod().equals(jwtClaims.getMethod()) : jwtClaims.getMethod() != null) {
+        if (getMethod() != null ? !getMethod().equals(jwtClaims.getMethod()) : jwtClaims.getMethod() != null)
             return false;
-        }
-        return getPath() != null ? getPath().equals(jwtClaims.getPath()) : jwtClaims.getPath() == null;
-
+        if (getPath() != null ? !getPath().equals(jwtClaims.getPath()) : jwtClaims.getPath() != null) return false;
+        return subject != null ? subject.equals(jwtClaims.subject) : jwtClaims.subject == null;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result = getTokenId() != null ? getTokenId().hashCode() : 0;
         result = 31 * result + (getIssuer() != null ? getIssuer().hashCode() : 0);
         result = 31 * result + (getAudience() != null ? getAudience().hashCode() : 0);
@@ -234,10 +241,12 @@ public class JWTClaims {
         result = 31 * result + (getContentHash() != null ? getContentHash().hashCode() : 0);
         result = 31 * result + (getMethod() != null ? getMethod().hashCode() : 0);
         result = 31 * result + (getPath() != null ? getPath().hashCode() : 0);
+        result = 31 * result + (subject != null ? subject.hashCode() : 0);
         return result;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "JWTClaims{" +
                 "tokenId='" + tokenId + '\'' +
                 ", issuer='" + issuer + '\'' +
@@ -245,10 +254,11 @@ public class JWTClaims {
                 ", issuedAt=" + issuedAt +
                 ", notBefore=" + notBefore +
                 ", expiresAt=" + expiresAt +
-                ", contentHash='" + contentHash + '\'' +
                 ", contentHashAlgorithm='" + contentHashAlgorithm + '\'' +
+                ", contentHash='" + contentHash + '\'' +
                 ", method='" + method + '\'' +
                 ", path='" + path + '\'' +
+                ", subject='" + subject + '\'' +
                 '}';
     }
 }

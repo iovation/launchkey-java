@@ -12,17 +12,20 @@
 
 package com.launchkey.sdk;
 
-import com.launchkey.sdk.cache.LocalMemoryPingResponseCache;
-import com.launchkey.sdk.cache.PingResponseCache;
+import com.launchkey.sdk.cache.Cache;
+import com.launchkey.sdk.cache.HashCache;
 import com.launchkey.sdk.crypto.JCECrypto;
-import com.launchkey.sdk.service.token.TokenIdService;
-import com.launchkey.sdk.service.token.UUIDTokenIdService;
+import com.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.launchkey.sdk.transport.domain.EntityIdentifier.EntityType;
+import com.launchkey.sdk.transport.domain.EntityKeyMap;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import java.security.Provider;
 import java.security.Security;
+import java.security.interfaces.RSAPrivateKey;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,35 +33,36 @@ import java.util.concurrent.TimeUnit;
  */
 public class ClientFactoryBuilder {
 
-    private TokenIdService tokenIdService = null;
-    private TokenIdService tokenIdServiceInstance = null;
-    private PingResponseCache pingResponseCache = null;
-    private PingResponseCache pingResponseCacheInstance = null;
     private Provider jceProvider = null;
     private Provider jceProviderInstance = null;
     private HttpClient httpClient = null;
-    private HttpClient httpClientInstance = null;
+    private Cache keyCache = null;
 
     private String apiBaseURL = "https://api.launchkey.com";
-    private String apiIdentifier = "application:1000000000";
+    private String apiIdentifier = "lka";
     private Integer httpClientMaxClients = 200;
     private Integer httpClientConnectionTTLSecs = 30;
-    private Integer requestExpireSeconds = 300;
-    private int pingResponseCacheTTL = 300;
+    private Integer requestExpireSeconds = 5;
+    private int offsetTTL = 3600;
+    private int currentPublicKeyTTL = 300;
+    private EntityKeyMap entityKeyMap = new EntityKeyMap();
 
     /**
      * Build a factory based on the currently configured information
+     *
      * @return Client Factory
      */
     public ClientFactory build() {
         return new ClientFactory(
                 getJceProvider(),
-                getPingResponseCache(),
                 getHttpClient(),
-                getTokenIdService(),
+                getKeyCache(),
                 getApiBaseURL(),
                 getApiIdentifier(),
-                getRequestExpireSeconds()
+                getRequestExpireSeconds(),
+                offsetTTL,
+                currentPublicKeyTTL,
+                entityKeyMap
         );
 
     }
@@ -77,7 +81,7 @@ public class ClientFactoryBuilder {
     /**
      * Set the JCE provider to be used to perform cryptography
      *
-     * @param provider JCE provider to be used to build a {@link JCECrypto} service
+     * @param provider JCE provider to be used to build a {@link JCECrypto} getServiceService
      * @return this
      */
     public ClientFactoryBuilder setJCEProvider(Provider provider) {
@@ -106,7 +110,6 @@ public class ClientFactoryBuilder {
     public ClientFactoryBuilder setHttpClientConnectionTTLSecs(int httpClientConnectionTTLSecs) {
         if (this.httpClientConnectionTTLSecs != httpClientConnectionTTLSecs) {
             this.httpClientConnectionTTLSecs = httpClientConnectionTTLSecs;
-            this.httpClientInstance = null;
         }
         return this;
     }
@@ -121,34 +124,22 @@ public class ClientFactoryBuilder {
     public ClientFactoryBuilder setHttpMaxClients(int httpMaxClients) {
         if (this.httpClientMaxClients != httpMaxClients) {
             this.httpClientMaxClients = httpMaxClients;
-            this.httpClientInstance = null;
         }
         return this;
     }
 
-    /**
-     * Set the ping response cache to be used for caching Platform API /ping calls
-     *
-     * @param pingResponseCache Ping response cache to be used for caching Platform API /ping calls
-     * @return this
-     */
-    public ClientFactoryBuilder setPingResponseCache(PingResponseCache pingResponseCache) {
-        this.pingResponseCache = pingResponseCache;
+    public ClientFactoryBuilder setKeyCache(Cache keyCache) {
+        this.keyCache = keyCache;
         return this;
     }
 
-    /**
-     * Set the Ping Response cache Time To Live in milliseconds.  This value will be ignored
-     * if an {@link PingResponseCache} is set with {@link #setPingResponseCache(PingResponseCache)}
-     *
-     * @param pingResponseCacheTTL Set the Ping Response cache Time To Live in milliseconds
-     * @return this
-     */
-    public ClientFactoryBuilder setPingResponseCacheTTL(int pingResponseCacheTTL) {
-        if (this.pingResponseCacheTTL != pingResponseCacheTTL) {
-            this.pingResponseCacheTTL = pingResponseCacheTTL;
-            this.pingResponseCacheInstance = null;
-        }
+    public ClientFactoryBuilder setOffsetTTL(int offsetTTL) {
+        this.offsetTTL = offsetTTL;
+        return this;
+    }
+
+    public ClientFactoryBuilder setCurrentPublicKeyTTL(int currentPublicKeyTTL) {
+        this.currentPublicKeyTTL = currentPublicKeyTTL;
         return this;
     }
 
@@ -182,40 +173,27 @@ public class ClientFactoryBuilder {
         return this;
     }
 
-    /**
-     * Set the {@link TokenIdService} that will be utilized by the factory
-     * @param tokenIdService {@link TokenIdService} that will be utilized by the factory
-     * @return this
-     */
-    public ClientFactoryBuilder setTokenIdService(TokenIdService tokenIdService) {
-        this.tokenIdService = tokenIdService;
+    public ClientFactoryBuilder addServicePrivateKey(String serviceId, RSAPrivateKey privateKey, String pulicKeyFingerprint) {
+        addEntityPrivateKey(EntityType.SERVICE, serviceId, privateKey, pulicKeyFingerprint);
         return this;
     }
 
-    private PingResponseCache getPingResponseCache() {
-        PingResponseCache cache;
-        if (pingResponseCache == null) {
-            if (pingResponseCacheInstance == null) {
-                pingResponseCacheInstance = new LocalMemoryPingResponseCache(pingResponseCacheTTL);
-            }
-            cache = pingResponseCacheInstance;
-        } else {
-            cache = pingResponseCache;
-        }
-        return cache;
+    public ClientFactoryBuilder addDirectoryPrivateKey(String directoryId, RSAPrivateKey privateKey, String pulicKeyFingerprint) {
+        addEntityPrivateKey(EntityType.DIRECTORY, directoryId, privateKey, pulicKeyFingerprint);
+        return this;
     }
 
-    private TokenIdService getTokenIdService() {
-        TokenIdService service;
-        if (tokenIdService == null) {
-            if (tokenIdServiceInstance == null) {
-                tokenIdServiceInstance = new UUIDTokenIdService();
-            }
-            service = tokenIdServiceInstance;
-        } else {
-            service = tokenIdService;
-        }
-        return service;
+    public ClientFactoryBuilder addOrganizationPrivateKey(String organizationId, RSAPrivateKey privateKey, String pulicKeyFingerprint) {
+        addEntityPrivateKey(EntityType.ORGANIZATION, organizationId, privateKey, pulicKeyFingerprint);
+        return this;
+    }
+
+    private void addEntityPrivateKey(EntityType type, String id, RSAPrivateKey privateKey, String pulicKeyFingerprint) {
+        entityKeyMap.addKey(
+                new EntityIdentifier(type, UUID.fromString(id)),
+                pulicKeyFingerprint,
+                privateKey
+        );
     }
 
     private HttpClient getHttpClient() {
@@ -247,5 +225,12 @@ public class ClientFactoryBuilder {
             provider = jceProvider;
         }
         return provider;
+    }
+
+    private Cache getKeyCache() {
+        if (keyCache == null) {
+            keyCache = new HashCache();
+        }
+        return keyCache;
     }
 }

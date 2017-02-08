@@ -12,80 +12,78 @@
 
 package com.launchkey.sdk.crypto.jwt;
 
-import com.launchkey.sdk.error.BaseException;
-import com.launchkey.sdk.service.ping.PingService;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.NumericDate;
-import org.jose4j.jwt.consumer.InvalidJwtException;
-import org.jose4j.jwt.consumer.JwtConsumer;
-import org.jose4j.jwt.consumer.JwtConsumerBuilder;
+import org.jose4j.jwt.consumer.*;
+import org.jose4j.jwx.JsonWebStructure;
 import org.jose4j.lang.JoseException;
 
-import java.security.Key;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Jose4jJWTService implements JWTService {
-    private final String platformIdentifier;
-    private final String entityIdentifier;
-    private final RSAPrivateKey privateKey;
-    private final PingService pingService;
+    private final String apiIdentifier;
+    private final Map<String, RSAPrivateKey> privateKeys;
+    private final String currentPrivateKeyId;
     private final int requestExpireSeconds;
 
     /**
-     * @param platformIdentifier   JWT identifier for the Platform API. Used as the audience for encoding and the
-     *                             issuer for decoding.
-     * @param entityIdentifier     JWT identifier for the entity interacting with the Platform APi. Used as the
-     *                             issuer for encoding and the audience for decoding.
-     * @param privateKey           RSA Private Key of the RSA public/private key pair that will be used to generate digital
-     *                             signatures when encoding.
-     * @param pingService          Ping service to obtain the Platform time to prevent time differential errors when
-     *                             encoding and decoding as well as obtaining the RSA Public Key of the RSA public/private
-     *                             key pair of the Platfgorm API which will be used to verify digital signatures when decoding.
+     * @param apiIdentifier JWT identifier for the Platform API. Used as the apiIdentifier for encoding and the
+     * issuer for decoding.
+     * @param privateKeys Mapped list of RSA Private Key by key ID of the RSA public/private key pairs that will be
+     * used to generate digital encoding and decoding as well as obtaining the RSA Public Key of the RSA public/private
+     * key pair of the Platform API which will be used to verify digital signatures when decoding.
+     * @param currentPrivateKeyId Public key fingerprint of the RSA private key that wi8ll be used to encode requests.
      * @param requestExpireSeconds The number of seconds from the issue ("iss") time to use for the expiration ("exp")
-     *                             time when encoding.
+     * time when encoding.
      */
     public Jose4jJWTService(
-            String platformIdentifier, String entityIdentifier, RSAPrivateKey privateKey, PingService pingService,
-            int requestExpireSeconds
+            String apiIdentifier, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKeyId, int requestExpireSeconds
     ) {
-        this.platformIdentifier = platformIdentifier;
-        this.entityIdentifier = entityIdentifier;
-        this.privateKey = privateKey;
-        this.pingService = pingService;
+        this.apiIdentifier = apiIdentifier;
+        this.privateKeys = privateKeys;
+        this.currentPrivateKeyId = currentPrivateKeyId;
         this.requestExpireSeconds = requestExpireSeconds;
     }
 
     @Override
     public String encode(
-            String jti, String method, String path, String contentHashAlgorithm, String contentHash
+            String jti, String issuer, String subject, Date currentTime, String method, String path, String contentHashAlgorithm, String contentHash
     ) throws JWTError {
         JwtClaims jwtClaims = new JwtClaims();
         jwtClaims.setJwtId(jti);
-        jwtClaims.setIssuer(entityIdentifier);
-        jwtClaims.setAudience(platformIdentifier);
+        jwtClaims.setIssuer(issuer);
+        jwtClaims.setSubject(subject);
+        jwtClaims.setAudience(apiIdentifier);
 
-        NumericDate now = getNow();
+        NumericDate now = NumericDate.fromMilliseconds(currentTime.getTime());
         jwtClaims.setIssuedAt(now);
         jwtClaims.setNotBefore(now);
 
-        NumericDate exp = getNow();
+        NumericDate exp = NumericDate.fromMilliseconds(currentTime.getTime());
         exp.addSeconds((long) requestExpireSeconds);
         jwtClaims.setExpirationTime(exp);
 
-        jwtClaims.setClaim("Path", path);
-        jwtClaims.setClaim("Method", method);
-
+        Map<String, String> request = new HashMap<String, String>();
+        //noinspection SpellCheckingInspection
+        request.put("meth", method);
+        request.put("path", path);
         if (contentHashAlgorithm != null) {
-            jwtClaims.setClaim("Content-Hash-Alg", contentHashAlgorithm);
-            jwtClaims.setClaim("Content-Hash", contentHash);
+            request.put("func", contentHashAlgorithm);
+            request.put("hash", contentHash);
         }
+        jwtClaims.setClaim("request", request);
 
         JsonWebSignature jws = new JsonWebSignature();
-        jws.setKey(privateKey);
+        jws.setKeyIdHeaderValue(currentPrivateKeyId);
+        jws.setKey(privateKeys.get(currentPrivateKeyId));
         jws.setPayload(jwtClaims.toJson());
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
 
@@ -98,7 +96,8 @@ public class Jose4jJWTService implements JWTService {
         return jwt;
     }
 
-    @Override public JWTClaims decode(String jwt) throws JWTError {
+    @Override
+    public JWTClaims decode(PublicKey publicKey, String expectedAudience, String expectedTokenId, Date currentTime, String jwt) throws JWTError {
         JWTClaims claims;
         try {
             AlgorithmConstraints algorithmConstraints = new AlgorithmConstraints(
@@ -108,51 +107,96 @@ public class Jose4jJWTService implements JWTService {
                     AlgorithmIdentifiers.RSA_USING_SHA512
             );
 
-            NumericDate evaluationTime = getNow();
-            Key publicKey = pingService.getPublicKey();
-            JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+            NumericDate evaluationTime = NumericDate.fromMilliseconds(currentTime.getTime());
+            JwtConsumerBuilder builder = new JwtConsumerBuilder()
                     .setVerificationKey(publicKey)
                     .setEvaluationTime(evaluationTime)
                     .setAllowedClockSkewInSeconds(5)
-                    .setExpectedAudience(entityIdentifier)
-                    .setExpectedIssuer(platformIdentifier)
-                    .setRequireJwtId()
+                    .setExpectedAudience(expectedAudience)
+                    .setExpectedIssuer(apiIdentifier)
                     .setRequireIssuedAt()
                     .setRequireNotBefore()
                     .setRequireExpirationTime()
-                    .setJwsAlgorithmConstraints(algorithmConstraints)
-                    .build();
+                    .setJwsAlgorithmConstraints(algorithmConstraints);
+            if (expectedTokenId != null) {
+                builder.setRequireJwtId()
+                        .registerValidator(new JwtIdValidator(expectedTokenId))
+                        .build();
+            }
+            JwtConsumer jwtConsumer = builder.build();
 
             JwtClaims libraryClaims = jwtConsumer.processToClaims(jwt);
+            Map<String, String> requestClaims = libraryClaims.getClaimValue("request", Map.class);
             claims = new JWTClaims(
                     libraryClaims.getJwtId(),
                     libraryClaims.getIssuer(),
+                    libraryClaims.getSubject(),
                     libraryClaims.getAudience().get(0),
                     (int) libraryClaims.getIssuedAt().getValue(),
                     (int) libraryClaims.getNotBefore().getValue(),
                     (int) libraryClaims.getExpirationTime().getValue(),
-                    libraryClaims.getStringClaimValue("Content-Hash-Alg"),
-                    libraryClaims.getStringClaimValue("Content-Hash"),
-                    libraryClaims.getStringClaimValue("Method"),
-                    libraryClaims.getStringClaimValue("Path")
+                    requestClaims == null ? null : requestClaims.get("func"),
+                    requestClaims == null ? null : requestClaims.get("hash"),
+                    requestClaims == null ? null : requestClaims.get("meth"),
+                    requestClaims == null ? null : requestClaims.get("path")
             );
         } catch (InvalidJwtException e) {
             throw new JWTError("An error occurred parsing the JWT", e);
         } catch (MalformedClaimException e) {
             throw new JWTError("An error occurred parsing a claim", e);
-        } catch (BaseException e) {
-            throw new JWTError("An error occurred retrieving the platform public key to verify the JWT signature", e);
         }
         return claims;
     }
 
-    private NumericDate getNow() throws JWTError {
-        NumericDate numericDate;
+    @Override
+    public JWTData getJWTData(String jwt) throws JWTError {
+        String keyId = null;
+        JWTData jwtData;
         try {
-            numericDate = NumericDate.fromMilliseconds(pingService.getPlatformTime().getTime());
-        } catch (BaseException e) {
-            throw new JWTError("An error occurred retrieving the Platform time", e);
+            JwtConsumer consumer = new JwtConsumerBuilder()
+                    .setSkipAllValidators()
+                    .setSkipSignatureVerification()
+                    .build();
+            JwtContext jwtContext = consumer.process(jwt);
+            for (JsonWebStructure joseObject : jwtContext.getJoseObjects()) {
+                keyId = joseObject.getKeyIdHeaderValue();
+                if (keyId != null) {
+                    break;
+                }
+            }
+            if (keyId == null) {
+                throw new JWTError("No kid found!", null);
+            }
+            JwtClaims claims = consumer.processToClaims(jwt);
+            jwtData = new JWTData(
+                    claims.getIssuer(),
+                    claims.getSubject(),
+                    claims.getAudience().get(0),
+                    keyId
+            );
+        } catch (InvalidJwtException e) {
+            throw new JWTError("An error occurred parsing the JWT", e);
+        } catch (MalformedClaimException e) {
+            throw new JWTError("An error occurred parsing the JWT", e);
         }
-        return numericDate;
+        return jwtData;
+    }
+
+    /**
+     * Validator to assert JWT ID (tid) is the expected value
+     */
+    public class JwtIdValidator implements Validator {
+
+        private final String expected;
+
+        public JwtIdValidator(String expected) {
+            this.expected = expected;
+        }
+
+        @Override
+        public String validate(JwtContext jwtContext) throws MalformedClaimException {
+            String jti = jwtContext.getJwtClaims().getJwtId();
+            return jti != null && jti.equals(expected) ? null : "Mismatched JWT ID";
+        }
     }
 }

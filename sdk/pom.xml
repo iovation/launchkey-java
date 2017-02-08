@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.launchkey.sdk</groupId>
         <artifactId>launchkey-root</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>launchkey-sdk</artifactId>
     <name>LaunchKey SDK</name>
@@ -48,6 +48,12 @@
             <version>[0.5.1,1.0.0)</version>
         </dependency>
 
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>[1.0.0,2.0.0)</version>
+        </dependency>
+
 
         <dependency>
             <groupId>junit</groupId>
@@ -66,7 +72,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
+            <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
 

@@ -1,4 +1,4 @@
-# SDK for Java
+# LaunchKey SDK for Java
 
 [![Build Status](https://travis-ci.org/iovation/launchkey-java.svg?branch=master)](https://travis-ci.org/iovation/launchkey-java)
 
@@ -7,13 +7,13 @@
 
 ## SDK
 
-The SDK for Java provides a native Java SDK for interacting with the Platform API.
+The LaunchKey SDK for Java provides a native Java SDK for interacting with the LaunchKey API.
 
 [Go to the README](sdk/README.md)
 
 ## Examples
 
-Examples for using the Platform SDK for Java
+Examples for using the LaunchKey SDK for Java
 
 ### CLI Example
 

@@ -12,9 +12,10 @@
 
 package com.launchkey.sdk.crypto;
 
-import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
@@ -26,7 +27,7 @@ public interface Crypto {
      * Encrypt the provided message with the provided public key.  The message will be encrypted with the
      * RSA/ECB/OAEP with SHA1 cipher and MGF1 padding.
      *
-     * @param message   Message to be encrypted
+     * @param message Message to be encrypted
      * @param publicKey Public key with which to encrypt the message
      * @return encrypted message
      */
@@ -37,40 +38,10 @@ public interface Crypto {
      * RSA/ECB/OAEP with SHA1 cipher and MGF1 padding.
      *
      * @param message Message to decrypt
+     * @param privateKey Private key with which to encrypt the message
      * @return decrypted message
      */
-    byte[] decryptRSA(byte[] message);
-
-    /**
-     * Sign the provided message with the private key and return the signature.  The signature will be generated with
-     * SHA256 with RSA.
-     *
-     * @param message Message to sign
-     * @return signature
-     */
-    byte[] sign(byte[] message);
-
-    /**
-     * Verify that the provided signature was created with the private key paired with the provided public key
-     * using the provided message.  The signature must have been generated with SHA256 with RSA.
-     *
-     * @param signature Signature to verify
-     * @param message   Message to verify against
-     * @param publicKey Public key paired with the private key used tpo generate the signature
-     * @return true if valid an false if not valid
-     */
-    boolean verifySignature(byte[] signature, byte[] message, PublicKey publicKey);
-
-    /**
-     * Decrypt AES/CBC
-     *
-     * @param message Message to sign
-     * @param key     Key for crypto
-     * @param iv      Initialization Vector (IV) for crypto
-     * @return decrypted message
-     * @throws GeneralSecurityException When an error occurred decrypting the message
-     */
-    byte[] decryptAES(byte[] message, byte[] key, byte[] iv) throws GeneralSecurityException;
+    byte[] decryptRSA(byte[] message, PrivateKey privateKey);
 
     /**
      * Get a public key from the provided PEM formatted string
@@ -87,4 +58,8 @@ public interface Crypto {
      * @throws NoSuchAlgorithmException When the provider does not support SHA-256
      */
     byte[] sha256(byte[] input) throws NoSuchAlgorithmException;
+
+    String getRsaPublicKeyFingerprint(RSAPublicKey key) throws IllegalArgumentException;
+
+    String getRsaPublicKeyFingerprint(RSAPrivateKey key) throws IllegalArgumentException;
 }

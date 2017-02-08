@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.StringReader;
-import java.nio.charset.Charset;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -19,7 +18,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class JCECryptoTest {
     @SuppressWarnings("SpellCheckingInspection")
@@ -58,7 +58,7 @@ public class JCECryptoTest {
 
     @SuppressWarnings("SpellCheckingInspection")
     private static final String PUBLIC_KEY =
-            ("-----BEGIN RSA PUBLIC KEY-----\n" +
+            ("-----BEGIN PUBLIC KEY-----\n" +
                     "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq2izh7NEarDdrdZLrpli\n" +
                     "zezZG/JzW14XQ74IXkjEqkvxhZ1s6joGtvoxX+P0QRyWrhgtiUnN3DSRAa0QLsZ0\n" +
                     "ZKk5a2AMGqu0/6eoJGwXSHcLreLEfqdd8+zlvDrbWISekTLoecLttwKSIcP2bcq1\n" +
@@ -66,7 +66,9 @@ public class JCECryptoTest {
                     "pnnw5lKwX+9IBAT/679eGUlh8HfTSG6JQaNezyRG1cOd+pO6hKxff6Q2GVXqHsrI\n" +
                     "ac4AlR80AEaBeiuFYxjHpruS6BRcyW8UvqX0l9rKMDAWNAtMWt2egYAe6XOEXIWO\n" +
                     "iQIDAQAB\n" +
-                    "-----END RSA PUBLIC KEY-----\n");
+                    "-----END PUBLIC KEY-----\n");
+
+    private static final String PUBLIC_KEY_FINGERPRINT = "39:bc:93:66:34:af:e5:15:b4:a1:33:58:81:dc:68:2c";
 
     private static final String PUBLIC_KEY_CARRIAGE_RETURN = PUBLIC_KEY.replace('\n', '\r');
     private static final String PUBLIC_KEY_CARRIAGE_RETURN_NEWLINE = PUBLIC_KEY.replace("\n", "\r\n");
@@ -74,7 +76,8 @@ public class JCECryptoTest {
     private Base64 base64;
     private BouncyCastleProvider provider;
     private JCECrypto crypto;
-    private PublicKey rsaPublicKey;
+    private RSAPublicKey rsaPublicKey;
+    private RSAPrivateKey rsaPrivateKey;
 
     @Before
     public void setUp() throws Exception {
@@ -82,11 +85,11 @@ public class JCECryptoTest {
         provider = new BouncyCastleProvider();
         KeyFactory keyFactory = KeyFactory.getInstance("RSA", provider);
         PemObject pem = new PemReader(new StringReader(PRIVATE_KEY)).readPemObject();
-        PrivateKey rsaPrivateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(pem.getContent()));
+        rsaPrivateKey = (RSAPrivateKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(pem.getContent()));
         pem = new PemReader(new StringReader(PUBLIC_KEY)).readPemObject();
-        rsaPublicKey = keyFactory.generatePublic(new X509EncodedKeySpec(pem.getContent()));
+        rsaPublicKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(pem.getContent()));
 
-        crypto = new JCECrypto(rsaPrivateKey, provider);
+        crypto = new JCECrypto(provider);
     }
 
     @After
@@ -95,23 +98,8 @@ public class JCECryptoTest {
         provider = null;
         crypto = null;
         rsaPublicKey = null;
-    }
-
-    @Test
-    public void testDecryptAES() throws Exception {
-        String expected = "This is the expected unencrypted value";
-
-        @SuppressWarnings("SpellCheckingInspection")
-        String base64encodedEncrypted = "Uc7ZMWqCc6TfQU/KTdl1KHEkTIWQWSC+uuSyMU5Kg088E32HLePvHkwwxTdqzhgH";
-        @SuppressWarnings("SpellCheckingInspection")
-        String actual = new String(
-                crypto.decryptAES(
-                        base64.decode(base64encodedEncrypted.getBytes()),
-                        "myciphermyciphermyciphermycipher".getBytes(),
-                        "iviviviviviviviv".getBytes()
-                )
-        );
-        assertEquals(expected, actual);
+        rsaPrivateKey = null;
+        rsaPublicKey = null;
     }
 
     @Test
@@ -124,14 +112,14 @@ public class JCECryptoTest {
                         "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
                         "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
                         "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
-        String actual = new String(crypto.decryptRSA(base64.decode(base64encodedEncrypted)));
+        String actual = new String(crypto.decryptRSA(base64.decode(base64encodedEncrypted), rsaPrivateKey));
         assertEquals(expected, actual);
     }
 
     @Test
     public void testEncryptRSA() throws Exception {
         String expected = "This is the expected unencrypted value";
-        String actual = new String(crypto.decryptRSA(crypto.encryptRSA(expected.getBytes(), rsaPublicKey)));
+        String actual = new String(crypto.decryptRSA(crypto.encryptRSA(expected.getBytes(), rsaPublicKey), rsaPrivateKey));
         assertEquals(expected, actual);
     }
 
@@ -145,63 +133,9 @@ public class JCECryptoTest {
                         "lgl4Z/z9/z6hiEbutDdmh8lcAaCQnGbPYoH174oXvIXHdVhMD9ajNVb4gWqWlGzz/xih2hQS9DoR\n" +
                         "87tsVDUtqZjnN1qgiO3nzxZw2RrBSBPnZWtpcHs24a7R/AHnL+tKrFcIDbADiMIM3+Mao73ZWSf7\n" +
                         "kTXLdICAqZOuCqYZcU4xdr9Wy/R2tWKOlPm9rw==\n";
-        String actual = new String(crypto.decryptRSA(base64.decode(base64encodedEncrypted)));
+        String actual = new String(crypto.decryptRSA(base64.decode(base64encodedEncrypted), rsaPrivateKey));
         assertEquals(expected, actual);
     }
-
-    @Test
-    public void testVerifySignatureReturnsTrueWhenSignatureValid() throws Exception {
-        @SuppressWarnings("SpellCheckingInspection")
-        String base64encodedMessage = "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
-                "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
-                "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
-                "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
-                "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
-        @SuppressWarnings("SpellCheckingInspection")
-        String base64encodedSignature = "BKOVrXZJVOobOQHpmgPnUpggaYtlZBuKsNv300MTg1fykvD7K6/HKl" +
-                "v27aJUOrtyPzVur+Jad5nz6JHhSrUy5dCVOyeGRnQ4nhrlvkhOcBn4/ctz2l6ZGK6bzOOR7gmUl/3Z" +
-                "nAtHqaTWNlFIlhOe+JEtaMEEvc2fB5rh87ibDGUI9ZtYENoEDkaN7UUq121qZWVCg7Nj3z0+yLhEji" +
-                "rNYgs8tI5CzNIySX85qRLI83EJrelMNWskqKvy/lhr5GasQMZUTEPbtjXz7AunqZRVAkRw/LAoQu2J" +
-                "ZXnJiJYhtRw/bZmU94Ah6GAW3bNmvEAZns2fs+A3KdfY52DpwEWwuw==";
-        boolean actual = crypto.verifySignature(
-                base64.decode(base64encodedSignature),
-                base64.decode(base64encodedMessage),
-                rsaPublicKey
-        );
-        assertTrue(actual);
-    }
-
-    @Test
-    public void testVerifySignatureReturnsFalseWhenSignatureInvalid() throws Exception {
-        @SuppressWarnings("SpellCheckingInspection")
-        String base64encodedEncrypted =
-                "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
-                        "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
-                        "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
-                        "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
-                        "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
-        @SuppressWarnings("SpellCheckingInspection")
-        String base64encodedSignature =
-                "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
-                        "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
-                        "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
-                        "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
-                        "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
-        boolean actual = crypto.verifySignature(
-                base64.decode(base64encodedSignature),
-                base64.decode(base64encodedEncrypted),
-                rsaPublicKey
-        );
-        assertFalse(actual);
-    }
-
-    @Test
-    public void testSignJSONObject() throws Exception {
-        byte[] dataToSign = "{\"text\": \"This is the data to sign\"}".getBytes();
-        byte[] signature = crypto.sign(dataToSign);
-        assertTrue("Signature did not verify", crypto.verifySignature(signature, dataToSign, rsaPublicKey));
-    }
-
 
     @Test
     public void testGetRSAPublicKeyFromPEM() throws Exception {
@@ -210,13 +144,13 @@ public class JCECryptoTest {
     }
 
     @Test
-    public void testGetRSAPublicKeyFromPEM_CarriageReturn() throws Exception {
+    public void testGetRSAPublicKeyFromPEMCarriageReturn() throws Exception {
         RSAPublicKey actual = JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY_CARRIAGE_RETURN);
         assertNotNull(actual);
     }
 
     @Test
-    public void testGetRSAPublicKeyFromPEM_CarriageReturnNewline() throws Exception {
+    public void testGetRSAPublicKeyFromPEMCarriageReturnNewline() throws Exception {
         RSAPublicKey actual = JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY_CARRIAGE_RETURN_NEWLINE);
         assertNotNull(actual);
     }
@@ -228,13 +162,13 @@ public class JCECryptoTest {
     }
 
     @Test
-    public void testGetRSAPrivateKeyFromPEM_CarriageReturn() throws Exception {
+    public void testGetRSAPrivateKeyFromPEMCarriageReturn() throws Exception {
         RSAPrivateKey actual = JCECrypto.getRSAPrivateKeyFromPEM(provider, PRIVATE_KEY_CARRIAGE_RETURN);
         assertNotNull(actual);
     }
 
     @Test
-    public void testGetRSAPrivateKeyFromPEM_CarriageReturnNewline() throws Exception {
+    public void testGetRSAPrivateKeyFromPEMCarriageReturnNewline() throws Exception {
         RSAPrivateKey actual = JCECrypto.getRSAPrivateKeyFromPEM(provider, PRIVATE_KEY_CARRIAGE_RETURN_NEWLINE);
         assertNotNull(actual);
     }
@@ -244,5 +178,15 @@ public class JCECryptoTest {
         String expected = "e806a291cfc3e61f83b98d344ee57e3e8933cccece4fb45e1481f1f560e70eb1";
         String actual = Hex.toHexString(crypto.sha256("Testing".getBytes()));
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetRsaPublicKeyFingerprintWithPrivateKeyReturnsProperFingerprint() throws Exception {
+        assertEquals(PUBLIC_KEY_FINGERPRINT, crypto.getRsaPublicKeyFingerprint(rsaPrivateKey));
+    }
+
+    @Test
+    public void testGetRsaPublicKeyFingerprintWithPublicKeyReturnsProperFingerprint() throws Exception {
+        assertEquals(PUBLIC_KEY_FINGERPRINT, crypto.getRsaPublicKeyFingerprint(rsaPublicKey));
     }
 }
