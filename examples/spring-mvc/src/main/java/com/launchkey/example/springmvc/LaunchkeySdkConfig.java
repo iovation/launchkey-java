@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "lk")
-public class PlatformSdkConfig {
+public class LaunchkeySdkConfig {
     private String baseUrl;
     private String serviceId;
     private String privateKeyLocation;

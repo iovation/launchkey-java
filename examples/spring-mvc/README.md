@@ -41,10 +41,10 @@ mvn clean package
   
   There are numerous ways to set those properties but the simplest way is usually to pass arguments to the JAR
   execution.  This is an example of how to run the example app from the main project root with the project version
-  of `3.0.0-SNAPSHOT`:
+  of `4.0.0-SNAPSHOT`:
   
   ```
-  java -jar examples/spring-mvc/target/examples-spring-mvc-3.0.0-SNAPSHOT.jar --lk.service-id=1234567890 --lk.private-key-location=/tmp/private-key.pem
+  java -jar examples/spring-mvc/target/examples-spring-mvc-4.0.0-SNAPSHOT.jar --lk.service-id=3cb7c699-be47-414f-830b-e81b9bb8cc40 --lk.private-key-location=/tmp/private-key.pem
   ```
 
 The name and location of the JAR file are subject to change. If you downloaded the JAR, substitute that name. If you 

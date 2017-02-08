@@ -8,13 +8,13 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.ArrayList;
 
-public class MultiFactorAuthenticationProvider implements AuthenticationProvider {
+public class LaunchKeyAuthenticationProvider implements AuthenticationProvider {
 
     private final AuthManager authManager;
 
     private int authRequestCounter = 0;
 
-    public MultiFactorAuthenticationProvider(AuthManager authManager) {
+    public LaunchKeyAuthenticationProvider(AuthManager authManager) {
         this.authManager = authManager;
     }
 

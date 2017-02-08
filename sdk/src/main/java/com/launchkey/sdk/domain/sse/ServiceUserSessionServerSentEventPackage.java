@@ -27,7 +27,7 @@ public class ServiceUserSessionServerSentEventPackage implements ServerSentEvent
     /**
      * Unique user identifier that will match the user hash in {@link AuthorizationResponse#getServiceUserHash()}
      */
-    private final String userHash;
+    private final String serviceUserHash;
 
     /**
      * The date and time the remote logout was requested. This value is to be used to ensure the user has not started
@@ -40,15 +40,15 @@ public class ServiceUserSessionServerSentEventPackage implements ServerSentEvent
      * @param logoutRequested The date and time the remote logout was requested. This value is to be used to ensure
      *                        the user has not started a new session since the logout was request and inadvertently
      *                        ending their application session.
-     * @param userHash Unique user identifier that will match the user hash in {@link AuthorizationResponse#getServiceUserHash()}
+     * @param serviceUserHash Unique user identifier that will match the user hash in {@link AuthorizationResponse#getServiceUserHash()}
      */
     @JsonCreator
     public ServiceUserSessionServerSentEventPackage(
             @JsonProperty("api_time") Date logoutRequested,
-            @JsonProperty("user_hash") String userHash
+            @JsonProperty("service_user_hash") String serviceUserHash
     ) {
         this.logoutRequested = logoutRequested;
-        this.userHash = userHash;
+        this.serviceUserHash = serviceUserHash;
     }
 
     /**
@@ -64,8 +64,8 @@ public class ServiceUserSessionServerSentEventPackage implements ServerSentEvent
      * Get the unique user identifier that will match the user hash in {@link AuthorizationResponse#getServiceUserHash()}
      * @return Unique user identifier
      */
-    public String getUserHash() {
-        return userHash;
+    public String getServiceUserHash() {
+        return serviceUserHash;
     }
 
     @Override public boolean equals(Object o) {
@@ -75,13 +75,13 @@ public class ServiceUserSessionServerSentEventPackage implements ServerSentEvent
         ServiceUserSessionServerSentEventPackage that = (ServiceUserSessionServerSentEventPackage) o;
 
         if (logoutRequested != null ? !logoutRequested.equals(that.logoutRequested) : that.logoutRequested != null) return false;
-        return !(userHash != null ? !userHash.equals(that.userHash) : that.userHash != null);
+        return !(serviceUserHash != null ? !serviceUserHash.equals(that.serviceUserHash) : that.serviceUserHash != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = getUserHash() != null ? getUserHash().hashCode() : 0;
+        int result = getServiceUserHash() != null ? getServiceUserHash().hashCode() : 0;
         result = 31 * result + (getLogoutRequested() != null ? getLogoutRequested().hashCode() : 0);
         return result;
     }
@@ -89,7 +89,7 @@ public class ServiceUserSessionServerSentEventPackage implements ServerSentEvent
     @Override
     public String toString() {
         return "ServiceUserSessionServerSentEventPackage{" +
-                "userHash='" + userHash + '\'' +
+                "serviceUserHash='" + serviceUserHash + '\'' +
                 ", logoutRequested=" + logoutRequested +
                 '}';
     }

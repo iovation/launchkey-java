@@ -34,7 +34,7 @@ public class AuthManager {
 
     @SuppressWarnings("ThrowFromFinallyBlock")
     @Autowired
-    public AuthManager(PlatformSdkConfig appConfig) throws ConfigurationException, IOException {
+    public AuthManager(LaunchkeySdkConfig appConfig) throws ConfigurationException, IOException {
         final String serviceId = appConfig.getServiceId();
         final String privateKeyLocation = appConfig.getPrivateKeyLocation();
         final String baseURL = appConfig.getBaseUrl();
@@ -103,18 +103,18 @@ public class AuthManager {
     public void logout(String sessionId) throws AuthException {
         if (sessionAuthenticationMap.get(sessionId)) {
             sessionAuthenticationMap.put(sessionId, false);
-            if (sessionAuthRequestMap.containsKey(sessionId)) {
-//                try {
-//                    serviceService.sessionEnd(sessionUserNameMap.get(sessionId));
+            if (sessionUserNameMap.containsKey(sessionId)) {
+                try {
+                    serviceService.sessionEnd(sessionUserNameMap.get(sessionId));
                     sessionAuthenticationMap.put(sessionId, false);
                     sessionAuthRequestMap.remove(sessionId);
                     sessionUserNameMap.remove(sessionId);
-//                } catch (BaseException apiException) {
-//                    throw new AuthException(
-//                            "Error on logout for getServiceService request: " + sessionAuthRequestMap.get(sessionId),
-//                            apiException
-//                    );
-//                }
+                } catch (BaseException apiException) {
+                    throw new AuthException(
+                            "Error on logout for getServiceService request: " + sessionAuthRequestMap.get(sessionId),
+                            apiException
+                    );
+                }
             } else {
                 throw new AuthException("No getServiceService request found for this session");
             }
@@ -151,7 +151,7 @@ public class AuthManager {
                 }
                 serviceService.sessionStart(sessionUserNameMap.get(sessionId));
             } else if (serverSentEventPackage instanceof ServiceUserSessionServerSentEventPackage) {
-                String userHash = ((ServiceUserSessionServerSentEventPackage) serverSentEventPackage).getUserHash();
+                String userHash = ((ServiceUserSessionServerSentEventPackage) serverSentEventPackage).getServiceUserHash();
                 for (String sessionId : userHashSessionMap.get(userHash)) {
                     logout(sessionId);
                 }

@@ -2,7 +2,6 @@ package com.launchkey.sdk.domain.sse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import com.launchkey.sdk.domain.sse.ServiceUserSessionServerSentEventPackage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,19 +46,19 @@ public class ServiceUserSessionServerSentEventPackageTest {
 
     @Test
     public void testGetUserHash() throws Exception {
-        assertEquals("User Hash", serviceUserSessionServerSentEventPackage.getUserHash());
+        assertEquals("User Hash", serviceUserSessionServerSentEventPackage.getServiceUserHash());
     }
 
     @Test
     public void testJSONParsable() throws Exception {
-        String json = "{\"api_time\":\"1970-01-01T00:00:00Z\",\"user_hash\":\"User Hash\"}";
+        String json = "{\"api_time\":\"1970-01-01T00:00:00Z\",\"service_user_hash\":\"User Hash\"}";
         ServiceUserSessionServerSentEventPackage actual = mapper.readValue(json, ServiceUserSessionServerSentEventPackage.class);
         assertEquals(serviceUserSessionServerSentEventPackage, actual);
     }
 
     @Test
     public void testJSONParseAllowsUnknown() throws Exception {
-        String json = "{\"api_time\":\"1970-01-01T00:00:00Z\",\"user_hash\":\"User Hash\"," +
+        String json = "{\"api_time\":\"1970-01-01T00:00:00Z\",\"service_user_hash\":\"User Hash\"," +
                 "\"unknown\": \"Unknown Value\"}";
         ServiceUserSessionServerSentEventPackage actual = mapper.readValue(json, ServiceUserSessionServerSentEventPackage.class);
         assertEquals(serviceUserSessionServerSentEventPackage, actual);

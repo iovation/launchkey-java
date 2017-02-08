@@ -1,17 +1,17 @@
-# SDK for Java
+# LaunchKey SDK for Java
 
   * [Modules](#modules)
   * [Support](#support)
 
 ## SDK
 
-The SDK for Java provides a native Java SDK for interacting with the Platform API.
+The LaunchKey SDK for Java provides a native Java SDK for interacting with the LaunchKey API.
 
 [Go to the README](sdk/README.md)
 
 ## Examples
 
-Examples for using the Platform SDK for Java
+Examples for using the LaunchKey SDK for Java
 
 ### CLI Example
 

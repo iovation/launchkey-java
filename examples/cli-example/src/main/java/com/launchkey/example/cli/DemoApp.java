@@ -319,7 +319,7 @@ public class DemoApp {
     ) throws BaseException, InterruptedException {
         String authRequest = serviceService.authorize(username, context);
         System.out.println();
-        System.out.println("Login request successful");
+        System.out.println("Authorization request successful");
         System.out.println("    Auth Request: " + authRequest);
         System.out.print("Checking for response from the End User");
         System.out.println();
@@ -331,13 +331,13 @@ public class DemoApp {
             authorizationResponse = serviceService.getAuthorizationResponse(authRequest);
             if (authorizationResponse != null) {
                 System.out.println();
-                System.out.println("Login request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
-                System.out.println("    Auth Request: " + authorizationResponse.getAuthorizationRequestId());
-                System.out.println("    Device ID:    " + authorizationResponse.getDeviceId());
-                System.out.println("    Svc User Hash:    " + authorizationResponse.getServiceUserHash());
-                System.out.println("    User Push ID: " + authorizationResponse.getUserPushId());
+                System.out.println("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
+                System.out.println("    Auth Request:  " + authorizationResponse.getAuthorizationRequestId());
+                System.out.println("    Device ID:     " + authorizationResponse.getDeviceId());
+                System.out.println("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
+                System.out.println("    User Push ID:  " + authorizationResponse.getUserPushId());
                 String orgHash = authorizationResponse.getOrganizationUserHash() == null ? "N/A" : authorizationResponse.getOrganizationUserHash();
-                System.out.println("    Org User Hash:  " + orgHash);
+                System.out.println("    Org User Hash: " + orgHash);
                 System.out.println();
                 return;
             }

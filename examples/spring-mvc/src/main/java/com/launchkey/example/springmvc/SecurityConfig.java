@@ -28,6 +28,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth, AuthManager authManager, LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         this.logoutSuccessHandler = logoutSuccessHandler;
-        auth.authenticationProvider(new MultiFactorAuthenticationProvider(authManager));
+        auth.authenticationProvider(new LaunchKeyAuthenticationProvider(authManager));
     }
 }

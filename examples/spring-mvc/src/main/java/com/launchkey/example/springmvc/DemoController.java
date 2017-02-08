@@ -60,7 +60,6 @@ public class DemoController {
         authManager.handleCallback(headers, body);
     }
 
-
     public static class Authorized {
         public boolean authorized;
     }
