@@ -1,9 +1,25 @@
 # CHANGELOG
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
+  * 4.0.0
+
+    __If you are not embedding a LaunchKey authenticator in your own mobile application, you will not be able to use version 4.0.x. Future releases will provide v3 API access for implementations utilizing the LaunchKey Mobile Authenticator.__ 
+
+    * Remove all API v1 endpoint code
+    * Remove all newly deprecated API v3 endpoint code (organization endpoints)
+    * Create clients and services for new API v3 endpoints
+
+  * 3.1.0
+    * Add organization based White Label Device management
+    * Deprecate application based White Label Device linking
+    * Create separate clients for organization and application credentials with a new factory
+    * Deprecate old client and related classes
+    * Implement JWT/JWE based communication with new organization endpoints
+
   * 3.0.0
     * Remove deprecated methods and classes
     * Update any documentation for new terminology
+
   * 2.1.0
     * Refactor classes, interfaces, methods, attributes, and parameters for new terminology. Backwards compatibility
         was maintained and old classes, interfaces, and methods were deprecated. They will be removed in version 3.0.
