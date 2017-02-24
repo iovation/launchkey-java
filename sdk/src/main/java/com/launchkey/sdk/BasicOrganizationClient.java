@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A basic implementation of an {@link OrganizationClient}
  */
+@Deprecated
 public class BasicOrganizationClient implements OrganizationClient {
     private final Map<String, DirectoryService> directoryServices;
     private final Map<String, ServiceService> serviceServices;

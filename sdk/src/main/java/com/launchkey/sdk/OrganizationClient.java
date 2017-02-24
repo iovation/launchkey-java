@@ -18,6 +18,7 @@ import com.launchkey.sdk.service.ServiceService;
 /**
  * Client for Organization based credentials.
  */
+@Deprecated
 public interface OrganizationClient {
 
     /**

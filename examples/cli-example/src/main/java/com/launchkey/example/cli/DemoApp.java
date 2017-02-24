@@ -1,21 +1,20 @@
 package com.launchkey.example.cli;
 
-import com.launchkey.sdk.ClientFactory;
-import com.launchkey.sdk.ClientFactoryBuilder;
-import com.launchkey.sdk.ServiceClient;
+import com.launchkey.sdk.FactoryFactory;
+import com.launchkey.sdk.FactoryFactoryBuilder;
+import com.launchkey.sdk.client.DirectoryClient;
+import com.launchkey.sdk.client.ServiceClient;
+import com.launchkey.sdk.client.ServiceFactory;
 import com.launchkey.sdk.domain.directory.Device;
 import com.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
 import com.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.launchkey.sdk.error.BaseException;
-import com.launchkey.sdk.service.DirectoryService;
-import com.launchkey.sdk.service.ServiceService;
 import com.martiansoftware.jsap.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
@@ -24,9 +23,6 @@ import org.apache.http.ssl.TrustStrategy;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -37,10 +33,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class DemoApp {
@@ -61,7 +55,7 @@ public class DemoApp {
             boolean help = commandLine.getBoolean("help");
             String[] commandArgs = commandLine.getStringArray("command-args");
             Provider provider = new BouncyCastleProvider();
-            ClientFactory clientFactory = getClientFactory(
+            FactoryFactory factoryFactory = getFactoryFactory(
                     commandLine.getURL("base-url").toString(),
                     !commandLine.getBoolean("no-verify"),
                     provider);
@@ -72,7 +66,7 @@ public class DemoApp {
                     printHelp(serviceJsap);
                 } else {
                     JSAPResult result = serviceJsap.parse(commandArgs);
-                    processServiceCommand(clientFactory, result);
+                    processServiceCommand(factoryFactory, result);
                 }
             } else if (command.equalsIgnoreCase("directory")) {
                 JSAP orgJsap = getDirectoryJSAP();
@@ -80,7 +74,7 @@ public class DemoApp {
                     printHelp(orgJsap);
                 } else {
                     JSAPResult result = orgJsap.parse(commandArgs);
-                    processDirectoryCommand(clientFactory, result);
+                    processDirectoryCommand(factoryFactory, result);
                 }
             } else {
                 System.out.println();
@@ -110,14 +104,14 @@ public class DemoApp {
         }
     }
 
-    private static void processDirectoryCommand(ClientFactory clientFactory, JSAPResult commandData) throws IOException, BaseException, JSAPException {
+    private static void processDirectoryCommand(FactoryFactory factoryFactory, JSAPResult commandData) throws IOException, BaseException, JSAPException {
         String directoryId = commandData.getString("directory-id");
         String privateKeyLocation = commandData.getString("key-file");
         String action = commandData.getString("action");
         String[] actionOptions = commandData.getStringArray("action-args");
         if (action != null && action.equalsIgnoreCase("device-link")) {
             if (actionOptions.length == 1) {
-                handleDirectoryUserDeviceLink(actionOptions[0], getDirectoryService(clientFactory, directoryId, privateKeyLocation));
+                handleDirectoryUserDeviceLink(actionOptions[0], getDirectoryFactory(factoryFactory, directoryId, privateKeyLocation));
             } else {
                 System.out.println();
                 System.out.println(
@@ -128,7 +122,7 @@ public class DemoApp {
             }
         } else if (action != null && action.equalsIgnoreCase("devices-list")) {
             if (actionOptions.length == 1) {
-                handleDirectoryUserDevicesList(actionOptions[0], getDirectoryService(clientFactory, directoryId, privateKeyLocation));
+                handleDirectoryUserDevicesList(actionOptions[0], getDirectoryFactory(factoryFactory, directoryId, privateKeyLocation));
             } else {
                 System.out.println();
                 System.out.println(
@@ -139,7 +133,7 @@ public class DemoApp {
             }
         } else if (action != null && action.equalsIgnoreCase("device-unlink")) {
             if (actionOptions.length == 2) {
-                handleDirectoryUserDeviceUnlink(actionOptions[0], actionOptions[1], getDirectoryService(clientFactory, directoryId, privateKeyLocation));
+                handleDirectoryUserDeviceUnlink(actionOptions[0], actionOptions[1], getDirectoryFactory(factoryFactory, directoryId, privateKeyLocation));
             } else {
                 System.out.println();
                 System.out.println(
@@ -157,14 +151,14 @@ public class DemoApp {
         }
     }
 
-    private static DirectoryService getDirectoryService(
-            ClientFactory clientFactory, String directoryId, String privateKeyLocation
+    private static DirectoryClient getDirectoryFactory(
+            FactoryFactory factoryFactory, String directoryId, String privateKeyLocation
     ) throws IOException {
-        return clientFactory.makeDirectoryClient(directoryId, readFile(privateKeyLocation))
-                .getDirectoryService();
+        return factoryFactory.makeDirectoryFactory(directoryId, readFile(privateKeyLocation))
+                .makeDirectoryClient();
     }
 
-    private static void processServiceCommand(ClientFactory clientFactory, JSAPResult commandData) throws JSAPException, IOException, BaseException, InterruptedException {
+    private static void processServiceCommand(FactoryFactory factoryFactory, JSAPResult commandData) throws JSAPException, IOException, BaseException, InterruptedException {
         String serviceId = commandData.getString("svc-id");
         String privateKeyLocation = commandData.getString("key-file");
         String action = commandData.getString("action");
@@ -174,13 +168,13 @@ public class DemoApp {
                 handleAuthorize(
                         actionOptions[0],
                         null,
-                        getServiceClient(clientFactory, serviceId, privateKeyLocation).getServiceService()
+                        getServiceFactory(factoryFactory, serviceId, privateKeyLocation).makeServiceClient()
                 );
             } else if (actionOptions.length == 2) {
                 handleAuthorize(
                         actionOptions[0],
                         actionOptions[1],
-                        getServiceClient(clientFactory, serviceId, privateKeyLocation).getServiceService()
+                        getServiceFactory(factoryFactory, serviceId, privateKeyLocation).makeServiceClient()
                 );
             } else {
                 System.out.println();
@@ -193,7 +187,7 @@ public class DemoApp {
             }
         } else if (action != null && action.equalsIgnoreCase("session-start")) {
             if (actionOptions.length == 1) {
-                getServiceClient(clientFactory, serviceId, privateKeyLocation).getServiceService().sessionStart(actionOptions[0]);
+                getServiceFactory(factoryFactory, serviceId, privateKeyLocation).makeServiceClient().sessionStart(actionOptions[0]);
                 System.out.println();
                 System.out.println("User session is started.");
                 System.out.println();
@@ -207,7 +201,7 @@ public class DemoApp {
 
         } else if (action != null && action.equalsIgnoreCase("session-end")) {
             if (actionOptions.length == 1) {
-                getServiceClient(clientFactory, serviceId, privateKeyLocation).getServiceService().sessionEnd(actionOptions[0]);
+                getServiceFactory(factoryFactory, serviceId, privateKeyLocation).makeServiceClient().sessionEnd(actionOptions[0]);
                 System.out.println();
                 System.out.println("User session is ended.");
                 System.out.println();
@@ -228,16 +222,16 @@ public class DemoApp {
         }
     }
 
-    private static ServiceClient getServiceClient(
-            ClientFactory clientFactory, String serviceId, String privateKeyLocation
+    private static ServiceFactory getServiceFactory(
+            FactoryFactory factoryFactory, String serviceId, String privateKeyLocation
     ) throws IOException {
-        return clientFactory.makeServiceClient(serviceId, readFile(privateKeyLocation));
+        return factoryFactory.makeServiceFactory(serviceId, readFile(privateKeyLocation));
     }
 
-    private static ClientFactory getClientFactory(
+    private static FactoryFactory getFactoryFactory(
             String baseUrl, boolean verifySSL,
             Provider provider) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        ClientFactoryBuilder builder = new ClientFactoryBuilder()
+        FactoryFactoryBuilder builder = new FactoryFactoryBuilder()
                 .setJCEProvider(provider)
                 .setAPIBaseURL(baseUrl);
 
@@ -279,18 +273,18 @@ public class DemoApp {
     }
 
     private static void handleDirectoryUserDeviceUnlink(
-            String identifier, String deviceName, DirectoryService directoryService
+            String identifier, String deviceName, DirectoryClient directoryClient
     ) throws BaseException {
         System.out.println();
-        directoryService.unlinkDevice(identifier, deviceName);
+        directoryClient.unlinkDevice(identifier, deviceName);
         System.out.println("Device unlinked");
         System.out.println();
     }
 
     private static void handleDirectoryUserDevicesList(
-            String identifier, DirectoryService directoryService
+            String identifier, DirectoryClient directoryClient
     ) throws BaseException {
-        List<Device> devices = directoryService.getLinkedDevices(identifier);
+        List<Device> devices = directoryClient.getLinkedDevices(identifier);
         System.out.println();
         System.out.println("Devices:");
         for (Device device : devices) {
@@ -304,9 +298,9 @@ public class DemoApp {
     }
 
     private static void handleDirectoryUserDeviceLink(
-            String identifier, DirectoryService directoryService
+            String identifier, DirectoryClient directoryClient
     ) throws BaseException {
-        DirectoryUserDeviceLinkData result = directoryService.linkDevice(identifier);
+        DirectoryUserDeviceLinkData result = directoryClient.linkDevice(identifier);
         System.out.println();
         System.out.println("Device link request successful");
         System.out.println("    QR Code URL: " + result.getQrCodeUrl());
@@ -315,9 +309,9 @@ public class DemoApp {
     }
 
     private static void handleAuthorize(
-            String username, String context, ServiceService serviceService
+            String username, String context, ServiceClient serviceClient
     ) throws BaseException, InterruptedException {
-        String authRequest = serviceService.authorize(username, context);
+        String authRequest = serviceClient.authorize(username, context);
         System.out.println();
         System.out.println("Authorization request successful");
         System.out.println("    Auth Request: " + authRequest);
@@ -328,7 +322,7 @@ public class DemoApp {
         while (new Date().getTime() - started < 30000) {
             Thread.sleep(1000L);
             System.out.print(".");
-            authorizationResponse = serviceService.getAuthorizationResponse(authRequest);
+            authorizationResponse = serviceClient.getAuthorizationResponse(authRequest);
             if (authorizationResponse != null) {
                 System.out.println();
                 System.out.println("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");

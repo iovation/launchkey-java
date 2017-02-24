@@ -1,13 +1,13 @@
 package com.launchkey.example.springmvc;
 
-import com.launchkey.sdk.ServiceClient;
-import com.launchkey.sdk.ClientFactoryBuilder;
+import com.launchkey.sdk.FactoryFactoryBuilder;
+import com.launchkey.sdk.client.ServiceClient;
+import com.launchkey.sdk.client.ServiceFactory;
 import com.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.launchkey.sdk.domain.sse.AuthorizationResponseServerSentEventPackage;
 import com.launchkey.sdk.domain.sse.ServerSentEventPackage;
 import com.launchkey.sdk.domain.sse.ServiceUserSessionServerSentEventPackage;
 import com.launchkey.sdk.error.BaseException;
-import com.launchkey.sdk.service.ServiceService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class AuthManager {
-    final Logger log = LoggerFactory.getLogger(getClass());
-    private final ServiceService serviceService;
+    private final ServiceClient serviceClient;
     private final Map<String, String> sessionAuthRequestMap;
     private final Map<String, Boolean> sessionAuthenticationMap;
     private final Map<String, List<String>> userHashSessionMap;
@@ -40,6 +39,7 @@ public class AuthManager {
         final String baseURL = appConfig.getBaseUrl();
 
         boolean halt = false;
+        Logger log = LoggerFactory.getLogger(getClass());
         if (serviceId == null) {
             log.error("lk.service-id property not provided");
             halt = true;
@@ -65,14 +65,14 @@ public class AuthManager {
         }
         String privateKey = sb.toString();
 
-        ClientFactoryBuilder builder = new ClientFactoryBuilder()
+        FactoryFactoryBuilder builder = new FactoryFactoryBuilder()
                 .setJCEProvider(new BouncyCastleProvider());
         if (baseURL != null) {
             builder.setAPIBaseURL(baseURL);
         }
-        ServiceClient client = builder.build().makeServiceClient(serviceId, privateKey);
+        ServiceFactory factory = builder.build().makeServiceFactory(serviceId, privateKey);
 
-        serviceService = client.getServiceService();
+        serviceClient = factory.makeServiceClient();
         sessionAuthenticationMap = Collections.synchronizedMap(new HashMap<String, Boolean>());
         sessionAuthRequestMap = new ConcurrentHashMap<String, String>();
         userHashSessionMap = new ConcurrentHashMap<String, List<String>>();
@@ -81,7 +81,7 @@ public class AuthManager {
 
     public void login(String username, String context) throws AuthException {
         try {
-            String authRequestId = this.serviceService.authorize(username, context);
+            String authRequestId = this.serviceClient.authorize(username, context);
             String sessionId = getSessionId();
             sessionAuthRequestMap.put(sessionId, authRequestId);
             sessionUserNameMap.put(sessionId, username);
@@ -105,7 +105,7 @@ public class AuthManager {
             sessionAuthenticationMap.put(sessionId, false);
             if (sessionUserNameMap.containsKey(sessionId)) {
                 try {
-                    serviceService.sessionEnd(sessionUserNameMap.get(sessionId));
+                    serviceClient.sessionEnd(sessionUserNameMap.get(sessionId));
                     sessionAuthenticationMap.put(sessionId, false);
                     sessionAuthRequestMap.remove(sessionId);
                     sessionUserNameMap.remove(sessionId);
@@ -123,7 +123,7 @@ public class AuthManager {
 
     public void handleCallback(Map<String, List<String>> headers, String body) throws AuthException {
         try {
-            ServerSentEventPackage serverSentEventPackage = serviceService.handleServerSentEvent(headers, body);
+            ServerSentEventPackage serverSentEventPackage = serviceClient.handleServerSentEvent(headers, body);
             if (serverSentEventPackage instanceof AuthorizationResponseServerSentEventPackage) {
                 AuthorizationResponse authorizationResponse = ((AuthorizationResponseServerSentEventPackage) serverSentEventPackage).getAuthorizationResponse();
                 String authRequestId = authorizationResponse.getAuthorizationRequestId();
@@ -149,7 +149,7 @@ public class AuthManager {
                 if (!sessionList.contains(sessionId)) {
                     sessionList.add(sessionId);
                 }
-                serviceService.sessionStart(sessionUserNameMap.get(sessionId));
+                serviceClient.sessionStart(sessionUserNameMap.get(sessionId));
             } else if (serverSentEventPackage instanceof ServiceUserSessionServerSentEventPackage) {
                 String userHash = ((ServiceUserSessionServerSentEventPackage) serverSentEventPackage).getServiceUserHash();
                 for (String sessionId : userHashSessionMap.get(userHash)) {

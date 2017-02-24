@@ -12,6 +12,7 @@
 
 package com.launchkey.sdk.service;
 
+import com.launchkey.sdk.client.BasicDirectoryClient;
 import com.launchkey.sdk.domain.directory.Device;
 import com.launchkey.sdk.domain.directory.DeviceStatus;
 import com.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
@@ -24,59 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class BasicDirectoryService implements DirectoryService {
-    public final Transport transport;
-    public final EntityIdentifier directory;
-
+@Deprecated
+public class BasicDirectoryService extends BasicDirectoryClient implements DirectoryService {
     public BasicDirectoryService(UUID directoryId, Transport transport) {
-        this.transport = transport;
-        this.directory = new EntityIdentifier(EntityType.DIRECTORY, directoryId);
-    }
-
-    public DirectoryUserDeviceLinkData linkDevice(String userId) throws PlatformErrorException, UnknownEntityException,
-            InvalidResponseException, InvalidStateException, InvalidRequestException, InvalidCredentialsException,
-            CommunicationErrorException, MarshallingError, CryptographyError {
-        DirectoryV3DevicesPostRequest request = new DirectoryV3DevicesPostRequest(userId);
-        DirectoryV3DevicesPostResponse response = transport.directoryV3DevicesPost(request, directory);
-        return new DirectoryUserDeviceLinkData(response.getCode(), response.getQRCode());
-    }
-
-    @Override
-    public List<Device> getLinkedDevices(String userId) throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException, InvalidRequestException, InvalidCredentialsException, CommunicationErrorException, MarshallingError, CryptographyError {
-        DirectoryV3DevicesListPostRequest request = new DirectoryV3DevicesListPostRequest(userId);
-        DirectoryV3DevicesListPostResponse response = transport.directoryV3DevicesListPost(request, directory);
-        List<Device> devices = new ArrayList();
-        for (DirectoryV3DevicesListPostResponseDevice responseDevice : response.getDevices()) {
-            devices.add(new Device(
-                    responseDevice.getId().toString(),
-                    responseDevice.getName(),
-                    DeviceStatus.fromCode(responseDevice.getStatus()),
-                    responseDevice.getType()
-            ));
-        }
-        return devices;
-    }
-
-    @Override
-    public void unlinkDevice(String userId, String deviceId) throws PlatformErrorException,
-            UnknownEntityException, InvalidResponseException, InvalidStateException, InvalidRequestException,
-            InvalidCredentialsException, CommunicationErrorException, MarshallingError, CryptographyError {
-        UUID deviceUUID;
-        try {
-            deviceUUID = UUID.fromString(deviceId);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Device ID", e);
-
-        }
-        DirectoryV3DevicesDeleteRequest request = new DirectoryV3DevicesDeleteRequest(userId, deviceUUID);
-        transport.directoryV3devicesDelete(request, directory);
-    }
-
-    @Override
-    public void endAllServiceSessions(String userId) throws PlatformErrorException, UnknownEntityException,
-            InvalidResponseException, InvalidStateException, InvalidRequestException, InvalidCredentialsException,
-            CommunicationErrorException, CryptographyError, MarshallingError {
-        DirectoryV3SessionsDeleteRequest request = new DirectoryV3SessionsDeleteRequest((userId));
-        transport.directoryV3SessionsDelete(request, directory);
+        super(directoryId, transport);
     }
 }
