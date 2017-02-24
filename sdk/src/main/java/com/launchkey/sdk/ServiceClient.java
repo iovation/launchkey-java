@@ -17,6 +17,7 @@ import com.launchkey.sdk.service.ServiceService;
 /**
  * Client for Service Credentials
  */
+@Deprecated
 public interface ServiceClient {
     /**
      * Get an Service service based on the credentials associated

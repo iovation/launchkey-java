@@ -10,17 +10,24 @@
  * limitations under the License.
  */
 
-package com.launchkey.sdk.service;
+package com.launchkey.sdk.client;
 
-import com.launchkey.sdk.client.BasicServiceClient;
+import com.launchkey.sdk.client.ServiceClient;
 import com.launchkey.sdk.transport.Transport;
 
 import java.util.UUID;
 
-@Deprecated
-public class BasicServiceService extends BasicServiceClient implements ServiceService {
+public class ServiceFactory {
 
-    public BasicServiceService(UUID serviceId, Transport transport) {
-        super(serviceId, transport);
+    private final Transport transport;
+    private final UUID serviceId;
+
+    public ServiceFactory(Transport transport, UUID serviceID) {
+        this.transport = transport;
+        this.serviceId = serviceID;
+    }
+
+    public ServiceClient makeServiceClient() {
+        return new BasicServiceClient(serviceId, transport);
     }
 }

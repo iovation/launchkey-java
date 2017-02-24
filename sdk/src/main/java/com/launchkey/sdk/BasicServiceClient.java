@@ -22,7 +22,8 @@ import java.util.UUID;
  * Basic client for interacting with the LaunchKey API utilizing
  * Service credentials.
  */
-public class BasicServiceClient implements ServiceClient {
+@Deprecated
+public class BasicServiceClient implements com.launchkey.sdk.ServiceClient {
 
     private final ServiceService serviceService;
 

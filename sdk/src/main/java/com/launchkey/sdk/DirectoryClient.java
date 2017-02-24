@@ -18,6 +18,7 @@ import com.launchkey.sdk.service.ServiceService;
 /**
  * CLient for Directory Credentials
  */
+@Deprecated
 public interface DirectoryClient {
     /**
      * Get a Directory service based on the client credentials
