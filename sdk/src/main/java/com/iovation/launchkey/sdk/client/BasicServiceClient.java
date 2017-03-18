@@ -15,7 +15,6 @@ package com.iovation.launchkey.sdk.client;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.ServiceUserSessionEndWebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
-import com.iovation.launchkey.sdk.service.ServiceService;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.*;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
@@ -28,7 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class BasicServiceClient implements ServiceService {
+public class BasicServiceClient implements ServiceClient {
     private final EntityIdentifier serviceEntity;
     private final Transport transport;
 
