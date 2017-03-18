@@ -2,19 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>launchkey-examples-parent</artifactId>
-        <groupId>com.launchkey.sdk</groupId>
-        <version>4.1.0-SNAPSHOT</version>
+        <artifactId>sdk-examples-parent</artifactId>
+        <groupId>com.iovation.launchkey</groupId>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>examples-cli</artifactId>
-    <name>CLI Example Application</name>
-    <description>Example application for using the Platform SDK in a CLI application</description>
+    <artifactId>sdk-examples-cli</artifactId>
+    <name>iovation LaunchKey SDK Example CLI Application</name>
+    <description>Example application for using the LaunchKey SDK in a CLI application</description>
 
     <dependencies>
         <dependency>
-            <groupId>com.launchkey.sdk</groupId>
-            <artifactId>launchkey-sdk</artifactId>
+            <groupId>com.iovation.launchkey</groupId>
+            <artifactId>sdk</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -37,7 +37,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.launchkey.example.cli.DemoApp</mainClass>
+                            <mainClass>com.iovation.launchkey.sdk.example.cli.DemoApp</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
