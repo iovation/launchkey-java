@@ -1,12 +1,6 @@
 # CHANGELOG
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
-  * 4.1.0
-    * Rename classes based on user feedback
-      * Client factory renamed to factory factory
-      * Clients renamed to factories
-      * Services renamed to clients
-  
   * 4.0.0
 
     __If you are not embedding a LaunchKey authenticator in your own mobile application, you will not be able to use version 4.0.x. Future releases will provide v3 API access for implementations utilizing the LaunchKey Mobile Authenticator.__ 
@@ -14,6 +8,7 @@ This changelog references the relevant changes (bug and security fixes) for the 
     * Remove all API v1 endpoint code
     * Remove all newly deprecated API v3 endpoint code (organization endpoints)
     * Create clients and services for new API v3 endpoints
+    * Rename all classes for migration to com.iovation.launchkey group
 
   * 3.1.0
     * Add organization based White Label Device management

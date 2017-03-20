@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.launchkey.sdk</groupId>
-    <artifactId>launchkey-root</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <groupId>com.iovation.launchkey</groupId>
+    <artifactId>sdk-root</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>LaunchKey Root Module</name>
+    <name>iovation LaunchKey SDK Root Module</name>
     <description>Root module for all modules related to the iovation LaunchKey SDK for Java</description>
     <url>https://github.com/LaunchKey/launchkey-java</url>
 
@@ -29,7 +29,7 @@
     <licenses>
         <license>
             <name>MIT</name>
-            <url>https://raw.githubusercontent.com/LaunchKey/launchkey-java/master/LICENSE.txt</url>
+            <url>https://raw.githubusercontent.com/iovation/launchkey-java/master/LICENSE.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -50,11 +50,11 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
+            <id>iovation-ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>ossrh</id>
+            <id>iovation-ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
     </distributionManagement>
@@ -183,7 +183,7 @@
                 <version>1.6.6</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
+                    <serverId>iovation-ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
                 </configuration>

@@ -9,7 +9,7 @@
 
 This example project utilizes Spring MVC and Spring Boot to provide a fully self-contained browser based example
 of implementing the SDK in a web application environment.  The example application hooks directly into the 
-Spring MVC Web Security flow.  It implements Server Sent Events (SSE) to process authentication
+Spring MVC Web Security flow.  It implements webhooks to process authentication
 responses and logout requests.  Rudimentary JavaScript exists on the home page to check for remote logout and force
 the user to re-authenticate.
 
@@ -20,7 +20,7 @@ This example requires a JVM for Java 1.7 or greater.
 Follow the pre-requisites instructions for the SDK: [SDK Instructions](../../sdk/README.md#prerequisites).
 The demo will utilize the Bouncy Castle JCE provider.  Make sure to install that provider in the instructions.
 
-You will also need a reverse proxy in order to allow for Server Sent Events (SSE) to process.  Ngrok is free and simple
+You will also need a reverse proxy in order to allow for webhooks to process.  Ngrok is free and simple
 to use.  The examples in this document will be based on Ngrok.  [You may obtain Ngrok here](https://ngrok.com/).
 
 
@@ -99,10 +99,10 @@ GET /                          302 Found
 
     ```
 
-5. Now that your web server and reverse proxy are working, update your application with the callback URL.  This is done
-   by placing the URL you just verified from Ngrok plus the path `/callback` into the callback field in the General
-   section of your Application configuration in the Dashboard.
-   Based ion the Ngrok example above the callback URL would be: `https://d5caea01.ngrok.com/callback`.
+5. Now that your web server and reverse proxy are working, update your Service Profile with the webhook callback URL.
+   This is done by placing the URL you just verified from Ngrok plus the path `/webhook` into the callback field in 
+   the General section of your Application configuration in the Dashboard.
+   Based ion the Ngrok example above the callback URL would be: `https://d5caea01.ngrok.com/webhook`.
 
 6. Access the home page at [http://localhost:8080](http://localhost:8080).  You will be redirected to the `/login`
   page the first time you access the page.

@@ -1,4 +1,4 @@
-# LaunchKey SDK for Java - CLI Example
+# iovation LaunchKey SDK for Java - CLI Example
 
 
   * [Pre-Requisites](#prerequisites)
@@ -10,7 +10,7 @@
 
 ## <a name="prerequisites"></a>Pre-Requisites
 
-Follow the pre-requisites instructions for the LaunchKey SDK for Java: [SDK Instructions](../../sdk/README.md#prerequisites).
+Follow the pre-requisites instructions for the iovation LaunchKey SDK for Java: [SDK Instructions](../../sdk/README.md#prerequisites).
 The demo will utilize the Bouncy Castle JCE provider.  Make sure to install that provider in the instructions.
 
 ## <a name="installation"></a>Installation
