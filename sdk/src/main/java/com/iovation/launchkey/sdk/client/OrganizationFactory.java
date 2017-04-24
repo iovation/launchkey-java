@@ -26,7 +26,7 @@ public class OrganizationFactory {
         this.organizationId = organizationId;
     }
 
-    DirectoryClient makeDirectoryClient(String directoryId) {
+    public DirectoryClient makeDirectoryClient(String directoryId) {
         UUID directoryUUID;
         try {
             directoryUUID = UUID.fromString(directoryId);
@@ -38,7 +38,7 @@ public class OrganizationFactory {
         return new BasicDirectoryClient(directoryUUID, transport);
     }
 
-    ServiceClient makeServiceClient(String serviceId) {
+    public ServiceClient makeServiceClient(String serviceId) {
         UUID serviceUUID;
         try {
             serviceUUID = UUID.fromString(serviceId);
