@@ -1,6 +1,10 @@
 # CHANGELOG
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
+
+  * 4.0.1 Bug fix for Organization Factory method access
+    * Make factory methods public
+    * Add tests outside the package for all client factories to prevent recurrence
   * 4.0.0
 
     __If you are not embedding a LaunchKey authenticator in your own mobile application, you will not be able to use version 4.0.x. Future releases will provide v3 API access for implementations utilizing the LaunchKey Mobile Authenticator.__ 
