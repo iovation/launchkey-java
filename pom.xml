@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.iovation.launchkey</groupId>
     <artifactId>sdk-root</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>iovation LaunchKey SDK Root Module</name>
     <description>Root module for all modules related to the iovation LaunchKey SDK for Java</description>
@@ -23,7 +23,7 @@
         <connection>scm:git:git@github.com:iovation/launchkey-java.git</connection>
         <developerConnection>scm:git:git@github.com:iovation/launchkey-java.git</developerConnection>
         <url>https://github.com/iovation/launchkey-java</url>
-        <tag>v4.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <licenses>
