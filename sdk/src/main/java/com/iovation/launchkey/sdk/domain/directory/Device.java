@@ -12,11 +12,15 @@
 
 package com.iovation.launchkey.sdk.domain.directory;
 
+import java.util.Date;
+
 public class Device {
     private final String id;
     private final String name;
     private final DeviceStatus status;
     private final String type;
+    private final Date created;
+    private final Date updated;
 
     /**
      * A device that may perform user interaction with the Platform API
@@ -25,11 +29,13 @@ public class Device {
      * @param status Status of the device (link pending, linked, unlink pending)
      * @param type Type of device (iOS, Android, etc.)
      */
-    public Device(String id, String name, DeviceStatus status, String type) {
+    public Device(String id, String name, DeviceStatus status, String type, Date created, Date updated) {
         this.id = id;
         this.name = name;
         this.status = status;
         this.type = type;
+        this.created = created;
+        this.updated = updated;
     }
 
     /**
@@ -64,6 +70,22 @@ public class Device {
         return type;
     }
 
+    /**
+     * Get the date/time the device was created
+     * @return Created date/time
+     */
+    public Date getCreated() {
+        return created;
+    }
+
+    /**
+     * Get the date/time the device was last updated
+     * @return Updated date/time
+     */
+    public Date getUpdated() {
+        return updated;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -74,7 +96,10 @@ public class Device {
         if (getId() != null ? !getId().equals(device.getId()) : device.getId() != null) return false;
         if (getName() != null ? !getName().equals(device.getName()) : device.getName() != null) return false;
         if (getStatus() != device.getStatus()) return false;
-        return getType() != null ? getType().equals(device.getType()) : device.getType() == null;
+        if (getType() != null ? !getType().equals(device.getType()) : device.getType() != null) return false;
+        if (getCreated() != null ? !getCreated().equals(device.getCreated()) : device.getCreated() != null)
+            return false;
+        return getUpdated() != null ? getUpdated().equals(device.getUpdated()) : device.getUpdated() == null;
     }
 
     @Override
@@ -83,6 +108,8 @@ public class Device {
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         result = 31 * result + (getStatus() != null ? getStatus().hashCode() : 0);
         result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+        result = 31 * result + (getCreated() != null ? getCreated().hashCode() : 0);
+        result = 31 * result + (getUpdated() != null ? getUpdated().hashCode() : 0);
         return result;
     }
 
@@ -93,6 +120,8 @@ public class Device {
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", type='" + type + '\'' +
+                ", created=" + created +
+                ", updated=" + updated +
                 '}';
     }
 }

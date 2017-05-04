@@ -15,6 +15,7 @@ package com.iovation.launchkey.sdk.transport.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -23,17 +24,23 @@ public class DirectoryV3DevicesListPostResponseDevice {
     private final String name;
     private final String type;
     private final int status;
+    private final Date created;
+    private final Date updated;
 
     public DirectoryV3DevicesListPostResponseDevice(
             @JsonProperty(value = "id") UUID id,
             @JsonProperty(value = "name") String name,
             @JsonProperty(value = "type") String type,
-            @JsonProperty(value = "status") int status
+            @JsonProperty(value = "status") int status,
+            @JsonProperty(value = "created") Date created,
+            @JsonProperty(value = "updated") Date updated
     ) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.status = status;
+        this.created = created;
+        this.updated = updated;
     }
 
     public UUID getId() {
@@ -52,6 +59,14 @@ public class DirectoryV3DevicesListPostResponseDevice {
         return status;
     }
 
+    public Date getCreated() {
+        return created;
+    }
+
+    public Date getUpdated() {
+        return updated;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -62,7 +77,9 @@ public class DirectoryV3DevicesListPostResponseDevice {
         if (getStatus() != that.getStatus()) return false;
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) return false;
-        return getType() != null ? getType().equals(that.getType()) : that.getType() == null;
+        if (getType() != null ? !getType().equals(that.getType()) : that.getType() != null) return false;
+        if (getCreated() != null ? !getCreated().equals(that.getCreated()) : that.getCreated() != null) return false;
+        return getUpdated() != null ? getUpdated().equals(that.getUpdated()) : that.getUpdated() == null;
     }
 
     @Override
@@ -71,6 +88,8 @@ public class DirectoryV3DevicesListPostResponseDevice {
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         result = 31 * result + (getType() != null ? getType().hashCode() : 0);
         result = 31 * result + getStatus();
+        result = 31 * result + (getCreated() != null ? getCreated().hashCode() : 0);
+        result = 31 * result + (getUpdated() != null ? getUpdated().hashCode() : 0);
         return result;
     }
 
@@ -81,6 +100,8 @@ public class DirectoryV3DevicesListPostResponseDevice {
                 ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", status=" + status +
+                ", created=" + created +
+                ", updated=" + updated +
                 '}';
     }
 }

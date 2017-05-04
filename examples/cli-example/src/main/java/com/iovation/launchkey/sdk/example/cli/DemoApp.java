@@ -105,7 +105,7 @@ public class DemoApp {
     }
 
     private static void processDirectoryCommand(FactoryFactory factoryFactory, JSAPResult commandData) throws IOException, BaseException, JSAPException {
-        String directoryId = commandData.getString("directory-id");
+        String directoryId = commandData.getString("dir-id");
         String privateKeyLocation = commandData.getString("key-file");
         String action = commandData.getString("action");
         String[] actionOptions = commandData.getStringArray("action-args");
@@ -138,7 +138,7 @@ public class DemoApp {
                 System.out.println();
                 System.out.println(
                         "device-unlink action requires two action arguments which are the unique ID of the " +
-                                "user for your application and the name of the device to delete"
+                                "user for your application and the ID of the device to delete"
                 );
                 System.out.println();
             }
@@ -288,13 +288,14 @@ public class DemoApp {
         System.out.println();
         System.out.println("Devices:");
         for (Device device : devices) {
-            System.out.println("  " + device.getName() + ":");
+            System.out.println("  " + device.getId() + ":");
+            System.out.println("    Name:    " + device.getName());
             System.out.println("    Type:    " + device.getType());
             System.out.println("    Status:  " + device.getStatus());
+            System.out.println("    Created: " + device.getCreated());
+            System.out.println("    Updated: " + device.getUpdated());
         }
         System.out.println();
-
-
     }
 
     private static void handleDirectoryUserDeviceLink(

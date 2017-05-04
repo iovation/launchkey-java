@@ -50,7 +50,9 @@ public class BasicDirectoryClient implements DirectoryClient {
                     responseDevice.getId().toString(),
                     responseDevice.getName(),
                     DeviceStatus.fromCode(responseDevice.getStatus()),
-                    responseDevice.getType()
+                    responseDevice.getType(),
+                    responseDevice.getCreated(),
+                    responseDevice.getUpdated()
             ));
         }
         return devices;
