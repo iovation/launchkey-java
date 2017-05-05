@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.UUIDHelper;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.ServiceUserSessionEndWebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
@@ -32,6 +33,7 @@ public class BasicServiceClient implements ServiceClient {
     private final Transport transport;
 
     public BasicServiceClient(UUID serviceId, Transport transport) {
+        UUIDHelper.validateVersion(serviceId, 1);
         this.serviceEntity = new EntityIdentifier(EntityIdentifier.EntityType.SERVICE, serviceId);
         this.transport = transport;
     }

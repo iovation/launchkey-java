@@ -28,7 +28,7 @@ public class DirectoryFactoryExternalAccessVerificationTest {
 
     @Before
     public void setUp() throws Exception {
-        factory = new DirectoryFactory(mock(Transport.class), UUID.randomUUID());
+        factory = new DirectoryFactory(mock(Transport.class), UUID.fromString("49af9c38-31b3-11e7-93ae-92361f002671"));
     }
 
     @After
@@ -43,6 +43,6 @@ public class DirectoryFactoryExternalAccessVerificationTest {
 
     @Test
     public void testMakeServiceClient() throws Exception {
-        factory.makeServiceClient(UUID.randomUUID().toString());
+        factory.makeServiceClient("49af9c38-31b3-11e7-93ae-92361f002671");
     }
 }

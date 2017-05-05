@@ -72,8 +72,13 @@ public class FactoryFactory {
         return makeServiceFactory(serviceId, keys, publicKeyFingerprint);
     }
 
-    public ServiceFactory makeServiceFactory(String directoryId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
-        UUID serviceUUID = UUID.fromString(directoryId);
+    public ServiceFactory makeServiceFactory(String serviceId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
+        UUID serviceUUID;
+        try {
+            serviceUUID = UUIDHelper.fromString(serviceId, 1);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid Service ID", e);
+        }
         EntityIdentifier serviceEntity = new EntityIdentifier(EntityType.SERVICE, serviceUUID);
         Transport transport = getTransport(serviceEntity, privateKeys, currentPrivateKey);
         ServiceFactory serviceFactory = new ServiceFactory(transport, serviceUUID);
@@ -88,8 +93,13 @@ public class FactoryFactory {
         return makeDirectoryFactory(directoryId, keys, publicKeyFingerprint);
     }
 
-    public DirectoryFactory makeDirectoryFactory(String serviceId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
-        UUID directoryUUID = UUID.fromString(serviceId);
+    public DirectoryFactory makeDirectoryFactory(String directoryId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
+        UUID directoryUUID;
+        try {
+            directoryUUID = UUIDHelper.fromString(directoryId, 1);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid Directory ID", e);
+        }
         EntityIdentifier directoryEntity = new EntityIdentifier(EntityType.DIRECTORY, directoryUUID);
         Transport transport = getTransport(directoryEntity, privateKeys, currentPrivateKey);
         DirectoryFactory directoryFactory = new DirectoryFactory(transport, directoryUUID);
@@ -105,7 +115,12 @@ public class FactoryFactory {
     }
 
     public synchronized OrganizationFactory makeOrganizationFactory(String organizationId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
-        UUID organizationUUID = UUID.fromString(organizationId);
+        UUID organizationUUID;
+        try {
+            organizationUUID = UUIDHelper.fromString(organizationId, 1);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid Organization ID", e);
+        }
         EntityIdentifier organizationEntity = new EntityIdentifier(EntityType.ORGANIZATION, organizationUUID);
         Transport transport = getTransport(organizationEntity, privateKeys, currentPrivateKey);
         OrganizationFactory organizationFactory = new OrganizationFactory(transport, organizationUUID);

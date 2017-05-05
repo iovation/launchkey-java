@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.UUIDHelper;
 import com.iovation.launchkey.sdk.domain.directory.Device;
 import com.iovation.launchkey.sdk.domain.directory.DeviceStatus;
 import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
@@ -28,6 +29,7 @@ public class BasicDirectoryClient implements DirectoryClient {
     public final EntityIdentifier directory;
 
     public BasicDirectoryClient(UUID directoryId, Transport transport) {
+        UUIDHelper.validateVersion(directoryId, 1);
         this.transport = transport;
         this.directory = new EntityIdentifier(EntityIdentifier.EntityType.DIRECTORY, directoryId);
     }

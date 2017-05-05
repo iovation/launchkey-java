@@ -23,13 +23,16 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.mock;
 
+/**
+ * These tests are for regression and only ensure that the factory methods are accessible outside the package
+ */
 public class OrganizationFactoryExternalAccessVerificationTest {
 
-    OrganizationFactory factory = null;
+    private OrganizationFactory factory = null;
 
     @Before
     public void setUp() throws Exception {
-        factory = new OrganizationFactory(mock(Transport.class), UUID.randomUUID());
+        factory = new OrganizationFactory(mock(Transport.class), UUID.fromString("49af9c38-31b3-11e7-93ae-92361f002671"));
     }
 
     @After
@@ -39,11 +42,11 @@ public class OrganizationFactoryExternalAccessVerificationTest {
 
     @Test
     public void testMakeDirectoryClient() throws Exception {
-        factory.makeDirectoryClient(UUID.randomUUID().toString());
+        factory.makeDirectoryClient("49af9c38-31b3-11e7-93ae-92361f002671");
     }
 
     @Test
     public void testMakeServiceClient() throws Exception {
-        factory.makeServiceClient(UUID.randomUUID().toString());
+        factory.makeServiceClient("49af9c38-31b3-11e7-93ae-92361f002671");
     }
 }
