@@ -22,7 +22,7 @@ public class DirectoryV3DevicesListPostResponseTest {
     @Test
     public void getDevices() throws Exception {
         List<DirectoryV3DevicesListPostResponseDevice> expected =
-                Arrays.asList(new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0));
+                Arrays.asList(new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null));
         DirectoryV3DevicesListPostResponse response = new DirectoryV3DevicesListPostResponse(expected);
         List<DirectoryV3DevicesListPostResponseDevice> actual = response.getDevices();
         assertEquals(expected, actual);
@@ -32,9 +32,9 @@ public class DirectoryV3DevicesListPostResponseTest {
     public void equalsIsTrueForEqualObjects() throws Exception {
         UUID uuid = UUID.randomUUID();
         DirectoryV3DevicesListPostResponseDevice device =
-                new DirectoryV3DevicesListPostResponseDevice(uuid, "name", "type", 0);
+                new DirectoryV3DevicesListPostResponseDevice(uuid, "name", "type", 0, null, null);
         DirectoryV3DevicesListPostResponseDevice other =
-                new DirectoryV3DevicesListPostResponseDevice(uuid, "name", "type", 0);
+                new DirectoryV3DevicesListPostResponseDevice(uuid, "name", "type", 0, null, null);
 
         assertTrue(device.equals(other));
     }
@@ -42,9 +42,9 @@ public class DirectoryV3DevicesListPostResponseTest {
     @Test
     public void equalsIsFalseForUnequalObjects() throws Exception {
         DirectoryV3DevicesListPostResponseDevice device =
-                new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0);
+                new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null);
         DirectoryV3DevicesListPostResponseDevice other =
-                new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0);
+                new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null);
 
         assertFalse(device.equals(other));
     }
@@ -52,7 +52,7 @@ public class DirectoryV3DevicesListPostResponseTest {
     @Test
     public void hashCodeForEqualObjectsIsEqual() throws Exception {
         DirectoryV3DevicesListPostResponseDevice device =
-                new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0);
+                new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null);
 
         assertEquals(
                 new DirectoryV3DevicesListPostResponse(Arrays.asList(device)).hashCode(),
@@ -64,10 +64,10 @@ public class DirectoryV3DevicesListPostResponseTest {
     public void hashCodeForUnequalObjectsIsNotEqual() throws Exception {
         assertNotEquals(
                 new DirectoryV3DevicesListPostResponse(Arrays.asList(
-                        new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0)
+                        new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null)
                 )).hashCode(),
                 new DirectoryV3DevicesListPostResponse(Arrays.asList(
-                        new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0)
+                        new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null)
                 )).hashCode()
         );
     }
