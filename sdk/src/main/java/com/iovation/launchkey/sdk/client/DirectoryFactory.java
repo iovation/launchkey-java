@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.UUIDHelper;
 import com.iovation.launchkey.sdk.transport.Transport;
 
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class DirectoryFactory {
     private final UUID directoryId;
 
     public DirectoryFactory(Transport transport, UUID directoryId) {
+        UUIDHelper.validateVersion(directoryId, 1);
         this.transport = transport;
         this.directoryId = directoryId;
     }
@@ -32,11 +34,9 @@ public class DirectoryFactory {
     public ServiceClient makeServiceClient(String serviceId) {
         UUID serviceUUID;
         try {
-            serviceUUID = UUID.fromString(serviceId);
+            serviceUUID = UUIDHelper.fromString(serviceId, 1);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid Service ID", e);
-        } catch (NullPointerException e) {
-            throw new IllegalArgumentException("Service ID cannot be null", e);
         }
         return new BasicServiceClient(serviceUUID, transport);
     }

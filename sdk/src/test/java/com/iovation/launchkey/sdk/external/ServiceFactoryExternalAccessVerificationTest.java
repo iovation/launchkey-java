@@ -28,7 +28,7 @@ public class ServiceFactoryExternalAccessVerificationTest {
 
     @Before
     public void setUp() throws Exception {
-        factory = new ServiceFactory(mock(Transport.class), UUID.randomUUID());
+        factory = new ServiceFactory(mock(Transport.class), UUID.fromString("49af9c38-31b3-11e7-93ae-92361f002671"));
     }
 
     @After

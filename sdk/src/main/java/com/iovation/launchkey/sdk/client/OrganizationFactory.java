@@ -12,16 +12,17 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.UUIDHelper;
 import com.iovation.launchkey.sdk.transport.Transport;
 
 import java.util.UUID;
 
 public class OrganizationFactory {
     private final Transport transport;
-    @SuppressWarnings("FieldCanBeLocal")
     private final UUID organizationId;
 
     public OrganizationFactory(Transport transport, UUID organizationId) {
+        UUIDHelper.validateVersion(organizationId, 1);
         this.transport = transport;
         this.organizationId = organizationId;
     }
@@ -29,11 +30,9 @@ public class OrganizationFactory {
     public DirectoryClient makeDirectoryClient(String directoryId) {
         UUID directoryUUID;
         try {
-            directoryUUID = UUID.fromString(directoryId);
+            directoryUUID = UUIDHelper.fromString(directoryId, 1);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid Directory ID", e);
-        } catch (NullPointerException e) {
-            throw new IllegalArgumentException("Directory ID cannot be null", e);
         }
         return new BasicDirectoryClient(directoryUUID, transport);
     }
@@ -41,11 +40,9 @@ public class OrganizationFactory {
     public ServiceClient makeServiceClient(String serviceId) {
         UUID serviceUUID;
         try {
-            serviceUUID = UUID.fromString(serviceId);
+            serviceUUID = UUIDHelper.fromString(serviceId, 1);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid Service ID", e);
-        } catch (NullPointerException e) {
-            throw new IllegalArgumentException("Service ID cannot be null", e);
         }
         return new BasicServiceClient(serviceUUID, transport);
     }

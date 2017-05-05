@@ -3,9 +3,7 @@ package com.iovation.launchkey.sdk.client;
 import com.iovation.launchkey.sdk.transport.Transport;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.internal.matchers.InstanceOf;
 
 import java.util.UUID;
@@ -17,12 +15,9 @@ public class DirectoryFactoryTest {
 
     private DirectoryFactory directoryFactory;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Before
     public void setUp() throws Exception {
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = UUID.fromString("49af9c38-31b3-11e7-93ae-92361f002671");
         Transport transport = mock(Transport.class);
         directoryFactory = new DirectoryFactory(transport, uuid);
     }
@@ -33,31 +28,33 @@ public class DirectoryFactoryTest {
     }
 
     @Test
-    public void testMakeDirectoryClientWithValidUUIDReturnsClient() throws Exception {
+    public void testMakeDirectoryClientReturnsClient() throws Exception {
         assertThat(
                 directoryFactory.makeDirectoryClient(),
                 new InstanceOf(DirectoryClient.class)
         );
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testMakeServiceClientWithNullThrowsIllegalArgument() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
         directoryFactory.makeServiceClient(null);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testMakeServiceClientWithInvalidUUIDThrowsIllegalArgument() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
         directoryFactory.makeServiceClient("Not A UUID");
     }
 
     @Test
     public void testMakeServiceClientWithValidUUIDReturnsClient() throws Exception {
         assertThat(
-                directoryFactory.makeServiceClient(UUID.randomUUID().toString()),
+                directoryFactory.makeServiceClient("49af9c38-31b3-11e7-93ae-92361f002671"),
                 new InstanceOf(ServiceClient.class));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testMakeServiceClientWithNonUUID1ThrowsIllegalArgument() throws Exception {
+        directoryFactory.makeServiceClient(UUID.randomUUID().toString());
+    }
 
 }

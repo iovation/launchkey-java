@@ -22,6 +22,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class FactoryFactoryTest {
+    private static final String UUID1 = "49af9c38-31b3-11e7-93ae-92361f002671";
+
     final String privateKeyPEM =
             "-----BEGIN RSA PRIVATE KEY-----\n" +
                     "MIIEpAIBAAKCAQEAn+agtJ3eGHNxwkkss2jTCSdcLNrWKawjmvNc27YFe8cVmBlJ\n" +
@@ -79,10 +81,20 @@ public class FactoryFactoryTest {
         factoryFactory = null;
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void makeServiceFactoryWithNullUUIDThrowsIllegalArgument() throws Exception {
+        factoryFactory.makeServiceFactory(null, privateKeyPEM);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void makeServiceFactoryWithNonUUID1ThrowsIllegalArgument() throws Exception {
+        factoryFactory.makeServiceFactory(UUID.randomUUID().toString(), privateKeyPEM);
+    }
+
     @Test
     public void makeServiceFactoryWithKey() throws Exception {
         assertThat(
-                factoryFactory.makeServiceFactory(UUID.randomUUID().toString(), privateKeyPEM),
+                factoryFactory.makeServiceFactory(UUID1, privateKeyPEM),
                 new IsInstanceOf(ServiceFactory.class)
         );
     }
@@ -90,15 +102,25 @@ public class FactoryFactoryTest {
     @Test
     public void makeServiceFactoryWithKeymap() throws Exception {
         assertThat(
-                factoryFactory.makeServiceFactory(UUID.randomUUID().toString(), new HashMap<String, RSAPrivateKey>(), "Current key"),
+                factoryFactory.makeServiceFactory(UUID1, new HashMap<String, RSAPrivateKey>(), "Current key"),
                 new IsInstanceOf(ServiceFactory.class)
         );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void makeDirectoryFactoryWithNullUUIDThrowsIllegalArgument() throws Exception {
+        factoryFactory.makeDirectoryFactory(null, privateKeyPEM);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void makeDirectoryFactoryWithNonUUID1ThrowsIllegalArgument() throws Exception {
+        factoryFactory.makeDirectoryFactory(UUID.randomUUID().toString(), privateKeyPEM);
     }
 
     @Test
     public void makeDirectoryFactoryWithKey() throws Exception {
         assertThat(
-                factoryFactory.makeDirectoryFactory(UUID.randomUUID().toString(), privateKeyPEM),
+                factoryFactory.makeDirectoryFactory(UUID1, privateKeyPEM),
                 new IsInstanceOf(DirectoryFactory.class)
         );
     }
@@ -106,15 +128,25 @@ public class FactoryFactoryTest {
     @Test
     public void makeDirectoryFactoryWithKeymap() throws Exception {
         assertThat(
-                factoryFactory.makeDirectoryFactory(UUID.randomUUID().toString(), new HashMap<String, RSAPrivateKey>(), "Current key"),
+                factoryFactory.makeDirectoryFactory(UUID1, new HashMap<String, RSAPrivateKey>(), "Current key"),
                 new IsInstanceOf(DirectoryFactory.class)
         );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void makOrganizationFactoryWithNullUUIDThrowsIllegalArgument() throws Exception {
+        factoryFactory.makeOrganizationFactory(null, privateKeyPEM);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void makeOrganizationFactoryWithNonUUID1ThrowsIllegalArgument() throws Exception {
+        factoryFactory.makeOrganizationFactory(UUID.randomUUID().toString(), privateKeyPEM);
     }
 
     @Test
     public void makeOrganizationFactoryWithKey() throws Exception {
         assertThat(
-                factoryFactory.makeOrganizationFactory(UUID.randomUUID().toString(), privateKeyPEM),
+                factoryFactory.makeOrganizationFactory(UUID1, privateKeyPEM),
                 new IsInstanceOf(OrganizationFactory.class)
         );
     }
@@ -122,7 +154,7 @@ public class FactoryFactoryTest {
     @Test
     public void makeOrganizationFactoryWithKeymap() throws Exception {
         assertThat(
-                factoryFactory.makeOrganizationFactory(UUID.randomUUID().toString(), new HashMap<String, RSAPrivateKey>(), "Current key"),
+                factoryFactory.makeOrganizationFactory(UUID1, new HashMap<String, RSAPrivateKey>(), "Current key"),
                 new IsInstanceOf(OrganizationFactory.class)
         );
     }

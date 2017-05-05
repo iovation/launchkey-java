@@ -8,7 +8,6 @@ import org.mockito.internal.matchers.InstanceOf;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -20,7 +19,7 @@ public class ServiceFactoryTest {
     @Before
     public void setUp() throws Exception {
         transport = mock(Transport.class);
-        serviceFactory = new ServiceFactory(transport, UUID.randomUUID());
+        serviceFactory = new ServiceFactory(transport, UUID.fromString("49af9c38-31b3-11e7-93ae-92361f002671"));
     }
 
     @After
@@ -32,5 +31,10 @@ public class ServiceFactoryTest {
     @Test
     public void testMakeServiceClientReturnsServiceClient() throws Exception {
         assertThat(serviceFactory.makeServiceClient(), new InstanceOf(ServiceClient.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nonUUID1ThrowsIllegalArgument() throws Exception {
+        new ServiceFactory(transport, UUID.randomUUID());
     }
 }

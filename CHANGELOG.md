@@ -6,7 +6,9 @@ This changelog references the relevant changes (bug and security fixes) for the 
   
     * Add created and updated attributes to Device domain object
     * Fixed bug with example CLI app looking for incorrect Directory command argument
-    * Updated help information to coorect;y identify that the Device ID is needed not the name when using hte device-unlink command
+    * Updated help information to correctly identify that the Device ID is needed not the name when using hte device-unlink command
+    * Add UUID validation to factories and clients for entity IDs
+    * Fixed a few parameter names
 
   * 4.0.1
 
