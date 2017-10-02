@@ -1,11 +1,11 @@
 package com.iovation.launchkey.sdk.domain.webhook;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.containsString;
@@ -31,7 +31,7 @@ public class ServiceUserSessionWebhookPackageTest {
     public void setUp() throws Exception {
         serviceUserSessionServerSentEventPackage = new ServiceUserSessionEndWebhookPackage(new Date(0L), "User Hash");
         mapper = new ObjectMapper();
-        mapper.setDateFormat(new ISO8601DateFormat());
+//        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
     }
 
     @After
