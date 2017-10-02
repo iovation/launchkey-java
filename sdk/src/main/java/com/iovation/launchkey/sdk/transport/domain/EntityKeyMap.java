@@ -21,13 +21,13 @@ public class EntityKeyMap {
     private final ConcurrentHashMap<EntityIdentifier, ConcurrentHashMap<String, RSAPrivateKey>> store;
 
     public EntityKeyMap() {
-        store = new ConcurrentHashMap<EntityIdentifier, ConcurrentHashMap<String, RSAPrivateKey>>();
+        store = new ConcurrentHashMap<>();
     }
 
     public void addKey(EntityIdentifier entityIdentifier, String publicKeyFingerprint, RSAPrivateKey privateKey) {
         ConcurrentHashMap<String, RSAPrivateKey> entityKeys;
         if (!store.containsKey(entityIdentifier)) {
-            entityKeys = new ConcurrentHashMap<String, RSAPrivateKey>();
+            entityKeys = new ConcurrentHashMap<>();
             store.put(entityIdentifier, entityKeys);
         } else {
             entityKeys = store.get(entityIdentifier);

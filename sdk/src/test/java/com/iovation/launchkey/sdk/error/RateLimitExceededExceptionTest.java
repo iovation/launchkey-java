@@ -31,8 +31,7 @@ public class RateLimitExceededExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         RateLimitExceededException base = new RateLimitExceededException(MESSAGE, CAUSE, CODE);
-        RateLimitExceededException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class RateLimitExceededExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         RateLimitExceededException base = new RateLimitExceededException(MESSAGE, CAUSE, CODE);
-        RateLimitExceededException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

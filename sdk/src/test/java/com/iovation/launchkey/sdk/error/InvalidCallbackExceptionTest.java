@@ -31,8 +31,7 @@ public class InvalidCallbackExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         InvalidCallbackException base = new InvalidCallbackException(MESSAGE, CAUSE, CODE);
-        InvalidCallbackException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class InvalidCallbackExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         InvalidCallbackException base = new InvalidCallbackException(MESSAGE, CAUSE, CODE);
-        InvalidCallbackException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

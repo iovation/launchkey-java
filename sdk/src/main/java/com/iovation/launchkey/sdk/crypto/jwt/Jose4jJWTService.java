@@ -71,7 +71,7 @@ public class Jose4jJWTService implements JWTService {
         exp.addSeconds((long) requestExpireSeconds);
         jwtClaims.setExpirationTime(exp);
 
-        Map<String, String> request = new HashMap<String, String>();
+        Map<String, String> request = new HashMap<>();
         //noinspection SpellCheckingInspection
         request.put("meth", method);
         request.put("path", path);
@@ -126,7 +126,8 @@ public class Jose4jJWTService implements JWTService {
             JwtConsumer jwtConsumer = builder.build();
 
             JwtClaims libraryClaims = jwtConsumer.processToClaims(jwt);
-            Map<String, String> requestClaims = libraryClaims.getClaimValue("request", Map.class);
+            Map responseClaims = libraryClaims.getClaimValue("response", Map.class);
+
             claims = new JWTClaims(
                     libraryClaims.getJwtId(),
                     libraryClaims.getIssuer(),
@@ -135,10 +136,11 @@ public class Jose4jJWTService implements JWTService {
                     (int) libraryClaims.getIssuedAt().getValue(),
                     (int) libraryClaims.getNotBefore().getValue(),
                     (int) libraryClaims.getExpirationTime().getValue(),
-                    requestClaims == null ? null : requestClaims.get("func"),
-                    requestClaims == null ? null : requestClaims.get("hash"),
-                    requestClaims == null ? null : requestClaims.get("meth"),
-                    requestClaims == null ? null : requestClaims.get("path")
+                    responseClaims.get("func") == null ? null : String.valueOf(responseClaims.get("func")),
+                    responseClaims.get("hash") == null ? null : String.valueOf(responseClaims.get("hash")),
+                    Integer.valueOf(String.valueOf(responseClaims.get("status"))),
+                    responseClaims.get("cache") == null ? null : String.valueOf(responseClaims.get("cache")),
+                    responseClaims.get("location") == null ? null : String.valueOf(responseClaims.get("location"))
             );
         } catch (InvalidJwtException e) {
             throw new JWTError("An error occurred parsing the JWT", e);
@@ -174,9 +176,7 @@ public class Jose4jJWTService implements JWTService {
                     claims.getAudience().get(0),
                     keyId
             );
-        } catch (InvalidJwtException e) {
-            throw new JWTError("An error occurred parsing the JWT", e);
-        } catch (MalformedClaimException e) {
+        } catch (InvalidJwtException|MalformedClaimException e) {
             throw new JWTError("An error occurred parsing the JWT", e);
         }
         return jwtData;

@@ -122,11 +122,13 @@ public class Jose4jJWEServiceTest {
 
     @Test(expected = JWEFailure.class)
     public void decryptJoseExceptionThrowsJweFailure() throws Exception {
+        //noinspection SpellCheckingInspection
         jweService.decrypt("kjsdhflskd");
     }
 
     @Test
     public void getHeadersReturnsHeaders() throws Exception {
+        //noinspection SpellCheckingInspection
         final String jwe = "eyJhbGciOiAiUlNBLU9BRVAtMjU2IiwgImVuYyI6ICJBMjU2Q0JDLUhTNTEyIn0" +
                 "." +
                 "Y1MWFsSjxD2_dz5R4O5YxlltyyyD9TEWvfx78APqbHWbG93ABCHKoGVObyDDT0WewtrsOdTO64zkqoOo_aWQhTU93ghcrscQlWu-zeoT5Gm4g_HEDxblnmnquL5i_VmNwWtF9v-d540xc9kBzGaeCjh7TSeiovF5kdjzcBXnLcrhtk51ojjtE8B21kl3qk7XHKC7BH_wE9l8WZK-4qvFyRBJ7URga3XLBSpTDobUy--Wk2tRgbHw-WbELGf9Eylz99uKlfUrR7ayhrWF61vS2WrTpYtwW0E_AY21Uoxj8Orz0QlMmOtCKNcGfqpnVaV5QCveRB6pKbR0IT4i7Y7kmw" +
@@ -136,7 +138,7 @@ public class Jose4jJWEServiceTest {
                 "ATzHOCjSdR4OPnQEhKU9iVwr6zfoUJ4wdxZ-YZ852X0" +
                 "." +
                 "yWl6YlFVXgio_brw0UbqpP1CKrpg2gVQD16smhzu6Jk";
-        Map<String, Object> expected = new LinkedHashMap<String, Object>();
+        Map<String, Object> expected = new LinkedHashMap<>();
         expected.put("alg", "RSA-OAEP-256");
         expected.put("enc", "A256CBC-HS512");
 

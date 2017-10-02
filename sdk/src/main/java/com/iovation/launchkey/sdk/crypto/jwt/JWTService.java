@@ -22,6 +22,7 @@ public interface JWTService {
      * @param jti Token ID
      * @param issuer JWT issuer
      * @param subject JWT subject
+     * @param currentTime The current time used to generate Issued At, Not Before, and Expires
      * @param method Request method
      * @param path Request path
      * @param contentHashAlgorithm Hashing algorithm used to create the contentHash from the content
@@ -38,14 +39,18 @@ public interface JWTService {
      * @param publicKey Public Key to verify JWT signature
      * @param expectedAudience Audience identifier expected in response
      * @param expectedTokenId Expected Token ID
+     * @param currentTime The current time used to determine if the JWT is valid based on Issued At, Not Before, and
+     * Expires
      * @param jwt Compact serialization encoded JWT
      * @return Claims object
      * @throws JWTError When an error occurs decoding the JWT
      */
-    JWTClaims decode(PublicKey publicKey, String expectedAudience, String expectedTokenId, Date currentTime, String jwt) throws JWTError;
+    JWTClaims decode(PublicKey publicKey, String expectedAudience, String expectedTokenId, Date currentTime, String jwt)
+            throws JWTError;
 
     /**
      * Get the kid value from the header of the JWT
+     *
      * @param jwt Get the data from the JWT without verifying or validating
      * @return JWT data from claims and header
      * @throws JWTError When an error occurs parsing the JWT

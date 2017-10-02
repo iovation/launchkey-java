@@ -33,6 +33,7 @@ public class ServiceV3SessionsPostRequestTest {
         assertEquals(expected, actual);
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Test
     public void marshalsFullJsonAsExpected() throws Exception {
         ServiceV3SessionsPostRequest request = new ServiceV3SessionsPostRequest(

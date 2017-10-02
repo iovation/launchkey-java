@@ -12,16 +12,18 @@ package com.iovation.launchkey.sdk.transport.domain; /**
 
 import org.junit.Test;
 
-import java.security.PublicKey;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 
 public class PublicV3PublicKeyGetResponseTest {
     @Test
     public void publicKeyGetter() throws Exception {
-        PublicKey expected = mock(PublicKey.class);
-//        assertEquals(expected, new PublicPublicKeyGetResponse(expected, null).getPublicKey());
+        //noinspection SpellCheckingInspection
+        String publicKey = "-----BEGIN PUBLIC KEY-----\n" +
+                "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALPHw4M3S8LTwngk+KxzQCXrru6wI1ZJ\n" +
+                "evG0xc4iclQ3CUA38IMqD9o8nC6FXUeDdNLcBbVISDRi9X0OWc9hNn0CAwEAAQ==\n" +
+                "-----END PUBLIC KEY-----";
+        assertEquals(publicKey, new PublicV3PublicKeyGetResponse(publicKey, null).getPublicKey());
     }
 
     @Test

@@ -66,7 +66,7 @@ public class Jose4jJWEService implements JWEService {
             jwe.setEncryptionMethodHeaderParameter(ContentEncryptionAlgorithmIdentifiers.AES_256_CBC_HMAC_SHA_512);
             encrypted = jwe.getCompactSerialization();
         } catch (JoseException e) {
-            throw new JWEFailure("An error occurred attempting to decrypt a JWE", e);
+            throw new JWEFailure("An error occurred attempting to encrypt a JWE", e);
         }
         return encrypted;
     }
@@ -79,7 +79,7 @@ public class Jose4jJWEService implements JWEService {
             jwe.setCompactSerialization(data);
             String headersJSON = jwe.getHeaders().getFullHeaderAsJsonString();
             Map<String, Object> objectMap = JsonUtil.parseJson(headersJSON);
-            Map<String, String> headers = new LinkedHashMap<String, String>(objectMap.size());
+            Map<String, String> headers = new LinkedHashMap<>(objectMap.size());
             for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
                 headers.put(entry.getKey(), String.valueOf(entry.getValue()));
             }

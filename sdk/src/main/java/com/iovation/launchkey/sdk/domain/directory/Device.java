@@ -28,6 +28,8 @@ public class Device {
      * @param name Unique name of the device
      * @param status Status of the device (link pending, linked, unlink pending)
      * @param type Type of device (iOS, Android, etc.)
+     * @param created Date the device was created
+     * @param updated Date the device was last updated
      */
     public Device(String id, String name, DeviceStatus status, String type, Date created, Date updated) {
         this.id = id;

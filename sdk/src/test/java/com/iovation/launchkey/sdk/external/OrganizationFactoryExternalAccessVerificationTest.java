@@ -17,7 +17,6 @@ import com.iovation.launchkey.sdk.transport.Transport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
 import java.util.UUID;
 

@@ -31,8 +31,7 @@ public class NoSuchUserExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         NoSuchUserException base = new NoSuchUserException(MESSAGE, CAUSE, CODE);
-        NoSuchUserException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class NoSuchUserExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         NoSuchUserException base = new NoSuchUserException(MESSAGE, CAUSE, CODE);
-        NoSuchUserException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

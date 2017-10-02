@@ -464,9 +464,8 @@ public class DemoApp {
 
     @SuppressWarnings("ThrowFromFinallyBlock")
     private static String readFile(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
         StringBuilder sb = new StringBuilder();
-        try {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line = br.readLine();
 
             while (line != null) {
@@ -474,8 +473,6 @@ public class DemoApp {
                 sb.append("\n");
                 line = br.readLine();
             }
-        } finally {
-            br.close();
         }
         return sb.toString();
     }

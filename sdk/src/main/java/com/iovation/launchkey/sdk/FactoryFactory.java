@@ -1,18 +1,18 @@
 package com.iovation.launchkey.sdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iovation.launchkey.sdk.client.ServiceFactory;
-import com.iovation.launchkey.sdk.transport.Transport;
-import com.iovation.launchkey.sdk.transport.apachehttp.ApacheHttpTransport;
-import com.iovation.launchkey.sdk.transport.domain.EntityKeyMap;
 import com.iovation.launchkey.sdk.cache.Cache;
 import com.iovation.launchkey.sdk.client.DirectoryFactory;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.client.ServiceFactory;
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import com.iovation.launchkey.sdk.crypto.jwe.Jose4jJWEService;
 import com.iovation.launchkey.sdk.crypto.jwt.Jose4jJWTService;
+import com.iovation.launchkey.sdk.transport.Transport;
+import com.iovation.launchkey.sdk.transport.apachehttp.ApacheHttpTransport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier.EntityType;
+import com.iovation.launchkey.sdk.transport.domain.EntityKeyMap;
 import org.apache.http.client.HttpClient;
 
 import java.security.Provider;
@@ -40,6 +40,7 @@ public class FactoryFactory {
     /**
      * @param provider JCE provider
      * @param httpClient HTTP client
+     * @param keyCache Caching for public keys from LaunchKey API
      * @param apiBaseURL Base URL for the Platform API
      * @param apiIdentifier JWT identifier for the API. Used to send requests with the proper ID and validate
      * responses and server sent events.
@@ -67,64 +68,51 @@ public class FactoryFactory {
     public ServiceFactory makeServiceFactory(String serviceId, String privateKeyPEM) {
         RSAPrivateKey privateKey = makePrivateKeyFromPEM(privateKeyPEM);
         String publicKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(privateKey);
-        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<String, RSAPrivateKey>();
+        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<>();
         keys.put(publicKeyFingerprint, privateKey);
         return makeServiceFactory(serviceId, keys, publicKeyFingerprint);
     }
 
     public ServiceFactory makeServiceFactory(String serviceId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
-        UUID serviceUUID;
-        try {
-            serviceUUID = UUIDHelper.fromString(serviceId, 1);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Service ID", e);
-        }
+        UUID serviceUUID = UUID.fromString(serviceId);
         EntityIdentifier serviceEntity = new EntityIdentifier(EntityType.SERVICE, serviceUUID);
         Transport transport = getTransport(serviceEntity, privateKeys, currentPrivateKey);
-        ServiceFactory serviceFactory = new ServiceFactory(transport, serviceUUID);
-        return serviceFactory;
+        return new ServiceFactory(transport, serviceUUID);
     }
 
     public DirectoryFactory makeDirectoryFactory(String directoryId, String privateKeyPEM) {
         RSAPrivateKey privateKey = makePrivateKeyFromPEM(privateKeyPEM);
         String publicKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(privateKey);
-        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<String, RSAPrivateKey>();
+        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<>();
         keys.put(publicKeyFingerprint, privateKey);
         return makeDirectoryFactory(directoryId, keys, publicKeyFingerprint);
     }
 
-    public DirectoryFactory makeDirectoryFactory(String directoryId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
-        UUID directoryUUID;
-        try {
-            directoryUUID = UUIDHelper.fromString(directoryId, 1);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Directory ID", e);
-        }
+    public DirectoryFactory makeDirectoryFactory(String directoryId, Map<String, RSAPrivateKey> privateKeys,
+                                                 String currentPrivateKey) {
+        if (directoryId == null) throw new IllegalArgumentException("Argument directoryId cannot be null");
+        UUID directoryUUID = UUID.fromString(directoryId);
         EntityIdentifier directoryEntity = new EntityIdentifier(EntityType.DIRECTORY, directoryUUID);
         Transport transport = getTransport(directoryEntity, privateKeys, currentPrivateKey);
-        DirectoryFactory directoryFactory = new DirectoryFactory(transport, directoryUUID);
-        return directoryFactory;
+        return new DirectoryFactory(transport, directoryUUID);
     }
 
     public synchronized OrganizationFactory makeOrganizationFactory(String organizationId, String privateKeyPEM) {
         RSAPrivateKey privateKey = makePrivateKeyFromPEM(privateKeyPEM);
         String publicKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(privateKey);
-        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<String, RSAPrivateKey>();
+        Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<>();
         keys.put(publicKeyFingerprint, privateKey);
         return makeOrganizationFactory(organizationId, keys, publicKeyFingerprint);
     }
 
-    public synchronized OrganizationFactory makeOrganizationFactory(String organizationId, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKey) {
-        UUID organizationUUID;
-        try {
-            organizationUUID = UUIDHelper.fromString(organizationId, 1);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Organization ID", e);
-        }
+    public synchronized OrganizationFactory makeOrganizationFactory(String organizationId,
+                                                                    Map<String, RSAPrivateKey> privateKeys,
+                                                                    String currentPrivateKey) {
+        if (organizationId == null) throw new IllegalArgumentException("Argument organizationId cannot be null");
+        UUID organizationUUID = UUID.fromString(organizationId);
         EntityIdentifier organizationEntity = new EntityIdentifier(EntityType.ORGANIZATION, organizationUUID);
         Transport transport = getTransport(organizationEntity, privateKeys, currentPrivateKey);
-        OrganizationFactory organizationFactory = new OrganizationFactory(transport, organizationUUID);
-        return organizationFactory;
+        return new OrganizationFactory(transport, organizationUUID);
     }
 
     private Transport getTransport(
@@ -135,7 +123,7 @@ public class FactoryFactory {
         return new ApacheHttpTransport(
                 httpClient,
                 new JCECrypto(provider),
-                new ObjectMapper(),
+                getObjectMapper(),
                 keyCache,
                 apiBaseURL,
                 entityIdentifier,
@@ -145,6 +133,10 @@ public class FactoryFactory {
                 currentPublicKeyTTL,
                 entityKeyMap
         );
+    }
+
+    private ObjectMapper getObjectMapper() {
+        return new ObjectMapper();
     }
 
     private RSAPrivateKey makePrivateKeyFromPEM(String privateKeyPEM) {

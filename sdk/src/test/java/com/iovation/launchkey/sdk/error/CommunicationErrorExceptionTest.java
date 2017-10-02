@@ -31,8 +31,7 @@ public class CommunicationErrorExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         CommunicationErrorException base = new CommunicationErrorException(MESSAGE, CAUSE, CODE);
-        CommunicationErrorException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class CommunicationErrorExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         CommunicationErrorException base = new CommunicationErrorException(MESSAGE, CAUSE, CODE);
-        CommunicationErrorException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 
@@ -101,6 +99,37 @@ public class CommunicationErrorExceptionTest {
 
     @Test
     public void toStringContainsClassName() throws Exception {
-        assertTrue(new CommunicationErrorException(MESSAGE, CAUSE, CODE).toString().contains(CommunicationErrorException.class.getSimpleName()));
+        assertTrue(new CommunicationErrorException(MESSAGE, CAUSE, CODE).toString()
+                .contains(CommunicationErrorException.class.getSimpleName()));
+    }
+
+    @Test
+    public void from401IsUnauthorized() throws Exception {
+        assertEquals(new Unauthorized("Message", null, "401"),
+                CommunicationErrorException.fromStatusCode(401, "Message"));
+    }
+
+    @Test
+    public void from403IsForbidden() throws Exception {
+        assertEquals(new Unauthorized("Message", null, "403"),
+                CommunicationErrorException.fromStatusCode(403, "Message"));
+    }
+
+    @Test
+    public void from404IsEntityNotFound() throws Exception {
+        assertEquals(new Unauthorized("Message", null, "404"),
+                CommunicationErrorException.fromStatusCode(404, "Message"));
+    }
+
+    @Test
+    public void from408IsTimedOut() throws Exception {
+        assertEquals(new Unauthorized("Message", null, "408"),
+                CommunicationErrorException.fromStatusCode(408, "Message"));
+    }
+
+    @Test
+    public void from429IsRateLimited() throws Exception {
+        assertEquals(new Unauthorized("Message", null, "429"),
+                CommunicationErrorException.fromStatusCode(429, "Message"));
     }
 }

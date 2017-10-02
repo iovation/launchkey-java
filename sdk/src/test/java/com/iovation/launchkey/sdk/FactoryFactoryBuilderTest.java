@@ -5,10 +5,10 @@ import org.apache.http.client.HttpClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.matchers.InstanceOf;
 
 import java.security.Provider;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -28,7 +28,7 @@ public class FactoryFactoryBuilderTest {
 
     @Test
     public void buildReturnsFactoryFactory() throws Exception {
-        assertThat(builder.build(), new InstanceOf(FactoryFactory.class));
+        assertThat(builder.build(), instanceOf(FactoryFactory.class));
     }
 
     @Test

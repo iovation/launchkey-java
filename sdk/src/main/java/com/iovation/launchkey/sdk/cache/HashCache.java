@@ -18,7 +18,7 @@ public class HashCache implements Cache {
     private final ConcurrentHashMap<String, String> store;
 
     public HashCache() {
-        store = new ConcurrentHashMap<String, String>();
+        store = new ConcurrentHashMap<>();
     }
 
     @Override

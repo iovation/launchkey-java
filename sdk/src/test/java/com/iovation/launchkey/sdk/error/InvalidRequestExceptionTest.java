@@ -31,8 +31,7 @@ public class InvalidRequestExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         InvalidRequestException base = new InvalidRequestException(MESSAGE, CAUSE, CODE);
-        InvalidRequestException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class InvalidRequestExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         InvalidRequestException base = new InvalidRequestException(MESSAGE, CAUSE, CODE);
-        InvalidRequestException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 
@@ -102,5 +100,89 @@ public class InvalidRequestExceptionTest {
     @Test
     public void toStringContainsClassName() throws Exception {
         assertTrue(new InvalidRequestException(MESSAGE, CAUSE, CODE).toString().contains(InvalidRequestException.class.getSimpleName()));
+    }
+
+    @Test
+    public void fromARG001IsInvalidParameters() throws Exception {
+        assertEquals(new InvalidParameters("Message", null, "ARG-001"),
+                InvalidRequestException.fromErrorCode("ARG-001", "Message"));
+    }
+
+    @Test
+    public void fromARG002IsInvalidRoute() throws Exception {
+        assertEquals(new InvalidRoute("Message", null, "ARG-002"),
+                InvalidRequestException.fromErrorCode("ARG-002", "Message"));
+    }
+
+    @Test
+    public void fromSVC001ServiceNameTaken() throws Exception {
+        assertEquals(new ServiceNameTaken("Message", null, "SVC-001"),
+                InvalidRequestException.fromErrorCode("SVC-001", "Message"));
+    }
+
+    @Test
+    public void fromSVC002IsInvalidPolicyInput() throws Exception {
+        assertEquals(new InvalidPolicyInput("Message", null, "SVC-002"),
+                InvalidRequestException.fromErrorCode("SVC-002", "Message"));
+    }
+
+    @Test
+    public void fromSVC003IsPolicyFailure() throws Exception {
+        assertEquals(new PolicyFailure("Message", null, "SVC-003"),
+                InvalidRequestException.fromErrorCode("SVC-003", "Message"));
+    }
+
+    @Test
+    public void fromSVC004IsServiceNotFound() throws Exception {
+        assertEquals(new ServiceNotFound("Message", null, "SVC-004"),
+                InvalidRequestException.fromErrorCode("SVC-004", "Message"));
+    }
+
+    @Test
+    public void fromDIR0011IsInvalidDirectoryIdentifier() throws Exception {
+        assertEquals(new InvalidParameters("Message", null, "DIR-001"),
+                InvalidDirectoryIdentifier.fromErrorCode("DIR-001", "Message"));
+    }
+
+    @Test
+    public void fromKEY001IsInvalidPublicKey() throws Exception {
+        assertEquals(new InvalidParameters("Message", null, "KEY-001"),
+                InvalidPublicKey.fromErrorCode("KEY-001", "Message"));
+    }
+
+    @Test
+    public void fromKEY002IsPublicKeyAlreadyInUse() throws Exception {
+        assertEquals(new InvalidParameters("Message", null, "KEY-002"),
+                PublicKeyAlreadyInUse.fromErrorCode("KEY-002", "Message"));
+    }
+
+    @Test
+    public void fromKEY003IsPublicKeyDoesNotExist() throws Exception {
+        assertEquals(new PublicKeyDoesNotExist("Message", null, "KEY-003"),
+                InvalidRequestException.fromErrorCode("KEY-003", "Message"));
+    }
+
+    @Test
+    public void fromKEY0041IsLastRemainingKey() throws Exception {
+        assertEquals(new LastRemainingKey("Message", null, "KEY-003"),
+                InvalidRequestException.fromErrorCode("KEY-003", "Message"));
+    }
+
+    @Test
+    public void fromORG003IsDirectoryNameInUse() throws Exception {
+        assertEquals(new DirectoryNameInUse("Message", null, "ORG-003"),
+                InvalidRequestException.fromErrorCode("ORG-003", "Message"));
+    }
+
+    @Test
+    public void fromORG005IsLastRemainingSDKKey() throws Exception {
+        assertEquals(new LastRemainingSDKKey("Message", null, "ORG-005"),
+                InvalidRequestException.fromErrorCode("ORG-005", "Message"));
+    }
+
+    @Test
+    public void fromORG006IsInvalidSDKKey() throws Exception {
+        assertEquals(new InvalidSDKKey("Message", null, "ORG-006"),
+                InvalidRequestException.fromErrorCode("ORG-006", "Message"));
     }
 }

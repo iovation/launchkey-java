@@ -17,12 +17,12 @@ import org.junit.rules.ExpectedException;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 
 public class EntityIdentifierTest {
     @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    public final ExpectedException thrown = ExpectedException.none();
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Test
     public void getToStringWithServiceEntity() throws Exception {
         String expected = "svc:319d2db1-3965-4f2e-89a0-26572ddbf31d";
@@ -30,6 +30,7 @@ public class EntityIdentifierTest {
         assertEquals(expected, actual);
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Test
     public void getToStringWithDirectoryEntity() throws Exception {
         String expected = "dir:319d2db1-3965-4f2e-89a0-26572ddbf31d";
@@ -37,6 +38,7 @@ public class EntityIdentifierTest {
         assertEquals(expected, actual);
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Test
     public void getToStringWithOrganizationEntity() throws Exception {
         String expected = "org:319d2db1-3965-4f2e-89a0-26572ddbf31d";

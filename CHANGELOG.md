@@ -2,6 +2,18 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.2.0
+  
+    * Add Organization Service management
+    * Add Directory management
+    * Add Directory Service management
+    * Add Jail Break Protection to Auth Service Policy
+    * Remove UUID version 1 requirement in factories for Organization, Directory, and Service ID as they can now be version 3 or 4
+    * Add more specific named errors for HTTP status codes and LaunchKey error codes.
+    * Migrate test mocks from Mockito 1.x to 2.x
+    * Cucumber based integration tests
+    * Dropped support for Java 6
+
   * 4.1.0
   
     * Add created and updated attributes to Device domain object

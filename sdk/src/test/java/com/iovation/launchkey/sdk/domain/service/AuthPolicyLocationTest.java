@@ -4,6 +4,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -45,4 +47,8 @@ public class AuthPolicyLocationTest {
         assertEquals(1.1, location.getRadius(), 0.001);
     }
 
+    @Test
+    public void toStringHasClassName() throws Exception {
+        assertThat(location.toString(), containsString(location.getClass().getSimpleName()));
+    }
 }

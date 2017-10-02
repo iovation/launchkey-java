@@ -16,10 +16,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ServiceV3AuthsPostRequest {
     private final String username;
-    private final ServiceV3AuthsPostRequestPolicy policy;
+    private final AuthPolicy policy;
     private final String context;
 
-    public ServiceV3AuthsPostRequest(String username, ServiceV3AuthsPostRequestPolicy policy, String context) {
+    public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context) {
         this.username = username;
         this.policy = policy;
         this.context = context;
@@ -31,7 +31,7 @@ public class ServiceV3AuthsPostRequest {
     }
 
     @JsonProperty("policy")
-    public ServiceV3AuthsPostRequestPolicy getPolicy() {
+    public AuthPolicy getPolicy() {
         return policy;
     }
 

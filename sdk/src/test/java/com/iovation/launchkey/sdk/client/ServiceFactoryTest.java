@@ -4,10 +4,10 @@ import com.iovation.launchkey.sdk.transport.Transport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.matchers.InstanceOf;
 
 import java.util.UUID;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -30,11 +30,6 @@ public class ServiceFactoryTest {
 
     @Test
     public void testMakeServiceClientReturnsServiceClient() throws Exception {
-        assertThat(serviceFactory.makeServiceClient(), new InstanceOf(ServiceClient.class));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nonUUID1ThrowsIllegalArgument() throws Exception {
-        new ServiceFactory(transport, UUID.randomUUID());
+        assertThat(serviceFactory.makeServiceClient(), instanceOf(ServiceClient.class));
     }
 }
