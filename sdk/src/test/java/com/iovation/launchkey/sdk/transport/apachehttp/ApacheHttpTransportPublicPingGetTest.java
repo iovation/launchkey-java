@@ -17,7 +17,9 @@ import com.iovation.launchkey.sdk.error.InvalidResponseException;
 import com.iovation.launchkey.sdk.transport.domain.PublicV3PingGetResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +29,9 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTestBase {
+
     @Test
     public void publicPingGetCallsHttpClientWithProperHttpRequestMethod() throws Exception {
         transport.publicV3PingGet();
@@ -40,9 +44,8 @@ public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTes
     public void publicPingGetCallsHttpClientWithProperHttpRequestUri() throws Exception {
         URI expected = URI.create(baseUrl.concat("/public/v3/ping"));
         transport.publicV3PingGet();
-        ArgumentCaptor<HttpUriRequest> actual = ArgumentCaptor.forClass(HttpUriRequest.class);
-        verify(httpClient).execute(actual.capture());
-        assertEquals(expected, actual.getValue().getURI());
+        verify(httpClient).execute(requestCaptor.capture());
+        assertEquals(expected, requestCaptor.getValue().getURI());
     }
 
     @Test
@@ -67,7 +70,8 @@ public class ApacheHttpTransportPublicPingGetTest extends ApacheHttpTransportTes
 
     @Test(expected = InvalidResponseException.class)
     public void publicPingThrowsInvalidResponseExceptionWhenObjectParserThrowsJsonMappingException() throws Exception {
-        when(objectMapper.readValue(any(InputStream.class), any(Class.class))).thenThrow(mock(JsonMappingException.class));
+        when(objectMapper.readValue(any(InputStream.class), any(Class.class)))
+                .thenThrow(mock(JsonMappingException.class));
         transport.publicV3PingGet();
     }
 

@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 public class PublicV3PingGetResponseTest {
     private PublicV3PingGetResponse publicPingGetResponse;
 
-    @Rule public ExpectedException thrown = ExpectedException.none();
+    @Rule public final ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
@@ -43,9 +43,9 @@ public class PublicV3PingGetResponseTest {
 
     @Test
     public void jsonParseWSetsExpectedTimeValue() throws Exception {
-        Date expected = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").parse("2010-01-01T00:00:00Z");
+        Date expected = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").parse("2017-11-03T20:50:43Z");
         Date actual = new ObjectMapper().readValue(
-                "{\"api_time\": \"2010-01-01T00:00:00Z\"}",
+                "{\"api_time\": \"2017-11-03T20:50:43Z\"}",
                 PublicV3PingGetResponse.class
         ).getApiTime();
         assertEquals(expected, actual);

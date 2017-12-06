@@ -45,13 +45,13 @@ public class DemoController {
         if (!authorized.authorized) {
             session.invalidate();
         }
-        return new ResponseEntity<Authorized>(authorized, HttpStatus.OK);
+        return new ResponseEntity<>(authorized, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/webhook", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     public void webhook (WebRequest request, @RequestBody String body) throws AuthManager.AuthException {
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<>();
         Iterator<String> headerNames = request.getHeaderNames();
         while (headerNames.hasNext()) {
             String headerName = headerNames.next();

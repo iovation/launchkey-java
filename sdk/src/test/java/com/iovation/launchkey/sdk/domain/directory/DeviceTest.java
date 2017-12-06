@@ -79,7 +79,7 @@ public class DeviceTest {
     }
 
     @Test
-    public void equalsIsTrueForEqivalentObject() throws Exception {
+    public void equalsIsTrueForEquivalentObject() throws Exception {
         assertTrue(device.equals(new Device(ID, NAME, DeviceStatus.LINKED, TYPE, CREATED, UPDATED)));
     }
 

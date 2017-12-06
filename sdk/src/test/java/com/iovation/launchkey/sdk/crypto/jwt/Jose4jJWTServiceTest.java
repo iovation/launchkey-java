@@ -1,6 +1,7 @@
 package com.iovation.launchkey.sdk.crypto.jwt;
 
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
+import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -11,14 +12,17 @@ import org.junit.Test;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.Provider;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Copyright 2017 iovation, Inc. All rights reserved.
@@ -77,7 +81,7 @@ public class Jose4jJWTServiceTest {
         keyPairGenerator.initialize(2048);
         keyPair = keyPairGenerator.generateKeyPair();
         platformDate = new Date();
-        privateKeys = new HashMap<String, RSAPrivateKey>();
+        privateKeys = new HashMap<>();
         currentPrivateKeyId = JCECrypto.getRsaPublicKeyFingerprint(provider, (RSAPrivateKey) keyPair.getPrivate());
         privateKeys.put(currentPrivateKeyId, (RSAPrivateKey) keyPair.getPrivate());
         jwtService = new Jose4jJWTService(
@@ -91,7 +95,7 @@ public class Jose4jJWTServiceTest {
     @Test
     public void encodeEncodesSomethingThatProperlyDecodes() throws Exception {
 
-        Map<String, Object> expected = new HashMap<String, Object>();
+        Map<String, Object> expected = new HashMap<>();
         expected.put("jti", "Expected JTI");
         expected.put("iss", ENTITY_IDENTIFIER);
         expected.put("sub", null);
@@ -99,7 +103,7 @@ public class Jose4jJWTServiceTest {
         expected.put("iat", Long.valueOf(platformDate.getTime() / 1000));
         expected.put("nbf", Long.valueOf(platformDate.getTime() / 1000));
         expected.put("exp", Long.valueOf(platformDate.getTime() / 1000) + EXPIRE_SECONDS);
-        Map<String, String> request = new HashMap<String, String>();
+        Map<String, String> request = new HashMap<>();
         request.put("func", "S256");
         request.put("hash", "Hash Value");
         request.put("path", "/path/to/resource");
@@ -151,7 +155,7 @@ public class Jose4jJWTServiceTest {
     @Test(expected = JWTError.class)
     public void decodeInvalidJwtThrowsJwtError() throws Exception {
         final RSAPublicKey publicKey = JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY_PEM);
-        jwtService.decode(publicKey, "audience", "token ID", new Date(), "aksjfhaslkhf");
+        jwtService.decode(publicKey, "audience", "token ID", new Date(), "any-string");
     }
 
     @Test(expected = JWTError.class)
@@ -164,5 +168,33 @@ public class Jose4jJWTServiceTest {
                 EXPIRE_SECONDS
         );
         jwtService.decode(publicKey, "audience", "token ID", new Date(), TOKEN);
+    }
+
+    @Test
+    public void testJwtDoesNotCollideForSameRequestData() throws Exception {
+        String issuer = "rnd:" + UUID.randomUUID().toString();
+        String subject = "rnd:" + UUID.randomUUID().toString();
+        String method = "GET";
+        String path = "/public/v3/ping";
+        String a =
+                jwtService.encode(UUID.randomUUID().toString(), issuer, subject, new Date(), method, path, null, null);
+        String b =
+                jwtService.encode(UUID.randomUUID().toString(), issuer, subject, new Date(), method, path, null, null);
+        assertNotEquals(a, b);
+    }
+
+    @Test
+    public void testJwtDoesNotCollideForSameRequestDataHash() throws Exception {
+        String issuer = "rnd:" + UUID.randomUUID().toString();
+        String subject = "rnd:" + UUID.randomUUID().toString();
+        String method = "GET";
+        String path = "/public/v3/ping";
+        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+        String a =
+                jwtService.encode(UUID.randomUUID().toString(), issuer, subject, new Date(), method, path, null, null);
+        String b =
+                jwtService.encode(UUID.randomUUID().toString(), issuer, subject, new Date(), method, path, null, null);
+        assertNotEquals(Hex.encodeHexString(sha256.digest(a.getBytes())),
+                Hex.encodeHexString(sha256.digest(b.getBytes())));
     }
 }

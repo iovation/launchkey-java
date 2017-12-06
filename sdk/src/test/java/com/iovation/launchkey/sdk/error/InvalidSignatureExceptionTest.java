@@ -31,8 +31,7 @@ public class InvalidSignatureExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         InvalidSignatureException base = new InvalidSignatureException(MESSAGE, CAUSE, CODE);
-        InvalidSignatureException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class InvalidSignatureExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         InvalidSignatureException base = new InvalidSignatureException(MESSAGE, CAUSE, CODE);
-        InvalidSignatureException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

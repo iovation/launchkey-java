@@ -31,8 +31,7 @@ public class NoLinkedDevicesExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         NoLinkedDevicesException base = new NoLinkedDevicesException(MESSAGE, CAUSE, CODE);
-        NoLinkedDevicesException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class NoLinkedDevicesExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         NoLinkedDevicesException base = new NoLinkedDevicesException(MESSAGE, CAUSE, CODE);
-        NoLinkedDevicesException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

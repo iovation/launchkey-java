@@ -59,6 +59,22 @@ public interface Crypto {
      */
     byte[] sha256(byte[] input) throws NoSuchAlgorithmException;
 
+    /**
+     * Generate a 384 bit hash with the Secure Hash Algorithm
+     * @param input Data to hash
+     * @return Hashed data
+     * @throws NoSuchAlgorithmException When the provider does not support SHA-256
+     */
+    byte[] sha384(byte[] input) throws NoSuchAlgorithmException;
+
+    /**
+     * Generate a 512 bit hash with the Secure Hash Algorithm
+     * @param input Data to hash
+     * @return Hashed data
+     * @throws NoSuchAlgorithmException When the provider does not support SHA-256
+     */
+    byte[] sha512(byte[] input) throws NoSuchAlgorithmException;
+
     String getRsaPublicKeyFingerprint(RSAPublicKey key) throws IllegalArgumentException;
 
     String getRsaPublicKeyFingerprint(RSAPrivateKey key) throws IllegalArgumentException;

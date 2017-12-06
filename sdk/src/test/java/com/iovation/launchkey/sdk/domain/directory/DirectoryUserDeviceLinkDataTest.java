@@ -23,7 +23,7 @@ public class DirectoryUserDeviceLinkDataTest {
     private static final String URL = "Expected URL";
     private static final String CODE = "Expected Code";
     private DirectoryUserDeviceLinkData deviceAddResponse;
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void setUp() throws Exception {

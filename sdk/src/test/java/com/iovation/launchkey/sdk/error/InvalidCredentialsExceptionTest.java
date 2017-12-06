@@ -31,8 +31,7 @@ public class InvalidCredentialsExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         InvalidCredentialsException base = new InvalidCredentialsException(MESSAGE, CAUSE, CODE);
-        InvalidCredentialsException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class InvalidCredentialsExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         InvalidCredentialsException base = new InvalidCredentialsException(MESSAGE, CAUSE, CODE);
-        InvalidCredentialsException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

@@ -26,9 +26,10 @@ class ApiRequestBuilderFactory {
     private final ObjectMapper objectMapper;
     private final Crypto crypto;
     private final JWTService jwtService;
-    private JWEService jweService;
+    private final JWEService jweService;
 
-    public ApiRequestBuilderFactory(String issuer, String baseUrl, ObjectMapper objectMapper, Crypto crypto, JWTService jwtService, JWEService jweService) {
+    ApiRequestBuilderFactory(String issuer, String baseUrl, ObjectMapper objectMapper, Crypto crypto,
+                             JWTService jwtService, JWEService jweService) {
         this.issuer = issuer;
         this.baseUrl = baseUrl;
         this.objectMapper = objectMapper;

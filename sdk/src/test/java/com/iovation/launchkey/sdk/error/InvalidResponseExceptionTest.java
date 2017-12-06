@@ -31,8 +31,7 @@ public class InvalidResponseExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         InvalidResponseException base = new InvalidResponseException(MESSAGE, CAUSE, CODE);
-        InvalidResponseException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class InvalidResponseExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         InvalidResponseException base = new InvalidResponseException(MESSAGE, CAUSE, CODE);
-        InvalidResponseException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

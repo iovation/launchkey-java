@@ -12,7 +12,6 @@
 
 package com.iovation.launchkey.sdk.client;
 
-import com.iovation.launchkey.sdk.UUIDHelper;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.ServiceUserSessionEndWebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
@@ -33,25 +32,25 @@ public class BasicServiceClient implements ServiceClient {
     private final Transport transport;
 
     public BasicServiceClient(UUID serviceId, Transport transport) {
-        UUIDHelper.validateVersion(serviceId, 1);
         this.serviceEntity = new EntityIdentifier(EntityIdentifier.EntityType.SERVICE, serviceId);
         this.transport = transport;
     }
 
     @Override
     public String authorize(String user, String context, AuthPolicy policy)
-            throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
 
-        ServiceV3AuthsPostRequestPolicy requestPolicy;
+        com.iovation.launchkey.sdk.transport.domain.AuthPolicy requestPolicy;
         if (policy == null) {
             requestPolicy = null;
         } else {
-            requestPolicy = new ServiceV3AuthsPostRequestPolicy(
+            requestPolicy = new com.iovation.launchkey.sdk.transport.domain.AuthPolicy(
                     policy.getRequiredFactors(),
                     policy.isKnowledgeFactorRequired(),
                     policy.isInherenceFactorRequired(),
-                    policy.isPossessionFactorRequired()
+                    policy.isPossessionFactorRequired(),
+                    null
             );
             for (AuthPolicy.Location location : policy.getLocations()) {
                 requestPolicy.addGeoFence(
@@ -68,24 +67,24 @@ public class BasicServiceClient implements ServiceClient {
 
     @Override
     public String authorize(String user, String context)
-            throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
         return authorize(user, context, null);
     }
 
     @Override
     public String authorize(String user)
-            throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
         return authorize(user, null, null);
     }
 
     @Override
     public AuthorizationResponse getAuthorizationResponse(String authorizationRequestId)
-            throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError, AuthorizationRequestTimedOutError, NoKeyFoundException {
         UUID authorizationRequestUUID;
-        authorizationRequestUUID = getUUIDFromString(authorizationRequestId, "authorizationRequestId");
+        authorizationRequestUUID = getAuthRequestIdFromString(authorizationRequestId);
         AuthorizationResponse response;
         ServiceV3AuthsGetResponse transportResponse = transport.serviceV3AuthsGet(
                 authorizationRequestUUID, serviceEntity
@@ -105,35 +104,35 @@ public class BasicServiceClient implements ServiceClient {
         return response;
     }
 
-    private UUID getUUIDFromString(String uuid, String parameter) {
+    private UUID getAuthRequestIdFromString(String uuid) {
         UUID authorizationRequestUUID;
         try {
             authorizationRequestUUID = UUID.fromString(uuid);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(parameter + " must be a valid UUID!", e);
+            throw new IllegalArgumentException("authorizationRequestId must be a valid UUID!", e);
         }
         return authorizationRequestUUID;
     }
 
     @Override
     public void sessionStart(String user, String authorizationRequestId)
-            throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
-        UUID authorizationRequestUUID = authorizationRequestId == null ? null : getUUIDFromString(authorizationRequestId, "authorizationRequestId");
+        UUID authorizationRequestUUID = authorizationRequestId == null ? null : getAuthRequestIdFromString(authorizationRequestId);
         ServiceV3SessionsPostRequest request = new ServiceV3SessionsPostRequest(user, authorizationRequestUUID);
         transport.serviceV3SessionsPost(request, serviceEntity);
     }
 
     @Override
     public void sessionStart(String user)
-            throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
         sessionStart(user, null);
     }
 
     @Override
     public void sessionEnd(String user)
-            throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
         ServiceV3SessionsDeleteRequest request = new ServiceV3SessionsDeleteRequest(user);
         transport.serviceV3SessionsDelete(request, serviceEntity);
@@ -141,7 +140,7 @@ public class BasicServiceClient implements ServiceClient {
 
     @Override
     public WebhookPackage handleWebhook(Map<String, List<String>> headers, String body)
-            throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError, NoKeyFoundException {
         ServerSentEvent transportResponse = transport.handleServerSentEvent(headers, body);
         WebhookPackage response;
@@ -171,7 +170,7 @@ public class BasicServiceClient implements ServiceClient {
     }
 
     private Map<String, List<String>> normalizeHeaders(Map<String, List<String>> inputHeaders) {
-        Map<String, List<String>> outputHeaders = new ConcurrentHashMap<String, List<String>>(inputHeaders.size());
+        Map<String, List<String>> outputHeaders = new ConcurrentHashMap<>(inputHeaders.size());
         for (Map.Entry<String, List<String>> entry : inputHeaders.entrySet()) {
             outputHeaders.put(entry.getKey().toUpperCase(), entry.getValue());
         }

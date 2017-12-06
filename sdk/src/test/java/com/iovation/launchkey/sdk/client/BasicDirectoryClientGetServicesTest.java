@@ -1,0 +1,104 @@
+package com.iovation.launchkey.sdk.client; /**
+ * Copyright 2017 iovation, Inc.
+ * <p>
+ * Licensed under the MIT License.
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located in the "LICENSE.txt" file accompanying
+ * this file. This file is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import com.iovation.launchkey.sdk.domain.servicemanager.Service;
+import com.iovation.launchkey.sdk.transport.Transport;
+import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.ServicesListPostRequest;
+import com.iovation.launchkey.sdk.transport.domain.ServicesListPostResponse;
+import com.iovation.launchkey.sdk.transport.domain.ServicesListPostResponseService;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
+public class BasicDirectoryClientGetServicesTest {
+    private final static UUID directoryId = UUID.fromString("67c87654-aed9-11e7-98e9-0469f8dc10a5");
+
+    @Mock
+    public Transport transport;
+
+    @Mock
+    private ServicesListPostResponse response;
+
+    @Captor
+    private ArgumentCaptor<EntityIdentifier> entityCaptor;
+
+    @Captor
+    private ArgumentCaptor<ServicesListPostRequest> requestCaptor;
+
+    public DirectoryClient client;
+
+    @Before
+    public void setUp() throws Exception {
+        client = new BasicDirectoryClient(directoryId, transport);
+        when(transport.directoryV3ServicesListPost(any(ServicesListPostRequest.class), any(EntityIdentifier.class)))
+                .thenReturn(response);
+        when(response.getServices()).thenReturn(new ArrayList<ServicesListPostResponseService>());
+    }
+
+    @Test
+    public void sendsSubjectEntityType() throws Exception {
+        client.getServices(new ArrayList<UUID>());
+        verify(transport).directoryV3ServicesListPost(any(ServicesListPostRequest.class), entityCaptor.capture());
+        assertEquals(EntityIdentifier.EntityType.DIRECTORY, entityCaptor.getValue().getType());
+    }
+
+    @Test
+    public void sendsSubjectEntityId() throws Exception {
+        client.getServices(new ArrayList<UUID>());
+        verify(transport).directoryV3ServicesListPost(any(ServicesListPostRequest.class), entityCaptor.capture());
+        assertEquals(directoryId, entityCaptor.getValue().getId());
+    }
+
+    @Test
+    public void sendsServiceIds() throws Exception {
+        List<UUID> ids = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
+        client.getServices(ids);
+        verify(transport).directoryV3ServicesListPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(ids, requestCaptor.getValue().getServiceIds());
+    }
+
+    @SuppressWarnings("SpellCheckingInspection")
+    @Test
+    public void returnsAllDevices() throws Exception {
+        List<Service> expected = Arrays.asList(
+                new Service(UUID.fromString("f4c24794-aefc-11e7-8d36-0469f8dc10a5"), "name1", "description1",
+                        URI.create("https://foo.bar"), URI.create("https://fizz.buzz"), true),
+                new Service(UUID.fromString("f6d44d14-aefc-11e7-9200-0469f8dc10a5"), "name2", "description2",
+                        URI.create("https://bar.foo"), URI.create("https://buzz.fizz"), true)
+        );
+        when(response.getServices()).thenReturn(Arrays.asList(
+                new ServicesListPostResponseService(UUID.fromString("f4c24794-aefc-11e7-8d36-0469f8dc10a5"), "name1",
+                        "description1", URI.create("https://foo.bar"), URI.create("https://fizz.buzz"), true),
+                new ServicesListPostResponseService(UUID.fromString("f6d44d14-aefc-11e7-9200-0469f8dc10a5"), "name2",
+                        "description2", URI.create("https://bar.foo"), URI.create("https://buzz.fizz"), true)
+        ));
+        List<Service> actual = client.getServices(new ArrayList<UUID>());
+        assertEquals(expected, actual);
+    }
+}

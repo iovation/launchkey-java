@@ -63,19 +63,27 @@ public class JCECrypto implements Crypto {
 
     @Override
     public byte[] sha256(byte[] input) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256", provider);
-        byte[] response = digest.digest(input);
-        return response;
+        return getDigest(input, "SHA-256");
+    }
+
+    @Override
+    public byte[] sha384(byte[] input) throws NoSuchAlgorithmException {
+        return getDigest(input, "SHA-384");
+    }
+
+    @Override
+    public byte[] sha512(byte[] input) throws NoSuchAlgorithmException {
+        return getDigest(input, "SHA-512");
     }
 
     @Override
     public String getRsaPublicKeyFingerprint(RSAPublicKey key) throws IllegalArgumentException {
-        return this.getRsaPublicKeyFingerprint(provider, key);
+        return getRsaPublicKeyFingerprint(provider, key);
     }
 
     @Override
     public String getRsaPublicKeyFingerprint(RSAPrivateKey key) throws IllegalArgumentException {
-        return this.getRsaPublicKeyFingerprint(provider, key);
+        return getRsaPublicKeyFingerprint(provider, key);
     }
 
     /**
@@ -146,6 +154,41 @@ public class JCECrypto implements Crypto {
         }
     }
 
+
+    /**
+     * Get a PEM formatted string from the provided public key
+     *
+     * @param publicKey RSA Public Key object
+     * @return PEM formatted public key string
+     */
+    public static String getPEMFromRSAPublicKey(RSAPublicKey publicKey) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("-----BEGIN PUBLIC KEY-----\n");
+
+        String encoded  = new String(BASE_64.encode(publicKey.getEncoded()));
+
+        int start = 0;
+        int end = 64;
+        try {
+            //noinspection InfiniteLoopStatement
+            while (true) {
+                builder.append(encoded.substring(start, end));
+                builder.append("\n");
+                start = end;
+                end = start + 64;
+            }
+        } catch (IndexOutOfBoundsException e) {
+            if (start != encoded.length()) {
+                builder.append(encoded.substring(start, encoded.length()));
+                builder.append("\n");
+            }
+        }
+
+        builder.append("-----END PUBLIC KEY-----\n");
+        return builder.toString();
+    }
+
+
     private static byte[] getKeyBytesFromPEM(String pem) {
         StringBuilder strippedKey = new StringBuilder(pem.length());
         Scanner scanner = new Scanner(pem);
@@ -174,5 +217,10 @@ public class JCECrypto implements Crypto {
         } catch (NoSuchPaddingException e) {
             throw new IllegalArgumentException("Provider does not provide required padding: MGF1", e);
         }
+    }
+
+    private byte[] getDigest(byte[] input, String algorithm) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance(algorithm, provider);
+        return digest.digest(input);
     }
 }

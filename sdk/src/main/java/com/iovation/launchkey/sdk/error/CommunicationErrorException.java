@@ -12,6 +12,11 @@
 
 package com.iovation.launchkey.sdk.error;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * This exception is thrown when an error occurs communicating with the Platform API.  In this error the
  * code and message will be re-purposed to the following:
@@ -32,5 +37,30 @@ public class CommunicationErrorException extends BaseException {
      */
     public CommunicationErrorException(String message, Throwable cause, String errorCode) {
         super(message, cause, errorCode);
+    }
+
+
+    private static final Map<String, Class<? extends CommunicationErrorException>> STATUS_MAP = new ConcurrentHashMap<>();
+    static {
+        STATUS_MAP.put("401", Unauthorized.class);
+        STATUS_MAP.put("403", Forbidden.class);
+        STATUS_MAP.put("404", EntityNotFound.class);
+        STATUS_MAP.put("408", RequestTimedOut.class);
+        STATUS_MAP.put("429", RateLimited.class);
+
+    }
+    public static CommunicationErrorException fromStatusCode(int statusCode, String message) {
+        String code = String.valueOf(statusCode);
+        Class<? extends CommunicationErrorException> clazz = STATUS_MAP.get(code);
+        if (clazz == null) clazz = CommunicationErrorException.class;
+
+        try {
+            Constructor<? extends CommunicationErrorException>
+                    c = clazz.getDeclaredConstructor(String.class, Throwable.class, String.class);
+            c.setAccessible(true);
+            return c.newInstance(message, null, code);
+        } catch (NoSuchMethodException|IllegalAccessException|InstantiationException|InvocationTargetException e) {
+            return new CommunicationErrorException(message, null, code);
+        }
     }
 }

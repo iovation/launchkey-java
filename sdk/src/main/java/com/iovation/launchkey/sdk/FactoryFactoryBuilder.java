@@ -45,7 +45,7 @@ public class FactoryFactoryBuilder {
     private Integer requestExpireSeconds = 5;
     private int offsetTTL = 3600;
     private int currentPublicKeyTTL = 300;
-    private EntityKeyMap entityKeyMap = new EntityKeyMap();
+    private final EntityKeyMap entityKeyMap = new EntityKeyMap();
 
     /**
      * Build a factory based on the currently configured information
@@ -173,25 +173,25 @@ public class FactoryFactoryBuilder {
         return this;
     }
 
-    public FactoryFactoryBuilder addServicePrivateKey(String serviceId, RSAPrivateKey privateKey, String pulicKeyFingerprint) {
-        addEntityPrivateKey(EntityType.SERVICE, serviceId, privateKey, pulicKeyFingerprint);
+    public FactoryFactoryBuilder addServicePrivateKey(String serviceId, RSAPrivateKey privateKey, String publicKeyFingerprint) {
+        addEntityPrivateKey(EntityType.SERVICE, serviceId, privateKey, publicKeyFingerprint);
         return this;
     }
 
-    public FactoryFactoryBuilder addDirectoryPrivateKey(String directoryId, RSAPrivateKey privateKey, String pulicKeyFingerprint) {
-        addEntityPrivateKey(EntityType.DIRECTORY, directoryId, privateKey, pulicKeyFingerprint);
+    public FactoryFactoryBuilder addDirectoryPrivateKey(String directoryId, RSAPrivateKey privateKey, String publicKeyFingerprint) {
+        addEntityPrivateKey(EntityType.DIRECTORY, directoryId, privateKey, publicKeyFingerprint);
         return this;
     }
 
-    public FactoryFactoryBuilder addOrganizationPrivateKey(String organizationId, RSAPrivateKey privateKey, String pulicKeyFingerprint) {
-        addEntityPrivateKey(EntityType.ORGANIZATION, organizationId, privateKey, pulicKeyFingerprint);
+    public FactoryFactoryBuilder addOrganizationPrivateKey(String organizationId, RSAPrivateKey privateKey, String publicKeyFingerprint) {
+        addEntityPrivateKey(EntityType.ORGANIZATION, organizationId, privateKey, publicKeyFingerprint);
         return this;
     }
 
-    private void addEntityPrivateKey(EntityType type, String id, RSAPrivateKey privateKey, String pulicKeyFingerprint) {
+    private void addEntityPrivateKey(EntityType type, String id, RSAPrivateKey privateKey, String publicKeyFingerprint) {
         entityKeyMap.addKey(
                 new EntityIdentifier(type, UUID.fromString(id)),
-                pulicKeyFingerprint,
+                publicKeyFingerprint,
                 privateKey
         );
     }
@@ -206,7 +206,12 @@ public class FactoryFactoryBuilder {
             connectionManager.setMaxTotal(httpClientMaxClients);
             // Set max per route as there is only one route
             connectionManager.setDefaultMaxPerRoute(httpClientMaxClients);
-            httpClient = HttpClients.custom().setConnectionManager(connectionManager).build();
+            httpClient = HttpClients.custom()
+                    .setConnectionManager(connectionManager)
+                    .disableAutomaticRetries()
+                    .disableRedirectHandling()
+                    .disableAuthCaching()
+                    .build();
         }
         return httpClient;
     }

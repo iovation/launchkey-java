@@ -31,8 +31,7 @@ public class ExpiredAuthRequestExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         ExpiredAuthRequestException base = new ExpiredAuthRequestException(MESSAGE, CAUSE, CODE);
-        ExpiredAuthRequestException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class ExpiredAuthRequestExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         ExpiredAuthRequestException base = new ExpiredAuthRequestException(MESSAGE, CAUSE, CODE);
-        ExpiredAuthRequestException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

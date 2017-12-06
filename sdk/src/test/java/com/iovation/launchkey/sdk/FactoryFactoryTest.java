@@ -1,13 +1,12 @@
 package com.iovation.launchkey.sdk;
 
-import com.iovation.launchkey.sdk.client.ServiceFactory;
-import com.iovation.launchkey.sdk.transport.domain.EntityKeyMap;
 import com.iovation.launchkey.sdk.cache.Cache;
 import com.iovation.launchkey.sdk.client.DirectoryFactory;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.client.ServiceFactory;
+import com.iovation.launchkey.sdk.transport.domain.EntityKeyMap;
 import org.apache.http.client.HttpClient;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,15 +15,16 @@ import java.security.KeyPairGenerator;
 import java.security.Provider;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.HashMap;
-import java.util.UUID;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class FactoryFactoryTest {
     private static final String UUID1 = "49af9c38-31b3-11e7-93ae-92361f002671";
 
-    final String privateKeyPEM =
+    @SuppressWarnings("SpellCheckingInspection")
+    private static final String privateKeyPEM =
             "-----BEGIN RSA PRIVATE KEY-----\n" +
                     "MIIEpAIBAAKCAQEAn+agtJ3eGHNxwkkss2jTCSdcLNrWKawjmvNc27YFe8cVmBlJ\n" +
                     "e/GCru+uIiN9BLncK3B/d1IyZRvC/qza8Gk7SA3/EbXmuo05vnwNuGKLS9+3CJqn\n" +
@@ -53,15 +53,13 @@ public class FactoryFactoryTest {
                     "mo5GzkQVT4GyetA0hQJoJorT2Rfx9KSCCQ6cdNKnhvxjEYgbJuRKfw==\n" +
                     "-----END RSA PRIVATE KEY-----";
 
-    private KeyPairGenerator keyPairGenerator;
-
 
     private FactoryFactory factoryFactory;
 
     @Before
     public void setUp() throws Exception {
         Provider provider = new BouncyCastleProvider();
-        keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
 
         factoryFactory = new FactoryFactory(
                 provider,
@@ -81,21 +79,11 @@ public class FactoryFactoryTest {
         factoryFactory = null;
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void makeServiceFactoryWithNullUUIDThrowsIllegalArgument() throws Exception {
-        factoryFactory.makeServiceFactory(null, privateKeyPEM);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void makeServiceFactoryWithNonUUID1ThrowsIllegalArgument() throws Exception {
-        factoryFactory.makeServiceFactory(UUID.randomUUID().toString(), privateKeyPEM);
-    }
-
     @Test
     public void makeServiceFactoryWithKey() throws Exception {
         assertThat(
                 factoryFactory.makeServiceFactory(UUID1, privateKeyPEM),
-                new IsInstanceOf(ServiceFactory.class)
+                instanceOf(ServiceFactory.class)
         );
     }
 
@@ -103,7 +91,7 @@ public class FactoryFactoryTest {
     public void makeServiceFactoryWithKeymap() throws Exception {
         assertThat(
                 factoryFactory.makeServiceFactory(UUID1, new HashMap<String, RSAPrivateKey>(), "Current key"),
-                new IsInstanceOf(ServiceFactory.class)
+                instanceOf(ServiceFactory.class)
         );
     }
 
@@ -112,16 +100,11 @@ public class FactoryFactoryTest {
         factoryFactory.makeDirectoryFactory(null, privateKeyPEM);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void makeDirectoryFactoryWithNonUUID1ThrowsIllegalArgument() throws Exception {
-        factoryFactory.makeDirectoryFactory(UUID.randomUUID().toString(), privateKeyPEM);
-    }
-
     @Test
     public void makeDirectoryFactoryWithKey() throws Exception {
         assertThat(
                 factoryFactory.makeDirectoryFactory(UUID1, privateKeyPEM),
-                new IsInstanceOf(DirectoryFactory.class)
+                instanceOf(DirectoryFactory.class)
         );
     }
 
@@ -129,7 +112,7 @@ public class FactoryFactoryTest {
     public void makeDirectoryFactoryWithKeymap() throws Exception {
         assertThat(
                 factoryFactory.makeDirectoryFactory(UUID1, new HashMap<String, RSAPrivateKey>(), "Current key"),
-                new IsInstanceOf(DirectoryFactory.class)
+                instanceOf(DirectoryFactory.class)
         );
     }
 
@@ -138,16 +121,11 @@ public class FactoryFactoryTest {
         factoryFactory.makeOrganizationFactory(null, privateKeyPEM);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void makeOrganizationFactoryWithNonUUID1ThrowsIllegalArgument() throws Exception {
-        factoryFactory.makeOrganizationFactory(UUID.randomUUID().toString(), privateKeyPEM);
-    }
-
     @Test
     public void makeOrganizationFactoryWithKey() throws Exception {
         assertThat(
                 factoryFactory.makeOrganizationFactory(UUID1, privateKeyPEM),
-                new IsInstanceOf(OrganizationFactory.class)
+                instanceOf(OrganizationFactory.class)
         );
     }
 
@@ -155,7 +133,7 @@ public class FactoryFactoryTest {
     public void makeOrganizationFactoryWithKeymap() throws Exception {
         assertThat(
                 factoryFactory.makeOrganizationFactory(UUID1, new HashMap<String, RSAPrivateKey>(), "Current key"),
-                new IsInstanceOf(OrganizationFactory.class)
+                instanceOf(OrganizationFactory.class)
         );
     }
 

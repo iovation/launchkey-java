@@ -10,36 +10,32 @@ package com.iovation.launchkey.sdk.cache; /**
  * limitations under the License.
  */
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class JavaxCacheTest {
-    private javax.cache.Cache javaxCache;
+
+    @Mock
+    private javax.cache.Cache<String, String> javaxCache;
     private JavaxCache cache;
 
     @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    public final ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
-        javaxCache = mock(javax.cache.Cache.class);
         cache = new JavaxCache(javaxCache);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        javaxCache = null;
-        cache = null;
     }
 
     @Test
@@ -51,7 +47,7 @@ public class JavaxCacheTest {
     @Test
     public void getReturnsJavaxCacheGetResponse() throws Exception {
         when(javaxCache.get(anyString())).thenReturn("Value");
-        assertEquals("Value", cache.get(null));
+        assertEquals("Value", cache.get(""));
     }
 
     @Test
@@ -60,7 +56,7 @@ public class JavaxCacheTest {
         when(javaxCache.get(anyString())).thenThrow(cause);
         thrown.expect(CacheException.class);
         thrown.expectCause(is(cause));
-        cache.get(null);
+        cache.get("");
     }
 
     @Test
@@ -76,6 +72,6 @@ public class JavaxCacheTest {
         doThrow(cause).when(javaxCache).put(anyString(), anyString());
         thrown.expect(CacheException.class);
         thrown.expectCause(is(cause));
-        cache.put(null, null);
+        cache.put("", "");
     }
 }

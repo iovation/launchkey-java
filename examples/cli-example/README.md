@@ -64,12 +64,12 @@ application credentials for the Application ID you provide in the calls.
   
         Performing an authorization request is accomplished with the authorize action which is passed a username.
 
-        Example: Execute an authorization request for user _myusername_, the service ID of 
+        Example: Execute an authorization request for user _MyUsername_, the service ID of 
         _cc07872d-1f99-41e4-8359-eaff0d2269d9_, and service private key _/tmp/private.key_.
 
         ```
         java -jar examples-cli-3.0.0-jar-with-dependencies.jar \
-        cc07872d-1f99-41e4-8359-eaff0d2269d9 /tmp/private.key authorize myusername
+        cc07872d-1f99-41e4-8359-eaff0d2269d9 /tmp/private.key authorize MyUsername
         ```
 
         The request will happen in two steps.  The service will make an authorization request and then poll for a user
@@ -114,7 +114,7 @@ application credentials for the Application ID you provide in the calls.
 
         ```
         java -jar examples-cli-3.0.0-jar-with-dependencies.jar \
-        cc07872d-1f99-41e4-8359-eaff0d2269d9 /tmp/private.key session-start myusername
+        cc07872d-1f99-41e4-8359-eaff0d2269d9 /tmp/private.key session-start MyUsername
         ```
 
         You will receive the message:
@@ -129,7 +129,7 @@ application credentials for the Application ID you provide in the calls.
 
         ```
         java -jar examples-cli-3.0.0-jar-with-dependencies.jar \
-        cc07872d-1f99-41e4-8359-eaff0d2269d9 /tmp/private.key session-end myusername
+        cc07872d-1f99-41e4-8359-eaff0d2269d9 /tmp/private.key session-end MyUsername
         ```
 
         You will receive the message:

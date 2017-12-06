@@ -56,7 +56,7 @@ public class JCECryptoTest {
 
     @SuppressWarnings("SpellCheckingInspection")
     private static final String PUBLIC_KEY =
-            ("-----BEGIN PUBLIC KEY-----\n" +
+            "-----BEGIN PUBLIC KEY-----\n" +
                     "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq2izh7NEarDdrdZLrpli\n" +
                     "zezZG/JzW14XQ74IXkjEqkvxhZ1s6joGtvoxX+P0QRyWrhgtiUnN3DSRAa0QLsZ0\n" +
                     "ZKk5a2AMGqu0/6eoJGwXSHcLreLEfqdd8+zlvDrbWISekTLoecLttwKSIcP2bcq1\n" +
@@ -64,7 +64,7 @@ public class JCECryptoTest {
                     "pnnw5lKwX+9IBAT/679eGUlh8HfTSG6JQaNezyRG1cOd+pO6hKxff6Q2GVXqHsrI\n" +
                     "ac4AlR80AEaBeiuFYxjHpruS6BRcyW8UvqX0l9rKMDAWNAtMWt2egYAe6XOEXIWO\n" +
                     "iQIDAQAB\n" +
-                    "-----END PUBLIC KEY-----\n");
+                    "-----END PUBLIC KEY-----\n";
 
     private static final String PUBLIC_KEY_FINGERPRINT = "39:bc:93:66:34:af:e5:15:b4:a1:33:58:81:dc:68:2c";
 
@@ -117,13 +117,15 @@ public class JCECryptoTest {
     @Test
     public void testEncryptRSA() throws Exception {
         String expected = "This is the expected unencrypted value";
-        String actual = new String(crypto.decryptRSA(crypto.encryptRSA(expected.getBytes(), rsaPublicKey), rsaPrivateKey));
+        String actual =
+                new String(crypto.decryptRSA(crypto.encryptRSA(expected.getBytes(), rsaPublicKey), rsaPrivateKey));
         assertEquals(expected, actual);
     }
 
     @Test
     public void testDecryptAuthTypeDataWithNewLines() throws Exception {
-        String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\", \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+        String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
+                " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
         @SuppressWarnings("SpellCheckingInspection")
         String base64encodedEncrypted =
                 "MW7DckKE5IXFWkUN5liJeVo27Jhaq+XSeJSHci1/Qa0dvbhr4YRybxg2DiGlWLVZdZzPr5JaOzO8\n" +
@@ -173,8 +175,27 @@ public class JCECryptoTest {
 
     @Test
     public void testSha256() throws Exception {
+        //noinspection SpellCheckingInspection
         String expected = "e806a291cfc3e61f83b98d344ee57e3e8933cccece4fb45e1481f1f560e70eb1";
         String actual = Hex.toHexString(crypto.sha256("Testing".getBytes()));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testSha384() throws Exception {
+        //noinspection SpellCheckingInspection
+        String expected = "2ca8b7b913d970a884fdb61daf74f6b4f868bc2ac20ea75" +
+                "83009259f382b14a04be97ea64ba0bab703ca7ea75a932bd5";
+        String actual = Hex.toHexString(crypto.sha384("Testing".getBytes()));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testSha512() throws Exception {
+        //noinspection SpellCheckingInspection
+        String expected = "64f02697ccd1c0ae741d9e226f957127da7a614d6a18f55f9f2726d2027faac1" +
+                "e95e619dac5417eb4898fd6a9fb8aeb9cdd005e913c80e57454cae4b6fc6e5d6";
+        String actual = Hex.toHexString(crypto.sha512("Testing".getBytes()));
         assertEquals(expected, actual);
     }
 
@@ -186,5 +207,22 @@ public class JCECryptoTest {
     @Test
     public void testGetRsaPublicKeyFingerprintWithPublicKeyReturnsProperFingerprint() throws Exception {
         assertEquals(PUBLIC_KEY_FINGERPRINT, crypto.getRsaPublicKeyFingerprint(rsaPublicKey));
+    }
+
+    @Test
+    public void testGetPEMFromPublicKey() throws Exception {
+        assertEquals(PUBLIC_KEY,
+                JCECrypto.getPEMFromRSAPublicKey(JCECrypto.getRSAPublicKeyFromPEM(provider, PUBLIC_KEY)));
+    }
+
+    @Test
+    public void testGetPEMFromPubicKey1024Key() throws Exception {
+        //noinspection SpellCheckingInspection
+        final String pem = "-----BEGIN PUBLIC KEY-----\n" +
+                "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANd/rO3/EY0rGeT4Sib6qD6AS26SHDUt\n" +
+                "sN9nM11H1ajurrZz4ZKCKPG1jdmqvo/tGXvt5mQyvR9WJCg6+uokSfMCAwEAAQ==\n" +
+                "-----END PUBLIC KEY-----\n";
+        assertEquals(pem,
+                JCECrypto.getPEMFromRSAPublicKey(JCECrypto.getRSAPublicKeyFromPEM(provider, pem)));
     }
 }

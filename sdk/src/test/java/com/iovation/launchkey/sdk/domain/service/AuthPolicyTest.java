@@ -22,42 +22,42 @@ import static org.junit.Assert.*;
 public class AuthPolicyTest {
     @Test
     public void getRequiredFactorsReturnsValueForRequiredFactorsConstructor() throws Exception {
-        assertEquals(99, new AuthPolicy(99).getRequiredFactors());
+        assertEquals(Integer.valueOf(99), new AuthPolicy(99).getRequiredFactors());
     }
 
     @Test
     public void getRequiredFactorsReturnsValueForRequiredFactorsLocationsConstructor() throws Exception {
-        assertEquals(99, new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).getRequiredFactors());
+        assertEquals(Integer.valueOf(99), new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).getRequiredFactors());
     }
 
     @Test
-    public void getRequiredFactorsReturnsZeroForLocationsConstructor() throws Exception {
-        assertEquals(0, new AuthPolicy(new ArrayList<AuthPolicy.Location>()).getRequiredFactors());
+    public void getRequiredFactorsReturnsNullForLocationsConstructor() throws Exception {
+        assertEquals(null, new AuthPolicy(new ArrayList<AuthPolicy.Location>()).getRequiredFactors());
     }
 
     @Test
-    public void getRequiredFactorsReturnsZeroForFactorRequiredConstructor() throws Exception {
-        assertEquals(0, new AuthPolicy(true, true, true).getRequiredFactors());
+    public void getRequiredFactorsReturnsNullForFactorRequiredConstructor() throws Exception {
+        assertEquals(null, new AuthPolicy(true, true, true).getRequiredFactors());
     }
 
     @Test
-    public void getRequiredFactorsReturnsZeroForFactorRequiredLocationsConstructor() throws Exception {
-        assertEquals(0, new AuthPolicy(true, true, true, new ArrayList<AuthPolicy.Location>()).getRequiredFactors());
+    public void getRequiredFactorsReturnsNullForFactorRequiredLocationsConstructor() throws Exception {
+        assertEquals(null, new AuthPolicy(true, true, true, new ArrayList<AuthPolicy.Location>()).getRequiredFactors());
     }
 
     @Test
-    public void isKnowledgeFactorRequiredReturnsFalseForRequiredFactorsConstructor() throws Exception {
-        assertFalse(new AuthPolicy(99).isKnowledgeFactorRequired());
+    public void isKnowledgeFactorRequiredReturnsNullForRequiredFactorsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99).isKnowledgeFactorRequired());
     }
 
     @Test
-    public void isKnowledgeFactorRequiredReturnsFalseForRequiredFactorsLocationsConstructor() throws Exception {
-        assertFalse(new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).isKnowledgeFactorRequired());
+    public void isKnowledgeFactorRequiredReturnsNullForRequiredFactorsLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).isKnowledgeFactorRequired());
     }
 
     @Test
-    public void isKnowledgeFactorRequiredReturnsFalseForLocationsConstructor() throws Exception {
-        assertFalse(new AuthPolicy(new ArrayList<AuthPolicy.Location>()).isKnowledgeFactorRequired());
+    public void isKnowledgeFactorRequiredReturnsNullForLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(new ArrayList<AuthPolicy.Location>()).isKnowledgeFactorRequired());
     }
 
     @Test
@@ -72,13 +72,13 @@ public class AuthPolicyTest {
     }
 
     @Test
-    public void isInherenceFactorRequiredReturnsFalseForRequiredFactorsConstructor() throws Exception {
-        assertFalse(new AuthPolicy(99).isInherenceFactorRequired());
+    public void isInherenceFactorRequiredReturnsNullForRequiredFactorsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99).isInherenceFactorRequired());
     }
 
     @Test
     public void isInherenceFactorRequiredReturnsFalseForRequiredFactorsLocationsConstructor() throws Exception {
-        assertFalse(new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).isInherenceFactorRequired());
+        assertNull(new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).isInherenceFactorRequired());
     }
 
     @Test
@@ -93,18 +93,18 @@ public class AuthPolicyTest {
     }
 
     @Test
-    public void isPossessionFactorRequiredReturnsFalseForRequiredFactorsConstructor() throws Exception {
-        assertFalse(new AuthPolicy(99).isPossessionFactorRequired());
+    public void isPossessionFactorRequiredReturnsNullForRequiredFactorsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99).isPossessionFactorRequired());
     }
 
     @Test
-    public void isPossessionFactorRequiredReturnsFalseForRequiredFactorsLocationsConstructor() throws Exception {
-        assertFalse(new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).isPossessionFactorRequired());
+    public void isPossessionFactorRequiredReturnsNullForRequiredFactorsLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).isPossessionFactorRequired());
     }
 
     @Test
-    public void isPossessionFactorRequiredReturnsFalseForLocationsConstructor() throws Exception {
-        assertFalse(new AuthPolicy(new ArrayList<AuthPolicy.Location>()).isPossessionFactorRequired());
+    public void isPossessionFactorRequiredReturnsNullForLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(new ArrayList<AuthPolicy.Location>()).isPossessionFactorRequired());
     }
 
     @Test
@@ -125,14 +125,14 @@ public class AuthPolicyTest {
 
     @Test
     public void getLocationsReturnsEquivalentListForRequiredFactorsLocationsConstructor() throws Exception {
-        List<AuthPolicy.Location> expected = new ArrayList<AuthPolicy.Location>();
+        List<AuthPolicy.Location> expected = new ArrayList<>();
         expected.add(new AuthPolicy.Location(1.1, 2.2, 3.3));
         assertEquals(expected, new AuthPolicy(99, expected).getLocations());
     }
 
     @Test
     public void getLocationsReturnsEquivalentListForLocationsConstructor() throws Exception {
-        List<AuthPolicy.Location> expected = new ArrayList<AuthPolicy.Location>();
+        List<AuthPolicy.Location> expected = new ArrayList<>();
         expected.add(new AuthPolicy.Location(1.1, 2.2, 3.3));
         assertEquals(expected, new AuthPolicy(expected).getLocations());
     }
@@ -145,14 +145,14 @@ public class AuthPolicyTest {
 
     @Test
     public void getLocationsReturnsEquivalentListForFactorRequiredLocationsConstructor() throws Exception {
-        List<AuthPolicy.Location> expected = new ArrayList<AuthPolicy.Location>();
+        List<AuthPolicy.Location> expected = new ArrayList<>();
         expected.add(new AuthPolicy.Location(1.1, 2.2, 3.3));
         assertEquals(expected, new AuthPolicy(true, true, true, expected).getLocations());
     }
 
     @Test
     public void getLocationsIsNotTheSameListPassedInConstructor() throws Exception {
-        List<AuthPolicy.Location> expected = new ArrayList<AuthPolicy.Location>();
+        List<AuthPolicy.Location> expected = new ArrayList<>();
         expected.add(new AuthPolicy.Location(1.1, 2.2, 3.3));
         assertNotSame(expected, new AuthPolicy(expected).getLocations());
     }

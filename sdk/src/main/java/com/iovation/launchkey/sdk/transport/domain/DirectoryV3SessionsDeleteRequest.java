@@ -25,26 +25,4 @@ public class DirectoryV3SessionsDeleteRequest {
     public String getIdentifier() {
         return identifier;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DirectoryV3SessionsDeleteRequest)) return false;
-
-        DirectoryV3SessionsDeleteRequest that = (DirectoryV3SessionsDeleteRequest) o;
-
-        return getIdentifier() != null ? getIdentifier().equals(that.getIdentifier()) : that.getIdentifier() == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return getIdentifier() != null ? getIdentifier().hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "DirectoryV3SessionsDeleteRequest{" +
-                "identifier='" + identifier + '\'' +
-                '}';
-    }
 }

@@ -17,21 +17,25 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHeader;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ApacheHttpTransportPublicPublicKeyGetTest extends ApacheHttpTransportTestBase {
     private String publicKeyPEM;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        //noinspection SpellCheckingInspection
         publicKeyPEM = "-----BEGIN PUBLIC KEY-----\n" +
                 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8zQos4iDSjmUVrFUAg5G\n" +
                 "uhU6GehNKb8MCXFadRWiyLGjtbGZAk8fusQU0Uj9E3o0mne0SYESACkhyK+3M1Er\n" +
@@ -48,27 +52,24 @@ public class ApacheHttpTransportPublicPublicKeyGetTest extends ApacheHttpTranspo
     @Test
     public void publicPublicKeyGetCallsHttpClientWithProperHttpRequestMethod() throws Exception {
         transport.publicV3PublicKeyGet("fingerprint");
-        ArgumentCaptor<HttpUriRequest> actual = ArgumentCaptor.forClass(HttpUriRequest.class);
-        verify(httpClient).execute(actual.capture());
-        assertEquals("GET", actual.getValue().getMethod());
+        verify(httpClient).execute(requestCaptor.capture());
+        assertEquals("GET", requestCaptor.getValue().getMethod());
     }
 
     @Test
     public void publicPublicKeyGetCallsHttpClientWithProperHttpRequestUriWithoutFingerprint() throws Exception {
         URI expected = URI.create(baseUrl.concat("/public/v3/public-key"));
         transport.publicV3PublicKeyGet(null);
-        ArgumentCaptor<HttpUriRequest> actual = ArgumentCaptor.forClass(HttpUriRequest.class);
-        verify(httpClient).execute(actual.capture());
-        assertEquals(expected, actual.getValue().getURI());
+        verify(httpClient).execute(requestCaptor.capture());
+        assertEquals(expected, requestCaptor.getValue().getURI());
     }
 
     @Test
     public void publicPublicKeyGetCallsHttpClientWithProperHttpRequestUriWithFingerprint() throws Exception {
         URI expected = URI.create(baseUrl.concat("/public/v3/public-key/expected-fingerprint"));
         transport.publicV3PublicKeyGet("expected-fingerprint");
-        ArgumentCaptor<HttpUriRequest> actual = ArgumentCaptor.forClass(HttpUriRequest.class);
-        verify(httpClient).execute(actual.capture());
-        assertEquals(expected, actual.getValue().getURI());
+        verify(httpClient).execute(requestCaptor.capture());
+        assertEquals(expected, requestCaptor.getValue().getURI());
     }
 
     @Test
@@ -88,7 +89,7 @@ public class ApacheHttpTransportPublicPublicKeyGetTest extends ApacheHttpTranspo
     @Test(expected = CommunicationErrorException.class)
     public void publicPublicKeyGetThrowsInvalidResponseExceptionWhenEntityGetContentThrowsIOError() throws Exception {
         HttpEntity entity = mock(HttpEntity.class);
-        when(entity.getContent()).thenThrow(new IOException());
+        doThrow(new IOException()).when(entity).writeTo(any(OutputStream.class));
         when(httpResponse.getEntity()).thenReturn(entity);
         transport.publicV3PublicKeyGet("fingerprint");
     }

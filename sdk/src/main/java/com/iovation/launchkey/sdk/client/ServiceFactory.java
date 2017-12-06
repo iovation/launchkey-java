@@ -12,7 +12,6 @@
 
 package com.iovation.launchkey.sdk.client;
 
-import com.iovation.launchkey.sdk.UUIDHelper;
 import com.iovation.launchkey.sdk.transport.Transport;
 
 import java.util.UUID;
@@ -23,7 +22,6 @@ public class ServiceFactory {
     private final UUID serviceId;
 
     public ServiceFactory(Transport transport, UUID serviceID) {
-        UUIDHelper.validateVersion(serviceID, 1);
         this.transport = transport;
         this.serviceId = serviceID;
     }

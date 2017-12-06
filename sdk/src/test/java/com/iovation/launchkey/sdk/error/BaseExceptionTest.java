@@ -31,8 +31,7 @@ public class BaseExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         BaseException base = new BaseException(MESSAGE, CAUSE, CODE);
-        BaseException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class BaseExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         BaseException base = new BaseException(MESSAGE, CAUSE, CODE);
-        BaseException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 

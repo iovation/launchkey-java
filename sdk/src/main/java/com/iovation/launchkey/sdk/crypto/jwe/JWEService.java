@@ -53,6 +53,7 @@ public interface JWEService {
      * Get the JWE headers from the data
      * @param data JWE data
      * @return Headers
+     * @throws JWEFailure When an issue arises while attempting to encrypt the data
      */
     Map<String, String> getHeaders(String data) throws JWEFailure;
 }

@@ -41,7 +41,7 @@ public class ServiceV3AuthsPostRequestPolicyTest {
                         "}" +
                     "]" +
                 "}";
-        ServiceV3AuthsPostRequestPolicy policy = new ServiceV3AuthsPostRequestPolicy(2, true, true, true);
+        @SuppressWarnings("deprecation") ServiceV3AuthsPostRequestPolicy policy = new ServiceV3AuthsPostRequestPolicy(2, true, true, true);
         policy.addGeoFence(1.1, 2.1, 3.1);
         policy.addGeoFence(1.2, 2.2, 3.2);
         String actual = new ObjectMapper().writeValueAsString(policy);

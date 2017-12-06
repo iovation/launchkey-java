@@ -10,7 +10,6 @@ package com.iovation.launchkey.sdk.transport.domain; /**
  * limitations under the License.
  */
 
-import static org.junit.Assert.*;
 
 public class RequestClaimTest {
 

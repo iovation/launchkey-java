@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@SuppressWarnings("deprecation")
 public class JWTClaimsTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private JWTClaims jwtClaims;
@@ -35,8 +36,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
 
     }
@@ -88,55 +90,18 @@ public class JWTClaimsTest {
     }
 
     @Test
-    public void getMethod() throws Exception {
-        assertEquals("Method", jwtClaims.getMethod());
+    public void getStatusCode() throws Exception {
+        assertEquals(201, jwtClaims.getStatusCode());
     }
 
     @Test
-    public void getPath() throws Exception {
-        assertEquals("Path", jwtClaims.getPath());
+    public void getLocationHeader() throws Exception {
+        assertEquals("Location Header", jwtClaims.getLocationHeader());
     }
 
     @Test
-    public void jsonEncode() throws Exception {
-        String expected = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash-Alg\":\"Body Hash Alg\",\"Content-Hash\":\"Body Hash\",\"Method\":\"Method\",\"Path\":\"Path\"}";
-        String actual = OBJECT_MAPPER.writeValueAsString(jwtClaims);
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void jsonEncodeSkipsNullItems() throws Exception {
-        String expected = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"Method\":\"Method\",\"Path\":\"Path\"}";
-        String actual = OBJECT_MAPPER.writeValueAsString(new JWTClaims("Token ID", "Issuer", "Subject", "Audience", null, null, null, null, null, "Method", "Path"));
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void jsonDecode() throws Exception {
-        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Method\":\"Method\",\"Path\":\"Path\"}";
-        JWTClaims actual = OBJECT_MAPPER.readValue(json, JWTClaims.class);
-        assertEquals(jwtClaims, actual);
-    }
-
-    @Test
-    public void jsonDecodeWithNoMethod() throws Exception {
-        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Path\":\"Path\"}";
-        JWTClaims actual = OBJECT_MAPPER.readValue(json, JWTClaims.class);
-        assertNull(actual.getMethod());
-    }
-
-    @Test
-    public void jsonDecodeWithNoPath() throws Exception {
-        String json = "{\"tid\":\"Token ID\",\"iss\":\"Issuer\",\"sub\":\"Subject\",\"aud\":\"Audience\",\"iat\":11111,\"nbf\":22222,\"exp\":33333,\"Content-Hash\":\"Body Hash\",\"Content-Hash-Alg\":\"Body Hash Alg\",\"Method\":\"Method\"}";
-        JWTClaims actual = OBJECT_MAPPER.readValue(json, JWTClaims.class);
-        assertNull(actual.getPath());
-    }
-
-    @Test
-    public void jsonDecodeWithUnknownValueDoesNotError() throws Exception {
-        String json = "{\"unk\":\"value\"}";
-        JWTClaims actual = OBJECT_MAPPER.readValue(json, JWTClaims.class);
-        assertNotNull(actual);
+    public void getCacheControlHeader() throws Exception {
+        assertEquals("Cache Header", jwtClaims.getCacheControlHeader());
     }
 
     @Test
@@ -162,8 +127,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertTrue(jwtClaims.equals(other));
     }
@@ -180,8 +146,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -198,8 +165,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -216,8 +184,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -234,8 +203,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -252,8 +222,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -270,8 +241,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -288,8 +260,9 @@ public class JWTClaimsTest {
                 33334,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -306,8 +279,9 @@ public class JWTClaimsTest {
                 33333,
                 "Other Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -324,14 +298,15 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Other Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
 
     @Test
-    public void equalsIsFalseWhenMethodIsDifferent() throws Exception {
+    public void equalsIsFalseWhenStatusCodeIsDifferent() throws Exception {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
@@ -342,14 +317,15 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Other Method",
-                "Path"
+                501,
+                "Cache Header",
+                "Location Header"
         );
         assertFalse(jwtClaims.equals(other));
     }
 
     @Test
-    public void equalsIsFalseWhenPathIsDifferent() throws Exception {
+    public void equalsIsFalseWhenCacheHeaderIsDifferent() throws Exception {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
@@ -360,8 +336,28 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Other Path"
+                201,
+                "Cache X Header",
+                "Location Header"
+        );
+        assertNotEquals(jwtClaims.hashCode(), other.hashCode());
+    }
+
+    @Test
+    public void equalsIsFalseWhenLocationHeaderIsDifferent() throws Exception {
+        JWTClaims other = new JWTClaims(
+                "Token ID",
+                "Issuer",
+                "Subject",
+                "Audience",
+                11111,
+                22222,
+                33333,
+                "Body Hash Alg",
+                "Body Hash",
+                201,
+                "Cache Header",
+                "Location X Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -383,8 +379,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -401,8 +398,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -419,8 +417,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -437,8 +436,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -455,8 +455,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -473,14 +474,15 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
 
     @Test
-    public void hashcodeIsNotEqualWhenNotBeforedIsDifferent() throws Exception {
+    public void hashcodeIsNotEqualWhenNotBeforeIsDifferent() throws Exception {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
@@ -491,8 +493,9 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -509,8 +512,9 @@ public class JWTClaimsTest {
                 33334,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -527,8 +531,9 @@ public class JWTClaimsTest {
                 33333,
                 "Other Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -545,14 +550,15 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Other Body Hash",
-                "Method",
-                "Path"
+                201,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
 
     @Test
-    public void hashcodeIsNotEqualWhenMethodIsDifferent() throws Exception {
+    public void hashcodeIsNotEqualWhenStatusCodeIsDifferent() throws Exception {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
@@ -563,14 +569,15 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Other Method",
-                "Path"
+                501,
+                "Cache Header",
+                "Location Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
 
     @Test
-    public void hashcodeIsNotEqualWhenPathIsDifferent() throws Exception {
+    public void hashcodeIsNotEqualWhenCacheIsDifferent() throws Exception {
         JWTClaims other = new JWTClaims(
                 "Token ID",
                 "Issuer",
@@ -581,8 +588,28 @@ public class JWTClaimsTest {
                 33333,
                 "Body Hash Alg",
                 "Body Hash",
-                "Method",
-                "Other Path"
+                201,
+                "Cache X Header",
+                "Location Header"
+        );
+        assertNotEquals(jwtClaims.hashCode(), other.hashCode());
+    }
+
+    @Test
+    public void hashcodeIsNotEqualWhenLocationIsDifferent() throws Exception {
+        JWTClaims other = new JWTClaims(
+                "Token ID",
+                "Issuer",
+                "Subject",
+                "Audience",
+                11111,
+                22222,
+                33333,
+                "Body Hash Alg",
+                "Body Hash",
+                201,
+                "Cache Header",
+                "Location X Header"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }

@@ -3,19 +3,22 @@ package com.iovation.launchkey.sdk.transport.apachehttp;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.iovation.launchkey.sdk.cache.Cache;
+import com.iovation.launchkey.sdk.cache.CacheException;
 import com.iovation.launchkey.sdk.crypto.Crypto;
+import com.iovation.launchkey.sdk.crypto.jwe.JWEFailure;
+import com.iovation.launchkey.sdk.crypto.jwe.JWEService;
+import com.iovation.launchkey.sdk.crypto.jwt.JWTClaims;
+import com.iovation.launchkey.sdk.crypto.jwt.JWTData;
+import com.iovation.launchkey.sdk.crypto.jwt.JWTError;
+import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.*;
 import com.iovation.launchkey.sdk.transport.domain.Error;
-import com.iovation.launchkey.sdk.cache.Cache;
-import com.iovation.launchkey.sdk.cache.CacheException;
-import com.iovation.launchkey.sdk.crypto.jwe.JWEFailure;
-import com.iovation.launchkey.sdk.crypto.jwe.JWEService;
-import com.iovation.launchkey.sdk.crypto.jwt.JWTData;
-import com.iovation.launchkey.sdk.crypto.jwt.JWTError;
-import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -29,6 +32,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.*;
@@ -62,6 +66,7 @@ public class ApacheHttpTransport implements Transport {
                                int offsetTTL, int currentPublicKeyTTL, EntityKeyMap entityKeyMap
     ) {
         this.objectMapper = objectMapper;
+        this.objectMapper.setDateFormat(new StdDateFormat());
         this.crypto = crypto;
         this.httpClient = httpClient;
         this.jwtService = jwtService;
@@ -78,7 +83,7 @@ public class ApacheHttpTransport implements Transport {
     @Override
     public PublicV3PingGetResponse publicV3PingGet()
             throws CommunicationErrorException, MarshallingError, InvalidResponseException, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         HttpResponse response = getHttpResponse("GET", "/public/v3/ping", null, null, false, null);
         return parseJsonResponse(response.getEntity(), PublicV3PingGetResponse.class);
     }
@@ -86,7 +91,7 @@ public class ApacheHttpTransport implements Transport {
     @Override
     public PublicV3PublicKeyGetResponse publicV3PublicKeyGet(String publicKeyFingerprint)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
 
         String path = "/public/v3/public-key";
         if (publicKeyFingerprint != null) {
@@ -114,7 +119,7 @@ public class ApacheHttpTransport implements Transport {
     @Override
     public ServiceV3AuthsPostResponse serviceV3AuthsPost(ServiceV3AuthsPostRequest request, EntityIdentifier subject)
             throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         HttpResponse response = getHttpResponse("POST", "/service/v3/auths", subject, request, true, null);
         return decryptResponse(response, ServiceV3AuthsPostResponse.class);
     }
@@ -122,17 +127,19 @@ public class ApacheHttpTransport implements Transport {
     @Override
     public ServiceV3AuthsGetResponse serviceV3AuthsGet(UUID authRequestId, EntityIdentifier subject)
             throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException, AuthorizationRequestTimedOutError, NoKeyFoundException {
+            InvalidCredentialsException, AuthorizationRequestTimedOutError,
+            NoKeyFoundException {
         ServiceV3AuthsGetResponse response;
         String path = "/service/v3/auths/" + authRequestId.toString();
-        HttpResponse httpResponse = getHttpResponse("GET", path, subject, null, true, Arrays.asList(408));
+        HttpResponse httpResponse = getHttpResponse("GET", path, subject, null, true, Collections.singletonList(408));
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         if (statusCode == 204) { // User has not responded
             response = null;
         } else if (statusCode == 408) { // User did not respond before request timed out
             throw new AuthorizationRequestTimedOutError();
         } else { // Users responded
-            ServiceV3AuthsGetResponseCore apiResponse = decryptResponse(httpResponse, ServiceV3AuthsGetResponseCore.class);
+            ServiceV3AuthsGetResponseCore apiResponse =
+                    decryptResponse(httpResponse, ServiceV3AuthsGetResponseCore.class);
             try {
                 JWTData jwtData = jwtService.getJWTData(getJWT(httpResponse));
                 EntityIdentifier audience = EntityIdentifier.fromString(jwtData.getAudience());
@@ -173,25 +180,31 @@ public class ApacheHttpTransport implements Transport {
     @Override
     public void serviceV3SessionsPost(ServiceV3SessionsPostRequest request, EntityIdentifier subject)
             throws CommunicationErrorException, InvalidResponseException, MarshallingError,
-            CryptographyError, InvalidRequestException, InvalidCredentialsException {
+            CryptographyError, InvalidCredentialsException {
         getHttpResponse("POST", "/service/v3/sessions", subject, request, true, null);
     }
 
     @Override
     public void serviceV3SessionsDelete(ServiceV3SessionsDeleteRequest request, EntityIdentifier subject)
             throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         getHttpResponse("DELETE", "/service/v3/sessions", subject, request, true, null);
     }
 
     @Override
-    public DirectoryV3DevicesPostResponse directoryV3DevicesPost(DirectoryV3DevicesPostRequest request, EntityIdentifier subject) throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError, InvalidRequestException, InvalidCredentialsException {
+    public DirectoryV3DevicesPostResponse directoryV3DevicesPost(DirectoryV3DevicesPostRequest request,
+                                                                 EntityIdentifier subject)
+            throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
+            InvalidCredentialsException {
         HttpResponse response = getHttpResponse("POST", "/directory/v3/devices", subject, request, true, null);
         return decryptResponse(response, DirectoryV3DevicesPostResponse.class);
     }
 
     @Override
-    public DirectoryV3DevicesListPostResponse directoryV3DevicesListPost(DirectoryV3DevicesListPostRequest request, EntityIdentifier subject) throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError, InvalidRequestException, InvalidCredentialsException {
+    public DirectoryV3DevicesListPostResponse directoryV3DevicesListPost(DirectoryV3DevicesListPostRequest request,
+                                                                         EntityIdentifier subject)
+            throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
+            InvalidCredentialsException {
         HttpResponse response = getHttpResponse("POST", "/directory/v3/devices/list", subject, request, true, null);
         DirectoryV3DevicesListPostResponseDevice[] devices =
                 decryptResponse(response, DirectoryV3DevicesListPostResponseDevice[].class);
@@ -199,17 +212,34 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
-    public void directoryV3devicesDelete(DirectoryV3DevicesDeleteRequest request, EntityIdentifier subject) throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError, InvalidRequestException, InvalidCredentialsException {
+    public void directoryV3devicesDelete(DirectoryV3DevicesDeleteRequest request, EntityIdentifier subject)
+            throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
+            InvalidCredentialsException {
         getHttpResponse("DELETE", "/directory/v3/devices", subject, request, true, null);
     }
 
     @Override
-    public void directoryV3SessionsDelete(DirectoryV3SessionsDeleteRequest request, EntityIdentifier subject) throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError, InvalidRequestException, InvalidCredentialsException {
+    public DirectoryV3SessionsListPostResponse directoryV3SessionsListPost(DirectoryV3SessionsListPostRequest request,
+                                                                           EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        HttpResponse response = getHttpResponse("POST", "/directory/v3/sessions/list", subject, request, true, null);
+        DirectoryV3SessionsListPostResponseSession[] sessions =
+                decryptResponse(response, DirectoryV3SessionsListPostResponseSession[].class);
+        return new DirectoryV3SessionsListPostResponse(Arrays.asList(sessions));
+    }
+
+    @Override
+    public void directoryV3SessionsDelete(DirectoryV3SessionsDeleteRequest request, EntityIdentifier subject)
+            throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
+            InvalidCredentialsException {
         getHttpResponse("DELETE", "/directory/v3/sessions", subject, request, true, null);
     }
 
     @Override
-    public ServerSentEvent handleServerSentEvent(Map<String, List<String>> headers, String body) throws CommunicationErrorException, MarshallingError, InvalidRequestException, InvalidResponseException, InvalidCredentialsException, CryptographyError, NoKeyFoundException {
+    public ServerSentEvent handleServerSentEvent(Map<String, List<String>> headers, String body)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError, NoKeyFoundException {
         ServerSentEvent response;
         HeaderGroup headerGroup = new HeaderGroup();
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
@@ -227,9 +257,12 @@ public class ApacheHttpTransport implements Transport {
                 final String encryptionKeyId = jweService.getHeaders(body).get("kid");
                 final RSAPrivateKey privateKey = entityKeyMap.getKey(requestingEntity, encryptionKeyId);
                 final String decrypted = jweService.decrypt(body, privateKey);
-                final ServerSentEventAuthorizationResponseCore core = objectMapper.readValue(decrypted, ServerSentEventAuthorizationResponseCore.class);
-                final byte[] decryptedDeviceResponse = crypto.decryptRSA(BASE_64.decode(core.getAuth().getBytes()), privateKey);
-                final ServiceV3AuthsGetResponseDevice deviceResponse = objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDevice.class);
+                final ServerSentEventAuthorizationResponseCore core =
+                        objectMapper.readValue(decrypted, ServerSentEventAuthorizationResponseCore.class);
+                final byte[] decryptedDeviceResponse =
+                        crypto.decryptRSA(BASE_64.decode(core.getAuth().getBytes()), privateKey);
+                final ServiceV3AuthsGetResponseDevice deviceResponse =
+                        objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDevice.class);
                 response = new ServerSentEventAuthorizationResponse(
                         requestingEntity,
                         EntityIdentifier.fromString(jwtData.getSubject()).getId(),
@@ -252,17 +285,314 @@ public class ApacheHttpTransport implements Transport {
         } catch (JsonParseException e) {
             throw new InvalidRequestException("Unable to parse the decrypted body as JSON!", e, null);
         } catch (JsonMappingException e) {
-            throw new InvalidRequestException("Unable to map the decrypted body JSON to a Map<String, Object>!", e, null);
+            throw new InvalidRequestException("Unable to map the decrypted body JSON to a Map<String, Object>!", e,
+                    null);
         } catch (IOException e) {
             throw new InvalidRequestException("Unable to read the body due to an I/O error!", e, null);
         }
         return response;
     }
 
-    private HttpResponse getHttpResponse(
-            String method, String path, EntityIdentifier subjectEntity, Object transportObject, boolean signRequest, List<Integer> httpStatusCodeWhiteList)
+    @Override
+    public OrganizationV3DirectoriesPostResponse organizationV3DirectoriesPost(
+            OrganizationV3DirectoriesPostRequest request, EntityIdentifier subject)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError {
+        HttpResponse response = getHttpResponse("POST", "/organization/v3/directories", subject, request, true, null);
+        return decryptResponse(response, OrganizationV3DirectoriesPostResponse.class);
+    }
+
+    @Override
+    public void organizationV3DirectoriesPatch(OrganizationV3DirectoriesPatchRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PATCH", "/organization/v3/directories", subject, request, true, null);
+    }
+
+    @Override
+    public OrganizationV3DirectoriesGetResponse organizationV3DirectoriesGet(EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        HttpResponse response = getHttpResponse("GET", "/organization/v3/directories", subject, null, true, null);
+        OrganizationV3DirectoriesGetResponseDirectory[] directories =
+                decryptResponse(response, OrganizationV3DirectoriesGetResponseDirectory[].class);
+        return new OrganizationV3DirectoriesGetResponse(Arrays.asList(directories));
+    }
+
+    @Override
+    public OrganizationV3DirectoriesListPostResponse organizationV3DirectoriesListPost(
+            OrganizationV3DirectoriesListPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/directories/list", subject, request, true, null);
+        return new OrganizationV3DirectoriesListPostResponse(Arrays.asList(
+                decryptResponse(httpResponse, OrganizationV3DirectoriesListPostResponseDirectory[].class)));
+    }
+
+    @Override
+    public KeysPostResponse organizationV3DirectoryKeysPost(OrganizationV3DirectoryKeysPostRequest request,
+                                                            EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/directory/keys", subject, request, true, null);
+        return decryptResponse(httpResponse, KeysPostResponse.class);
+    }
+
+    @Override
+    public KeysListPostResponse organizationV3DirectoryKeysListPost(OrganizationV3DirectoryKeysListPostRequest request,
+                                                                    EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/directory/keys/list", subject, request, true, null);
+        return new KeysListPostResponse(
+                Arrays.asList(decryptResponse(httpResponse, KeysListPostResponsePublicKey[].class)));
+    }
+
+    @Override
+    public void organizationV3DirectoryKeysPatch(OrganizationV3DirectoryKeysPatchRequest request,
+                                                 EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PATCH", "/organization/v3/directory/keys", subject, request, true, null);
+    }
+
+    @Override
+    public void organizationV3DirectoryKeysDelete(OrganizationV3DirectoryKeysDeleteRequest request,
+                                                  EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("DELETE", "/organization/v3/directory/keys", subject, request, true, null);
+    }
+
+    @Override
+    public OrganizationV3DirectorySdkKeysPostResponse organizationV3DirectorySdkKeysPost(
+            OrganizationV3DirectorySdkKeysPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/directory/sdk-keys", subject, request, true, null);
+        return decryptResponse(httpResponse, OrganizationV3DirectorySdkKeysPostResponse.class);
+    }
+
+    @Override
+    public void organizationV3DirectorySdkKeysDelete(OrganizationV3DirectorySdkKeysDeleteRequest request,
+                                                     EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("DELETE", "/organization/v3/directory/sdk-keys", subject, request, true, null);
+    }
+
+    @Override
+    public OrganizationV3DirectorySdkKeysListPostResponse organizationV3DirectorySdkKeysListPost(
+            OrganizationV3DirectorySdkKeysListPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/directory/sdk-keys/list", subject, request, true, null);
+        final UUID[] sdkKeys = decryptResponse(httpResponse, UUID[].class);
+
+        return new OrganizationV3DirectorySdkKeysListPostResponse(Arrays.asList(sdkKeys));
+    }
+
+    @Override
+    public ServicesPostResponse organizationV3ServicesPost(ServicesPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/services", subject, request, true, null);
+        return decryptResponse(httpResponse, ServicesPostResponse.class);
+    }
+
+    @Override
+    public void organizationV3ServicesPatch(ServicesPatchRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PATCH", "/organization/v3/services", subject, request, true, null);
+    }
+
+    @Override
+    public ServicesListPostResponse organizationV3ServicesListPost(ServicesListPostRequest request,
+                                                                   EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/services/list", subject, request, true, null);
+        return new ServicesListPostResponse(
+                Arrays.asList(decryptResponse(httpResponse, ServicesListPostResponseService[].class)));
+    }
+
+    @Override
+    public ServicesGetResponse organizationV3ServicesGet(EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("GET", "/organization/v3/services", subject, null, true, null);
+        return new ServicesGetResponse(
+                Arrays.asList(decryptResponse(httpResponse, ServicesGetResponseService[].class)));
+    }
+
+    @Override
+    public KeysListPostResponse organizationV3ServiceKeysListPost(ServiceKeysListPostRequest request,
+                                                                  EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/service/keys/list", subject, request, true, null);
+        return new KeysListPostResponse(
+                Arrays.asList(decryptResponse(httpResponse, KeysListPostResponsePublicKey[].class)));
+    }
+
+    @Override
+    public KeysPostResponse organizationV3ServiceKeysPost(ServiceKeysPostRequest request,
+                                                          EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/organization/v3/service/keys", subject, request, true, null);
+        return decryptResponse(httpResponse, KeysPostResponse.class);
+    }
+
+    @Override
+    public void organizationV3ServiceKeysPatch(ServiceKeysPatchRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PATCH", "/organization/v3/service/keys", subject, request, true, null);
+    }
+
+    @Override
+    public void organizationV3ServiceKeysDelete(ServiceKeysDeleteRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("DELETE", "/organization/v3/service/keys", subject, request, true, null);
+    }
+
+    @Override
+    public void organizationV3ServicePolicyPut(ServicePolicyPutRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PUT", "/organization/v3/service/policy", subject, request, true, null);
+    }
+
+    @Override
+    public ServicePolicy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
+                                                             EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse response =
+                getHttpResponse("POST", "/organization/v3/service/policy/item", subject, request, true, null);
+        return decryptResponse(response, ServicePolicy.class);
+    }
+
+    @Override
+    public void organizationV3ServicePolicyDelete(ServicePolicyDeleteRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("DELETE", "/organization/v3/service/policy", subject, request, true, null);
+    }
+
+    @Override
+    public ServicesPostResponse directoryV3ServicesPost(ServicesPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/directory/v3/services", subject, request, true, null);
+        return decryptResponse(httpResponse, ServicesPostResponse.class);
+    }
+
+    @Override
+    public void directoryV3ServicesPatch(ServicesPatchRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PATCH", "/directory/v3/services", subject, request, true, null);
+    }
+
+    @Override
+    public ServicesListPostResponse directoryV3ServicesListPost(ServicesListPostRequest request,
+                                                                EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/directory/v3/services/list", subject, request, true, null);
+        return new ServicesListPostResponse(
+                Arrays.asList(decryptResponse(httpResponse, ServicesListPostResponseService[].class)));
+    }
+
+    @Override
+    public ServicesGetResponse directoryV3ServicesGet(EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("GET", "/directory/v3/services", subject, null, true, null);
+        return new ServicesGetResponse(
+                Arrays.asList(decryptResponse(httpResponse, ServicesGetResponseService[].class)));
+    }
+
+    @Override
+    public KeysPostResponse directoryV3ServiceKeysPost(ServiceKeysPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/directory/v3/service/keys", subject, request, true, null);
+        return decryptResponse(httpResponse, KeysPostResponse.class);
+    }
+
+    @Override
+    public KeysListPostResponse directoryV3ServiceKeysListPost(ServiceKeysListPostRequest request,
+                                                               EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        final HttpResponse httpResponse =
+                getHttpResponse("POST", "/directory/v3/service/keys/list", subject, request, true, null);
+        return new KeysListPostResponse(
+                Arrays.asList(decryptResponse(httpResponse, KeysListPostResponsePublicKey[].class)));
+    }
+
+    @Override
+    public void directoryV3ServiceKeysDelete(ServiceKeysDeleteRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("DELETE", "/directory/v3/service/keys", subject, request, true, null);
+    }
+
+    @Override
+    public void directoryV3ServiceKeysPatch(ServiceKeysPatchRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PATCH", "/directory/v3/service/keys", subject, request, true, null);
+    }
+
+    @Override
+    public void directoryV3ServicePolicyPut(ServicePolicyPutRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PUT", "/directory/v3/service/policy", subject, request, true, null);
+    }
+
+    @Override
+    public ServicePolicy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
+                                                          EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        HttpResponse response =
+                getHttpResponse("POST", "/directory/v3/service/policy/item", subject, request, true, null);
+        return decryptResponse(response, ServicePolicy.class);
+    }
+
+    @Override
+    public void directoryV3ServicePolicyDelete(ServicePolicyDeleteRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("DELETE", "/directory/v3/service/policy", subject, request, true, null);
+    }
+
+    protected HttpResponse getHttpResponse(
+            String method, String path, EntityIdentifier subjectEntity, Object transportObject, boolean signRequest,
+            List<Integer> httpStatusCodeWhiteList)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
 
         PublicKey publicKey;
         String publicKeyFingerprint;
@@ -290,7 +620,9 @@ public class ApacheHttpTransport implements Transport {
                 .build(requestId);
         try {
             HttpResponse response = httpClient.execute(request);
-            throwForStatus(response, requestId, httpStatusCodeWhiteList == null ? new ArrayList<Integer>() : httpStatusCodeWhiteList);
+            if (response != null) response = new ReplayHttpResponse(response);
+            throwForStatus(response, requestId,
+                    httpStatusCodeWhiteList == null ? new ArrayList<Integer>() : httpStatusCodeWhiteList);
             if (signRequest) {
                 validateResponseJWT(response, requestId);
             }
@@ -301,61 +633,46 @@ public class ApacheHttpTransport implements Transport {
     }
 
     private void throwForStatus(HttpResponse response, String requestId, List<Integer> httpStatusCodeWhiteList)
-            throws CommunicationErrorException, InvalidRequestException, InvalidResponseException,
+            throws CommunicationErrorException, InvalidResponseException,
             InvalidCredentialsException, MarshallingError, CryptographyError {
         final int statusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCodeWhiteList.contains(statusCode)) {
-            // Do nothing
+            logger.debug("Did not throw for status as it was in white list");
         } else if (statusCode == 400) {
             final HttpEntity httpEntity = response.getEntity();
             if (httpEntity == null || httpEntity.getContentLength() == 0) {
                 throw new InvalidRequestException(
                         response.getStatusLine().getReasonPhrase(),
                         null,
-                        "HTTP-" + String.valueOf(statusCode)
+                        "HTTP-400"
                 );
             } else {
                 try {
                     validateResponseJWT(response, requestId);
                     com.iovation.launchkey.sdk.transport.domain.Error error = decryptResponse(response, Error.class);
                     Object detail = error.getErrorDetail();
-                    throw new InvalidResponseException(
-                            objectMapper.writeValueAsString(detail), null, error.getErrorCode());
+                    throw InvalidRequestException
+                            .fromErrorCode(error.getErrorCode(), objectMapper.writeValueAsString(detail));
                 } catch (IOException e) {
                     throw new InvalidResponseException("Unable to parse error in response", e, null);
                 }
             }
-        } else if (statusCode == 401) {
-            throw new InvalidRequestException(
-                    response.getStatusLine().getReasonPhrase(),
-                    null,
-                    "HTTP-" + String.valueOf(statusCode)
-            );
-        } else if (statusCode == 403) {
-            throw new InvalidCredentialsException(
-                    response.getStatusLine().getReasonPhrase(),
-                    null,
-                    "HTTP-" + String.valueOf(statusCode)
-            );
         } else if (!(statusCode >= 200 && statusCode < 300)) {
-            throw new CommunicationErrorException(
-                    "HTTP Error: [" + String.valueOf(statusCode)
-                            + "] " + response.getStatusLine().getReasonPhrase()
-                    , null, null);
+            String message = "HTTP Error: [" + String.valueOf(statusCode)
+                    + "] " + response.getStatusLine().getReasonPhrase();
+            throw CommunicationErrorException.fromStatusCode(statusCode, message);
 
         }
     }
 
-    private <T> T decryptResponse(HttpResponse response, Class<T> type)
+    protected <T> T decryptResponse(HttpResponse response, Class<T> type)
             throws InvalidResponseException, CommunicationErrorException, CryptographyError {
         ByteArrayOutputStream encrypted = new ByteArrayOutputStream();
         try {
             response.getEntity().writeTo(encrypted);
             String json = jweService.decrypt(encrypted.toString());
             return objectMapper.readValue(json, type);
-        } catch (JsonParseException e) {
-            throw new InvalidResponseException("Unable to parse response as JSON", e, null);
-        } catch (JsonMappingException e) {
+        } catch (JsonParseException | JsonMappingException e) {
             throw new InvalidResponseException("Unable to parse response as JSON", e, null);
         } catch (IOException e) {
             throw new CommunicationErrorException("AN IO Error Occurred", e, null);
@@ -368,9 +685,7 @@ public class ApacheHttpTransport implements Transport {
             throws InvalidResponseException, CommunicationErrorException {
         try {
             return objectMapper.readValue(entity.getContent(), valueType);
-        } catch (JsonParseException e) {
-            throw new InvalidResponseException("Unable to parse response as JSON", e, null);
-        } catch (JsonMappingException e) {
+        } catch (JsonParseException | JsonMappingException e) {
             throw new InvalidResponseException("Unable to parse response as JSON", e, null);
         } catch (IOException e) {
             throw new CommunicationErrorException("AN IO Error Occurred", e, null);
@@ -379,19 +694,58 @@ public class ApacheHttpTransport implements Transport {
 
     private void validateResponseJWT(HttpResponse response, String expectedTokenId)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         try {
 
             final String jwt = getJWT(response);
-            validateJWT(expectedTokenId, jwt);
+            final JWTClaims claims = validateJWT(expectedTokenId, jwt);
+            HttpEntity entity = response.getEntity();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            if (entity != null) entity.writeTo(stream);
+
+            if (claims.getStatusCode() != response.getStatusLine().getStatusCode())
+                throw new JWTError("Status code of response content does not match JWT response status code", null);
+
+            if (stream.size() > 0) {
+
+                String hash;
+                if (claims.getContentHashAlgorithm().equals("S256")) {
+                    hash = Hex.encodeHexString(crypto.sha256(stream.toByteArray()));
+                } else if (claims.getContentHashAlgorithm().equals("S384")) {
+                    hash = Hex.encodeHexString(crypto.sha384(stream.toByteArray()));
+                } else if (claims.getContentHashAlgorithm().equals("S512")) {
+                    hash = Hex.encodeHexString(crypto.sha512(stream.toByteArray()));
+                } else {
+                    throw new JWTError("Hash of response content uses unsupported algorithm of " +
+                            claims.getContentHashAlgorithm(), null);
+                }
+                if (claims.getContentHash() == null || !hash.equals(claims.getContentHash()))
+                    throw new JWTError("Hash of response content does not match JWT response hash", null);
+            }
+
+            if (response.containsHeader("Location") &&
+                    !response.getFirstHeader("Location").equals(claims.getLocationHeader()))
+                throw new JWTError("Location header of response content does not match JWT response location", null);
+
+            if (response.containsHeader("Cache-Control") &&
+                    !response.getFirstHeader("Cache-Control").equals(claims.getLocationHeader()))
+                throw new JWTError("Cache-Control header of response content does not match JWT response cache", null);
+
+
         } catch (JWTError jwtError) {
             throw new InvalidResponseException("Invalid JWT in response!", jwtError, null);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    private void validateJWT(String expectedTokenId, String jwt) throws JWTError, MarshallingError, InvalidResponseException, CommunicationErrorException, CryptographyError, InvalidRequestException, InvalidCredentialsException {
+    private JWTClaims validateJWT(String expectedTokenId, String jwt)
+            throws JWTError, MarshallingError, InvalidResponseException, CommunicationErrorException, CryptographyError,
+            InvalidCredentialsException {
         String keyId = jwtService.getJWTData(jwt).getKeyId();
-        jwtService.decode(
+        return jwtService.decode(
                 getPublicKeyData(keyId).getKey(), issuer.toString(), expectedTokenId, getCurrentDate(), jwt);
     }
 
@@ -402,7 +756,7 @@ public class ApacheHttpTransport implements Transport {
 
     private PublicKeyData getCurrentPublicKeyData()
             throws CommunicationErrorException, MarshallingError, InvalidResponseException, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         if (currentPublicKeyDataExpires == null || currentPublicKeyDataExpires.before(new Date())) {
             setCurrentPublicKeyData();
         }
@@ -412,7 +766,7 @@ public class ApacheHttpTransport implements Transport {
 
     private synchronized void setCurrentPublicKeyData()
             throws CommunicationErrorException, MarshallingError, InvalidResponseException, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         currentPublicKeyData = getPublicKeyData(null);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -422,7 +776,7 @@ public class ApacheHttpTransport implements Transport {
 
     private PublicKeyData getPublicKeyData(String fingerprint)
             throws MarshallingError, InvalidResponseException, CommunicationErrorException, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         PublicKeyData publicKeyData = null;
 
         if (fingerprint != null) {
@@ -453,7 +807,7 @@ public class ApacheHttpTransport implements Transport {
             publicKeyData = new PublicKeyData(
                     crypto.getRSAPublicKeyFromPEM(apiKey.getPublicKey()), apiKey.getPublicKeyFingerprint());
             try {
-                publicKeyCache.put(apiKey.getPublicKeyFingerprint(), apiKey.getPublicKey());
+                publicKeyCache.put("LaunchKeyPublicKey:" + apiKey.getPublicKeyFingerprint(), apiKey.getPublicKey());
             } catch (CacheException e) {
                 logger.error("Unable to cache public key. This will degrade performance.", e);
             }
@@ -463,7 +817,7 @@ public class ApacheHttpTransport implements Transport {
 
     private Date getCurrentDate()
             throws MarshallingError, InvalidResponseException, CommunicationErrorException, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         if (serverTimeOffsetExpires == null || serverTimeOffsetExpires.before(new Date())) {
             setServerTimeOffset();
         }
@@ -475,7 +829,7 @@ public class ApacheHttpTransport implements Transport {
 
     private synchronized void setServerTimeOffset()
             throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
-            InvalidRequestException, InvalidCredentialsException {
+            InvalidCredentialsException {
         Date now = new Date();
         PublicV3PingGetResponse response = publicV3PingGet();
         serverTimeOffset = new Long(response.getApiTime().getTime() - now.getTime()).intValue();

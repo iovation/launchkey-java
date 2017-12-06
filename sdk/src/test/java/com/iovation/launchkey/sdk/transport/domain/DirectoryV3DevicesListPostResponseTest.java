@@ -12,7 +12,7 @@ package com.iovation.launchkey.sdk.transport.domain; /**
 
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +22,8 @@ public class DirectoryV3DevicesListPostResponseTest {
     @Test
     public void getDevices() throws Exception {
         List<DirectoryV3DevicesListPostResponseDevice> expected =
-                Arrays.asList(new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null));
+                Collections.singletonList(
+                        new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null));
         DirectoryV3DevicesListPostResponse response = new DirectoryV3DevicesListPostResponse(expected);
         List<DirectoryV3DevicesListPostResponseDevice> actual = response.getDevices();
         assertEquals(expected, actual);
@@ -55,18 +56,18 @@ public class DirectoryV3DevicesListPostResponseTest {
                 new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null);
 
         assertEquals(
-                new DirectoryV3DevicesListPostResponse(Arrays.asList(device)).hashCode(),
-                new DirectoryV3DevicesListPostResponse(Arrays.asList(device)).hashCode()
+                new DirectoryV3DevicesListPostResponse(Collections.singletonList(device)).hashCode(),
+                new DirectoryV3DevicesListPostResponse(Collections.singletonList(device)).hashCode()
         );
     }
 
     @Test
     public void hashCodeForUnequalObjectsIsNotEqual() throws Exception {
         assertNotEquals(
-                new DirectoryV3DevicesListPostResponse(Arrays.asList(
+                new DirectoryV3DevicesListPostResponse(Collections.singletonList(
                         new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null)
                 )).hashCode(),
-                new DirectoryV3DevicesListPostResponse(Arrays.asList(
+                new DirectoryV3DevicesListPostResponse(Collections.singletonList(
                         new DirectoryV3DevicesListPostResponseDevice(UUID.randomUUID(), "name", "type", 0, null, null)
                 )).hashCode()
         );

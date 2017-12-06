@@ -19,12 +19,15 @@ import com.fasterxml.jackson.annotation.*;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"tid", "iss", "sub", "aud", "iat", "nbf", "exp", "Content-Hash-Alg", "Content-Hash", "Method", "Path"})
+@JsonPropertyOrder(
+        {"tid", "iss", "sub", "aud", "iat", "nbf", "exp", "Content-Hash-Alg", "Content-Hash", "Method", "Path"})
 public class JWTClaims {
 
     private final String tokenId;
 
     private final String issuer;
+
+    private final String subject;
 
     private final String audience;
 
@@ -38,55 +41,57 @@ public class JWTClaims {
 
     private final String contentHash;
 
-    private final String method;
+    private final int statusCode;
 
-    private final String path;
+    private final String cacheControlHeader;
 
-    private final String subject;
+    private final String locationHeader;
 
     /**
-     * @param tokenId              "tid" claim. Globally unique identifier for this token. This is similar no a nonce
-     *                             and is meant to be utilized to protect against replay attacks. It will be the echo
-     *                             of the request token in the response to ensure this is the proper response.
-     *                             See: <a href="https://tools.ietf.org/html/rfc7519#section-4.1.7">RFC</a>
-     * @param issuer               "iss" claim. This identifies the originator of the claim.
-     *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.1">RFC</a>
-     * @param subject             "aud" claim. This identifies the subject of the claim.
-     *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.2">RFC</a>
-     * @param audience             "aud" claim. This identifies the intended audience of the claim.
-     *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.3">RFC</a>
-     * @param issuedAt             "iat" claim. This is the number of seconds past the EPOC at which time the claim
-     *                             was created.
-     *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.6">RFC</a>
-     * @param notBefore            "nbf" claim. This is the number of seconds past the EPOC at which time the claim
-     *                             will be valid.
-     *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.5">RFC</a>
-     * @param expiresAt            "nbf" claim. This is the number of seconds past the EPOC at which time the claim
-     *                             will expire.
-     *                             See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.5">RFC</a>
-     * @param contentHash          Proprietary claim which contains the hash of the HTTP message body utilizing the
-     *                             hashing algorithm. It will be null if there is no message body.
-     *                             specified in contentHashAlgorithm parameter.
+     * @param tokenId "tid" claim. Globally unique identifier for this token. This is similar no a nonce
+     * and is meant to be utilized to protect against replay attacks. It will be the echo
+     * of the request token in the response to ensure this is the proper response.
+     * See: <a href="https://tools.ietf.org/html/rfc7519#section-4.1.7">RFC</a>
+     * @param issuer "iss" claim. This identifies the originator of the claim.
+     * See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.1">RFC</a>
+     * @param subject "aud" claim. This identifies the subject of the claim.
+     * See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.2">RFC</a>
+     * @param audience "aud" claim. This identifies the intended audience of the claim.
+     * See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.3">RFC</a>
+     * @param issuedAt "iat" claim. This is the number of seconds past the EPOC at which time the claim
+     * was created.
+     * See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.6">RFC</a>
+     * @param notBefore "nbf" claim. This is the number of seconds past the EPOC at which time the claim
+     * will be valid.
+     * See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.5">RFC</a>
+     * @param expiresAt "nbf" claim. This is the number of seconds past the EPOC at which time the claim
+     * will expire.
+     * See:  <a href="https://tools.ietf.org/html/rfc7519#section-4.1.5">RFC</a>
+     * @param contentHash Proprietary claim which contains the hash of the HTTP message body utilizing the
+     * hashing algorithm. It will be null if there is no message body.
+     * specified in contentHashAlgorithm parameter.
      * @param contentHashAlgorithm Hashing algorithm utilized to create the contentHash parameter. It will be null
-     *                             if there is no message body.
-     * @param method               Proprietary claim which contains the expected HTTP method of the request. This
-     *                             will be absent from responses.
-     * @param path                 Proprietary claim which contains the expected PATH of the request. This will
-     *                             be absent from responses.
+     * if there is no message body.
+     * @param statusCode Expected response status code. This will never be null.
+     * @param cacheControlHeader Expected value for the "Cache-Control" header. This may be null if not was provided
+     * in the response.
+     * @param locationHeader Expected value for the "Location" header. This may be null if not was provided
+     * in the response.
      */
     @JsonCreator
     public JWTClaims(
-            @JsonProperty("tid") String tokenId,
-            @JsonProperty("iss") String issuer,
-            @JsonProperty("sub") String subject,
-            @JsonProperty("aud") String audience,
-            @JsonProperty("iat") Integer issuedAt,
-            @JsonProperty("nbf") Integer notBefore,
-            @JsonProperty("exp") Integer expiresAt,
-            @JsonProperty("Content-Hash-Alg") String contentHashAlgorithm,
-            @JsonProperty("Content-Hash") String contentHash,
-            @JsonProperty("Method") String method,
-            @JsonProperty("Path") String path
+            String tokenId,
+            String issuer,
+            String subject,
+            String audience,
+            Integer issuedAt,
+            Integer notBefore,
+            Integer expiresAt,
+            String contentHashAlgorithm,
+            String contentHash,
+            int statusCode,
+            String cacheControlHeader,
+            String locationHeader
     ) {
         this.tokenId = tokenId;
         this.issuer = issuer;
@@ -97,12 +102,14 @@ public class JWTClaims {
         this.expiresAt = expiresAt;
         this.contentHashAlgorithm = contentHashAlgorithm;
         this.contentHash = contentHash;
-        this.method = method;
-        this.path = path;
+        this.statusCode = statusCode;
+        this.cacheControlHeader = cacheControlHeader;
+        this.locationHeader = locationHeader;
     }
 
     /**
      * Get the token ID
+     *
      * @return Token ID
      */
     @JsonProperty("tid")
@@ -112,6 +119,7 @@ public class JWTClaims {
 
     /**
      * Get the claim's issuer
+     *
      * @return The issuer
      */
     @JsonProperty("iss")
@@ -121,6 +129,7 @@ public class JWTClaims {
 
     /**
      * Get the claim's subject
+     *
      * @return The subject
      */
     @JsonProperty("sub")
@@ -130,6 +139,7 @@ public class JWTClaims {
 
     /**
      * Get the claim's audience
+     *
      * @return The audience
      */
     @JsonProperty("aud")
@@ -139,6 +149,7 @@ public class JWTClaims {
 
     /**
      * Get the timestamp for issued at
+     *
      * @return The timestamp for issued at
      */
     @JsonProperty("iat")
@@ -148,6 +159,7 @@ public class JWTClaims {
 
     /**
      * Get the timestamp for not before
+     *
      * @return The timestamp for not before
      */
     @JsonProperty("nbf")
@@ -157,6 +169,7 @@ public class JWTClaims {
 
     /**
      * Get the timestamp for expire
+     *
      * @return The timestamp for expire
      */
     @JsonProperty("exp")
@@ -166,6 +179,7 @@ public class JWTClaims {
 
     /**
      * Get the content hash
+     *
      * @return The content hash
      */
     @JsonProperty("Content-Hash")
@@ -175,6 +189,7 @@ public class JWTClaims {
 
     /**
      * Get the content hash algorithm
+     *
      * @return The content hash algorithm
      */
     @JsonProperty("Content-Hash-Alg")
@@ -183,21 +198,27 @@ public class JWTClaims {
     }
 
     /**
-     * Get the request method
-     * @return The request method
+     * Get the response status code
+     * @return The response status code
      */
-    @JsonProperty("Method")
-    public String getMethod() {
-        return method;
+    public int getStatusCode() {
+        return statusCode;
     }
 
     /**
-     * Get the request path
-     * @return The request path
+     * Get the expected Cache-Control header value
+     * @return The expected Cache-Control header value
      */
-    @JsonProperty("Path")
-    public String getPath() {
-        return path;
+    public String getCacheControlHeader() {
+        return cacheControlHeader;
+    }
+
+    /**
+     * Get the expected Location header value
+     * @return The expected Location header value
+     */
+    public String getLocationHeader() {
+        return locationHeader;
     }
 
     @Override
@@ -207,41 +228,38 @@ public class JWTClaims {
 
         JWTClaims jwtClaims = (JWTClaims) o;
 
-        if (getTokenId() != null ? !getTokenId().equals(jwtClaims.getTokenId()) : jwtClaims.getTokenId() != null)
+        if (statusCode != jwtClaims.statusCode) return false;
+        if (tokenId != null ? !tokenId.equals(jwtClaims.tokenId) : jwtClaims.tokenId != null) return false;
+        if (issuer != null ? !issuer.equals(jwtClaims.issuer) : jwtClaims.issuer != null) return false;
+        if (subject != null ? !subject.equals(jwtClaims.subject) : jwtClaims.subject != null) return false;
+        if (audience != null ? !audience.equals(jwtClaims.audience) : jwtClaims.audience != null) return false;
+        if (issuedAt != null ? !issuedAt.equals(jwtClaims.issuedAt) : jwtClaims.issuedAt != null) return false;
+        if (notBefore != null ? !notBefore.equals(jwtClaims.notBefore) : jwtClaims.notBefore != null) return false;
+        if (expiresAt != null ? !expiresAt.equals(jwtClaims.expiresAt) : jwtClaims.expiresAt != null) return false;
+        if (contentHashAlgorithm != null ? !contentHashAlgorithm.equals(jwtClaims.contentHashAlgorithm) :
+                jwtClaims.contentHashAlgorithm != null) return false;
+        if (contentHash != null ? !contentHash.equals(jwtClaims.contentHash) : jwtClaims.contentHash != null)
             return false;
-        if (getIssuer() != null ? !getIssuer().equals(jwtClaims.getIssuer()) : jwtClaims.getIssuer() != null)
-            return false;
-        if (getAudience() != null ? !getAudience().equals(jwtClaims.getAudience()) : jwtClaims.getAudience() != null)
-            return false;
-        if (getIssuedAt() != null ? !getIssuedAt().equals(jwtClaims.getIssuedAt()) : jwtClaims.getIssuedAt() != null)
-            return false;
-        if (getNotBefore() != null ? !getNotBefore().equals(jwtClaims.getNotBefore()) : jwtClaims.getNotBefore() != null)
-            return false;
-        if (getExpiresAt() != null ? !getExpiresAt().equals(jwtClaims.getExpiresAt()) : jwtClaims.getExpiresAt() != null)
-            return false;
-        if (getContentHashAlgorithm() != null ? !getContentHashAlgorithm().equals(jwtClaims.getContentHashAlgorithm()) : jwtClaims.getContentHashAlgorithm() != null)
-            return false;
-        if (getContentHash() != null ? !getContentHash().equals(jwtClaims.getContentHash()) : jwtClaims.getContentHash() != null)
-            return false;
-        if (getMethod() != null ? !getMethod().equals(jwtClaims.getMethod()) : jwtClaims.getMethod() != null)
-            return false;
-        if (getPath() != null ? !getPath().equals(jwtClaims.getPath()) : jwtClaims.getPath() != null) return false;
-        return subject != null ? subject.equals(jwtClaims.subject) : jwtClaims.subject == null;
+        if (cacheControlHeader != null ? !cacheControlHeader.equals(jwtClaims.cacheControlHeader) :
+                jwtClaims.cacheControlHeader != null) return false;
+        return locationHeader != null ? locationHeader.equals(jwtClaims.locationHeader) :
+                jwtClaims.locationHeader == null;
     }
 
     @Override
     public int hashCode() {
-        int result = getTokenId() != null ? getTokenId().hashCode() : 0;
-        result = 31 * result + (getIssuer() != null ? getIssuer().hashCode() : 0);
-        result = 31 * result + (getAudience() != null ? getAudience().hashCode() : 0);
-        result = 31 * result + (getIssuedAt() != null ? getIssuedAt().hashCode() : 0);
-        result = 31 * result + (getNotBefore() != null ? getNotBefore().hashCode() : 0);
-        result = 31 * result + (getExpiresAt() != null ? getExpiresAt().hashCode() : 0);
-        result = 31 * result + (getContentHashAlgorithm() != null ? getContentHashAlgorithm().hashCode() : 0);
-        result = 31 * result + (getContentHash() != null ? getContentHash().hashCode() : 0);
-        result = 31 * result + (getMethod() != null ? getMethod().hashCode() : 0);
-        result = 31 * result + (getPath() != null ? getPath().hashCode() : 0);
+        int result = tokenId != null ? tokenId.hashCode() : 0;
+        result = 31 * result + (issuer != null ? issuer.hashCode() : 0);
         result = 31 * result + (subject != null ? subject.hashCode() : 0);
+        result = 31 * result + (audience != null ? audience.hashCode() : 0);
+        result = 31 * result + (issuedAt != null ? issuedAt.hashCode() : 0);
+        result = 31 * result + (notBefore != null ? notBefore.hashCode() : 0);
+        result = 31 * result + (expiresAt != null ? expiresAt.hashCode() : 0);
+        result = 31 * result + (contentHashAlgorithm != null ? contentHashAlgorithm.hashCode() : 0);
+        result = 31 * result + (contentHash != null ? contentHash.hashCode() : 0);
+        result = 31 * result + statusCode;
+        result = 31 * result + (cacheControlHeader != null ? cacheControlHeader.hashCode() : 0);
+        result = 31 * result + (locationHeader != null ? locationHeader.hashCode() : 0);
         return result;
     }
 
@@ -250,15 +268,16 @@ public class JWTClaims {
         return "JWTClaims{" +
                 "tokenId='" + tokenId + '\'' +
                 ", issuer='" + issuer + '\'' +
+                ", subject='" + subject + '\'' +
                 ", audience='" + audience + '\'' +
                 ", issuedAt=" + issuedAt +
                 ", notBefore=" + notBefore +
                 ", expiresAt=" + expiresAt +
                 ", contentHashAlgorithm='" + contentHashAlgorithm + '\'' +
                 ", contentHash='" + contentHash + '\'' +
-                ", method='" + method + '\'' +
-                ", path='" + path + '\'' +
-                ", subject='" + subject + '\'' +
+                ", statusCode=" + statusCode +
+                ", cacheControlHeader='" + cacheControlHeader + '\'' +
+                ", locationHeader='" + locationHeader + '\'' +
                 '}';
     }
 }

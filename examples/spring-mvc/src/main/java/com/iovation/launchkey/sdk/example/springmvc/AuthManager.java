@@ -50,9 +50,8 @@ public class AuthManager {
         }
         if (halt) throw new ConfigurationException("Missing required lk configuration");
 
-        BufferedReader br = new BufferedReader(new FileReader(privateKeyLocation));
         StringBuilder sb = new StringBuilder();
-        try {
+        try (BufferedReader br = new BufferedReader(new FileReader(privateKeyLocation))) {
             String line = br.readLine();
 
             while (line != null) {
@@ -60,8 +59,6 @@ public class AuthManager {
                 sb.append("\n");
                 line = br.readLine();
             }
-        } finally {
-            br.close();
         }
         String privateKey = sb.toString();
 
@@ -74,9 +71,9 @@ public class AuthManager {
 
         serviceClient = factory.makeServiceClient();
         sessionAuthenticationMap = Collections.synchronizedMap(new HashMap<String, Boolean>());
-        sessionAuthRequestMap = new ConcurrentHashMap<String, String>();
-        userHashSessionMap = new ConcurrentHashMap<String, List<String>>();
-        sessionUsernameMap = new ConcurrentHashMap<String, String>();
+        sessionAuthRequestMap = new ConcurrentHashMap<>();
+        userHashSessionMap = new ConcurrentHashMap<>();
+        sessionUsernameMap = new ConcurrentHashMap<>();
     }
 
     public void login(String username, String context) throws AuthException {

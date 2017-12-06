@@ -31,8 +31,7 @@ public class PlatformErrorExceptionTest {
     @Test
     public void equalsIsTrueForSameObject() throws Exception {
         PlatformErrorException base = new PlatformErrorException(MESSAGE, CAUSE, CODE);
-        PlatformErrorException other = base;
-        assertTrue(base.equals(other));
+        assertTrue(base.equals(base));
     }
 
     @Test
@@ -66,8 +65,7 @@ public class PlatformErrorExceptionTest {
     @Test
     public void hashCodeIsEqualForSameObject() throws Exception {
         PlatformErrorException base = new PlatformErrorException(MESSAGE, CAUSE, CODE);
-        PlatformErrorException other = base;
-        assertEquals(base.hashCode(), other.hashCode());
+        assertEquals(base.hashCode(), base.hashCode());
 
     }
 
