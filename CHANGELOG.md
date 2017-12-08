@@ -2,6 +2,10 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.2.1
+
+    * Fixed bug in Jose4jJWTService#decode which caused null pointer exception when decoding a request JWT from a webhook
+
   * 4.2.0
   
     * Add Organization Service management

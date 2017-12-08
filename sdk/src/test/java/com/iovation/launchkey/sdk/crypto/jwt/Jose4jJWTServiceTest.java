@@ -5,8 +5,11 @@ import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jws.AlgorithmIdentifiers;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
+import org.jose4j.lang.JoseException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,8 +49,8 @@ public class Jose4jJWTServiceTest {
 
     private Jose4jJWTService jwtService;
     private Date platformDate;
-    private KeyPair keyPair;
-    private String currentPrivateKeyId;
+    private static KeyPair keyPair = null;
+    private static String currentPrivateKeyId = null;
 
     @SuppressWarnings("SpellCheckingInspection")
     private static final String PUBLIC_KEY_PEM = "-----BEGIN PUBLIC KEY-----\n" +
@@ -77,12 +80,14 @@ public class Jose4jJWTServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
-        keyPairGenerator.initialize(2048);
-        keyPair = keyPairGenerator.generateKeyPair();
+        if (keyPair == null) {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
+            keyPairGenerator.initialize(2048);
+            keyPair = keyPairGenerator.generateKeyPair();
+            currentPrivateKeyId = JCECrypto.getRsaPublicKeyFingerprint(provider, (RSAPrivateKey) keyPair.getPrivate());
+        }
         platformDate = new Date();
         privateKeys = new HashMap<>();
-        currentPrivateKeyId = JCECrypto.getRsaPublicKeyFingerprint(provider, (RSAPrivateKey) keyPair.getPrivate());
         privateKeys.put(currentPrivateKeyId, (RSAPrivateKey) keyPair.getPrivate());
         jwtService = new Jose4jJWTService(
                 PLATFORM_IDENTIFIER,
@@ -91,6 +96,7 @@ public class Jose4jJWTServiceTest {
                 EXPIRE_SECONDS
         );
     }
+
 
     @Test
     public void encodeEncodesSomethingThatProperlyDecodes() throws Exception {
@@ -196,5 +202,176 @@ public class Jose4jJWTServiceTest {
                 jwtService.encode(UUID.randomUUID().toString(), issuer, subject, new Date(), method, path, null, null);
         assertNotEquals(Hex.encodeHexString(sha256.digest(a.getBytes())),
                 Hex.encodeHexString(sha256.digest(b.getBytes())));
+    }
+
+    @Test
+    public void testDecodeProcessesTID() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        jwtClaims.setJwtId(expected);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, expected, new Date(), jwt).getTokenId();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesIssuer() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getIssuer();
+        assertEquals(PLATFORM_IDENTIFIER, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesSubject() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        jwtClaims.setSubject(expected);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getSubject();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesAudience() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        jwtClaims.setAudience(expected);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), expected, jwtClaims.getJwtId(), new Date(), jwt).getAudience();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesIssuedAt() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final long actual =
+                (long) jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getIssuedAt();
+        assertEquals(jwtClaims.getIssuedAt().getValue(), actual);
+    }
+
+    @Test
+    public void testDecodeProcessesNotBefore() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final long actual =
+                (long) jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getNotBefore();
+        assertEquals(jwtClaims.getNotBefore().getValue(), actual);
+    }
+
+    @Test
+    public void testDecodeProcessesExpiresAt() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final long actual =
+                (long) jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getExpiresAt();
+        assertEquals(jwtClaims.getExpirationTime().getValue(), actual);
+    }
+
+    @Test
+    public void testDecodeProcessesResponseContentHash() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        Map<String, Object> response = new HashMap<>();
+        response.put("hash", expected);
+        jwtClaims.setClaim("response", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getContentHash();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesResponseContentHashAlgorithm() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        Map<String, Object> response = new HashMap<>();
+        response.put("func", expected);
+        jwtClaims.setClaim("response", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getContentHashAlgorithm();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesResponseStatusCode() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        Integer expected = 200;
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", expected);
+        jwtClaims.setClaim("response", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final Integer actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getStatusCode();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesResponseCacheControlHeader() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        Map<String, Object> response = new HashMap<>();
+        response.put("cache", expected);
+        jwtClaims.setClaim("response", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getCacheControlHeader();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesResponseLocationHeader() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        Map<String, Object> response = new HashMap<>();
+        response.put("location", expected);
+        jwtClaims.setClaim("response", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getLocationHeader();
+        assertEquals(expected, actual);
+    }
+
+    private JwtClaims getBaseClaims() {
+        JwtClaims jwtClaims = new JwtClaims();
+        jwtClaims.setGeneratedJwtId();
+        jwtClaims.setExpirationTimeMinutesInTheFuture(60000);
+        jwtClaims.setAudience(ENTITY_IDENTIFIER);
+        jwtClaims.setIssuer(PLATFORM_IDENTIFIER);
+        jwtClaims.setIssuedAtToNow();
+        jwtClaims.setNotBeforeMinutesInThePast(0);
+        return jwtClaims;
+    }
+
+    private String getJwsCompactSerializationFromJtwClaims(JwtClaims claims) throws JWTError {
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setKeyIdHeaderValue(currentPrivateKeyId);
+        jws.setKey(privateKeys.get(currentPrivateKeyId));
+        jws.setPayload(claims.toJson());
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+
+        String jwt;
+        try {
+            jwt = jws.getCompactSerialization();
+        } catch (JoseException e) {
+            throw new JWTError("An error occurred encoding the JWT", e);
+        }
+        return jwt;
     }
 }

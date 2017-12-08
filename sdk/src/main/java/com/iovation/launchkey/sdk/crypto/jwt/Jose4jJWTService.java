@@ -126,7 +126,7 @@ public class Jose4jJWTService implements JWTService {
             JwtConsumer jwtConsumer = builder.build();
 
             JwtClaims libraryClaims = jwtConsumer.processToClaims(jwt);
-            Map responseClaims = libraryClaims.getClaimValue("response", Map.class);
+            Map responseClaims = libraryClaims.getClaimValue("response", Map.class) == null ? new HashMap<String, Object>(): libraryClaims.getClaimValue("response", Map.class);
 
             claims = new JWTClaims(
                     libraryClaims.getJwtId(),
@@ -138,7 +138,7 @@ public class Jose4jJWTService implements JWTService {
                     (int) libraryClaims.getExpirationTime().getValue(),
                     responseClaims.get("func") == null ? null : String.valueOf(responseClaims.get("func")),
                     responseClaims.get("hash") == null ? null : String.valueOf(responseClaims.get("hash")),
-                    Integer.valueOf(String.valueOf(responseClaims.get("status"))),
+                    responseClaims.get("status") == null ? null :Integer.valueOf(String.valueOf(responseClaims.get("status"))),
                     responseClaims.get("cache") == null ? null : String.valueOf(responseClaims.get("cache")),
                     responseClaims.get("location") == null ? null : String.valueOf(responseClaims.get("location"))
             );
