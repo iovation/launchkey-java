@@ -41,7 +41,7 @@ public class JWTClaims {
 
     private final String contentHash;
 
-    private final int statusCode;
+    private final Integer statusCode;
 
     private final String cacheControlHeader;
 
@@ -89,7 +89,7 @@ public class JWTClaims {
             Integer expiresAt,
             String contentHashAlgorithm,
             String contentHash,
-            int statusCode,
+            Integer statusCode,
             String cacheControlHeader,
             String locationHeader
     ) {
@@ -201,7 +201,7 @@ public class JWTClaims {
      * Get the response status code
      * @return The response status code
      */
-    public int getStatusCode() {
+    public Integer getStatusCode() {
         return statusCode;
     }
 
@@ -228,7 +228,7 @@ public class JWTClaims {
 
         JWTClaims jwtClaims = (JWTClaims) o;
 
-        if (statusCode != jwtClaims.statusCode) return false;
+        if (statusCode != null ? !statusCode.equals(jwtClaims.statusCode) : jwtClaims.statusCode != null) return false;
         if (tokenId != null ? !tokenId.equals(jwtClaims.tokenId) : jwtClaims.tokenId != null) return false;
         if (issuer != null ? !issuer.equals(jwtClaims.issuer) : jwtClaims.issuer != null) return false;
         if (subject != null ? !subject.equals(jwtClaims.subject) : jwtClaims.subject != null) return false;
@@ -257,7 +257,7 @@ public class JWTClaims {
         result = 31 * result + (expiresAt != null ? expiresAt.hashCode() : 0);
         result = 31 * result + (contentHashAlgorithm != null ? contentHashAlgorithm.hashCode() : 0);
         result = 31 * result + (contentHash != null ? contentHash.hashCode() : 0);
-        result = 31 * result + statusCode;
+        result = 31 * result + (statusCode != null ? statusCode.hashCode() : 0);
         result = 31 * result + (cacheControlHeader != null ? cacheControlHeader.hashCode() : 0);
         result = 31 * result + (locationHeader != null ? locationHeader.hashCode() : 0);
         return result;

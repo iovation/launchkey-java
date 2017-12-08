@@ -91,7 +91,7 @@ public class JWTClaimsTest {
 
     @Test
     public void getStatusCode() throws Exception {
-        assertEquals(201, jwtClaims.getStatusCode());
+        assertEquals(Integer.valueOf(201), jwtClaims.getStatusCode());
     }
 
     @Test
