@@ -27,6 +27,11 @@ public class OrganizationFactoryTest {
         organizationFactory = null;
     }
 
+    @Test
+    public void testMakeOrganizationClientReturnsClient() throws Exception {
+        assertThat(organizationFactory.makeOrganizationClient(), instanceOf(OrganizationClient.class));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testMakeDirectoryClientWithNullThrowsIllegalArgument() throws Exception {
         organizationFactory.makeDirectoryClient(null);

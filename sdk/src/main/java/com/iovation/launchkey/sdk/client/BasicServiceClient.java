@@ -47,10 +47,10 @@ public class BasicServiceClient implements ServiceClient {
         } else {
             requestPolicy = new com.iovation.launchkey.sdk.transport.domain.AuthPolicy(
                     policy.getRequiredFactors(),
-                    policy.isKnowledgeFactorRequired(),
                     policy.isInherenceFactorRequired(),
+                    policy.isKnowledgeFactorRequired(),
                     policy.isPossessionFactorRequired(),
-                    null
+                    policy.isJailbreakProtectionEnabled()
             );
             for (AuthPolicy.Location location : policy.getLocations()) {
                 requestPolicy.addGeoFence(

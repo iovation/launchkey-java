@@ -25,6 +25,7 @@ public class AuthPolicy {
     private final Boolean requireInherenceFactor;
     private final Boolean requirePossessionFactor;
     private final List<Location> locations;
+    private final Boolean enableJailbreakProtection;
 
     /**
      * Create an service policy which only has geofence location requirements.
@@ -51,7 +52,20 @@ public class AuthPolicy {
      * @param locations List of acceptable locations in which the user's device may be located.
      */
     public AuthPolicy(Integer requiredFactors, List<Location> locations) {
+        this(requiredFactors, null, locations);
+    }
+
+    /**
+     * Create an service policy that includes the number of factors and geofence locations
+     *
+     * @param requiredFactors The number of unique factors to require.
+     * @param enableJailbreakProtection Enable protection against jailbroken or rooted devices responding to an
+     *                                  authorization request.
+     * @param locations List of acceptable locations in which the user's device may be located.
+     */
+    public AuthPolicy(Integer requiredFactors, Boolean enableJailbreakProtection, List<Location> locations) {
         this.requiredFactors = requiredFactors;
+        this.enableJailbreakProtection = enableJailbreakProtection;
         this.locations = Collections.unmodifiableList(new ArrayList<>(locations));
         requirePossessionFactor = null;
         requireInherenceFactor = null;
@@ -79,10 +93,26 @@ public class AuthPolicy {
      */
     public AuthPolicy(Boolean requireKnowledgeFactor, Boolean requireInherenceFactor, Boolean requirePossessionFactor,
                       List<Location> locations) {
+        this(requireKnowledgeFactor, requireInherenceFactor, requirePossessionFactor, null, locations);
+    }
+
+    /**
+     * Create an getServiceService policy that includes determination of which getServiceService factors are required as well as geofence locations.
+     *
+     * @param requireKnowledgeFactor Is a knowledge factor required
+     * @param requireInherenceFactor Is an inherence factor required
+     * @param requirePossessionFactor Is a possession factor required
+     * @param enableJailbreakProtection Enable protection against jailbroken or rooted devices responding to an
+     *                                  authorization request.
+     * @param locations List of acceptable locations in which the user's device may be located.
+     */
+    public AuthPolicy(Boolean requireKnowledgeFactor, Boolean requireInherenceFactor, Boolean requirePossessionFactor,
+                      Boolean enableJailbreakProtection, List<Location> locations) {
         this.requiredFactors = null;
         this.requireKnowledgeFactor = requireKnowledgeFactor;
         this.requireInherenceFactor = requireInherenceFactor;
         this.requirePossessionFactor = requirePossessionFactor;
+        this.enableJailbreakProtection = enableJailbreakProtection;
         this.locations = Collections.unmodifiableList(new ArrayList<>(locations));
     }
 
@@ -120,6 +150,13 @@ public class AuthPolicy {
      */
     public Boolean isPossessionFactorRequired() {
         return requirePossessionFactor;
+    }
+
+    /**
+     * @return Is jail break protection enabled
+     */
+    public Boolean isJailbreakProtectionEnabled() {
+        return enableJailbreakProtection;
     }
 
     /**
@@ -193,6 +230,8 @@ public class AuthPolicy {
                 that.requireInherenceFactor != null) return false;
         if (requirePossessionFactor != null ? !requirePossessionFactor.equals(that.requirePossessionFactor) :
                 that.requirePossessionFactor != null) return false;
+        if (enableJailbreakProtection != null ? !enableJailbreakProtection.equals(that.enableJailbreakProtection) :
+                that.enableJailbreakProtection != null) return false;
         return locations != null ? locations.equals(that.locations) : that.locations == null;
     }
 
@@ -202,6 +241,7 @@ public class AuthPolicy {
         result = 31 * result + (requireKnowledgeFactor != null ? requireKnowledgeFactor.hashCode() : 0);
         result = 31 * result + (requireInherenceFactor != null ? requireInherenceFactor.hashCode() : 0);
         result = 31 * result + (requirePossessionFactor != null ? requirePossessionFactor.hashCode() : 0);
+        result = 31 * result + (enableJailbreakProtection != null ? enableJailbreakProtection.hashCode() : 0);
         result = 31 * result + (locations != null ? locations.hashCode() : 0);
         return result;
     }
@@ -213,6 +253,7 @@ public class AuthPolicy {
                 ", requireKnowledgeFactor=" + requireKnowledgeFactor +
                 ", requireInherenceFactor=" + requireInherenceFactor +
                 ", requirePossessionFactor=" + requirePossessionFactor +
+                ", isJailbreakProtectionEnabled=" + enableJailbreakProtection +
                 ", locations=" + locations +
                 '}';
     }

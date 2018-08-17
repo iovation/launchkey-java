@@ -3,6 +3,7 @@ package com.iovation.launchkey.sdk.domain.service;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -46,6 +47,11 @@ public class AuthPolicyTest {
     }
 
     @Test
+    public void getRequiredFactorsReturnsNullForFactorRequiredJailbreakProtectionLocationsConstructor() throws Exception {
+        assertEquals(null, new AuthPolicy(true, true, true, true, new ArrayList<AuthPolicy.Location>()).getRequiredFactors());
+    }
+
+    @Test
     public void isKnowledgeFactorRequiredReturnsNullForRequiredFactorsConstructor() throws Exception {
         assertNull(new AuthPolicy(99).isKnowledgeFactorRequired());
     }
@@ -58,6 +64,11 @@ public class AuthPolicyTest {
     @Test
     public void isKnowledgeFactorRequiredReturnsNullForLocationsConstructor() throws Exception {
         assertNull(new AuthPolicy(new ArrayList<AuthPolicy.Location>()).isKnowledgeFactorRequired());
+    }
+
+    @Test
+    public void isKnowledgeFactorRequiredReturnsNulllForForRequiredFactorsJailbreakProtectionLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99, true, new ArrayList<AuthPolicy.Location>()).isKnowledgeFactorRequired());
     }
 
     @Test
@@ -74,6 +85,11 @@ public class AuthPolicyTest {
     @Test
     public void isInherenceFactorRequiredReturnsNullForRequiredFactorsConstructor() throws Exception {
         assertNull(new AuthPolicy(99).isInherenceFactorRequired());
+    }
+
+    @Test
+    public void isInherenceFactorRequiredReturnsNulllForForRequiredFactorsJailbreakProtectionLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99, true, new ArrayList<AuthPolicy.Location>()).isInherenceFactorRequired());
     }
 
     @Test
@@ -108,6 +124,11 @@ public class AuthPolicyTest {
     }
 
     @Test
+    public void isossessionFactorRequiredReturnsNulllForForRequiredFactorsJailbreakProtectionLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99, true, new ArrayList<AuthPolicy.Location>()).isPossessionFactorRequired());
+    }
+
+    @Test
     public void isPossessionFactorRequiredReturnsValueForFactorRequiredConstructor() throws Exception {
         assertTrue(new AuthPolicy(true, true, true).isPossessionFactorRequired());
 
@@ -116,6 +137,42 @@ public class AuthPolicyTest {
     @Test
     public void isPossessionFactorRequiredReturnsValueForFactorRequiredLocationsConstructor() throws Exception {
         assertTrue(new AuthPolicy(true, true, true, new ArrayList<AuthPolicy.Location>()).isPossessionFactorRequired());
+    }
+
+    @Test
+    public void isJailbreakProtectionEnabledReturnsNullForRequiredFactorsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99).isJailbreakProtectionEnabled());
+    }
+
+    @Test
+    public void isJailbreakProtectionEnabledReturnsNullForRequiredFactorsLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(99, new ArrayList<AuthPolicy.Location>()).isJailbreakProtectionEnabled());
+    }
+
+    @Test
+    public void isJailbreakProtectionEnabledReturnsNullForLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(new ArrayList<AuthPolicy.Location>()).isJailbreakProtectionEnabled());
+    }
+
+    @Test
+    public void isJailbreakProtectionEnabledReturnsValueForForRequiredFactorsJailbreakProtectionLocationsConstructor() throws Exception {
+        assertTrue(new AuthPolicy(99, true, new ArrayList<AuthPolicy.Location>()).isJailbreakProtectionEnabled());
+    }
+
+    @Test
+    public void isJailbreakProtectionEnabledReturnsNullForFactorRequiredConstructor() throws Exception {
+        assertNull(new AuthPolicy(true, true, true).isJailbreakProtectionEnabled());
+
+    }
+
+    @Test
+    public void isJailbreakProtectionEnabledReturnsNullForFactorRequiredLocationsConstructor() throws Exception {
+        assertNull(new AuthPolicy(true, true, true, new ArrayList<AuthPolicy.Location>()).isJailbreakProtectionEnabled());
+    }
+
+    @Test
+    public void isJailbreakProtectionEnabledReturnsValueForFactorRequiredJailbreakProtectionLocationsConstructor() throws Exception {
+        assertTrue(new AuthPolicy(false, false, false, true, new ArrayList<AuthPolicy.Location>()).isJailbreakProtectionEnabled());
     }
 
     @Test
@@ -128,6 +185,13 @@ public class AuthPolicyTest {
         List<AuthPolicy.Location> expected = new ArrayList<>();
         expected.add(new AuthPolicy.Location(1.1, 2.2, 3.3));
         assertEquals(expected, new AuthPolicy(99, expected).getLocations());
+    }
+
+    @Test
+    public void getLocationsReturnsEquivalentListForRequiredFactorsJailbreakProtectionLocationsConstructor() throws Exception {
+        List<AuthPolicy.Location> expected = new ArrayList<>();
+        expected.add(new AuthPolicy.Location(1.1, 2.2, 3.3));
+        assertEquals(expected, new AuthPolicy(99, true, expected).getLocations());
     }
 
     @Test
@@ -151,6 +215,13 @@ public class AuthPolicyTest {
     }
 
     @Test
+    public void getLocationsReturnsEquivalentListForFactorRequiredJailbreakProtectionLocationsConstructor() throws Exception {
+        List<AuthPolicy.Location> expected = new ArrayList<>();
+        expected.add(new AuthPolicy.Location(1.1, 2.2, 3.3));
+        assertEquals(expected, new AuthPolicy(true, true, true, true, expected).getLocations());
+    }
+
+    @Test
     public void getLocationsIsNotTheSameListPassedInConstructor() throws Exception {
         List<AuthPolicy.Location> expected = new ArrayList<>();
         expected.add(new AuthPolicy.Location(1.1, 2.2, 3.3));
@@ -159,7 +230,11 @@ public class AuthPolicyTest {
 
     @Test
     public void equalWhenObjectsEqual() throws Exception {
-        assertEquals(new AuthPolicy(true, false, true), new AuthPolicy(true, false, true));
+        AuthPolicy left = new AuthPolicy(false, true,
+                false, false, new ArrayList<AuthPolicy.Location>());
+        AuthPolicy right = new AuthPolicy(false, true,
+                false, false, new ArrayList<AuthPolicy.Location>());
+        assertEquals(left, right);
     }
 
     @Test
@@ -168,13 +243,39 @@ public class AuthPolicyTest {
     }
 
     @Test
+    public void notEqualWhenObjectsNotEqualDueToIsJailbreakEnabled() throws Exception {
+        AuthPolicy left = new AuthPolicy(false, false,
+                false, false, new ArrayList<AuthPolicy.Location>());
+        AuthPolicy right = new AuthPolicy(false, false,
+                false, true, new ArrayList<AuthPolicy.Location>());
+        assertNotEquals(left, right);
+    }
+
+    @Test
     public void hashCodeEqualWhenObjectsEqual() throws Exception {
-        assertEquals(new AuthPolicy(false, true, false).hashCode(), new AuthPolicy(false, true, false).hashCode());
+        AuthPolicy left = new AuthPolicy(false, true,
+                false, false, new ArrayList<AuthPolicy.Location>());
+        AuthPolicy right = new AuthPolicy(false, true,
+                false, false, new ArrayList<AuthPolicy.Location>());
+        assertEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void hashCodeNotEqualWhenObjectsNotEqual() throws Exception {
-        assertNotEquals(new AuthPolicy(99).hashCode(), new AuthPolicy(98).hashCode());
+        AuthPolicy left = new AuthPolicy(false, true,
+                false, false, new ArrayList<AuthPolicy.Location>());
+        AuthPolicy right = new AuthPolicy(false, false,
+                false, false, new ArrayList<AuthPolicy.Location>());
+        assertNotEquals(left.hashCode(), right.hashCode());
+    }
+
+    @Test
+    public void hashCodeNotEqualWhenObjectsNotEqualDueToIsJailbreakEnabled() throws Exception {
+        AuthPolicy left = new AuthPolicy(false, false,
+                false, false, new ArrayList<AuthPolicy.Location>());
+        AuthPolicy right = new AuthPolicy(false, false,
+                false, true, new ArrayList<AuthPolicy.Location>());
+        assertNotEquals(left.hashCode(), right.hashCode());
     }
 
     @Test

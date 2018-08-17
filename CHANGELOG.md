@@ -2,6 +2,11 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.3.0
+
+    * Added ability to enable jailbreak protection to authorization policy constructor
+    * Fixed bug in authorization policy the swapped inherence and knowledge factors.
+
   * 4.2.1
 
     * Fixed bug in Jose4jJWTService#decode which caused null pointer exception when decoding a request JWT from a webhook
