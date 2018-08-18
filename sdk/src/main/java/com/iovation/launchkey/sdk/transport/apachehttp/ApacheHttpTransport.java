@@ -620,21 +620,22 @@ public class ApacheHttpTransport implements Transport {
                 .build(requestId);
         try {
             HttpResponse response = httpClient.execute(request);
-            if (response != null) response = new ReplayHttpResponse(response);
-            throwForStatus(response, requestId,
-                    httpStatusCodeWhiteList == null ? new ArrayList<Integer>() : httpStatusCodeWhiteList);
+            if (response == null) {
+                throw new InvalidResponseException("No response returned from HTTP client", null, null);
+            }
+            response = new ReplayHttpResponse(response);
             if (signRequest) {
                 validateResponseJWT(response, requestId);
             }
+            throwForStatus(response, httpStatusCodeWhiteList == null ? new ArrayList<Integer>() : httpStatusCodeWhiteList);
             return response;
         } catch (IOException e) {
             throw new CommunicationErrorException("An I/O Error Occurred", e, null);
         }
     }
 
-    private void throwForStatus(HttpResponse response, String requestId, List<Integer> httpStatusCodeWhiteList)
-            throws CommunicationErrorException, InvalidResponseException,
-            InvalidCredentialsException, MarshallingError, CryptographyError {
+    private void throwForStatus(HttpResponse response, List<Integer> httpStatusCodeWhiteList)
+            throws CommunicationErrorException, InvalidResponseException, CryptographyError {
         final int statusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCodeWhiteList.contains(statusCode)) {
             logger.debug("Did not throw for status as it was in white list");
@@ -648,7 +649,6 @@ public class ApacheHttpTransport implements Transport {
                 );
             } else {
                 try {
-                    validateResponseJWT(response, requestId);
                     com.iovation.launchkey.sdk.transport.domain.Error error = decryptResponse(response, Error.class);
                     Object detail = error.getErrorDetail();
                     throw InvalidRequestException
@@ -723,20 +723,20 @@ public class ApacheHttpTransport implements Transport {
                     throw new JWTError("Hash of response content does not match JWT response hash", null);
             }
 
-            if (response.containsHeader("Location") &&
-                    !response.getFirstHeader("Location").equals(claims.getLocationHeader()))
-                throw new JWTError("Location header of response content does not match JWT response location", null);
+            if ((response.containsHeader("Location") &&
+                            !response.getFirstHeader("Location").getValue().equals(claims.getLocationHeader()))
+                    || (!response.containsHeader("Location") && claims.getLocationHeader() != null)
+            ) throw new JWTError("Location header of response content does not match JWT response location", null);
 
-            if (response.containsHeader("Cache-Control") &&
-                    !response.getFirstHeader("Cache-Control").equals(claims.getLocationHeader()))
-                throw new JWTError("Cache-Control header of response content does not match JWT response cache", null);
+            if ((response.containsHeader("Cache-Control") &&
+                    !response.getFirstHeader("Cache-Control").getValue().equals(claims.getCacheControlHeader()))
+                || (!response.containsHeader("Cache-Control") && claims.getCacheControlHeader() != null)
+            ) throw new JWTError("Cache-Control header of response content does not match JWT response cache", null);
 
 
         } catch (JWTError jwtError) {
             throw new InvalidResponseException("Invalid JWT in response!", jwtError, null);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (NoSuchAlgorithmException | IOException e ) {
             e.printStackTrace();
         }
     }

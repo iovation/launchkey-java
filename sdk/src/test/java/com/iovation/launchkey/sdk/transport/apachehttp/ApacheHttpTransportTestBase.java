@@ -59,10 +59,10 @@ public class ApacheHttpTransportTestBase {
     @Mock private Provider provider;
     @Mock HttpResponse httpResponse;
     @Mock ObjectMapper objectMapper;
-    @Mock private EntityIdentifier issuer;
+    @Mock EntityIdentifier issuer;
     @Mock JWTService jwtService;
     @Mock private JWTData jwtData;
-    @Mock private JWTClaims jwtClaims;
+    @Mock protected JWTClaims jwtClaims;
     @Mock JWEService jweService;
     @Mock private Crypto crypto;
     @Mock private Cache publicKeyCache;
