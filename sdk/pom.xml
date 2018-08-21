@@ -4,14 +4,14 @@
     <parent>
         <groupId>com.iovation.launchkey</groupId>
         <artifactId>sdk-root</artifactId>
-        <version>4.2.1-SNAPSHOT</version>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
     <artifactId>sdk</artifactId>
     <name>iovation LaunchKey SDK</name>
     <description>SDK for interacting with the LaunchKey distributed authentication and authorization platform</description>
     <packaging>jar</packaging>
     <properties>
-        <jacksonVersion>[2.0,3.0)</jacksonVersion>
+        <jacksonVersion>[2.4.0,3.0.0)</jacksonVersion>
     </properties>
 
     <dependencies>

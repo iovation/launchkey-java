@@ -12,8 +12,6 @@
 
 package com.iovation.launchkey.sdk.domain.servicemanager;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
