@@ -62,7 +62,7 @@ public class DirectoryServiceManager {
                 directoryClients.remove(directoryId);
             } catch (Forbidden e) {
                 System.err.println(
-                        "Unable Directory Services to inactive for Directory " + directoryId + " due to error " + e);
+                        "Unable to set all Directory Services to inactive for Directory " + directoryId + " due to error " + e);
                 // There is no recovering from this, do not attempt to deactivate the Services for this Directory again
                 directoryClients.remove(directoryId);
             } catch (Exception e) {
