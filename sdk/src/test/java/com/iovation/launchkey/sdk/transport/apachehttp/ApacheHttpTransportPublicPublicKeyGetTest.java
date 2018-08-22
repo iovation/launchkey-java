@@ -15,6 +15,7 @@ import com.iovation.launchkey.sdk.error.InvalidResponseException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +46,7 @@ public class ApacheHttpTransportPublicPublicKeyGetTest extends ApacheHttpTranspo
                 "aFxOB8GA0Ny5SfI67u6w9Nz9Z9cBhcZBfJKdq5uRWjZWslHjBN3emTAKBpAUPNET\n" +
                 "nwIDAQAB\n" +
                 "-----END PUBLIC KEY-----";
-        ((BasicHttpEntity) httpResponse.getEntity()).setContent(new ByteArrayInputStream(publicKeyPEM.getBytes()));
+        when(httpResponse.getEntity()).thenReturn(new ByteArrayEntity(publicKeyPEM.getBytes()));
         when(httpResponse.getFirstHeader("X-IOV-KEY-ID")).thenReturn(new BasicHeader("X-IOV-KEY-ID", "Key ID"));
     }
 

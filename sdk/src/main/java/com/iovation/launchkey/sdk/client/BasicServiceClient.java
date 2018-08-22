@@ -159,7 +159,14 @@ public class BasicServiceClient implements ServiceClient {
     public WebhookPackage handleWebhook(Map<String, List<String>> headers, String body)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError, NoKeyFoundException {
-        ServerSentEvent transportResponse = transport.handleServerSentEvent(headers, body);
+        return handleWebhook(headers, body, null, null);
+    }
+
+    @Override
+    public WebhookPackage handleWebhook(Map<String, List<String>> headers, String body, String method, String path)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError, NoKeyFoundException {
+        ServerSentEvent transportResponse = transport.handleServerSentEvent(headers, method, path, body);
         WebhookPackage response;
         if (transportResponse == null) {
             response = null;
@@ -184,13 +191,5 @@ public class BasicServiceClient implements ServiceClient {
             throw new InvalidRequestException("Unknown response type was returned by the transport", null, null);
         }
         return response;
-    }
-
-    private Map<String, List<String>> normalizeHeaders(Map<String, List<String>> inputHeaders) {
-        Map<String, List<String>> outputHeaders = new ConcurrentHashMap<>(inputHeaders.size());
-        for (Map.Entry<String, List<String>> entry : inputHeaders.entrySet()) {
-            outputHeaders.put(entry.getKey().toUpperCase(), entry.getValue());
-        }
-        return outputHeaders;
     }
 }

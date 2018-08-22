@@ -57,7 +57,7 @@ public class DemoController {
             String headerName = headerNames.next();
             headers.put(headerName, Arrays.asList(request.getHeaderValues(headerName)));
         }
-        authManager.handleWebhook(headers, body);
+        authManager.handleWebhook(headers, body, "POST", "/webhook");
     }
 
     public static class Authorized {

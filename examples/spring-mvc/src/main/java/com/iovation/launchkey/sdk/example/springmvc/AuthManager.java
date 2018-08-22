@@ -116,9 +116,9 @@ public class AuthManager {
         }
     }
 
-    void handleWebhook(Map<String, List<String>> headers, String body) throws AuthException {
+    void handleWebhook(Map<String, List<String>> headers, String body, String method, String path) throws AuthException {
         try {
-            WebhookPackage webhookPackage = serviceClient.handleWebhook(headers, body);
+            WebhookPackage webhookPackage = serviceClient.handleWebhook(headers, body, method, path);
             if (webhookPackage instanceof AuthorizationResponseWebhookPackage) {
                 AuthorizationResponse authorizationResponse = ((AuthorizationResponseWebhookPackage) webhookPackage).getAuthorizationResponse();
                 String authRequestId = authorizationResponse.getAuthorizationRequestId();

@@ -38,7 +38,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
 
     }
@@ -129,7 +131,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertTrue(jwtClaims.equals(other));
     }
@@ -148,7 +152,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -167,7 +173,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -186,7 +194,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -205,7 +215,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -224,7 +236,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -243,7 +257,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -262,7 +278,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -281,7 +299,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -300,7 +320,9 @@ public class JWTClaimsTest {
                 "Other Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -319,7 +341,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 501,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertFalse(jwtClaims.equals(other));
     }
@@ -338,7 +362,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache X Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -357,7 +383,51 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location X Header"
+                "Location X Header",
+                "Request Method",
+                "Request Path"
+        );
+        assertNotEquals(jwtClaims.hashCode(), other.hashCode());
+    }
+
+    @Test
+    public void equalsIsFalseWhenMethodsDifferent() throws Exception {
+        JWTClaims other = new JWTClaims(
+                "Token ID",
+                "Issuer",
+                "Subject",
+                "Audience",
+                11111,
+                22222,
+                33333,
+                "Body Hash Alg",
+                "Body Hash",
+                201,
+                "Cache Header",
+                "Location Header",
+                "Request X Method",
+                "Request Path"
+        );
+        assertNotEquals(jwtClaims.hashCode(), other.hashCode());
+    }
+
+    @Test
+    public void equalsIsFalseWhenPathIsDifferent() throws Exception {
+        JWTClaims other = new JWTClaims(
+                "Token ID",
+                "Issuer",
+                "Subject",
+                "Audience",
+                11111,
+                22222,
+                33333,
+                "Body Hash Alg",
+                "Body Hash",
+                201,
+                "Cache Header",
+                "Location Header",
+                "Request Method",
+                "Request X Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -381,7 +451,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -400,7 +472,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -419,7 +493,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -438,7 +514,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -457,7 +535,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -476,7 +556,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -495,7 +577,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -514,7 +598,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -533,7 +619,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -552,7 +640,9 @@ public class JWTClaimsTest {
                 "Other Body Hash",
                 201,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -571,7 +661,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 501,
                 "Cache Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -590,7 +682,9 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache X Header",
-                "Location Header"
+                "Location Header",
+                "Request Method",
+                "Request Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }
@@ -609,7 +703,51 @@ public class JWTClaimsTest {
                 "Body Hash",
                 201,
                 "Cache Header",
-                "Location X Header"
+                "Location X Header",
+                "Request Method",
+                "Request Path"
+        );
+        assertNotEquals(jwtClaims.hashCode(), other.hashCode());
+    }
+
+    @Test
+    public void hashcodeIsNotEqualWhenMethodIsDifferent() throws Exception {
+        JWTClaims other = new JWTClaims(
+                "Token ID",
+                "Issuer",
+                "Subject",
+                "Audience",
+                11111,
+                22222,
+                33333,
+                "Body Hash Alg",
+                "Body Hash",
+                201,
+                "Cache Header",
+                "Location Header",
+                "Request X Method",
+                "Request Path"
+        );
+        assertNotEquals(jwtClaims.hashCode(), other.hashCode());
+    }
+
+    @Test
+    public void hashcodeIsNotEqualWhenPathIsDifferent() throws Exception {
+        JWTClaims other = new JWTClaims(
+                "Token ID",
+                "Issuer",
+                "Subject",
+                "Audience",
+                11111,
+                22222,
+                33333,
+                "Body Hash Alg",
+                "Body Hash",
+                201,
+                "Cache Header",
+                "Location Header",
+                "Request Method",
+                "Request X Path"
         );
         assertNotEquals(jwtClaims.hashCode(), other.hashCode());
     }

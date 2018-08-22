@@ -15,19 +15,20 @@ package com.iovation.launchkey.sdk.transport.apachehttp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iovation.launchkey.sdk.cache.Cache;
 import com.iovation.launchkey.sdk.crypto.Crypto;
+import com.iovation.launchkey.sdk.crypto.jwe.JWEService;
 import com.iovation.launchkey.sdk.crypto.jwt.JWTClaims;
 import com.iovation.launchkey.sdk.crypto.jwt.JWTData;
 import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.EntityKeyMap;
-import com.iovation.launchkey.sdk.crypto.jwe.JWEService;
 import com.iovation.launchkey.sdk.transport.domain.PublicV3PingGetResponse;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicStatusLine;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -36,7 +37,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -54,22 +54,22 @@ public class ApacheHttpTransportTestBase {
     final static String baseUrl = "https://base.url";
     final static String audience = "Expected Audience";
 
-    @Mock ApacheHttpTransport transport;
-    @Mock HttpClient httpClient;
+    @Mock protected ApacheHttpTransport transport;
+    @Mock protected HttpClient httpClient;
     @Mock private Provider provider;
-    @Mock HttpResponse httpResponse;
-    @Mock ObjectMapper objectMapper;
-    @Mock EntityIdentifier issuer;
-    @Mock JWTService jwtService;
+    @Mock protected HttpResponse httpResponse;
+    @Mock protected ObjectMapper objectMapper;
+    @Mock protected EntityIdentifier issuer;
+    @Mock protected JWTService jwtService;
     @Mock private JWTData jwtData;
     @Mock protected JWTClaims jwtClaims;
-    @Mock JWEService jweService;
-    @Mock private Crypto crypto;
+    @Mock protected JWEService jweService;
+    @Mock protected Crypto crypto;
     @Mock private Cache publicKeyCache;
     @Mock private EntityKeyMap entityKeyMap;
     @Mock private PublicV3PingGetResponse pingResponse;
     @Mock private RSAPublicKey publicKey;
-    @Captor ArgumentCaptor<HttpUriRequest> requestCaptor;
+    @Captor protected ArgumentCaptor<HttpUriRequest> requestCaptor;
 
     @Before
     public void setUp() throws Exception {
@@ -88,12 +88,13 @@ public class ApacheHttpTransportTestBase {
         when(jwtService.decode(any(PublicKey.class), anyString(), anyString(), any(Date.class), anyString())).thenReturn(jwtClaims);
         byte[] contentHash = MessageDigest.getInstance("SHA-256", new BouncyCastleProvider()).digest("Hello World!".getBytes());
         when(crypto.sha256(any(byte[].class))).thenReturn(contentHash);
+        when(crypto.sha384(any(byte[].class))).thenReturn(contentHash);
+        when(crypto.sha512(any(byte[].class))).thenReturn(contentHash);
         when(jwtClaims.getStatusCode()).thenReturn(200);
-        when(jwtClaims.getContentHashAlgorithm()).thenReturn("SHA-256");
+        when(jwtClaims.getContentHashAlgorithm()).thenReturn("S256");
         when(jwtClaims.getContentHash()).thenReturn(Hex.encodeHexString(contentHash));
         when(crypto.getRSAPublicKeyFromPEM(anyString())).thenReturn(publicKey);
-        BasicHttpEntity entity = new BasicHttpEntity();
-        entity.setContent(new ByteArrayInputStream("Hello World!".getBytes()));
+        HttpEntity entity = new ByteArrayEntity("Hello World!".getBytes());
         when(httpResponse.getEntity()).thenReturn(entity);
         when(httpResponse.getStatusLine()).thenReturn(new BasicStatusLine(
                 new ProtocolVersion("HTTP", 1, 1),
