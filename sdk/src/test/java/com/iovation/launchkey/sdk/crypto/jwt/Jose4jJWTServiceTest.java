@@ -348,6 +348,62 @@ public class Jose4jJWTServiceTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void testDecodeProcessesRequestContentHash() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        Map<String, Object> response = new HashMap<>();
+        response.put("hash", expected);
+        jwtClaims.setClaim("request", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getContentHash();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesRequestContentHashAlgorithm() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        Map<String, Object> response = new HashMap<>();
+        response.put("func", expected);
+        jwtClaims.setClaim("request", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getContentHashAlgorithm();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesRequestMethod() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        Map<String, Object> response = new HashMap<>();
+        response.put("meth", expected);
+        jwtClaims.setClaim("request", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getMethod();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDecodeProcessesRequestPath() throws Exception {
+        JwtClaims jwtClaims = getBaseClaims();
+        String expected = "Expected";
+        Map<String, Object> response = new HashMap<>();
+        response.put("path", expected);
+        jwtClaims.setClaim("request", response);
+        String jwt = getJwsCompactSerializationFromJtwClaims(jwtClaims);
+        final String actual =
+                jwtService.decode(keyPair.getPublic(), ENTITY_IDENTIFIER, jwtClaims.getJwtId(), new Date(), jwt)
+                        .getPath();
+        assertEquals(expected, actual);
+    }
+
     private JwtClaims getBaseClaims() {
         JwtClaims jwtClaims = new JwtClaims();
         jwtClaims.setGeneratedJwtId();

@@ -14,6 +14,8 @@ package com.iovation.launchkey.sdk.crypto.jwt;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.util.Objects;
+
 /**
  * Class representing a JWT Claim including proprietary claims used by the Platform API
  */
@@ -47,6 +49,10 @@ public class JWTClaims {
 
     private final String locationHeader;
 
+    private final String method;
+
+    private final String path;
+
     /**
      * @param tokenId "tid" claim. Globally unique identifier for this token. This is similar no a nonce
      * and is meant to be utilized to protect against replay attacks. It will be the echo
@@ -77,6 +83,8 @@ public class JWTClaims {
      * in the response.
      * @param locationHeader Expected value for the "Location" header. This may be null if not was provided
      * in the response.
+     * @param method The expected request method value. This may be null if this is not a request.
+     * @param path The expected request path value. This may be null if this is not a request.
      */
     @JsonCreator
     public JWTClaims(
@@ -91,7 +99,9 @@ public class JWTClaims {
             String contentHash,
             Integer statusCode,
             String cacheControlHeader,
-            String locationHeader
+            String locationHeader,
+            String method,
+            String path
     ) {
         this.tokenId = tokenId;
         this.issuer = issuer;
@@ -105,6 +115,8 @@ public class JWTClaims {
         this.statusCode = statusCode;
         this.cacheControlHeader = cacheControlHeader;
         this.locationHeader = locationHeader;
+        this.method = method;
+        this.path = path;
     }
 
     /**
@@ -221,63 +233,46 @@ public class JWTClaims {
         return locationHeader;
     }
 
+    /**
+     * Get the expected request method value
+     * @return The expected request method value
+     */
+    public String getMethod() {
+        return method;
+    }
+
+    /**
+     * Get the expected request path value
+     * @return The expected request path value
+     */
+    public String getPath() {
+        return path;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof JWTClaims)) return false;
-
+        if (o == null || getClass() != o.getClass()) return false;
         JWTClaims jwtClaims = (JWTClaims) o;
-
-        if (statusCode != null ? !statusCode.equals(jwtClaims.statusCode) : jwtClaims.statusCode != null) return false;
-        if (tokenId != null ? !tokenId.equals(jwtClaims.tokenId) : jwtClaims.tokenId != null) return false;
-        if (issuer != null ? !issuer.equals(jwtClaims.issuer) : jwtClaims.issuer != null) return false;
-        if (subject != null ? !subject.equals(jwtClaims.subject) : jwtClaims.subject != null) return false;
-        if (audience != null ? !audience.equals(jwtClaims.audience) : jwtClaims.audience != null) return false;
-        if (issuedAt != null ? !issuedAt.equals(jwtClaims.issuedAt) : jwtClaims.issuedAt != null) return false;
-        if (notBefore != null ? !notBefore.equals(jwtClaims.notBefore) : jwtClaims.notBefore != null) return false;
-        if (expiresAt != null ? !expiresAt.equals(jwtClaims.expiresAt) : jwtClaims.expiresAt != null) return false;
-        if (contentHashAlgorithm != null ? !contentHashAlgorithm.equals(jwtClaims.contentHashAlgorithm) :
-                jwtClaims.contentHashAlgorithm != null) return false;
-        if (contentHash != null ? !contentHash.equals(jwtClaims.contentHash) : jwtClaims.contentHash != null)
-            return false;
-        if (cacheControlHeader != null ? !cacheControlHeader.equals(jwtClaims.cacheControlHeader) :
-                jwtClaims.cacheControlHeader != null) return false;
-        return locationHeader != null ? locationHeader.equals(jwtClaims.locationHeader) :
-                jwtClaims.locationHeader == null;
+        return Objects.equals(tokenId, jwtClaims.tokenId) &&
+                Objects.equals(issuer, jwtClaims.issuer) &&
+                Objects.equals(subject, jwtClaims.subject) &&
+                Objects.equals(audience, jwtClaims.audience) &&
+                Objects.equals(issuedAt, jwtClaims.issuedAt) &&
+                Objects.equals(notBefore, jwtClaims.notBefore) &&
+                Objects.equals(expiresAt, jwtClaims.expiresAt) &&
+                Objects.equals(contentHashAlgorithm, jwtClaims.contentHashAlgorithm) &&
+                Objects.equals(contentHash, jwtClaims.contentHash) &&
+                Objects.equals(statusCode, jwtClaims.statusCode) &&
+                Objects.equals(cacheControlHeader, jwtClaims.cacheControlHeader) &&
+                Objects.equals(locationHeader, jwtClaims.locationHeader) &&
+                Objects.equals(method, jwtClaims.method) &&
+                Objects.equals(path, jwtClaims.path);
     }
 
     @Override
     public int hashCode() {
-        int result = tokenId != null ? tokenId.hashCode() : 0;
-        result = 31 * result + (issuer != null ? issuer.hashCode() : 0);
-        result = 31 * result + (subject != null ? subject.hashCode() : 0);
-        result = 31 * result + (audience != null ? audience.hashCode() : 0);
-        result = 31 * result + (issuedAt != null ? issuedAt.hashCode() : 0);
-        result = 31 * result + (notBefore != null ? notBefore.hashCode() : 0);
-        result = 31 * result + (expiresAt != null ? expiresAt.hashCode() : 0);
-        result = 31 * result + (contentHashAlgorithm != null ? contentHashAlgorithm.hashCode() : 0);
-        result = 31 * result + (contentHash != null ? contentHash.hashCode() : 0);
-        result = 31 * result + (statusCode != null ? statusCode.hashCode() : 0);
-        result = 31 * result + (cacheControlHeader != null ? cacheControlHeader.hashCode() : 0);
-        result = 31 * result + (locationHeader != null ? locationHeader.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "JWTClaims{" +
-                "tokenId='" + tokenId + '\'' +
-                ", issuer='" + issuer + '\'' +
-                ", subject='" + subject + '\'' +
-                ", audience='" + audience + '\'' +
-                ", issuedAt=" + issuedAt +
-                ", notBefore=" + notBefore +
-                ", expiresAt=" + expiresAt +
-                ", contentHashAlgorithm='" + contentHashAlgorithm + '\'' +
-                ", contentHash='" + contentHash + '\'' +
-                ", statusCode=" + statusCode +
-                ", cacheControlHeader='" + cacheControlHeader + '\'' +
-                ", locationHeader='" + locationHeader + '\'' +
-                '}';
+        return Objects.hash(tokenId, issuer, subject, audience, issuedAt, notBefore, expiresAt, contentHashAlgorithm,
+                contentHash, statusCode, cacheControlHeader, locationHeader, method, path);
     }
 }

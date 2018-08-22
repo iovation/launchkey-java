@@ -403,13 +403,38 @@ public interface Transport {
      * @throws CommunicationErrorException If there was an error communicating with the endpoint
      * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
      * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
-     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidResponseException When the authorization response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @throws NoKeyFoundException When the Entity and Key ID identifying the public key used to encrypt authorization
+     * response is not found in the known keys mapping.
+     *
+     * @deprecated This method is deprecated and replaced with the overloaded method
+     * {@link #handleServerSentEvent(Map, String, String, String)}
+     */
+    @Deprecated
+    ServerSentEvent handleServerSentEvent(Map<String, List<String>> headers, String body)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError, NoKeyFoundException;
+
+    /**
+     * Process a server sent event (SSE)
+     *
+     * @param headers Request headers
+     * @param method Request method
+     * @param path Request path
+     * @param body Request body
+     * @return The decrypted callback domain entity
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the authorization response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * @throws NoKeyFoundException When the Entity and Key ID identifying the public key used to encrypt authorization
      * response is not found in the known keys mapping.
      */
-    ServerSentEvent handleServerSentEvent(Map<String, List<String>> headers, String body)
+    ServerSentEvent handleServerSentEvent(Map<String, List<String>> headers, String method, String path, String body)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError, NoKeyFoundException;
 

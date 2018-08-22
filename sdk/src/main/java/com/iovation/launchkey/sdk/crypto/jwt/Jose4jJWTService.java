@@ -127,6 +127,9 @@ public class Jose4jJWTService implements JWTService {
 
             JwtClaims libraryClaims = jwtConsumer.processToClaims(jwt);
             Map responseClaims = libraryClaims.getClaimValue("response", Map.class) == null ? new HashMap<String, Object>(): libraryClaims.getClaimValue("response", Map.class);
+            Map requestClaims = libraryClaims.getClaimValue("request", Map.class) == null ? new HashMap<String, Object>(): libraryClaims.getClaimValue("request", Map.class);
+            Object bodyHashFunction = responseClaims.get("func") == null ? requestClaims.get("func") : responseClaims.get("func");
+            Object bodyHash = responseClaims.get("hash") == null ? requestClaims.get("hash") : responseClaims.get("hash");
 
             claims = new JWTClaims(
                     libraryClaims.getJwtId(),
@@ -136,11 +139,13 @@ public class Jose4jJWTService implements JWTService {
                     (int) libraryClaims.getIssuedAt().getValue(),
                     (int) libraryClaims.getNotBefore().getValue(),
                     (int) libraryClaims.getExpirationTime().getValue(),
-                    responseClaims.get("func") == null ? null : String.valueOf(responseClaims.get("func")),
-                    responseClaims.get("hash") == null ? null : String.valueOf(responseClaims.get("hash")),
+                    bodyHashFunction == null ? null : String.valueOf(bodyHashFunction),
+                    bodyHash == null ? null : String.valueOf(bodyHash),
                     responseClaims.get("status") == null ? null :Integer.valueOf(String.valueOf(responseClaims.get("status"))),
                     responseClaims.get("cache") == null ? null : String.valueOf(responseClaims.get("cache")),
-                    responseClaims.get("location") == null ? null : String.valueOf(responseClaims.get("location"))
+                    responseClaims.get("location") == null ? null : String.valueOf(responseClaims.get("location")),
+                    requestClaims.get("meth") == null ? null : String.valueOf(requestClaims.get("meth")),
+                    requestClaims.get("path") == null ? null : String.valueOf(requestClaims.get("path"))
             );
         } catch (InvalidJwtException e) {
             throw new JWTError("An error occurred parsing the JWT", e);

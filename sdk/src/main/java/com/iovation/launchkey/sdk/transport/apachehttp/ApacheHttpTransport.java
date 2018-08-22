@@ -237,9 +237,18 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
+    @Deprecated
     public ServerSentEvent handleServerSentEvent(Map<String, List<String>> headers, String body)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError, NoKeyFoundException {
+        return handleServerSentEvent(headers, null, null, body);
+    }
+
+    @Override
+    public ServerSentEvent handleServerSentEvent(Map<String, List<String>> headers, String method, String path, String body)
+        throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException,
+            CryptographyError, NoKeyFoundException {
+
         ServerSentEvent response;
         HeaderGroup headerGroup = new HeaderGroup();
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
@@ -249,11 +258,21 @@ public class ApacheHttpTransport implements Transport {
         }
         String jwt = headerGroup.getFirstHeader(IOV_JWT_HEADER).getValue();
         try {
-            validateJWT(null, jwt);
-            JWTData jwtData = jwtService.getJWTData(jwt);
+            JWTClaims jwtClaims = validateJWT(null, jwt);
+            if (method != null && !method.equals(jwtClaims.getMethod())) {
+                throw new JWTError("JWT request method does not match the method provided", null);
+            }
+            if (path != null && !path.equals(jwtClaims.getPath())) {
+                throw new JWTError("JWT request path does not match the path provided", null);
+            }
+
+            ByteArrayOutputStream bodyStream = new ByteArrayOutputStream();
+            bodyStream.write(body.getBytes());
+            verifyContentHash(jwtClaims, bodyStream, "request");
+
             if (headerGroup.getFirstHeader("Content-Type").getValue().startsWith("application/jose")) {
                 // Auths response is encrypted
-                final EntityIdentifier requestingEntity = EntityIdentifier.fromString(jwtData.getAudience());
+                final EntityIdentifier requestingEntity = EntityIdentifier.fromString(jwtClaims.getAudience());
                 final String encryptionKeyId = jweService.getHeaders(body).get("kid");
                 final RSAPrivateKey privateKey = entityKeyMap.getKey(requestingEntity, encryptionKeyId);
                 final String decrypted = jweService.decrypt(body, privateKey);
@@ -265,7 +284,7 @@ public class ApacheHttpTransport implements Transport {
                         objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDevice.class);
                 response = new ServerSentEventAuthorizationResponse(
                         requestingEntity,
-                        EntityIdentifier.fromString(jwtData.getSubject()).getId(),
+                        EntityIdentifier.fromString(jwtClaims.getSubject()).getId(),
                         core.getServiceUserHash(),
                         core.getOrgUserHash(),
                         core.getUserPushId(),
@@ -289,6 +308,8 @@ public class ApacheHttpTransport implements Transport {
                     null);
         } catch (IOException e) {
             throw new InvalidRequestException("Unable to read the body due to an I/O error!", e, null);
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidRequestException("Invalid hash algorithm", e, null);
         }
         return response;
     }
@@ -706,22 +727,7 @@ public class ApacheHttpTransport implements Transport {
             if (claims.getStatusCode() != response.getStatusLine().getStatusCode())
                 throw new JWTError("Status code of response content does not match JWT response status code", null);
 
-            if (stream.size() > 0) {
-
-                String hash;
-                if (claims.getContentHashAlgorithm().equals("S256")) {
-                    hash = Hex.encodeHexString(crypto.sha256(stream.toByteArray()));
-                } else if (claims.getContentHashAlgorithm().equals("S384")) {
-                    hash = Hex.encodeHexString(crypto.sha384(stream.toByteArray()));
-                } else if (claims.getContentHashAlgorithm().equals("S512")) {
-                    hash = Hex.encodeHexString(crypto.sha512(stream.toByteArray()));
-                } else {
-                    throw new JWTError("Hash of response content uses unsupported algorithm of " +
-                            claims.getContentHashAlgorithm(), null);
-                }
-                if (claims.getContentHash() == null || !hash.equals(claims.getContentHash()))
-                    throw new JWTError("Hash of response content does not match JWT response hash", null);
-            }
+            verifyContentHash(claims, stream, "response");
 
             if ((response.containsHeader("Location") &&
                             !response.getFirstHeader("Location").getValue().equals(claims.getLocationHeader()))
@@ -737,7 +743,32 @@ public class ApacheHttpTransport implements Transport {
         } catch (JWTError jwtError) {
             throw new InvalidResponseException("Invalid JWT in response!", jwtError, null);
         } catch (NoSuchAlgorithmException | IOException e ) {
-            e.printStackTrace();
+            throw new CryptographyError("An error occurred validating the body hash", e);
+        }
+    }
+
+    private void verifyContentHash(JWTClaims claims, ByteArrayOutputStream stream, String type) throws NoSuchAlgorithmException, JWTError {
+        String contentHashAlgorithm = claims.getContentHashAlgorithm();
+        if (stream.size() > 0 && contentHashAlgorithm != null) {
+            String hash;
+            if (claims.getContentHashAlgorithm().equals("S256")) {
+                hash = Hex.encodeHexString(crypto.sha256(stream.toByteArray()));
+            } else if (claims.getContentHashAlgorithm().equals("S384")) {
+                hash = Hex.encodeHexString(crypto.sha384(stream.toByteArray()));
+            } else if (claims.getContentHashAlgorithm().equals("S512")) {
+                hash = Hex.encodeHexString(crypto.sha512(stream.toByteArray()));
+            } else {
+                throw new JWTError("Hash of " + type + " content uses unsupported algorithm of " +
+                        claims.getContentHashAlgorithm(), null);
+            }
+            if (claims.getContentHash() == null || !hash.equals(claims.getContentHash()))
+                throw new JWTError("Hash of " + type + " content does not match JWT " + type + " hash", null);
+        } else if (stream.size() > 0 && claims.getContentHashAlgorithm() == null) {
+            throw new JWTError("No content hash algorithm found in JWT and there was content!", null);
+        } else if (stream.size() == 0 && claims.getContentHashAlgorithm() != null) {
+            throw new JWTError("Content hash algorithm found in JWT and there was no content!", null);
+        } else if (stream.size() == 0 && claims.getContentHash() != null) {
+            throw new JWTError("Content hash found in JWT and there was no content!", null);
         }
     }
 

@@ -4,9 +4,10 @@ This changelog references the relevant changes (bug and security fixes) for the 
 
   * 4.3.0
 
-    * Added ability to enable jailbreak protection to authorization policy constructor
+    * Added ability to enable jailbreak protection to authorization policy constructor.
     * Fixed bug in authorization policy the swapped inherence and knowledge factors.
-    * Fixed bug where response headers were not being properly validated and verified
+    * Fixed bug where response headers were not being properly validated and verified.
+    * Added verification of webhook headers.
 
   * 4.2.1
 
