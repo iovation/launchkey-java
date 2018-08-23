@@ -16,40 +16,47 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ServiceV3AuthsPostResponse {
     private final UUID authRequest;
+    private final String pushPackage;
 
     @JsonCreator
-    public ServiceV3AuthsPostResponse(@JsonProperty(value = "auth_request") UUID authRequest) {
+    public ServiceV3AuthsPostResponse(@JsonProperty(value = "auth_request") UUID authRequest, @JsonProperty(value = "push_package") String pushPackage) {
         this.authRequest = authRequest;
+        this.pushPackage = pushPackage;
     }
 
     public UUID getAuthRequest() {
         return authRequest;
     }
 
+    public String getPushPackage() {
+        return pushPackage;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ServiceV3AuthsPostResponse)) return false;
-
+        if (o == null || getClass() != o.getClass()) return false;
         ServiceV3AuthsPostResponse that = (ServiceV3AuthsPostResponse) o;
-
-        return getAuthRequest() != null ? getAuthRequest().equals(that.getAuthRequest()) : that.getAuthRequest() == null;
+        return Objects.equals(authRequest, that.authRequest) &&
+                Objects.equals(pushPackage, that.pushPackage);
     }
 
     @Override
     public int hashCode() {
-        return getAuthRequest() != null ? getAuthRequest().hashCode() : 0;
+        return Objects.hash(authRequest, pushPackage);
     }
 
     @Override
     public String toString() {
         return "ServiceV3AuthsPostResponse{" +
                 "authRequest=" + authRequest +
+                ", pushPackage='" + pushPackage + '\'' +
                 '}';
     }
 }

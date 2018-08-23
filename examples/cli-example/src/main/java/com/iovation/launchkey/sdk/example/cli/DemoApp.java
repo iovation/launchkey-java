@@ -7,6 +7,7 @@ import com.iovation.launchkey.sdk.client.ServiceClient;
 import com.iovation.launchkey.sdk.client.ServiceFactory;
 import com.iovation.launchkey.sdk.domain.directory.Device;
 import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
+import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.error.BaseException;
 import com.martiansoftware.jsap.*;
@@ -312,7 +313,7 @@ public class DemoApp {
     private static void handleAuthorize(
             String username, String context, ServiceClient serviceClient
     ) throws BaseException, InterruptedException {
-        String authRequest = serviceClient.authorize(username, context);
+        AuthorizationRequest authRequest = serviceClient.createAuthorizationRequest(username, context);
         System.out.println();
         System.out.println("Authorization request successful");
         System.out.println("    Auth Request: " + authRequest);
@@ -323,7 +324,7 @@ public class DemoApp {
         while (new Date().getTime() - started < 30000) {
             Thread.sleep(1000L);
             System.out.print(".");
-            authorizationResponse = serviceClient.getAuthorizationResponse(authRequest);
+            authorizationResponse = serviceClient.getAuthorizationResponse(authRequest.getId());
             if (authorizationResponse != null) {
                 System.out.println();
                 System.out.println("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
@@ -462,7 +463,7 @@ public class DemoApp {
         return jsap;
     }
 
-    @SuppressWarnings("ThrowFromFinallyBlock")
+    @SuppressWarnings({"ThrowFromFinallyBlock", "Duplicates"})
     private static String readFile(String fileName) throws IOException {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
