@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.ServiceUserSessionEndWebhookPackage;
@@ -43,6 +44,7 @@ public interface ServiceClient {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
      */
+    @Deprecated
     String authorize(String user, String context, AuthPolicy policy)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError;
@@ -64,6 +66,7 @@ public interface ServiceClient {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * @see AuthorizationResponse#getAuthorizationRequestId()
      */
+    @Deprecated
     String authorize(String user, String context)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError;
@@ -83,7 +86,73 @@ public interface ServiceClient {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * @see AuthorizationResponse#getAuthorizationRequestId()
      */
+    @Deprecated
     String authorize(String user)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError;
+
+    /**
+     * Create an authorization request for the provided user.  This will NOT
+     * begin a user session.
+     *
+     * @param userIdentifier LaunchKey Username, User Push ID, or Directory User ID for the End User
+     * @param context Arbitrary string of data up to 400 characters to be presented to the End User during
+     * authorization to provide context regarding the individual authorization request
+     * @param policy Authorization policy override for this authorization request. The policy can only increase the security
+     * level any existing policy in the Service Profile. It can never reduce the security level of the Service Profile's
+     * policy.
+     * @return Information regarding the authorization request.
+     * @throws CommunicationErrorException If there was an error communicating with the LaunchKey API
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * the signature of the response
+     */
+    AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError;
+
+
+    /**
+     * Create an authorization request for the provided user.  This will NOT
+     * begin a user session.
+     *
+     * @param userIdentifier LaunchKey Username, User Push ID, or Directory User ID for the End User
+     * @param context Arbitrary string of data up to 400 characters to be presented to the End User during
+     * authorization to provide context regarding the individual authorization request
+     * level any existing policy in the Service Profile. It can never reduce the security level of the Service Profile's
+     * policy.
+     * @return Information regarding the authorization request.
+     * @throws CommunicationErrorException If there was an error communicating with the LaunchKey API
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * the signature of the response
+     */
+    AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError;
+
+
+    /**
+     * Create an authorization request for the provided user.  This will NOT
+     * begin a user session.
+     *
+     * @param userIdentifier LaunchKey Username, User Push ID, or Directory User ID for the End User
+     * @return Information regarding the authorization request.
+     * @throws CommunicationErrorException If there was an error communicating with the LaunchKey API
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * the signature of the response
+     */
+    AuthorizationRequest createAuthorizationRequest(String userIdentifier)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError;
 

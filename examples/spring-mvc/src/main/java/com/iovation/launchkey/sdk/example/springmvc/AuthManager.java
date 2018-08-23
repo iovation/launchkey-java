@@ -3,6 +3,7 @@ package com.iovation.launchkey.sdk.example.springmvc;
 import com.iovation.launchkey.sdk.FactoryFactoryBuilder;
 import com.iovation.launchkey.sdk.client.ServiceClient;
 import com.iovation.launchkey.sdk.client.ServiceFactory;
+import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
@@ -76,11 +77,11 @@ public class AuthManager {
         sessionUsernameMap = new ConcurrentHashMap<>();
     }
 
-    public void login(String username, String context) throws AuthException {
+    void login(String username, String context) throws AuthException {
         try {
-            String authRequestId = serviceClient.authorize(username, context);
+            AuthorizationRequest authorizationRequest = serviceClient.createAuthorizationRequest(username, context);
             String sessionId = getSessionId();
-            sessionAuthRequestMap.put(sessionId, authRequestId);
+            sessionAuthRequestMap.put(sessionId, authorizationRequest.getId());
             sessionAuthenticationMap.put(sessionId, null);
             sessionUsernameMap.put(sessionId, username);
         } catch (BaseException apiException) {
@@ -88,7 +89,7 @@ public class AuthManager {
         }
     }
 
-    public Boolean isAuthorized() throws AuthException {
+    Boolean isAuthorized() throws AuthException {
         String sessionId = getSessionId();
         if (sessionAuthenticationMap.containsKey(sessionId)) {
             return sessionAuthenticationMap.get(sessionId);
@@ -115,7 +116,7 @@ public class AuthManager {
         }
     }
 
-    public void handleWebhook(Map<String, List<String>> headers, String body) throws AuthException {
+    void handleWebhook(Map<String, List<String>> headers, String body) throws AuthException {
         try {
             WebhookPackage webhookPackage = serviceClient.handleWebhook(headers, body);
             if (webhookPackage instanceof AuthorizationResponseWebhookPackage) {

@@ -44,7 +44,7 @@ public class AuthorizationResponse {
 
     /**
      * A value uniquely and permanently identifying the User associated with the authorization request within the Application whose
-     * Application Key was included in the request belongs.
+     * Application Key was included in the requestServerSentEventAuthorizationResponseCore belongs.
      */
     private final String userPushId;
 
