@@ -86,6 +86,13 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
+    public void sendsSubjectEntityTypeWithUserContextPolicyTitle() throws Exception {
+        client.createAuthorizationRequest(user, null, null, null);
+        verify(transport).serviceV3AuthsPost(any(ServiceV3AuthsPostRequest.class), entityCaptor.capture());
+        assertEquals(EntityIdentifier.EntityType.SERVICE, entityCaptor.getValue().getType());
+    }
+
+    @Test
     public void sendsSubjectEntityIdWithUser() throws Exception {
         client.createAuthorizationRequest(user);
         verify(transport).serviceV3AuthsPost(any(ServiceV3AuthsPostRequest.class), entityCaptor.capture());
@@ -100,8 +107,8 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
-    public void sendsSubjectEntityIdWithUserContextPolicy() throws Exception {
-        client.createAuthorizationRequest(user, null, null);
+    public void sendsSubjectEntityIdWithUserContextPolicyTitle() throws Exception {
+        client.createAuthorizationRequest(user, null, null, null);
         verify(transport).serviceV3AuthsPost(any(ServiceV3AuthsPostRequest.class), entityCaptor.capture());
         assertEquals(serviceId, entityCaptor.getValue().getId());
     }
@@ -128,6 +135,13 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
+    public void sendsUserAsUsernameWithUserContextPolicyTitle() throws Exception {
+        client.createAuthorizationRequest(user, null, null);
+        verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(user, requestCaptor.getValue().getUsername());
+    }
+
+    @Test
     public void sendsNullContextWithUser() throws Exception {
         client.createAuthorizationRequest(user);
         verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
@@ -144,6 +158,13 @@ public class BasicServiceClientTestAuthorizationRequest {
     @Test
     public void sendsContextWithUserContextPolicy() throws Exception {
         client.createAuthorizationRequest(user, "Expected Context", null);
+        verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals("Expected Context", requestCaptor.getValue().getContext());
+    }
+
+    @Test
+    public void sendsContextWithUserContextPolicyTitle() throws Exception {
+        client.createAuthorizationRequest(user, "Expected Context", null, null);
         verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("Expected Context", requestCaptor.getValue().getContext());
     }
@@ -259,6 +280,13 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
+    public void sendsTitleWithUserContextPolicyTitle() throws Exception {
+        client.createAuthorizationRequest(user, null, null, "Expected Title");
+        verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals("Expected Title", requestCaptor.getValue().getTitle());
+    }
+
+    @Test
     public void returnsAuthRequestIdWithUser() throws Exception {
         AuthorizationRequest actual = client.createAuthorizationRequest(user);
         assertEquals(authRequestId.toString(), actual.getId());
@@ -266,13 +294,19 @@ public class BasicServiceClientTestAuthorizationRequest {
 
     @Test
     public void returnsAuthRequestIdWithUserContext() throws Exception {
-        AuthorizationRequest actual = client.createAuthorizationRequest(user);
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null);
         assertEquals(authRequestId.toString(), actual.getId());
     }
 
     @Test
     public void returnsAuthRequestIdWithUserContextPolicy() throws Exception {
-        AuthorizationRequest actual = client.createAuthorizationRequest(user);
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null);
+        assertEquals(authRequestId.toString(), actual.getId());
+    }
+
+    @Test
+    public void returnsAuthRequestIdWithUserContextPolicyTitle() throws Exception {
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null);
         assertEquals(authRequestId.toString(), actual.getId());
     }
 
@@ -284,13 +318,19 @@ public class BasicServiceClientTestAuthorizationRequest {
 
     @Test
     public void returnsPushPackageWithUserContext() throws Exception {
-        AuthorizationRequest actual = client.createAuthorizationRequest(user);
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null);
         assertEquals(pushPackage, actual.getPushPackage());
     }
 
     @Test
     public void returnsPushPackageWithUserContextPolicy() throws Exception {
-        AuthorizationRequest actual = client.createAuthorizationRequest(user);
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null);
+        assertEquals(pushPackage, actual.getPushPackage());
+    }
+
+    @Test
+    public void returnsPushPackageWithUserContextPolicyTitle() throws Exception {
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null);
         assertEquals(pushPackage, actual.getPushPackage());
     }
 }
