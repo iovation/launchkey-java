@@ -41,25 +41,25 @@ public class BasicServiceClient implements ServiceClient {
     public String authorize(String user, String context, AuthPolicy policy)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(user, context, policy).getId();
+        return createAuthorizationRequest(user, context, policy, null).getId();
     }
 
     @Override
     public String authorize(String user, String context)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(user, context, null).getId();
+        return createAuthorizationRequest(user, context, null, null).getId();
     }
 
     @Override
     public String authorize(String user)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(user, null, null).getId();
+        return createAuthorizationRequest(user, null, null, null).getId();
     }
 
     @Override
-    public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
+    public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
         com.iovation.launchkey.sdk.transport.domain.AuthPolicy requestPolicy;
         if (policy == null) {
             requestPolicy = null;
@@ -79,21 +79,27 @@ public class BasicServiceClient implements ServiceClient {
                 );
             }
         }
-        ServiceV3AuthsPostRequest request = new ServiceV3AuthsPostRequest(userIdentifier, requestPolicy, context);
+        ServiceV3AuthsPostRequest request = new ServiceV3AuthsPostRequest(userIdentifier, requestPolicy, context, title);
         ServiceV3AuthsPostResponse response = transport.serviceV3AuthsPost(request, serviceEntity);
         return new AuthorizationRequest(
                 response.getAuthRequest().toString(),
                 response.getPushPackage());
+
+    }
+
+    @Override
+    public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
+        return createAuthorizationRequest(userIdentifier, context, policy, null);
     }
 
     @Override
     public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(userIdentifier, context, null);
+        return createAuthorizationRequest(userIdentifier, context, null, null);
     }
 
     @Override
     public AuthorizationRequest createAuthorizationRequest(String userIdentifier) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(userIdentifier, null, null);
+        return createAuthorizationRequest(userIdentifier, null, null, null);
     }
 
     @Override

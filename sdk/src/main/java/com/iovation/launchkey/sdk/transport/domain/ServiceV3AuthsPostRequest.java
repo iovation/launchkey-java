@@ -14,15 +14,19 @@ package com.iovation.launchkey.sdk.transport.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class ServiceV3AuthsPostRequest {
     private final String username;
     private final AuthPolicy policy;
     private final String context;
+    private final String title;
 
-    public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context) {
+    public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context, String title) {
         this.username = username;
         this.policy = policy;
         this.context = context;
+        this.title = title;
     }
 
     @JsonProperty("username")
@@ -40,25 +44,25 @@ public class ServiceV3AuthsPostRequest {
         return context;
     }
 
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ServiceV3AuthsPostRequest)) return false;
-
         ServiceV3AuthsPostRequest that = (ServiceV3AuthsPostRequest) o;
-
-        if (getUsername() != null ? !getUsername().equals(that.getUsername()) : that.getUsername() != null)
-            return false;
-        if (getPolicy() != null ? !getPolicy().equals(that.getPolicy()) : that.getPolicy() != null) return false;
-        return getContext() != null ? getContext().equals(that.getContext()) : that.getContext() == null;
+        return Objects.equals(getUsername(), that.getUsername()) &&
+                Objects.equals(getPolicy(), that.getPolicy()) &&
+                Objects.equals(getContext(), that.getContext()) &&
+                Objects.equals(getTitle(), that.getTitle());
     }
 
     @Override
     public int hashCode() {
-        int result = getUsername() != null ? getUsername().hashCode() : 0;
-        result = 31 * result + (getPolicy() != null ? getPolicy().hashCode() : 0);
-        result = 31 * result + (getContext() != null ? getContext().hashCode() : 0);
-        return result;
+        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle());
     }
 
     @Override
@@ -67,6 +71,7 @@ public class ServiceV3AuthsPostRequest {
                 "username='" + username + '\'' +
                 ", policy=" + policy +
                 ", context='" + context + '\'' +
+                ", title='" + title + '\'' +
                 '}';
     }
 }
