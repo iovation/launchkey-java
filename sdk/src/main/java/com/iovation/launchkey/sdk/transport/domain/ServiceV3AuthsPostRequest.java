@@ -12,21 +12,30 @@
 
 package com.iovation.launchkey.sdk.transport.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ServiceV3AuthsPostRequest {
     private final String username;
     private final AuthPolicy policy;
     private final String context;
     private final String title;
+    private final Integer ttl;
 
-    public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context, String title) {
+    public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context, String title, Integer ttl) {
         this.username = username;
         this.policy = policy;
         this.context = context;
         this.title = title;
+        this.ttl = ttl;
+    }
+
+    @Deprecated
+    public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context) {
+        this(username, policy, context, null, null);
     }
 
     @JsonProperty("username")
@@ -49,6 +58,11 @@ public class ServiceV3AuthsPostRequest {
         return title;
     }
 
+    @JsonProperty("ttl")
+    public Integer getTTL() {
+        return ttl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -57,12 +71,13 @@ public class ServiceV3AuthsPostRequest {
         return Objects.equals(getUsername(), that.getUsername()) &&
                 Objects.equals(getPolicy(), that.getPolicy()) &&
                 Objects.equals(getContext(), that.getContext()) &&
-                Objects.equals(getTitle(), that.getTitle());
+                Objects.equals(getTitle(), that.getTitle()) &&
+                Objects.equals(getTTL(), that.getTTL());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle());
+        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), getTTL());
     }
 
     @Override
@@ -72,6 +87,7 @@ public class ServiceV3AuthsPostRequest {
                 ", policy=" + policy +
                 ", context='" + context + '\'' +
                 ", title='" + title + '\'' +
+                ", ttl=" + ttl +
                 '}';
     }
 }

@@ -43,6 +43,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
+     * @deprecated in favor of {@link #createAuthorizationRequest(String, String, AuthPolicy, String, Integer)}
      */
     @Deprecated
     String authorize(String user, String context, AuthPolicy policy)
@@ -65,6 +66,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * @see AuthorizationResponse#getAuthorizationRequestId()
+     * @deprecated in favor of {@link #createAuthorizationRequest(String, String)}
      */
     @Deprecated
     String authorize(String user, String context)
@@ -85,6 +87,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * @see AuthorizationResponse#getAuthorizationRequestId()
+     * @deprecated in favor of {@link #createAuthorizationRequest(String)}
      */
     @Deprecated
     String authorize(String user)
@@ -103,6 +106,7 @@ public interface ServiceClient {
      * policy.
      * @param title String of data up to 200 characters to be presented to the End User during
      * authorization as the title of the individual authorization request
+     * @param ttl Time for this authorization request to be valid. If no value is provided, the system default will be used.
      * @return Information regarding the authorization request.
      * @throws CommunicationErrorException If there was an error communicating with the LaunchKey API
      * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
@@ -112,7 +116,7 @@ public interface ServiceClient {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
      */
-    AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title)
+    AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title, Integer ttl)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError;
 
@@ -134,9 +138,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
-     * @deprecated in favor of #cre
      */
-    @Deprecated
     AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError;
