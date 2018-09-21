@@ -87,7 +87,7 @@ public class BasicServiceClientTestAuthorizationRequest {
 
     @Test
     public void sendsSubjectEntityTypeWithUserContextPolicyTitle() throws Exception {
-        client.createAuthorizationRequest(user, null, null, null);
+        client.createAuthorizationRequest(user, null, null, null, null);
         verify(transport).serviceV3AuthsPost(any(ServiceV3AuthsPostRequest.class), entityCaptor.capture());
         assertEquals(EntityIdentifier.EntityType.SERVICE, entityCaptor.getValue().getType());
     }
@@ -108,7 +108,7 @@ public class BasicServiceClientTestAuthorizationRequest {
 
     @Test
     public void sendsSubjectEntityIdWithUserContextPolicyTitle() throws Exception {
-        client.createAuthorizationRequest(user, null, null, null);
+        client.createAuthorizationRequest(user, null, null, null, null);
         verify(transport).serviceV3AuthsPost(any(ServiceV3AuthsPostRequest.class), entityCaptor.capture());
         assertEquals(serviceId, entityCaptor.getValue().getId());
     }
@@ -163,8 +163,8 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
-    public void sendsContextWithUserContextPolicyTitle() throws Exception {
-        client.createAuthorizationRequest(user, "Expected Context", null, null);
+    public void sendsContextWithUserContextPolicyTitleTtl() throws Exception {
+        client.createAuthorizationRequest(user, "Expected Context", null, null, null);
         verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("Expected Context", requestCaptor.getValue().getContext());
     }
@@ -280,10 +280,17 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
-    public void sendsTitleWithUserContextPolicyTitle() throws Exception {
-        client.createAuthorizationRequest(user, null, null, "Expected Title");
+    public void sendsTitleWithUserContextPolicyTitleTtl() throws Exception {
+        client.createAuthorizationRequest(user, null, null, "Expected Title", null);
         verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("Expected Title", requestCaptor.getValue().getTitle());
+    }
+
+    @Test
+    public void sendsTtlWithUserContextPolicyTitleTtl() throws Exception {
+        client.createAuthorizationRequest(user, null, null, null, 999);
+        verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(Integer.valueOf(999), requestCaptor.getValue().getTTL());
     }
 
     @Test
@@ -305,8 +312,8 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
-    public void returnsAuthRequestIdWithUserContextPolicyTitle() throws Exception {
-        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null);
+    public void returnsAuthRequestIdWithUserContextPolicyTitleTtl() throws Exception {
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null, null);
         assertEquals(authRequestId.toString(), actual.getId());
     }
 
@@ -330,7 +337,7 @@ public class BasicServiceClientTestAuthorizationRequest {
 
     @Test
     public void returnsPushPackageWithUserContextPolicyTitle() throws Exception {
-        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null);
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null, null);
         assertEquals(pushPackage, actual.getPushPackage());
     }
 }
