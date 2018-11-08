@@ -47,8 +47,8 @@ public class ServiceV3AuthsPostRequestTest {
     public void equivalentAreEqual() {
         AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
         assertEquals(
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM"),
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM")
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB"),
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB")
         );
     }
 
@@ -56,8 +56,8 @@ public class ServiceV3AuthsPostRequestTest {
     public void notEquivalentAreNotEqual() {
         AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
         assertNotEquals(
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM"),
-                new ServiceV3AuthsPostRequest("B", policy, "D", "U", 2, "PU", "PN")
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB"),
+                new ServiceV3AuthsPostRequest("B", policy, "D", "U", 2, "PU", "PC")
         );
     }
 
@@ -65,17 +65,17 @@ public class ServiceV3AuthsPostRequestTest {
     public void notEquivalentForPushTitleAreNotEqual() {
         AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
         assertNotEquals(
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM"),
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PU", "PM")
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB"),
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PU", "PB")
         );
     }
 
     @Test
-    public void notEquivalentForPushMessageAreNotEqual() {
+    public void notEquivalentForPushBodyAreNotEqual() {
         AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
         assertNotEquals(
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PU", "PM"),
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PU", "PN")
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PU", "PB"),
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PU", "PC")
         );
     }
 
@@ -83,8 +83,8 @@ public class ServiceV3AuthsPostRequestTest {
     public void hashCodeIsSameForEquivalent() {
         AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
         assertEquals(
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM").hashCode(),
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM").hashCode()
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB").hashCode(),
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB").hashCode()
         );
     }
 
@@ -92,8 +92,8 @@ public class ServiceV3AuthsPostRequestTest {
     public void hashCodeNotSameForNotEquivalent() {
         AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
         assertNotEquals(
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM").hashCode(),
-                new ServiceV3AuthsPostRequest("B", policy, "D", "U", 2, "PU", "PN").hashCode()
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB").hashCode(),
+                new ServiceV3AuthsPostRequest("B", policy, "D", "U", 2, "PU", "PC").hashCode()
         );
     }
 
@@ -101,24 +101,24 @@ public class ServiceV3AuthsPostRequestTest {
     public void hashCodeNotSameForNotEquivalentPushTitle() {
         AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
         assertNotEquals(
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM").hashCode(),
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PU", "PM").hashCode()
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB").hashCode(),
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PU", "PB").hashCode()
         );
     }
 
     @Test
-    public void hashCodeNotSameForNotEquivalentPushMessage() {
+    public void hashCodeNotSameForNotEquivalentPushBody() {
         AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
         assertNotEquals(
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PM").hashCode(),
-                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PN").hashCode()
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PB").hashCode(),
+                new ServiceV3AuthsPostRequest("A", policy, "C", "T", 1, "PT", "PC").hashCode()
         );
     }
 
     @Test
     public void toStringContainsClassName() {
         assertThat(
-                new ServiceV3AuthsPostRequest("A", null, "C", "T", 1, "PT", "PM").toString(),
+                new ServiceV3AuthsPostRequest("A", null, "C", "T", 1, "PT", "PB").toString(),
                 containsString(ServiceV3AuthsPostRequest.class.getSimpleName())
         );
     }

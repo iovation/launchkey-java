@@ -25,17 +25,17 @@ public class ServiceV3AuthsPostRequest {
     private final String title;
     private final Integer ttl;
     private final String pushTitle;
-    private final String pushMessage;
+    private final String pushBody;
 
     public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context, String title, Integer ttl,
-                                     String pushTitle, String pushMessage) {
+                                     String pushTitle, String pushBody) {
         this.username = username;
         this.policy = policy;
         this.context = context;
         this.title = title;
         this.ttl = ttl;
         this.pushTitle = pushTitle;
-        this.pushMessage = pushMessage;
+        this.pushBody = pushBody;
     }
 
     @Deprecated
@@ -75,7 +75,7 @@ public class ServiceV3AuthsPostRequest {
 
     @JsonProperty("push_body")
     public String getPushBody() {
-        return pushMessage;
+        return pushBody;
     }
 
     @Override
@@ -87,14 +87,14 @@ public class ServiceV3AuthsPostRequest {
                 Objects.equals(getPolicy(), that.getPolicy()) &&
                 Objects.equals(getContext(), that.getContext()) &&
                 Objects.equals(getTitle(), that.getTitle()) &&
-                Objects.equals(ttl, that.ttl) &&
+                Objects.equals(getTTL(), that.getTTL()) &&
                 Objects.equals(getPushTitle(), that.getPushTitle()) &&
-                Objects.equals(pushMessage, that.pushMessage);
+                Objects.equals(pushBody, that.getPushBody());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), ttl, getPushTitle(), pushMessage);
+        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), ttl, getPushTitle(), pushBody);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class ServiceV3AuthsPostRequest {
                 ", title='" + title + '\'' +
                 ", ttl=" + ttl +
                 ", pushTitle='" + pushTitle + '\'' +
-                ", pushMessage='" + pushMessage + '\'' +
+                ", pushBody='" + pushBody + '\'' +
                 '}';
     }
 }

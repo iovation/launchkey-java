@@ -59,7 +59,7 @@ public class BasicServiceClient implements ServiceClient {
     }
 
     @Override
-    public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title, Integer ttl, String pushTitle, String pushMessage) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
+    public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title, Integer ttl, String pushTitle, String pushBody) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
         com.iovation.launchkey.sdk.transport.domain.AuthPolicy requestPolicy;
         if (policy == null) {
             requestPolicy = null;
@@ -80,7 +80,7 @@ public class BasicServiceClient implements ServiceClient {
             }
         }
         ServiceV3AuthsPostRequest request = new ServiceV3AuthsPostRequest(
-                userIdentifier, requestPolicy, context, title, ttl, pushTitle, pushMessage);
+                userIdentifier, requestPolicy, context, title, ttl, pushTitle, pushBody);
         ServiceV3AuthsPostResponse response = transport.serviceV3AuthsPost(request, serviceEntity);
         return new AuthorizationRequest(
                 response.getAuthRequest().toString(),

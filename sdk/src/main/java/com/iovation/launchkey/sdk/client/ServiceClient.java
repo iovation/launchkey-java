@@ -107,10 +107,10 @@ public interface ServiceClient {
      * @param title String of data up to 200 characters to be presented to the End User during
      * authorization as the title of the individual authorization request
      * @param ttl Time for this authorization request to be valid. If no value is provided, the system default will be used.
-     * @param pushTitle Title for push notification. This value will not have any effect if 3rd party push notification
-     * is implemented.
-     * @param pushMessage Title for push notification. This value will not have any effect if 3rd party push
-     * notification is implemented.
+     * @param pushTitle Title for push notification. This feature is only available for Directory Services. This value
+     * will not have any effect if 3rd party push notification is implemented.
+     * @param pushBody Body of push notification. This feature is only available for Directory Services. This value will
+     * not have any effect if 3rd party push notification is implemented.
      * @return Information regarding the authorization request.
      * @throws CommunicationErrorException If there was an error communicating with the LaunchKey API
      * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
@@ -121,7 +121,7 @@ public interface ServiceClient {
      * the signature of the response
      */
     AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy,
-                                                    String title, Integer ttl, String pushTitle, String pushMessage)
+                                                    String title, Integer ttl, String pushTitle, String pushBody)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError;
 
