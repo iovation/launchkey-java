@@ -12,5 +12,5 @@ Feature: Directory Client can list devices
     Then the Device List has 1 Device
 
   Scenario: Getting the Device list for a User with no Devices returns an empty list
-    When I retrieve the Devices list for the current User
+    When I retrieve the Devices list for the user "I do not exist"
     Then the Device List has 0 Devices

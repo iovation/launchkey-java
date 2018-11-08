@@ -13,4 +13,4 @@ Feature: Directory Client can get list of Service Sessions for a User Identifier
 
   Scenario: Retrieving a list of Service User Sessions for an invalid user raises an EntityNotFound exception
     When I attempt to retrieve the Session list for the User "Myxlplix"
-    Then a com.iovation.launchkey.sdk.error.EntityNotFound exception is thrown
+    Then a EntityNotFound error occurs

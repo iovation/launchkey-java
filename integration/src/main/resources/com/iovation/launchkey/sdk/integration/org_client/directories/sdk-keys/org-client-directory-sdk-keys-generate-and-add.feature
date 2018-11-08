@@ -13,4 +13,4 @@ Feature: Organization clients can generate and add an SDK Key to a Directory
 
   Scenario: Attempting to add an SDK key to an invalid Directory throws a Forbidden exception
     When I attempt to generate and add an SDK Key to the Directory with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs

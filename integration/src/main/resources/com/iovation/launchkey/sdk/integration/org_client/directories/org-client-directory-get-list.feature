@@ -17,4 +17,4 @@ Feature: Organization clients can get a list of Directories
 
   Scenario: Get an invalid Directory raises an exception
     When I attempt retrieve a list of Directories with the Directory ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs

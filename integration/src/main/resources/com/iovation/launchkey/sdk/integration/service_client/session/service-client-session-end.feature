@@ -19,4 +19,4 @@ Feature: Service Session End
 
   Scenario: Sending Session End with invalid user raise No Such User error
     When I attempt to send a Session End request for user "This is not a valid User"
-    Then a com.iovation.launchkey.sdk.error.EntityNotFound exception is thrown
+    Then a EntityNotFound error occurs

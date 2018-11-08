@@ -9,7 +9,7 @@ Feature: Organization Client can set Organization Service Policy
   Scenario: Setting the policy for invalid Service throws Forbidden
     When the Organization Service Policy is set to require 2 factors
     And I attempt to set the Policy for the Organization Service with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.ServiceNotFound exception is thrown
+    Then a ServiceNotFound error occurs
 
   Scenario: Setting the required factors will set only the factors and all else will be empty or null
     When the Organization Service Policy is set to require 2 factors
@@ -29,7 +29,7 @@ Feature: Organization Client can set Organization Service Policy
     And the Organization Service Policy is set to require possession
     And I set the Policy for the Current Organization Service
     And I retrieve the Policy for the Current Organization Service
-    And the Organization Service Policy has no requirement for number of factors
+    Then the Organization Service Policy has no requirement for number of factors
     And the Organization Service Policy does require inherence
     And the Organization Service Policy does require knowledge
     And the Organization Service Policy does require possession

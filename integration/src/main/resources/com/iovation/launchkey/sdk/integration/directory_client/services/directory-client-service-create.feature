@@ -8,6 +8,7 @@ Feature: Directory clients can create Directory Services
 
   Scenario: Client can send unique Service name and successfully create a Service
     When I create a Directory Service with the following:
+      | key          | value                             |
       | description  | Super Awesome Service             |
       | icon         | https://www.iovation.com/icon     |
       | callback_url | https://www.iovation.com/callback |
@@ -22,4 +23,4 @@ Feature: Directory clients can create Directory Services
   Scenario: Client sending duplicate Service name raises ServiceNameInUse
     Given I created a Directory Service
     And I attempt to create a Directory Service with the same name
-    Then a com.iovation.launchkey.sdk.error.ServiceNameTaken exception is thrown
+    Then a ServiceNameTaken error occurs

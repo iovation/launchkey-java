@@ -9,7 +9,7 @@ Feature: Organization clients can update Directories
   Scenario: Client can update active
     When I update the Directory as inactive
     And I retrieve the updated Directory
-    And the Directory is not active
+    Then the Directory is not active
 
   Scenario: I can update the Android Push Key
     When I update the Directory Android Key with "A new Android Key"
@@ -33,4 +33,4 @@ Feature: Organization clients can update Directories
 
   Scenario: Attempting to update an invalid Directory throws a Forbidden exception
     When I attempt to update the active status of the Directory with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs

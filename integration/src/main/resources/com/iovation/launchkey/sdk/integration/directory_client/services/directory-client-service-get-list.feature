@@ -13,4 +13,4 @@ Feature: Directory clients can get a list of their Directory Services by ID
 
   Scenario: Get an invalid Service raises an exception
     When I attempt retrieve a list of Directory Services with the Service ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs

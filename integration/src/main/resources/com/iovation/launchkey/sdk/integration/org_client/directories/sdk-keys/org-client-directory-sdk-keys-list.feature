@@ -13,4 +13,4 @@ Feature: Organization clients can list the available SDK Keys for a Directory
 
   Scenario: Attempting to list the SDK Keys for an invalid Directory throws Forbidden exception
     When I attempt to retrieve the current Directory SDK Keys for the Directory with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs

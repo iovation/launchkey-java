@@ -21,9 +21,9 @@ Feature: Directory clients can add a Public Key to a Directory Service
 
   Scenario: Attempting to add a Public Key to an invalid Directory Service throws a Forbidden exception
     When I attempt to add a Public Key to the Directory Service with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs
 
   Scenario: Attempting to add the same Public Key twice to the same Directory Service throws a PublicKeyAlreadyInUse exception
     When I add a Public Key to the Directory Service
     And I attempt to add the same Public Key to the Directory Service
-    Then a com.iovation.launchkey.sdk.error.PublicKeyAlreadyInUse exception is thrown
+    Then a PublicKeyAlreadyInUse error occurs
