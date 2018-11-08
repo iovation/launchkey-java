@@ -89,14 +89,14 @@ public class BasicOrganizationClientGetDirectoriesTest {
                 new Directory(UUID.fromString("fac25a3c-af79-49df-bd65-777e9c86e288"), "Expected Name", true,
                         Collections.singletonList(UUID.fromString("4137af5c-b460-11e7-9bcd-0469f8dc10a5")),
                         Collections.singletonList(UUID.fromString("6a033e54-b460-11e7-a723-0469f8dc10a5")),
-                        "Expected Android Key", "Expected iOS Certificate Fingerprint")
+                        "Expected Android Key", "Expected iOS Certificate Fingerprint", true)
         );
         when(response.getDirectories()).thenReturn(Collections.singletonList(
                 new OrganizationV3DirectoriesListPostResponseDirectory(
                         UUID.fromString("fac25a3c-af79-49df-bd65-777e9c86e288"), "Expected Name", true,
                         Collections.singletonList(UUID.fromString("4137af5c-b460-11e7-9bcd-0469f8dc10a5")),
                         Collections.singletonList(UUID.fromString("6a033e54-b460-11e7-a723-0469f8dc10a5")),
-                        "Expected Android Key", "Expected iOS Certificate Fingerprint")
+                        "Expected Android Key", "Expected iOS Certificate Fingerprint", true)
         ));
         List<Directory> actual = client.getDirectories(new ArrayList<UUID>());
         assertEquals(expected, actual);

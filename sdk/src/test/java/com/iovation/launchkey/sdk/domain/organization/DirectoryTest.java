@@ -23,64 +23,70 @@ public class DirectoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void idCannotBeNull() throws Exception {
-        new Directory(null, null, false, null, null, null, null);
+        new Directory(null, null, false, null, null, null, null, null);
     }
 
     @Test
     public void getId() throws Exception {
         UUID id = UUID.randomUUID();
-        assertEquals(id, new Directory(id, null, false, null, null, null, null).getId());
+        assertEquals(id, new Directory(id, null, false, null, null, null, null, null).getId());
     }
 
     @Test
     public void getName() throws Exception {
-        assertEquals("Name", new Directory(UUID.randomUUID(), "Name", false, null, null, null, null).getName());
+        assertEquals("Name", new Directory(UUID.randomUUID(), "Name", false, null, null, null, null, null).getName());
     }
 
     @Test
     public void isActive() throws Exception {
         UUID id = UUID.randomUUID();
-        assertTrue(new Directory(UUID.randomUUID(), null, true, null, null, null, null).isActive());
+        assertTrue(new Directory(UUID.randomUUID(), null, true, null, null, null, null, null).isActive());
     }
 
     @Test
     public void getServiceIds() throws Exception {
         List<UUID> expected = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         assertEquals(expected,
-                new Directory(UUID.randomUUID(), null, false, expected, null, null, null).getServiceIds());
+                new Directory(UUID.randomUUID(), null, false, expected, null, null, null, null).getServiceIds());
     }
 
     @Test
     public void getSdkKeys() throws Exception {
         List<UUID> expected = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         assertEquals(expected,
-                new Directory(UUID.randomUUID(), null, false, null, expected, null, null).getSdkKeys());
+                new Directory(UUID.randomUUID(), null, false, null, expected, null, null, null).getSdkKeys());
     }
 
     @Test
     public void getGetAndroidKey() throws Exception {
         assertEquals("Android Key",
-                new Directory(UUID.randomUUID(), null, false, null, null, "Android Key", null).getAndroidKey());
+                new Directory(UUID.randomUUID(), null, false, null, null, "Android Key", null, null).getAndroidKey());
     }
 
     @Test
     public void getIosCertificateFingerprint() throws Exception {
         assertEquals("Fingerprint",
-                new Directory(UUID.randomUUID(), null, false, null, null, null, "Fingerprint")
+                new Directory(UUID.randomUUID(), null, false, null, null, null, "Fingerprint", null)
                         .getIosCertificateFingerprint());
+    }
+
+    @Test
+    public void isDenialContextInquiryEnabled() throws Exception {
+        assertTrue(new Directory(UUID.randomUUID(), null, false, null, null, null, null, true)
+                        .isDenialContextInquiryEnabled());
     }
 
     @Test
     public void hashcodeIsEqualForSameId() throws Exception {
         UUID id = UUID.randomUUID();
-        assertEquals(new Directory(id, null, false, null, null, null, null).hashCode(),
-                new Directory(id, null, false, null, null, null, null).hashCode());
+        assertEquals(new Directory(id, null, false, null, null, null, null, null).hashCode(),
+                new Directory(id, null, false, null, null, null, null, null).hashCode());
     }
 
     @Test
     public void hashcodeIsNotSameAsId() throws Exception {
         UUID id = UUID.randomUUID();
-        assertNotEquals(id.hashCode(), new Directory(id, null, false, null, null, null, null).hashCode());
+        assertNotEquals(id.hashCode(), new Directory(id, null, false, null, null, null, null, null).hashCode());
     }
 
     @Test
@@ -88,16 +94,16 @@ public class DirectoryTest {
         UUID id = UUID.randomUUID();
         List<UUID> serviceIds = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         List<UUID> sdkKeys = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
-        assertTrue(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP")
-                .equals(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP")));
+        assertTrue(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP", null)
+                .equals(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP", null)));
     }
 
     @Test
     public void equalsIsFalseForDifferentId() throws Exception {
         List<UUID> serviceIds = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         List<UUID> sdkKeys = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
-        assertFalse(new Directory(UUID.randomUUID(), "Name", true, serviceIds, sdkKeys, "Key", "FP")
-                .equals(new Directory(UUID.randomUUID(), "Name", true, serviceIds, sdkKeys, "Key", "FP")));
+        assertFalse(new Directory(UUID.randomUUID(), "Name", true, serviceIds, sdkKeys, "Key", "FP", null)
+                .equals(new Directory(UUID.randomUUID(), "Name", true, serviceIds, sdkKeys, "Key", "FP", null)));
     }
 
     @Test
@@ -105,8 +111,8 @@ public class DirectoryTest {
         UUID id = UUID.randomUUID();
         List<UUID> serviceIds = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         List<UUID> sdkKeys = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
-        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP")
-                .equals(new Directory(id, "Other", true, serviceIds, sdkKeys, "Key", "FP")));
+        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP", null)
+                .equals(new Directory(id, "Other", true, serviceIds, sdkKeys, "Key", "FP", null)));
     }
 
     @Test
@@ -114,8 +120,8 @@ public class DirectoryTest {
         UUID id = UUID.randomUUID();
         List<UUID> serviceIds = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         List<UUID> sdkKeys = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
-        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP")
-                .equals(new Directory(id, "Name", false, serviceIds, sdkKeys, "Key", "FP")));
+        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP", null)
+                .equals(new Directory(id, "Name", false, serviceIds, sdkKeys, "Key", "FP", null)));
     }
 
     @Test
@@ -123,9 +129,9 @@ public class DirectoryTest {
         UUID id = UUID.randomUUID();
         List<UUID> sdkKeys = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         assertFalse(new Directory(id, "Name", true, Arrays.asList(UUID.randomUUID(), UUID.randomUUID()), sdkKeys, "Key",
-                "FP")
+                "FP", null)
                 .equals(new Directory(id, "Name", true, Arrays.asList(UUID.randomUUID(), UUID.randomUUID()), sdkKeys,
-                        "Key", "FP")));
+                        "Key", "FP", null)));
     }
 
     @Test
@@ -134,10 +140,10 @@ public class DirectoryTest {
         List<UUID> serviceIds = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         assertFalse(
                 new Directory(id, "Name", true, serviceIds, Arrays.asList(UUID.randomUUID(), UUID.randomUUID()), "Key",
-                        "FP")
+                        "FP", null)
                         .equals(new Directory(id, "Name", true, serviceIds,
                                 Arrays.asList(UUID.randomUUID(), UUID.randomUUID()),
-                                "Key", "FP")));
+                                "Key", "FP", null)));
     }
 
     @Test
@@ -145,8 +151,8 @@ public class DirectoryTest {
         UUID id = UUID.randomUUID();
         List<UUID> serviceIds = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         List<UUID> sdkKeys = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
-        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP")
-                .equals(new Directory(id, "Name", true, serviceIds, sdkKeys, "Other Key", "FP")));
+        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP", null)
+                .equals(new Directory(id, "Name", true, serviceIds, sdkKeys, "Other Key", "FP", null)));
     }
 
     @Test
@@ -154,13 +160,22 @@ public class DirectoryTest {
         UUID id = UUID.randomUUID();
         List<UUID> serviceIds = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
         List<UUID> sdkKeys = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
-        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP")
-                .equals(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "Other FP")));
+        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP", null)
+                .equals(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "Other FP", null)));
+    }
+
+    @Test
+    public void equalsIsFalseForDifferentDenialContextInquiryEnabled() throws Exception {
+        UUID id = UUID.randomUUID();
+        List<UUID> serviceIds = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
+        List<UUID> sdkKeys = Arrays.asList(UUID.randomUUID(), UUID.randomUUID());
+        assertFalse(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP", true)
+                .equals(new Directory(id, "Name", true, serviceIds, sdkKeys, "Key", "FP", false)));
     }
 
     @Test
     public void toStringContainsClassName() throws Exception {
-        assertThat(new Directory(UUID.randomUUID(), null, true, null, null, null, null).toString(),
+        assertThat(new Directory(UUID.randomUUID(), null, true, null, null, null, null, null).toString(),
                 containsString("Directory"));
     }
 }

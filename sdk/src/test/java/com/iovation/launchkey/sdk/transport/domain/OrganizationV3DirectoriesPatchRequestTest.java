@@ -21,29 +21,42 @@ public class OrganizationV3DirectoriesPatchRequestTest {
     @Test
     public void getDirectoryId() throws Exception {
         UUID id = UUID.randomUUID();
-        assertEquals(id, new OrganizationV3DirectoriesPatchRequest(id, false, null, null).getDirectoryId());
+        assertEquals(id, new OrganizationV3DirectoriesPatchRequest(id, false, null, null, null).getDirectoryId());
     }
 
     @Test
     public void isActive() throws Exception {
-        assertTrue(new OrganizationV3DirectoriesPatchRequest(null, true, null, null).isActive());
+        assertTrue(new OrganizationV3DirectoriesPatchRequest(null, true, null, null, null).isActive());
     }
 
     @Test
     public void getAndroidKey() throws Exception {
-        assertEquals("AK", new OrganizationV3DirectoriesPatchRequest(null, false, "AK", null).getAndroidKey());
+        assertEquals("AK", new OrganizationV3DirectoriesPatchRequest(null, false, "AK", null, null).getAndroidKey());
     }
 
     @Test
     public void getIosP12() throws Exception {
-        assertEquals("p12", new OrganizationV3DirectoriesPatchRequest(null, false, null, "p12").getIosP12());
+        assertEquals("p12", new OrganizationV3DirectoriesPatchRequest(null, false, null, "p12", null).getIosP12());
     }
 
     @Test
-    public void toJSON() throws Exception {
+    public void isDenialContextInquiryEnabled() throws Exception {
+        assertTrue(new OrganizationV3DirectoriesPatchRequest(null, false, null, null, true).isDenialContextInquiryEnabled());
+    }
+
+    @Test
+    public void toJSONWithNullDenialContextInquiryEnabledDoesNotSend() throws Exception {
         String expected = "{\"directory_id\":\"67c87654-aed9-11e7-98e9-0469f8dc10a5\"," +
                 "\"active\":true,\"android_key\":\"ak\",\"ios_p12\":\"p12\"}";
-        String actual = new ObjectMapper().writeValueAsString(new OrganizationV3DirectoriesPatchRequest(UUID.fromString("67c87654-aed9-11e7-98e9-0469f8dc10a5"), true, "ak", "p12"));
+        String actual = new ObjectMapper().writeValueAsString(new OrganizationV3DirectoriesPatchRequest(UUID.fromString("67c87654-aed9-11e7-98e9-0469f8dc10a5"), true, "ak", "p12", null));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void toJSONWithBooleanDenialContextInquiryEnabledDoesNotSend() throws Exception {
+        String expected = "{\"directory_id\":\"67c87654-aed9-11e7-98e9-0469f8dc10a5\"," +
+                "\"active\":true,\"android_key\":\"ak\",\"ios_p12\":\"p12\",\"denial_context_inquiry_enabled\":true}";
+        String actual = new ObjectMapper().writeValueAsString(new OrganizationV3DirectoriesPatchRequest(UUID.fromString("67c87654-aed9-11e7-98e9-0469f8dc10a5"), true, "ak", "p12", true));
         assertEquals(expected, actual);
     }
 }

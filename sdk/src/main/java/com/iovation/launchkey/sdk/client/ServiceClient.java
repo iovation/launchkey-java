@@ -14,6 +14,7 @@ package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
+import com.iovation.launchkey.sdk.domain.service.DenialReason;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.ServiceUserSessionEndWebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
@@ -111,6 +112,11 @@ public interface ServiceClient {
      * will not have any effect if 3rd party push notification is implemented.
      * @param pushBody Body of push notification. This feature is only available for Directory Services. This value will
      * not have any effect if 3rd party push notification is implemented.
+     * @param denialReasons List of denial reasons to present to the user if they deny the request. This list must
+     * include at least two items. At least one of the items must have a fraud value of false and at least one of the
+     * items must have a fraud value of true. If null is provided, the defaults will be used. If a list is provided
+     * and denial context inquiry is not enabled for the Directory, this request will error. This feature is only
+     * available for Directory Services.
      * @return Information regarding the authorization request.
      * @throws CommunicationErrorException If there was an error communicating with the LaunchKey API
      * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
@@ -121,7 +127,8 @@ public interface ServiceClient {
      * the signature of the response
      */
     AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy,
-                                                    String title, Integer ttl, String pushTitle, String pushBody)
+                                                    String title, Integer ttl, String pushTitle, String pushBody,
+                                                    List<DenialReason> denialReasons)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError;
 

@@ -2,6 +2,7 @@ package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
+import com.iovation.launchkey.sdk.domain.service.DenialReason;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.ServiceV3AuthsPostRequest;
@@ -293,19 +294,33 @@ public class BasicServiceClientTestAuthorizationRequest {
         assertEquals(Integer.valueOf(999), requestCaptor.getValue().getTTL());
     }
 
-
     @Test
     public void sendsPushTitleWithUserContextPolicyTitleTtlPushTitleBody() throws Exception {
-        client.createAuthorizationRequest(user, null, null, null, null, "Expected Push Title", null);
+        client.createAuthorizationRequest(user, null, null, null, null, "Expected Push Title", null, null);
         verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("Expected Push Title", requestCaptor.getValue().getPushTitle());
     }
 
     @Test
     public void sendsPushBodyWithUserContextPolicyTitleTtlPushTitleBody() throws Exception {
-        client.createAuthorizationRequest(user, null, null, null, null, null, "Expected Push Body");
+        client.createAuthorizationRequest(user, null, null, null, null, null, "Expected Push Body", null);
         verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("Expected Push Body", requestCaptor.getValue().getPushBody());
+    }
+
+    @Test
+    public void sendsDenialReasonsWithUserContextPolicyTitleTtlPushTitleBody() throws Exception {
+        List<DenialReason> reasons = new ArrayList<DenialReason>() {{
+            add(new DenialReason("1", "a", true));
+            add(new DenialReason("2", "b", false));
+        }};
+        client.createAuthorizationRequest(user, null, null, null, null, null, null, reasons);
+        verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        List<com.iovation.launchkey.sdk.transport.domain.DenialReason> expectedReasons = new ArrayList<com.iovation.launchkey.sdk.transport.domain.DenialReason>() {{
+            add(new com.iovation.launchkey.sdk.transport.domain.DenialReason("1", "a", true));
+            add(new com.iovation.launchkey.sdk.transport.domain.DenialReason("2", "b", false));
+        }};
+        assertEquals(expectedReasons, requestCaptor.getValue().getDenialReasons());
     }
 
     @Test
@@ -334,7 +349,7 @@ public class BasicServiceClientTestAuthorizationRequest {
 
     @Test
     public void returnsAuthRequestIdWithUserContextPolicyTitleTtlPushTitleBody() throws Exception {
-        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null, null, null, null);
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null, null, null, null, null);
         assertEquals(authRequestId.toString(), actual.getId());
     }
 

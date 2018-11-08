@@ -13,6 +13,7 @@
 package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
+import com.iovation.launchkey.sdk.domain.service.DenialReason;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.ServiceUserSessionEndWebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
@@ -22,11 +23,7 @@ import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 public class BasicServiceClient implements ServiceClient {
     private final EntityIdentifier serviceEntity;
@@ -59,7 +56,10 @@ public class BasicServiceClient implements ServiceClient {
     }
 
     @Override
-    public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title, Integer ttl, String pushTitle, String pushBody) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
+    public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy,
+                                                           String title, Integer ttl, String pushTitle, String pushBody,
+                                                           List<DenialReason> denialReasons)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
         com.iovation.launchkey.sdk.transport.domain.AuthPolicy requestPolicy;
         if (policy == null) {
             requestPolicy = null;
@@ -79,8 +79,21 @@ public class BasicServiceClient implements ServiceClient {
                 );
             }
         }
+
+        List<com.iovation.launchkey.sdk.transport.domain.DenialReason> requestDenialReasons;
+        if (denialReasons == null) {
+            requestDenialReasons = null;
+        } else {
+            requestDenialReasons = new ArrayList<>();
+            for (DenialReason denialreason : denialReasons) {
+                requestDenialReasons.add(new com.iovation.launchkey.sdk.transport.domain.DenialReason(
+                        denialreason.getId(), denialreason.getReason(), denialreason.isFraud()
+                ));
+            }
+        }
+
         ServiceV3AuthsPostRequest request = new ServiceV3AuthsPostRequest(
-                userIdentifier, requestPolicy, context, title, ttl, pushTitle, pushBody);
+                userIdentifier, requestPolicy, context, title, ttl, pushTitle, pushBody, requestDenialReasons);
         ServiceV3AuthsPostResponse response = transport.serviceV3AuthsPost(request, serviceEntity);
         return new AuthorizationRequest(
                 response.getAuthRequest().toString(),
@@ -90,22 +103,22 @@ public class BasicServiceClient implements ServiceClient {
 
     @Override
     public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title, Integer ttl) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(userIdentifier, context, policy, title, ttl, null, null);
+        return createAuthorizationRequest(userIdentifier, context, policy, title, ttl, null, null, null);
     }
 
     @Override
     public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(userIdentifier, context, policy, null, null);
+        return createAuthorizationRequest(userIdentifier, context, policy, null, null, null, null, null);
     }
 
     @Override
     public AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(userIdentifier, context, null, null, null);
+        return createAuthorizationRequest(userIdentifier, context, null, null, null, null, null, null);
     }
 
     @Override
     public AuthorizationRequest createAuthorizationRequest(String userIdentifier) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
-        return createAuthorizationRequest(userIdentifier, null, null, null, null);
+        return createAuthorizationRequest(userIdentifier, null, null, null, null, null, null, null);
     }
 
     @Override
@@ -121,6 +134,40 @@ public class BasicServiceClient implements ServiceClient {
         if (transportResponse == null) {
             response = null;
         } else {
+            AuthorizationResponse.Type type;
+            if (transportResponse.getType() == null) {
+                type = null;
+            } else if (transportResponse.getType().equals("AUTHORIZED")) {
+                type = AuthorizationResponse.Type.AUTHORIZED;
+            } else if (transportResponse.getType().equals("DENIED")) {
+                type = AuthorizationResponse.Type.DENIED;
+            } else if (transportResponse.getType().equals("FAILED")) {
+                type = AuthorizationResponse.Type.FAILED;
+            } else {
+                type = AuthorizationResponse.Type.OTHER;
+            }
+            AuthorizationResponse.Reason reason;
+            if (transportResponse.getReason() == null) {
+                reason = null;
+            } else if (transportResponse.getReason().equals("APPROVED")) {
+                reason = AuthorizationResponse.Reason.APPROVED;
+            } else if (transportResponse.getReason().equals("DISAPPROVED")) {
+                reason = AuthorizationResponse.Reason.DISAPPROVED;
+            } else if (transportResponse.getReason().equals("FRAUDULENT")) {
+                reason = AuthorizationResponse.Reason.FRAUDULENT;
+            } else if (transportResponse.getReason().equals("POLICY")) {
+                reason = AuthorizationResponse.Reason.POLICY;
+            } else if (transportResponse.getReason().equals("PERMISSION")) {
+                reason = AuthorizationResponse.Reason.PERMISSION;
+            } else if (transportResponse.getReason().equals("AUTHENTICATION")) {
+                reason = AuthorizationResponse.Reason.AUTHENTICATION;
+            } else if (transportResponse.getReason().equals("CONFIGURATION")) {
+                reason = AuthorizationResponse.Reason.CONFIGURATION;
+            } else if (transportResponse.getReason().equals("BUSY_LOCAL")) {
+                reason = AuthorizationResponse.Reason.BUSY_LOCAL;
+            } else {
+                reason = AuthorizationResponse.Reason.OTHER;
+            }
             response = new AuthorizationResponse(
                     transportResponse.getAuthorizationRequestId().toString(),
                     transportResponse.getResponse(),
@@ -128,7 +175,10 @@ public class BasicServiceClient implements ServiceClient {
                     transportResponse.getOrganizationUserHash(),
                     transportResponse.getUserPushId(),
                     transportResponse.getDeviceId(),
-                    Arrays.asList(transportResponse.getServicePins()));
+                    Arrays.asList(transportResponse.getServicePins()),
+                    type,
+                    reason,
+                    transportResponse.getDenialReason());
         }
         return response;
     }
@@ -182,7 +232,7 @@ public class BasicServiceClient implements ServiceClient {
         WebhookPackage response;
         if (transportResponse == null) {
             response = null;
-        } else if (ServerSentEventAuthorizationResponse.class.isInstance(transportResponse)) {
+        } else if (transportResponse instanceof ServerSentEventAuthorizationResponse) {
             response = new AuthorizationResponseWebhookPackage(
                     new AuthorizationResponse(
                             ((ServerSentEventAuthorizationResponse) transportResponse).getAuthorizationRequestId().toString(),
@@ -194,7 +244,7 @@ public class BasicServiceClient implements ServiceClient {
                             Arrays.asList(((ServerSentEventAuthorizationResponse) transportResponse).getServicePins())
                     )
             );
-        } else if (ServerSentEventUserServiceSessionEnd.class.isInstance(transportResponse)) {
+        } else if (transportResponse instanceof ServerSentEventUserServiceSessionEnd) {
             response = new ServiceUserSessionEndWebhookPackage(
                     ((ServerSentEventUserServiceSessionEnd) transportResponse).getApiTime(),
                     ((ServerSentEventUserServiceSessionEnd) transportResponse).getUserHash()

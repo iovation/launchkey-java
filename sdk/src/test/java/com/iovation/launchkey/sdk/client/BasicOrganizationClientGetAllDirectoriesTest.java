@@ -71,18 +71,22 @@ public class BasicOrganizationClientGetAllDirectoriesTest {
         List<Directory> expected = Arrays.asList(
                 new Directory(UUID.fromString("f4c24794-aefc-11e7-8d36-0469f8dc10a5"), "name1", true,
                         Collections.singletonList(UUID.fromString("4137af5c-b460-11e7-9bcd-0469f8dc10a5")),
-                        Collections.singletonList(UUID.fromString("7e45bb07-b467-11e7-9c84-0469f8dc10a5")), "AK 1", "p12 1"),
+                        Collections.singletonList(UUID.fromString("7e45bb07-b467-11e7-9c84-0469f8dc10a5")),
+                        "AK 1", "p12 1", true),
                 new Directory(UUID.fromString("f6d44d14-aefc-11e7-9200-0469f8dc10a5"), "name2", false,
                         Collections.singletonList(UUID.fromString("6a033e54-b460-11e7-a723-0469f8dc10a5")),
-                        Collections.singletonList(UUID.fromString("7ecd274f-b467-11e7-8936-0469f8dc10a5")), "AK 2", "p12 2")
+                        Collections.singletonList(UUID.fromString("7ecd274f-b467-11e7-8936-0469f8dc10a5")),
+                        "AK 2", "p12 2", false)
         );
         when(response.getDirectories()).thenReturn(Arrays.asList(
                 new OrganizationV3DirectoriesGetResponseDirectory(UUID.fromString("f4c24794-aefc-11e7-8d36-0469f8dc10a5"), "name1", true,
                         Collections.singletonList(UUID.fromString("4137af5c-b460-11e7-9bcd-0469f8dc10a5")),
-                        Collections.singletonList(UUID.fromString("7e45bb07-b467-11e7-9c84-0469f8dc10a5")), "AK 1", "p12 1"),
+                        Collections.singletonList(UUID.fromString("7e45bb07-b467-11e7-9c84-0469f8dc10a5")),
+                        "AK 1", "p12 1", true),
                 new OrganizationV3DirectoriesGetResponseDirectory(UUID.fromString("f6d44d14-aefc-11e7-9200-0469f8dc10a5"), "name2", false,
                         Collections.singletonList(UUID.fromString("6a033e54-b460-11e7-a723-0469f8dc10a5")),
-                        Collections.singletonList(UUID.fromString("7ecd274f-b467-11e7-8936-0469f8dc10a5")), "AK 2", "p12 2")
+                        Collections.singletonList(UUID.fromString("7ecd274f-b467-11e7-8936-0469f8dc10a5")),
+                        "AK 2", "p12 2", false)
         ));
         List<Directory> actual = client.getAllDirectories();
         assertEquals(expected, actual);

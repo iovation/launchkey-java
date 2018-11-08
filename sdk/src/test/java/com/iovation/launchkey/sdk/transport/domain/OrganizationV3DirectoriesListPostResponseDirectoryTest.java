@@ -30,7 +30,7 @@ public class OrganizationV3DirectoriesListPostResponseDirectoryTest {
                 UUID.fromString("fac25a3c-af79-49df-bd65-777e9c86e288"), "Expected Name", true,
                 Collections.singletonList(UUID.fromString("4137af5c-b460-11e7-9bcd-0469f8dc10a5")),
                 Collections.singletonList(UUID.fromString("6a033e54-b460-11e7-a723-0469f8dc10a5")),
-                "Expected Android Key", "Expected iOS Certificate Fingerprint");
+                "Expected Android Key", "Expected iOS Certificate Fingerprint", true);
     }
 
     @Test
@@ -56,6 +56,11 @@ public class OrganizationV3DirectoriesListPostResponseDirectoryTest {
     @Test
     public void isActive() throws Exception {
         assertTrue(directory.isActive());
+    }
+
+    @Test
+    public void isDenialContextInquiryEnabled() throws Exception {
+        assertTrue(directory.isDenialContextInquiryEnabled());
     }
 
     @Test
@@ -142,5 +147,18 @@ public class OrganizationV3DirectoriesListPostResponseDirectoryTest {
                         "\"ios_certificate_fingerprint\":\"Expected iOS Certificate Fingerprint\",\"active\":true}",
                 OrganizationV3DirectoriesListPostResponseDirectory.class);
         assertTrue(actual.isActive());
+    }
+
+    @Test
+    public void fromJSONParsesCorrectDenialContextInquireyEnabled() throws Exception {
+        OrganizationV3DirectoriesListPostResponseDirectory actual = new ObjectMapper().readValue(
+                "{\"id\":\"fac25a3c-af79-49df-bd65-777e9c86e288\",\"name\":\"Expected Name\"," +
+                        "\"service_ids\":[\"4137af5c-b460-11e7-9bcd-0469f8dc10a5\"]," +
+                        "\"sdk_keys\":[\"6a033e54-b460-11e7-a723-0469f8dc10a5\"]," +
+                        "\"android_key\":\"Expected Android Key\"," +
+                        "\"ios_certificate_fingerprint\":\"Expected iOS Certificate Fingerprint\",\"active\":true," +
+                        "\"denial_context_inquiry_enabled\":true}",
+                OrganizationV3DirectoriesListPostResponseDirectory.class);
+        assertTrue(actual.isDenialContextInquiryEnabled());
     }
 }

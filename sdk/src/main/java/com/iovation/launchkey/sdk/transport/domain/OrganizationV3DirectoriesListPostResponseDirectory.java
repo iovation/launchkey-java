@@ -28,13 +28,15 @@ public class OrganizationV3DirectoriesListPostResponseDirectory {
     private final List<UUID> sdkKeys;
     private final String androidKey;
     private final String iosCertificateFingerprint;
+    private final Boolean denialContextInquiryEnabled;
 
     @JsonCreator
     public OrganizationV3DirectoriesListPostResponseDirectory(
             @JsonProperty("id") UUID id, @JsonProperty("name") String name, @JsonProperty("active") boolean active,
             @JsonProperty("service_ids") List<UUID> serviceIds, @JsonProperty("sdk_keys") List<UUID> sdkKeys,
             @JsonProperty("android_key") String androidKey,
-            @JsonProperty("ios_certificate_fingerprint") String iosCertificateFingerprint) {
+            @JsonProperty("ios_certificate_fingerprint") String iosCertificateFingerprint,
+            @JsonProperty("denial_context_inquiry_enabled") Boolean denialContextInquiryEnabled) {
         this.id = id;
         this.name = name;
         this.active = active;
@@ -42,6 +44,7 @@ public class OrganizationV3DirectoriesListPostResponseDirectory {
         this.sdkKeys = sdkKeys;
         this.androidKey = androidKey;
         this.iosCertificateFingerprint = iosCertificateFingerprint;
+        this.denialContextInquiryEnabled = denialContextInquiryEnabled;
     }
 
     public UUID getId() {
@@ -70,5 +73,9 @@ public class OrganizationV3DirectoriesListPostResponseDirectory {
 
     public String getIosCertificateFingerprint() {
         return iosCertificateFingerprint;
+    }
+
+    public Boolean isDenialContextInquiryEnabled() {
+        return denialContextInquiryEnabled;
     }
 }
