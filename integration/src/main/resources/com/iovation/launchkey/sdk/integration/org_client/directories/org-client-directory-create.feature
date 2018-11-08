@@ -11,4 +11,4 @@ Feature: Organization clients can create Directories
   Scenario: Client sending duplicate Directory name raises DirectoryNameInUse
     Given I created a Directory
     And I attempt to create a Directory with the same name
-    Then a com.iovation.launchkey.sdk.error.DirectoryNameInUse exception is thrown
+    Then a DirectoryNameInUse error occurs

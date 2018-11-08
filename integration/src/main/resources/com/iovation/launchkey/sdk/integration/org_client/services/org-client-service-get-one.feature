@@ -5,6 +5,7 @@ Feature: Organization clients can get an Organization Services
 
   Scenario: Client can retrieve a single Service
     Given I created a Organization Service with the following:
+      | key          | value                             |
       | description  | Super Awesome Service             |
       | icon         | https://www.iovation.com/icon     |
       | callback_url | https://www.iovation.com/callback |
@@ -18,4 +19,4 @@ Feature: Organization clients can get an Organization Services
 
   Scenario: Get an invalid Service raises an exception
     When I attempt to retrieve the Organization Service with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs

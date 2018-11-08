@@ -48,6 +48,11 @@ public class DirectoryDeviceSteps {
         directoryDeviceManager.retrieveUserDevices();
     }
 
+    @And("^I retrieve the Devices list for the user \"([^\"]*)\"$")
+    public void iRetrieveTheDevicesListForTheCurrentUser(String userIdentifier) throws Throwable {
+        directoryDeviceManager.retrieveUserDevices(userIdentifier);
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Then("^the Device linking response contains a valid QR Code URL$")
     public void theDeviceLinkingResponseContainsAValidQRCodeURL() {

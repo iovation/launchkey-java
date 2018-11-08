@@ -19,8 +19,8 @@ Feature: Organization clients can update Directory Public Keys
 
   Scenario: Attempting to update a Public Key for an invalid Directory throws a Forbidden exception
     When I attempt to update a Public Key for the Directory with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs
 
-  Scenario: Attempting to update a Public Key for an invalid Directory throws a Forbidden exception
+  Scenario: Attempting to update a Public Key for an invalid Directory throws a Forbidden exception 2
     When I attempt to update a Public Key identified by "aa:bb:cc:dd:ee:ff:11:22:33:44:55:66:77:88:99:00" for the Directory
-    Then a com.iovation.launchkey.sdk.error.PublicKeyDoesNotExist exception is thrown
+    Then a PublicKeyDoesNotExist error occurs

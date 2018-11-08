@@ -1,4 +1,4 @@
-Feature: Service Client Authorization Request
+Feature: Service Client Authorization Request: Get Response
   In order to complete an authorization request
   As a Directory Service
   I can retrieve an Authorization Request for a User

@@ -10,7 +10,7 @@ Feature: Directory Client can set Directory Service Policy
   Scenario: Setting the policy for invalid Service throws Forbidden
     When the Directory Service Policy is set to require 2 factors
     And I attempt to set the Policy for the Directory Service with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.ServiceNotFound exception is thrown
+    Then a ServiceNotFound error occurs
 
   Scenario: Setting the required factors will set only the factors and all else will be empty or null
     When the Directory Service Policy is set to require 2 factors
@@ -30,7 +30,7 @@ Feature: Directory Client can set Directory Service Policy
     And the Directory Service Policy is set to require possession
     And I set the Policy for the Current Directory Service
     And I retrieve the Policy for the Current Directory Service
-    And the Directory Service Policy has no requirement for number of factors
+    Then the Directory Service Policy has no requirement for number of factors
     And the Directory Service Policy does require inherence
     And the Directory Service Policy does require knowledge
     And the Directory Service Policy does require possession

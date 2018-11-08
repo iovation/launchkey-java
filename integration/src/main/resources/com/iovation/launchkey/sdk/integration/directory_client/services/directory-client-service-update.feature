@@ -6,6 +6,7 @@ Feature: Directory clients can update Directory Services
   Background:
     Given I created a Directory
     And I created a Directory Service with the following:
+      | key          | value                             |
       | description  | Super Awesome Service             |
       | icon         | https://www.iovation.com/icon     |
       | callback_url | https://www.iovation.com/callback |
@@ -13,6 +14,7 @@ Feature: Directory clients can update Directory Services
 
   Scenario: Client can update all Directory attributes other than ID and name
     When I update the Directory Service with the following:
+      | key          | value                                |
       | description  | So Much Awesome                      |
       | icon         | https://www.iovation.com/iconic      |
       | callback_url | https://www.iovation.com/callbackish |
@@ -26,4 +28,4 @@ Feature: Directory clients can update Directory Services
 
   Scenario: Attempting to update an invalid Directory Service throws a Forbidden exception
     When I attempt to update the active status of the Directory Service with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs

@@ -35,8 +35,9 @@ public class GenericSteps {
         currentException = exception;
     }
 
-    @Then("^an? (.+) exception is thrown$")
-    public void anExceptionIsThrown(Class expectedExceptionClass) throws Throwable {
+    @Then("^an? (.+) error occurs$")
+    public void anExceptionIsThrown(String expectedException) throws Throwable {
+        Class expectedExceptionClass = Class.forName("com.iovation.launchkey.sdk.error." + expectedException);
         assertThat("An exception was expected but not thrown!", expectedExceptionClass, is(notNullValue()));
         assertThat(currentException, is(instanceOf(expectedExceptionClass)));
     }

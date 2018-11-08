@@ -14,13 +14,13 @@ Feature: Organization clients can create remove an SDK Key from a Directory
 
   Scenario: Attempting to remove an SDK Key to an invalid Directory throws a Forbidden exception
     When I attempt to remove the last generated SDK Key from the Directory with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.Forbidden exception is thrown
+    Then a Forbidden error occurs
 
   Scenario: Attempting to remove an SDK Key that does not exist throw an InvalidSDKKey exception
     When I attempt to remove the last generated SDK Key "eba60cb8-c649-11e7-abc4-cec278b6b50a" from the Directory
-    Then a com.iovation.launchkey.sdk.error.InvalidSDKKey exception is thrown
+    Then a InvalidSDKKey error occurs
 
   Scenario: Attempting to remove the last SDK Key from a Directory throw an LastRemainingSDKKey exception
     Given I generated and added 1 SDK Key to the Directory
     When I attempt to remove the last generated SDK Key from the Directory
-    Then a com.iovation.launchkey.sdk.error.LastRemainingSDKKey exception is thrown
+    Then a LastRemainingSDKKey error occurs

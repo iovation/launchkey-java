@@ -20,4 +20,4 @@ Feature: Organization Client can remove Organization Service Policy
 
   Scenario: Removing the policy for invalid Service throws Forbidden
     When I attempt to remove the Policy for the Organization Service with the ID "eba60cb8-c649-11e7-abc4-cec278b6b50a"
-    Then a com.iovation.launchkey.sdk.error.ServiceNotFound exception is thrown
+    Then a ServiceNotFound error occurs

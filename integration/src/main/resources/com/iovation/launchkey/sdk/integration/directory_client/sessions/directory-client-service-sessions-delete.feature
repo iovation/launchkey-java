@@ -1,4 +1,4 @@
-Feature: Directory Client can get list of Service Sessions for a User Identifier
+Feature: Directory Client can remove Service Sessions for a User Identifier
   In order to manage Service Sessions for a User
   As a Directory Client
   I can end all User Service Sessions
@@ -14,4 +14,4 @@ Feature: Directory Client can get list of Service Sessions for a User Identifier
 
   Scenario: Deleting Service User Sessions for an invalid user raises an EntityNotFound exception
     When I attempt to delete the Sessions for the User "Myxlplix"
-    Then a com.iovation.launchkey.sdk.error.EntityNotFound exception is thrown
+    Then an EntityNotFound error occurs
