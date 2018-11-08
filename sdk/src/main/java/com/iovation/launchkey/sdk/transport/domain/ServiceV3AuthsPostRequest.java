@@ -89,12 +89,12 @@ public class ServiceV3AuthsPostRequest {
                 Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getTTL(), that.getTTL()) &&
                 Objects.equals(getPushTitle(), that.getPushTitle()) &&
-                Objects.equals(pushBody, that.getPushBody());
+                Objects.equals(getPushBody(), that.getPushBody());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), ttl, getPushTitle(), pushBody);
+        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), getTTL(), getPushTitle(), getPushBody());
     }
 
     @Override
