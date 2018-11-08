@@ -293,6 +293,21 @@ public class BasicServiceClientTestAuthorizationRequest {
         assertEquals(Integer.valueOf(999), requestCaptor.getValue().getTTL());
     }
 
+
+    @Test
+    public void sendsPushTitleWithUserContextPolicyTitleTtlPushTitleBody() throws Exception {
+        client.createAuthorizationRequest(user, null, null, null, null, "Expected Push Title", null);
+        verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals("Expected Push Title", requestCaptor.getValue().getPushTitle());
+    }
+
+    @Test
+    public void sendsPushBodyWithUserContextPolicyTitleTtlPushTitleBody() throws Exception {
+        client.createAuthorizationRequest(user, null, null, null, null, null, "Expected Push Body");
+        verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals("Expected Push Body", requestCaptor.getValue().getPushBody());
+    }
+
     @Test
     public void returnsAuthRequestIdWithUser() throws Exception {
         AuthorizationRequest actual = client.createAuthorizationRequest(user);
@@ -318,6 +333,12 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
+    public void returnsAuthRequestIdWithUserContextPolicyTitleTtlPushTitleBody() throws Exception {
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null, null, null, null);
+        assertEquals(authRequestId.toString(), actual.getId());
+    }
+
+    @Test
     public void returnsPushPackageWithUser() throws Exception {
         AuthorizationRequest actual = client.createAuthorizationRequest(user);
         assertEquals(pushPackage, actual.getPushPackage());
@@ -336,7 +357,7 @@ public class BasicServiceClientTestAuthorizationRequest {
     }
 
     @Test
-    public void returnsPushPackageWithUserContextPolicyTitle() throws Exception {
+    public void returnsPushPackageWithUserContextPolicyPushTitleBody() throws Exception {
         AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null, null);
         assertEquals(pushPackage, actual.getPushPackage());
     }

@@ -107,6 +107,37 @@ public interface ServiceClient {
      * @param title String of data up to 200 characters to be presented to the End User during
      * authorization as the title of the individual authorization request
      * @param ttl Time for this authorization request to be valid. If no value is provided, the system default will be used.
+     * @param pushTitle Title for push notification. This feature is only available for Directory Services. This value
+     * will not have any effect if 3rd party push notification is implemented.
+     * @param pushBody Body of push notification. This feature is only available for Directory Services. This value will
+     * not have any effect if 3rd party push notification is implemented.
+     * @return Information regarding the authorization request.
+     * @throws CommunicationErrorException If there was an error communicating with the LaunchKey API
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * the signature of the response
+     */
+    AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy,
+                                                    String title, Integer ttl, String pushTitle, String pushBody)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError;
+
+    /**
+     * Create an authorization request for the provided user.  This will NOT
+     * begin a user session.
+     *
+     * @param userIdentifier LaunchKey Username, User Push ID, or Directory User ID for the End User
+     * @param context Arbitrary string of dataServiceV3AuthsPostRequestTest up to 400 characters to be presented to the End User during
+     * authorization to provide context regarding the individual authorization request
+     * @param policy Authorization policy override for this authorization request. The policy can only increase the security
+     * level any existing policy in the Service Profile. It can never reduce the security level of the Service Profile's
+     * policy.
+     * @param title String of data up to 200 characters to be presented to the End User during
+     * authorization as the title of the individual authorization request
+     * @param ttl Time for this authorization request to be valid. If no value is provided, the system default will be used.
      * @return Information regarding the authorization request.
      * @throws CommunicationErrorException If there was an error communicating with the LaunchKey API
      * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
