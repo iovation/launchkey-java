@@ -24,18 +24,23 @@ public class ServiceV3AuthsPostRequest {
     private final String context;
     private final String title;
     private final Integer ttl;
+    private final String pushTitle;
+    private final String pushMessage;
 
-    public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context, String title, Integer ttl) {
+    public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context, String title, Integer ttl,
+                                     String pushTitle, String pushMessage) {
         this.username = username;
         this.policy = policy;
         this.context = context;
         this.title = title;
         this.ttl = ttl;
+        this.pushTitle = pushTitle;
+        this.pushMessage = pushMessage;
     }
 
     @Deprecated
     public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context) {
-        this(username, policy, context, null, null);
+        this(username, policy, context, null, null, null, null);
     }
 
     @JsonProperty("username")
@@ -63,6 +68,16 @@ public class ServiceV3AuthsPostRequest {
         return ttl;
     }
 
+    @JsonProperty("push_title")
+    public String getPushTitle() {
+        return pushTitle;
+    }
+
+    @JsonProperty("push_body")
+    public String getPushBody() {
+        return pushMessage;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -72,12 +87,14 @@ public class ServiceV3AuthsPostRequest {
                 Objects.equals(getPolicy(), that.getPolicy()) &&
                 Objects.equals(getContext(), that.getContext()) &&
                 Objects.equals(getTitle(), that.getTitle()) &&
-                Objects.equals(getTTL(), that.getTTL());
+                Objects.equals(ttl, that.ttl) &&
+                Objects.equals(getPushTitle(), that.getPushTitle()) &&
+                Objects.equals(pushMessage, that.pushMessage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), getTTL());
+        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), ttl, getPushTitle(), pushMessage);
     }
 
     @Override
@@ -88,6 +105,8 @@ public class ServiceV3AuthsPostRequest {
                 ", context='" + context + '\'' +
                 ", title='" + title + '\'' +
                 ", ttl=" + ttl +
+                ", pushTitle='" + pushTitle + '\'' +
+                ", pushMessage='" + pushMessage + '\'' +
                 '}';
     }
 }
