@@ -18,14 +18,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Error {
     private final String errorCode;
     private final Object errorDetail;
+    private final Object errorData;
 
     @JsonCreator
     public Error(
             @JsonProperty(value = "error_code") String errorCode,
-            @JsonProperty(value = "error_detail") Object errorDetail
+            @JsonProperty(value = "error_detail") Object errorDetail,
+            @JsonProperty(value = "error_data") Object errorData
     ) {
         this.errorCode = errorCode;
         this.errorDetail = errorDetail;
+        this.errorData = errorData;
     }
 
     public String getErrorCode() {
@@ -34,5 +37,9 @@ public class Error {
 
     public Object getErrorDetail() {
         return errorDetail;
+    }
+
+    public Object getErrorData() {
+        return errorData;
     }
 }

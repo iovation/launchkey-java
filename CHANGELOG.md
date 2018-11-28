@@ -4,6 +4,8 @@ This changelog references the relevant changes (bug and security fixes) for the 
 
   * 4.3.0
 
+    * Added busy signal processing 
+    * Added dynamic authorization request push messaging
     * Added ability to enable jailbreak protection to authorization policy constructor.
     * Fixed bug in authorization policy the swapped inherence and knowledge factors.
     * Fixed bug where response headers were not being properly validated and verified.

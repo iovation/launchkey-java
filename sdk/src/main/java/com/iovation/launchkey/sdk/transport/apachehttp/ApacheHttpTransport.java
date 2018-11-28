@@ -728,14 +728,8 @@ public class ApacheHttpTransport implements Transport {
                         "HTTP-400"
                 );
             } else {
-                try {
-                    com.iovation.launchkey.sdk.transport.domain.Error error = decryptResponse(response, Error.class);
-                    Object detail = error.getErrorDetail();
-                    throw InvalidRequestException
-                            .fromErrorCode(error.getErrorCode(), objectMapper.writeValueAsString(detail));
-                } catch (IOException e) {
-                    throw new InvalidResponseException("Unable to parse error in response", e, null);
-                }
+                com.iovation.launchkey.sdk.transport.domain.Error error = decryptResponse(response, Error.class);
+                throw InvalidRequestException.fromError(error);
             }
         } else if (!(statusCode >= 200 && statusCode < 300)) {
             String message = "HTTP Error: [" + String.valueOf(statusCode)

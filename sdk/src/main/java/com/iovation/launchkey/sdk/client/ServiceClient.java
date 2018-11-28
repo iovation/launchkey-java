@@ -44,6 +44,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
+     * @throws AuthorizationInProgress When an authorization request already exists for the provided user
      * @deprecated in favor of {@link #createAuthorizationRequest(String, String, AuthPolicy, String, Integer)}
      */
     @Deprecated
@@ -66,6 +67,7 @@ public interface ServiceClient {
      * @throws InvalidResponseException When the response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @throws AuthorizationInProgress When an authorization request already exists for the provided user
      * @see AuthorizationResponse#getAuthorizationRequestId()
      * @deprecated in favor of {@link #createAuthorizationRequest(String, String)}
      */
@@ -87,6 +89,7 @@ public interface ServiceClient {
      * @throws InvalidResponseException When the response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @throws AuthorizationInProgress When an authorization request already exists for the provided user
      * @see AuthorizationResponse#getAuthorizationRequestId()
      * @deprecated in favor of {@link #createAuthorizationRequest(String)}
      */
@@ -125,6 +128,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
+     * @throws AuthorizationInProgress When an authorization request already exists for the provided userIdentifier
      */
     AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy,
                                                     String title, Integer ttl, String pushTitle, String pushBody,
@@ -153,6 +157,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
+     * @throws AuthorizationInProgress When an authorization request already exists for the provided userIdentifier
      */
     AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title, Integer ttl)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
@@ -176,6 +181,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
+     * @throws AuthorizationInProgress When an authorization request already exists for the provided userIdentifier
      */
     AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
@@ -199,6 +205,7 @@ public interface ServiceClient {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
+     * @throws AuthorizationInProgress When an authorization request already exists for the provided userIdentifier
      */
     AuthorizationRequest createAuthorizationRequest(String userIdentifier, String context)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
