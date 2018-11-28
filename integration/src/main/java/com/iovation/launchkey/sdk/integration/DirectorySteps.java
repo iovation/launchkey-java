@@ -11,7 +11,6 @@ import org.hamcrest.Matcher;
 import java.util.Collections;
 import java.util.UUID;
 
-import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -198,7 +197,8 @@ public class DirectorySteps {
 
     @Then("^Directory denial context inquiry enabled flag is false")
     public void directoryTheDirectoryDenialContextInquiryEnabledFlagIsValue() throws Throwable {
-        assertEquals(Boolean.FALSE, directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
+        assertThat(Boolean.FALSE,
+                is(equalTo(directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled())));
     }
 
     @And("^the Directory has the added SDK Keys?$")
