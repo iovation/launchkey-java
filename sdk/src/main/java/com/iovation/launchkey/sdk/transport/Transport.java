@@ -63,6 +63,7 @@ public interface Transport {
      * @throws InvalidResponseException When the response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @throws AuthorizationInProgress When an authorization request already exists for the provided userIdentifier
      */
     ServiceV3AuthsPostResponse serviceV3AuthsPost(ServiceV3AuthsPostRequest request, EntityIdentifier subject)
             throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
