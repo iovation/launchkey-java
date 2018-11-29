@@ -115,8 +115,8 @@ public class Directory {
 
     /**
      * Should the user be prompted for denial context when they deny authorization requests for any and all child
-     * services.
-     * @return Should the user be prompted for denial context
+     * services?
+     * @return Should the user be prompted for denial context?
      */
     public Boolean isDenialContextInquiryEnabled() {
         return denialContextInquiryEnabled;
