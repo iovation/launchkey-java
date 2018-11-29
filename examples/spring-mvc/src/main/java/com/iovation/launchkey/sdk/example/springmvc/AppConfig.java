@@ -2,7 +2,7 @@ package com.iovation.launchkey.sdk.example.springmvc;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Copyright 2017 iovation, Inc. All rights reserved.
@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * limitations under the License.
  */
 @Configuration
-public class AppConfig extends WebMvcConfigurerAdapter {
+public class AppConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/favicon.ico").addResourceLocations("resources/images");
