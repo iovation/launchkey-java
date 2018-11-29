@@ -24,7 +24,7 @@ public class OrganizationV3DirectoriesPatchRequest {
     private final Boolean active;
     private final String androidKey;
     private final String iosP12;
-    private Boolean denialContextInquiryEnabled;
+    private final Boolean denialContextInquiryEnabled;
 
     public OrganizationV3DirectoriesPatchRequest(UUID directoryId, Boolean active, String androidKey,
                                                  String iosP12, Boolean denialContextInquiryEnabled) {

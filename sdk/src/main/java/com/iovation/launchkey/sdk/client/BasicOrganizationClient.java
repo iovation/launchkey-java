@@ -55,6 +55,11 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
     }
 
     @Override
+    public void updateDirectory(UUID directoryId, Boolean active, String androidKey, String iosP12) throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException, InvalidCredentialsException, CommunicationErrorException, MarshallingError, CryptographyError {
+        updateDirectory(directoryId, active, androidKey, iosP12, null);
+    }
+
+    @Override
     public Directory getDirectory(UUID directoryId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,

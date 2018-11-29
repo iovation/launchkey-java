@@ -24,6 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -97,5 +98,12 @@ public class BasicOrganizationClientUpdateDirectoryTest {
         client.updateDirectory(null, false, null, null, true);
         verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
         assertTrue(requestCaptor.getValue().isDenialContextInquiryEnabled());
+    }
+
+    @Test
+    public void defaultsIsDenialContextInquiryEnabledOnDeprecatedMethod() throws Exception {
+        client.updateDirectory(null, false, null, null);
+        verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertNull(requestCaptor.getValue().isDenialContextInquiryEnabled());
     }
 }

@@ -8,7 +8,7 @@ public class DenialReason {
     private final boolean fraud;
 
     /**
-     * Denial reason to be presented to users during authentication when the deny the request. The ID
+     * Denial reason to be presented to users during authentication when they deny the request. The ID
      * will be added to the {@link AuthorizationResponse} to determine which item was selected.
      * @param id Universally unique identifier for this reason. This must be unique in an authorization request
      * and should be unique globally for proper tracking of user selections.

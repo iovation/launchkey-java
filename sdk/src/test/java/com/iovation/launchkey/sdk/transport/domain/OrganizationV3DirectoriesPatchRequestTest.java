@@ -53,7 +53,7 @@ public class OrganizationV3DirectoriesPatchRequestTest {
     }
 
     @Test
-    public void toJSONWithBooleanDenialContextInquiryEnabledDoesNotSend() throws Exception {
+    public void toJSONWithBooleanDenialContextInquiryEnabledDoesSend() throws Exception {
         String expected = "{\"directory_id\":\"67c87654-aed9-11e7-98e9-0469f8dc10a5\"," +
                 "\"active\":true,\"android_key\":\"ak\",\"ios_p12\":\"p12\",\"denial_context_inquiry_enabled\":true}";
         String actual = new ObjectMapper().writeValueAsString(new OrganizationV3DirectoriesPatchRequest(UUID.fromString("67c87654-aed9-11e7-98e9-0469f8dc10a5"), true, "ak", "p12", true));
