@@ -30,11 +30,12 @@ public class DirectoryEntity {
     private final String iosCertificateFingerprint;
     private final String iosCertificate;
     private final List<PublicKeyEntity> publicKeys;
+    private final Boolean denialContextInquiryEnabled;
 
     public DirectoryEntity(UUID id, String name, Boolean active, List<UUID> serviceIds, List<UUID> sdkKeys,
                            String androidKey,
-                           String iosCertificateFingerprint, String iosCertificate) {
-        this.iosCertificate = iosCertificate;
+                           String iosCertificateFingerprint, String iosCertificate,
+                           Boolean denialContextInquiryEnabled) {
         if (id == null) throw new IllegalArgumentException("Argument \"id\" cannot be null.");
         this.id = id;
         this.name = name;
@@ -42,7 +43,9 @@ public class DirectoryEntity {
         this.serviceIds = serviceIds != null ? serviceIds : new ArrayList<UUID>();
         this.sdkKeys = sdkKeys != null ? sdkKeys : new ArrayList<UUID>();
         this.androidKey = androidKey;
+        this.iosCertificate = iosCertificate;
         this.iosCertificateFingerprint = iosCertificateFingerprint;
+        this.denialContextInquiryEnabled = denialContextInquiryEnabled;
         publicKeys = new ArrayList<>();
     }
 
@@ -82,10 +85,14 @@ public class DirectoryEntity {
         return publicKeys;
     }
 
+    public Boolean isDenialContextInquiryEnabled() {
+        return denialContextInquiryEnabled;
+    }
+
     public static DirectoryEntity fromDirectory(Directory directory) {
         return new DirectoryEntity(directory.getId(), directory.getName(), directory.isActive(),
                 directory.getServiceIds(), directory.getSdkKeys(), directory.getAndroidKey(),
-                directory.getIosCertificateFingerprint(), null);
+                directory.getIosCertificateFingerprint(), null, directory.isDenialContextInquiryEnabled());
     }
 
     @Override
@@ -105,6 +112,7 @@ public class DirectoryEntity {
         if (that.sdkKeys != null) Collections.sort(that.sdkKeys);
         if (sdkKeys != null ? !sdkKeys.equals(that.sdkKeys) : that.sdkKeys != null) return false;
         if (androidKey != null ? !androidKey.equals(that.androidKey) : that.androidKey != null) return false;
+        if (denialContextInquiryEnabled != null ? !denialContextInquiryEnabled.equals(that.denialContextInquiryEnabled) : that.denialContextInquiryEnabled != null) return false;
         return iosCertificateFingerprint != null ? iosCertificateFingerprint.equals(that.iosCertificateFingerprint) :
                 that.iosCertificateFingerprint == null;
     }
@@ -125,6 +133,7 @@ public class DirectoryEntity {
                 ", androidKey='" + androidKey + '\'' +
                 ", iosCertificateFingerprint='" + iosCertificateFingerprint + '\'' +
                 ", iosCertificate='" + iosCertificate + '\'' +
+                ", denialContextInquiryEnabled='" + denialContextInquiryEnabled + "'" +
                 ", publicKeys=" + publicKeys +
                 '}';
     }

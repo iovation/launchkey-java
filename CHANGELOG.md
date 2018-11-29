@@ -9,6 +9,7 @@ This changelog references the relevant changes (bug and security fixes) for the 
     * Fixed bug where response headers were not being properly validated and verified.
     * Added verification of webhook headers.
     * Added dynamic authorization request title
+    * Added authorization response context
 
   * 4.2.1
 

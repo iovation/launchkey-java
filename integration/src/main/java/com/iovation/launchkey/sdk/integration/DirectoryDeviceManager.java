@@ -45,7 +45,7 @@ public class DirectoryDeviceManager {
     public void tearDown() throws Throwable {
         for (Map.Entry<UUID, Set<String>> entry : directoryUserIdentifiers.entrySet()) {
             UUID directoryId = entry.getKey();
-            organizationClient.updateDirectory(directoryId, true, null, null);
+            organizationClient.updateDirectory(directoryId, true, null, null, null);
             DirectoryClient directoryClient = directoryManager.getDirectoryClient(directoryId);
             try {
                 for (String userIdentifier : entry.getValue()) {
@@ -60,7 +60,7 @@ public class DirectoryDeviceManager {
             } catch (Exception e) {
                 System.err.println("Unable to unlink all User Devices for Directory " + directoryId);
             }
-            organizationClient.updateDirectory(directoryId, false, null, null);
+            organizationClient.updateDirectory(directoryId, false, null, null, null);
         }
     }
 

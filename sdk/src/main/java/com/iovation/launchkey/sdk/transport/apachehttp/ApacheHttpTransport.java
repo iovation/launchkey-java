@@ -130,40 +130,73 @@ public class ApacheHttpTransport implements Transport {
             InvalidCredentialsException, AuthorizationRequestTimedOutError,
             NoKeyFoundException {
         ServiceV3AuthsGetResponse response;
+        HttpResponse httpResponse;
+
         String path = "/service/v3/auths/" + authRequestId.toString();
-        HttpResponse httpResponse = getHttpResponse("GET", path, subject, null, true, Collections.singletonList(408));
+        try {
+            httpResponse = getHttpResponse("GET", path, subject, null, true, Collections.singletonList(408));
+        } catch (RequestTimedOut e) {
+            throw new AuthorizationRequestTimedOutError();
+        }
+
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         if (statusCode == 204) { // User has not responded
             response = null;
-        } else if (statusCode == 408) { // User did not respond before request timed out
-            throw new AuthorizationRequestTimedOutError();
         } else { // Users responded
             ServiceV3AuthsGetResponseCore apiResponse =
                     decryptResponse(httpResponse, ServiceV3AuthsGetResponseCore.class);
+
             try {
-                JWTData jwtData = jwtService.getJWTData(getJWT(httpResponse));
-                EntityIdentifier audience = EntityIdentifier.fromString(jwtData.getAudience());
-                RSAPrivateKey key = entityKeyMap.getKey(audience, apiResponse.getPublicKeyId());
-                byte[] decrypted;
-                try {
-                    byte[] encrypted = Base64.decodeBase64(apiResponse.getEncryptedDeviceResponse().getBytes());
-                    decrypted = crypto.decryptRSA(encrypted, key);
-                } catch (Exception e) {
-                    throw new CryptographyError("Unable to decrypt device response!", e);
+                if (apiResponse.getJweEncryptedDeviceResponse() != null) {
+                    String decrypted = jweService.decrypt(apiResponse.getJweEncryptedDeviceResponse());
+                    ServiceV3AuthsGetResponseDeviceJWE deviceResponse =
+                            objectMapper.readValue(decrypted, ServiceV3AuthsGetResponseDeviceJWE.class);
+                    Map<String, String> jweHeaders = jweService.getHeaders(decrypted);
+                    String jweAudience = jweHeaders.get("aud");
+                    EntityIdentifier audience = EntityIdentifier.fromString(jweAudience);
+                    response =  new ServiceV3AuthsGetResponse(
+                            audience,
+                            subject.getId(),
+                            apiResponse.getServiceUserHash(),
+                            apiResponse.getOrgUserHash(),
+                            apiResponse.getUserPushId(),
+                            deviceResponse.getAuthorizationRequestId(),
+                            "AUTHORIZED".equals(deviceResponse.getType()),
+                            deviceResponse.getDeviceId(),
+                            deviceResponse.getServicePins(),
+                            deviceResponse.getType(),
+                            deviceResponse.getReason(),
+                            deviceResponse.getDenialReason());
+
+                } else {
+                    JWTData jwtData = jwtService.getJWTData(getJWT(httpResponse));
+                    EntityIdentifier audience = EntityIdentifier.fromString(jwtData.getAudience());
+                    RSAPrivateKey key = entityKeyMap.getKey(audience, apiResponse.getPublicKeyId());
+                    byte[] decrypted;
+                    try {
+                        byte[] encrypted = Base64.decodeBase64(apiResponse.getEncryptedDeviceResponse().getBytes());
+                        decrypted = crypto.decryptRSA(encrypted, key);
+                    } catch (Exception e) {
+                        throw new CryptographyError("Unable to decrypt device response!", e);
+                    }
+                    ServiceV3AuthsGetResponseDevice deviceResponse =
+                            objectMapper.readValue(decrypted, ServiceV3AuthsGetResponseDevice.class);
+                    response = new ServiceV3AuthsGetResponse(
+                            audience,
+                            subject.getId(),
+                            apiResponse.getServiceUserHash(),
+                            apiResponse.getOrgUserHash(),
+                            apiResponse.getUserPushId(),
+                            deviceResponse.getAuthorizationRequestId(),
+                            deviceResponse.getResponse(),
+                            deviceResponse.getDeviceId(),
+                            deviceResponse.getServicePins(),
+                            null,
+                            null,
+                            null
+
+                    );
                 }
-                ServiceV3AuthsGetResponseDevice deviceResponse =
-                        objectMapper.readValue(decrypted, ServiceV3AuthsGetResponseDevice.class);
-                response = new ServiceV3AuthsGetResponse(
-                        audience,
-                        subject.getId(),
-                        apiResponse.getServiceUserHash(),
-                        apiResponse.getOrgUserHash(),
-                        apiResponse.getUserPushId(),
-                        deviceResponse.getAuthorizationRequestId(),
-                        deviceResponse.getResponse(),
-                        deviceResponse.getDeviceId(),
-                        deviceResponse.getServicePins()
-                );
             } catch (JWTError jwtError) {
                 throw new CryptographyError("Unable to parse JWT to get key info!", jwtError);
             } catch (JsonParseException e) {
@@ -172,6 +205,8 @@ public class ApacheHttpTransport implements Transport {
                 throw new MarshallingError("Unable to map the decrypted device response data!", e);
             } catch (IOException e) {
                 throw new CommunicationErrorException("An I/O error occurred!", e, null);
+            } catch (JWEFailure jweFailure) {
+                throw new CryptographyError("Unable to decrypt auth_jwe in response!", jweFailure);
             }
         }
         return response;
@@ -278,21 +313,45 @@ public class ApacheHttpTransport implements Transport {
                 final String decrypted = jweService.decrypt(body, privateKey);
                 final ServerSentEventAuthorizationResponseCore core =
                         objectMapper.readValue(decrypted, ServerSentEventAuthorizationResponseCore.class);
-                final byte[] decryptedDeviceResponse =
-                        crypto.decryptRSA(BASE_64.decode(core.getAuth().getBytes()), privateKey);
-                final ServiceV3AuthsGetResponseDevice deviceResponse =
-                        objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDevice.class);
-                response = new ServerSentEventAuthorizationResponse(
-                        requestingEntity,
-                        EntityIdentifier.fromString(jwtClaims.getSubject()).getId(),
-                        core.getServiceUserHash(),
-                        core.getOrgUserHash(),
-                        core.getUserPushId(),
-                        deviceResponse.getAuthorizationRequestId(),
-                        deviceResponse.getResponse(),
-                        deviceResponse.getDeviceId(),
-                        deviceResponse.getServicePins()
-                );
+                if (core.getAuthJwe() != null) {
+                    final String decryptedDeviceResponse =
+                            jweService.decrypt(core.getAuthJwe(), privateKey);
+                    final ServiceV3AuthsGetResponseDeviceJWE deviceResponse =
+                            objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDeviceJWE.class);
+                    response = new ServerSentEventAuthorizationResponse(
+                            requestingEntity,
+                            EntityIdentifier.fromString(jwtClaims.getSubject()).getId(),
+                            core.getServiceUserHash(),
+                            core.getOrgUserHash(),
+                            core.getUserPushId(),
+                            deviceResponse.getAuthorizationRequestId(),
+                            "AUTHORIZED".equals(deviceResponse.getType()),
+                            deviceResponse.getDeviceId(),
+                            deviceResponse.getServicePins(),
+                            deviceResponse.getType(),
+                            deviceResponse.getReason(),
+                            deviceResponse.getDenialReason()
+                    );
+                } else {
+                    final byte[] decryptedDeviceResponse =
+                            crypto.decryptRSA(BASE_64.decode(core.getAuth().getBytes()), privateKey);
+                    final ServiceV3AuthsGetResponseDevice deviceResponse =
+                            objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDevice.class);
+                    response = new ServerSentEventAuthorizationResponse(
+                            requestingEntity,
+                            EntityIdentifier.fromString(jwtClaims.getSubject()).getId(),
+                            core.getServiceUserHash(),
+                            core.getOrgUserHash(),
+                            core.getUserPushId(),
+                            deviceResponse.getAuthorizationRequestId(),
+                            deviceResponse.getResponse(),
+                            deviceResponse.getDeviceId(),
+                            deviceResponse.getServicePins(),
+                            null,
+                            null,
+                            null
+                    );
+                }
             } else {
                 // Session end is not encrypted
                 response = objectMapper.readValue(body, ServerSentEventUserServiceSessionEnd.class);

@@ -1,7 +1,6 @@
 package com.iovation.launchkey.sdk.integration;
 
 import com.google.inject.Inject;
-import com.iovation.launchkey.sdk.integration.entities.DirectoryEntity;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -10,13 +9,10 @@ import cucumber.runtime.java.guice.ScenarioScoped;
 import org.hamcrest.Matcher;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.comparesEqualTo;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 
@@ -105,7 +101,8 @@ public class DirectorySteps {
         directoryManager
                 .updateCurrentDirectory(true, directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
-                        directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint());
+                        directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
+                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
     }
 
     @When("^I updated? the Directory as inactive$")
@@ -113,7 +110,8 @@ public class DirectorySteps {
         directoryManager
                 .updateCurrentDirectory(false, directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
-                        directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint());
+                        directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
+                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
     }
 
     @Then("^the Directory is active$")
@@ -140,7 +138,8 @@ public class DirectorySteps {
     public void iUpdateTheDirectoryAndroidKeyWith(String androidKey) throws Throwable {
         directoryManager.updateCurrentDirectory(directoryManager.getCurrentDirectoryEntity().getActive(), androidKey,
                 directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
-                directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint());
+                directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
+                directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
     }
 
     @When("^I updated? the Directory Android Key with null$")
@@ -163,14 +162,16 @@ public class DirectorySteps {
         directoryManager
                 .updateCurrentDirectory(true, directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
-                        directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint());
+                        directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
+                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
     }
 
     @When("^I updated? the Directory iOS P12 with a valid certificate$")
     public void iUpdateTheDirectoryIOSPWithAValidCertificate() throws Throwable {
         directoryManager.updateCurrentDirectory(directoryManager.getCurrentDirectoryEntity().getActive(),
                 directoryManager.getCurrentDirectoryEntity().getAndroidKey(), keysManager.getBase64EncodedAlphaP12(),
-                keysManager.getAlphaCertificateFingerprint());
+                keysManager.getAlphaCertificateFingerprint(),
+                directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
     }
 
     @Then("^Directory the iOS Certificate Fingerprint matches the provided certificate$")
@@ -183,6 +184,21 @@ public class DirectorySteps {
     @Then("^the Directory has no IOS Certificate Fingerprint$")
     public void theDirectoryHasNoIOSCertificateFingerprint() throws Throwable {
         assertThat(directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(), is(nullValue()));
+    }
+
+    @When("^I update the Directory denial context inquiry enabled flag to false")
+    public void iUpdateTheDirectoryDenialContextInquiryEnabledFlag() throws Throwable {
+        directoryManager.updateCurrentDirectory(directoryManager.getCurrentDirectoryEntity().getActive(),
+                directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
+                directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
+                directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
+                false);
+    }
+
+    @Then("^Directory denial context inquiry enabled flag is false")
+    public void directoryTheDirectoryDenialContextInquiryEnabledFlagIsValue() throws Throwable {
+        assertThat(Boolean.FALSE,
+                is(equalTo(directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled())));
     }
 
     @And("^the Directory has the added SDK Keys?$")

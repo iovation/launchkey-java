@@ -57,6 +57,8 @@ public interface OrganizationClient extends ServiceManagingClient {
      * @param active Should the Directory be active
      * @param androidKey GCM push key
      * @param iosP12 APNS push certificate in .P12 format that has been Base64 Encoded
+     * @param denialContextInquiryEnabled Should the user be prompted for denial context when they deny authorization
+     * requests for any and all child services.
      * @throws InvalidResponseException When the response JWT is missing or does not pass validation, when the response
      * content hash does not match the value in the JWT, or when the JWE in the body fails validation, or the decrypted
      * JWE in the body cannot be parsed or mapped to the expected data.
@@ -73,6 +75,37 @@ public interface OrganizationClient extends ServiceManagingClient {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
      */
+    void updateDirectory(UUID directoryId, Boolean active, String androidKey, String iosP12, Boolean denialContextInquiryEnabled)
+            throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
+            InvalidCredentialsException, CommunicationErrorException, MarshallingError,
+            CryptographyError;
+
+
+    /**
+     * Update a Directory
+     *
+     * @param directoryId ID of the Directory you wish to update
+     * @param active Should the Directory be active
+     * @param androidKey GCM push key
+     * @param iosP12 APNS push certificate in .P12 format that has been Base64 Encoded
+     * @throws InvalidResponseException When the response JWT is missing or does not pass validation, when the response
+     * content hash does not match the value in the JWT, or when the JWE in the body fails validation, or the decrypted
+     * JWE in the body cannot be parsed or mapped to the expected data.
+     * @throws InvalidRequestException When the Platform API returns a 400 Bad Request HTTP Status
+     * @throws InvalidCredentialsException When the Platform API returns a 401 Unauthorized or 403 Forbidden HTTP Status
+     * @throws PlatformErrorException When the Platform API returns an unexpected HTTP Status
+     * @throws UnknownEntityException When the Platform API returns a 404 Not Found HTTP Status.
+     * @throws CommunicationErrorException When the HTTP client is unable to connect to the Platform API, cannot
+     * negotiate TLS with the Platform API, or is disconnected while sending or receiving a message from the
+     * Platform API.
+     * @throws InvalidStateException When the SDK does not have the proper resource to perform an action. This is most
+     * often due to invalid dependencies being provided or algorithms not being supported by the JCE provider.
+     * @throws MarshallingError When the response cannot be marshaled
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * the signature of the response
+     * @deprecated Please use {@link #updateDirectory(UUID, Boolean, String, String, Boolean)}
+     */
+    @Deprecated
     void updateDirectory(UUID directoryId, Boolean active, String androidKey, String iosP12)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,

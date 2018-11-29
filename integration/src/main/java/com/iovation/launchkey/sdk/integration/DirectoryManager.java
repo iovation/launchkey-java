@@ -61,7 +61,7 @@ public class DirectoryManager {
         List<DirectoryEntity> cleanup = new ArrayList<>();
         cleanup.addAll(directories);
         for (DirectoryEntity directoryEntity : cleanup) {
-            client.updateDirectory(directoryEntity.getId(), true, null, null);
+            client.updateDirectory(directoryEntity.getId(), true, null, null, null);
             try {
                 DirectoryClient directoryClient = getDirectoryClient(directoryEntity.getId());
                 try {
@@ -80,7 +80,7 @@ public class DirectoryManager {
                             "Unable to set all Directory Services to inactive for Directory " +
                                     directoryEntity.getId() + " due to error " + e);
                 }
-                client.updateDirectory(directoryEntity.getId(), false, null, null);
+                client.updateDirectory(directoryEntity.getId(), false, null, null, null);
             } catch (Exception e) {
                 System.err.println(
                         "Unable to set Directory " + directoryEntity.getId() + " as inactive due to error " + e);
@@ -101,7 +101,7 @@ public class DirectoryManager {
     UUID createDirectory(String name) throws Throwable {
         UUID id = client.createDirectory(name);
         previousDirectoryEntity = currentDirectoryEntity;
-        currentDirectoryEntity = new DirectoryEntity(id, name, null, null, null, null, null, null);
+        currentDirectoryEntity = new DirectoryEntity(id, name, null, null, null, null, null, null, true);
         directories.add(currentDirectoryEntity);
         return id;
     }
@@ -125,8 +125,10 @@ public class DirectoryManager {
         currentDirectoryEntity = directory;
     }
 
-    void updateCurrentDirectory(Boolean active, String androidKey, String p12, String p12Fingerprint) throws Throwable {
-        updateDirectory(currentDirectoryEntity.getId(), active, androidKey, p12, p12Fingerprint);
+    void updateCurrentDirectory(Boolean active, String androidKey, String p12, String p12Fingerprint,
+                                Boolean denialContextInquiryEnabled) throws Throwable {
+        updateDirectory(currentDirectoryEntity.getId(), active, androidKey, p12, p12Fingerprint,
+                denialContextInquiryEnabled);
     }
 
     void generateAndAddDirectorySdkKeyToCurrentDirectory() throws Throwable {
@@ -167,15 +169,15 @@ public class DirectoryManager {
     }
 
     void updateDirectory(UUID directoryId, Boolean active, String androidKey, String p12,
-                         String p12Fingerprint) throws Throwable {
-        client.updateDirectory(directoryId, active, androidKey, p12);
+                         String p12Fingerprint, Boolean denialContextInquiryEnabled) throws Throwable {
+        client.updateDirectory(directoryId, active, androidKey, p12, denialContextInquiryEnabled);
         currentDirectoryEntity = new DirectoryEntity(currentDirectoryEntity.getId(), currentDirectoryEntity.getName(),
                 active, currentDirectoryEntity.getServiceIds(), currentDirectoryEntity.getSdkKeys(), androidKey,
-                p12Fingerprint, p12);
+                p12Fingerprint, p12, denialContextInquiryEnabled);
     }
 
     void updateDirectory(UUID directoryId, boolean active) throws Throwable {
-        client.updateDirectory(directoryId, active, null, null);
+        client.updateDirectory(directoryId, active, null, null, null);
     }
 
     void retrieveSDKKeyList(UUID directoryId) throws Throwable {

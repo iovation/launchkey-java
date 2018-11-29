@@ -15,6 +15,7 @@ package com.iovation.launchkey.sdk.transport.domain;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,9 +27,10 @@ public class ServiceV3AuthsPostRequest {
     private final Integer ttl;
     private final String pushTitle;
     private final String pushBody;
+    private final List<DenialReason> denialReasons;
 
     public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context, String title, Integer ttl,
-                                     String pushTitle, String pushBody) {
+                                     String pushTitle, String pushBody, List<DenialReason> denialReasons) {
         this.username = username;
         this.policy = policy;
         this.context = context;
@@ -36,11 +38,12 @@ public class ServiceV3AuthsPostRequest {
         this.ttl = ttl;
         this.pushTitle = pushTitle;
         this.pushBody = pushBody;
+        this.denialReasons = denialReasons;
     }
 
     @Deprecated
     public ServiceV3AuthsPostRequest(String username, AuthPolicy policy, String context) {
-        this(username, policy, context, null, null, null, null);
+        this(username, policy, context, null, null, null, null, null);
     }
 
     @JsonProperty("username")
@@ -78,6 +81,12 @@ public class ServiceV3AuthsPostRequest {
         return pushBody;
     }
 
+    @JsonProperty("denial_reasons")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public List<DenialReason> getDenialReasons() {
+        return denialReasons;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -89,12 +98,14 @@ public class ServiceV3AuthsPostRequest {
                 Objects.equals(getTitle(), that.getTitle()) &&
                 Objects.equals(getTTL(), that.getTTL()) &&
                 Objects.equals(getPushTitle(), that.getPushTitle()) &&
-                Objects.equals(getPushBody(), that.getPushBody());
+                Objects.equals(getPushBody(), that.getPushBody()) &&
+                Objects.equals(getDenialReasons(), that.getDenialReasons());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), getTTL(), getPushTitle(), getPushBody());
+        return Objects.hash(getUsername(), getPolicy(), getContext(), getTitle(), getTTL(), getPushTitle(),
+                getPushBody(), getDenialReasons());
     }
 
     @Override
@@ -107,6 +118,7 @@ public class ServiceV3AuthsPostRequest {
                 ", ttl=" + ttl +
                 ", pushTitle='" + pushTitle + '\'' +
                 ", pushBody='" + pushBody + '\'' +
+                ", denialreasons=" + denialReasons +
                 '}';
     }
 }

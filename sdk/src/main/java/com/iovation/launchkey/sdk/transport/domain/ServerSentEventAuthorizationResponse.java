@@ -13,6 +13,7 @@
 package com.iovation.launchkey.sdk.transport.domain;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ServerSentEventAuthorizationResponse implements ServerSentEvent {
@@ -25,10 +26,14 @@ public class ServerSentEventAuthorizationResponse implements ServerSentEvent {
     private final boolean response;
     private final String deviceId;
     private final String[] servicePins;
+    private final String type;
+    private final String reason;
+    private final String denialReason;
 
     public ServerSentEventAuthorizationResponse(
             EntityIdentifier requestingEntity, UUID serviceId, String serviceUserHash, String organizationUserHash,
-            String userPushId, UUID authorizationRequestId, boolean response, String deviceId, String[] servicePins
+            String userPushId, UUID authorizationRequestId, boolean response, String deviceId, String[] servicePins,
+            String type, String reason, String denialReason
     ) {
         this.requestingEntity = requestingEntity;
         this.serviceId = serviceId;
@@ -39,6 +44,9 @@ public class ServerSentEventAuthorizationResponse implements ServerSentEvent {
         this.response = response;
         this.deviceId = deviceId;
         this.servicePins = servicePins;
+        this.type = type;
+        this.reason = reason;
+        this.denialReason = denialReason;
     }
 
     public EntityIdentifier getRequestingEntity() {
@@ -77,42 +85,40 @@ public class ServerSentEventAuthorizationResponse implements ServerSentEvent {
         return servicePins;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public String getDenialReason() {
+        return denialReason;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ServerSentEventAuthorizationResponse)) return false;
-
         ServerSentEventAuthorizationResponse that = (ServerSentEventAuthorizationResponse) o;
-
-        if (getResponse() != that.getResponse()) return false;
-        if (getRequestingEntity() != null ? !getRequestingEntity().equals(that.getRequestingEntity()) : that.getRequestingEntity() != null)
-            return false;
-        if (getServiceId() != null ? !getServiceId().equals(that.getServiceId()) : that.getServiceId() != null)
-            return false;
-        if (getServiceUserHash() != null ? !getServiceUserHash().equals(that.getServiceUserHash()) : that.getServiceUserHash() != null)
-            return false;
-        if (getOrganizationUserHash() != null ? !getOrganizationUserHash().equals(that.getOrganizationUserHash()) : that.getOrganizationUserHash() != null)
-            return false;
-        if (getUserPushId() != null ? !getUserPushId().equals(that.getUserPushId()) : that.getUserPushId() != null)
-            return false;
-        if (getAuthorizationRequestId() != null ? !getAuthorizationRequestId().equals(that.getAuthorizationRequestId()) : that.getAuthorizationRequestId() != null)
-            return false;
-        if (getDeviceId() != null ? !getDeviceId().equals(that.getDeviceId()) : that.getDeviceId() != null)
-            return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(getServicePins(), that.getServicePins());
+        return getResponse() == that.getResponse() &&
+                Objects.equals(getRequestingEntity(), that.getRequestingEntity()) &&
+                Objects.equals(getServiceId(), that.getServiceId()) &&
+                Objects.equals(getServiceUserHash(), that.getServiceUserHash()) &&
+                Objects.equals(getOrganizationUserHash(), that.getOrganizationUserHash()) &&
+                Objects.equals(getUserPushId(), that.getUserPushId()) &&
+                Objects.equals(getAuthorizationRequestId(), that.getAuthorizationRequestId()) &&
+                Objects.equals(getDeviceId(), that.getDeviceId()) &&
+                Arrays.equals(getServicePins(), that.getServicePins()) &&
+                Objects.equals(getType(), that.getType()) &&
+                Objects.equals(getReason(), that.getReason()) &&
+                Objects.equals(getDenialReason(), that.getDenialReason());
     }
 
     @Override
     public int hashCode() {
-        int result = getRequestingEntity() != null ? getRequestingEntity().hashCode() : 0;
-        result = 31 * result + (getServiceId() != null ? getServiceId().hashCode() : 0);
-        result = 31 * result + (getServiceUserHash() != null ? getServiceUserHash().hashCode() : 0);
-        result = 31 * result + (getOrganizationUserHash() != null ? getOrganizationUserHash().hashCode() : 0);
-        result = 31 * result + (getUserPushId() != null ? getUserPushId().hashCode() : 0);
-        result = 31 * result + (getAuthorizationRequestId() != null ? getAuthorizationRequestId().hashCode() : 0);
-        result = 31 * result + (getResponse() ? 1 : 0);
-        result = 31 * result + (getDeviceId() != null ? getDeviceId().hashCode() : 0);
+        int result = Objects.hash(getRequestingEntity(), getServiceId(), getServiceUserHash(), getOrganizationUserHash(), getUserPushId(), getAuthorizationRequestId(), getResponse(), getDeviceId(), getType(), getReason(), getDenialReason());
         result = 31 * result + Arrays.hashCode(getServicePins());
         return result;
     }
@@ -129,6 +135,9 @@ public class ServerSentEventAuthorizationResponse implements ServerSentEvent {
                 ", response=" + response +
                 ", deviceId='" + deviceId + '\'' +
                 ", servicePins=" + Arrays.toString(servicePins) +
+                ", type='" + type + '\'' +
+                ", reason='" + reason + '\'' +
+                ", denialReason='" + denialReason + '\'' +
                 '}';
     }
 }

@@ -24,6 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -51,14 +52,14 @@ public class BasicOrganizationClientUpdateDirectoryTest {
 
     @Test
     public void sendsSubjectEntityType() throws Exception {
-        client.updateDirectory(null, false, null, null);
+        client.updateDirectory(null, false, null, null, null);
         verify(transport).organizationV3DirectoriesPatch(any(OrganizationV3DirectoriesPatchRequest.class), entityCaptor.capture());
         assertEquals(EntityIdentifier.EntityType.ORGANIZATION, entityCaptor.getValue().getType());
     }
 
     @Test
     public void sendsSubjectEntityId() throws Exception {
-        client.updateDirectory(null, false, null, null);
+        client.updateDirectory(null, false, null, null, null);
         verify(transport).organizationV3DirectoriesPatch(any(OrganizationV3DirectoriesPatchRequest.class), entityCaptor.capture());
         assertEquals(orgId, entityCaptor.getValue().getId());
     }
@@ -66,29 +67,43 @@ public class BasicOrganizationClientUpdateDirectoryTest {
     @Test
     public void sendsDirectoryId() throws Exception {
         UUID id = UUID.randomUUID();
-        client.updateDirectory(id, false, null, null);
+        client.updateDirectory(id, false, null, null, null);
         verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(id, requestCaptor.getValue().getDirectoryId());
     }
 
     @Test
     public void sendsActive() throws Exception {
-        client.updateDirectory(null, true, null, null);
+        client.updateDirectory(null, true, null, null, null);
         verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
         assertTrue(requestCaptor.getValue().isActive());
     }
 
     @Test
     public void sendsAndroidKey() throws Exception {
-        client.updateDirectory(null, false, "AK", null);
+        client.updateDirectory(null, false, "AK", null, null);
         verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("AK", requestCaptor.getValue().getAndroidKey());
     }
 
     @Test
     public void sendsIosP12() throws Exception {
-        client.updateDirectory(null, false, null, "p12");
+        client.updateDirectory(null, false, null, "p12", null);
         verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("p12", requestCaptor.getValue().getIosP12());
+    }
+
+    @Test
+    public void sendsIsDenialContextInquiryEnabled() throws Exception {
+        client.updateDirectory(null, false, null, null, true);
+        verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertTrue(requestCaptor.getValue().isDenialContextInquiryEnabled());
+    }
+
+    @Test
+    public void defaultsIsDenialContextInquiryEnabledOnDeprecatedMethod() throws Exception {
+        client.updateDirectory(null, false, null, null);
+        verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertNull(requestCaptor.getValue().isDenialContextInquiryEnabled());
     }
 }

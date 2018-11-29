@@ -13,6 +13,7 @@
 package com.iovation.launchkey.sdk.domain.organization;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -27,6 +28,7 @@ public class Directory {
     private final List<UUID> sdkKeys;
     private final String androidKey;
     private final String iosCertificateFingerprint;
+    private final Boolean denialContextInquiryEnabled;
 
     /**
      * @param id The unique identifier for the Directory
@@ -37,9 +39,12 @@ public class Directory {
      * @param androidKey The key that will be used to send push notifications to Android Devices.
      * @param iosCertificateFingerprint The MD5 certificate fingerprint for the Certificate used to send push
      * notifications to iOS Devices.
+     * @param denialContextInquiryEnabled Will the user be prompted for denial context when they deny authorization
+     * requests for any and all child services.
+     *
      */
     public Directory(UUID id, String name, boolean active, List<UUID> serviceIds, List<UUID> sdkKeys, String androidKey,
-                     String iosCertificateFingerprint) {
+                     String iosCertificateFingerprint, Boolean denialContextInquiryEnabled) {
         if (id == null) throw new IllegalArgumentException("Argument \"id\" cannot be null.");
         this.id = id;
         this.name = name;
@@ -48,6 +53,7 @@ public class Directory {
         this.sdkKeys = sdkKeys;
         this.androidKey = androidKey;
         this.iosCertificateFingerprint = iosCertificateFingerprint;
+        this.denialContextInquiryEnabled = denialContextInquiryEnabled;
     }
 
     /**
@@ -107,22 +113,28 @@ public class Directory {
         return iosCertificateFingerprint;
     }
 
+    /**
+     * Should the user be prompted for denial context when they deny authorization requests for any and all child
+     * services?
+     * @return Should the user be prompted for denial context?
+     */
+    public Boolean isDenialContextInquiryEnabled() {
+        return denialContextInquiryEnabled;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Directory)) return false;
-
         Directory directory = (Directory) o;
-
-        if (active != directory.active) return false;
-        if (id != null ? !id.equals(directory.id) : directory.id != null) return false;
-        if (name != null ? !name.equals(directory.name) : directory.name != null) return false;
-        if (serviceIds != null ? !serviceIds.equals(directory.serviceIds) : directory.serviceIds != null) return false;
-        if (sdkKeys != null ? !sdkKeys.equals(directory.sdkKeys) : directory.sdkKeys != null) return false;
-        if (androidKey != null ? !androidKey.equals(directory.androidKey) : directory.androidKey != null) return false;
-        return iosCertificateFingerprint != null ?
-                iosCertificateFingerprint.equals(directory.iosCertificateFingerprint) :
-                directory.iosCertificateFingerprint == null;
+        return isActive() == directory.isActive() &&
+                Objects.equals(getId(), directory.getId()) &&
+                Objects.equals(getName(), directory.getName()) &&
+                Objects.equals(getServiceIds(), directory.getServiceIds()) &&
+                Objects.equals(getSdkKeys(), directory.getSdkKeys()) &&
+                Objects.equals(getAndroidKey(), directory.getAndroidKey()) &&
+                Objects.equals(getIosCertificateFingerprint(), directory.getIosCertificateFingerprint()) &&
+                Objects.equals(isDenialContextInquiryEnabled(), directory.isDenialContextInquiryEnabled());
     }
 
     @Override
@@ -139,6 +151,7 @@ public class Directory {
                 ", serviceIds=" + serviceIds +
                 ", androidKey='" + androidKey + '\'' +
                 ", iosCertificateFingerprint='" + iosCertificateFingerprint + '\'' +
+                ", denialContextInquiryEnabled='" + denialContextInquiryEnabled + "\'" +
                 '}';
     }
 }

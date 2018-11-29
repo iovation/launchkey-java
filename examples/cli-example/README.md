@@ -8,11 +8,6 @@
     * [Application User Session Management](#app)
     * [White Label Device Management](#whitelabel)
 
-## <a name="prerequisites"></a>Pre-Requisites
-
-Follow the pre-requisites instructions for the iovation LaunchKey SDK for Java: [SDK Instructions](../../sdk/README.md#prerequisites).
-The demo will utilize the Bouncy Castle JCE provider.  Make sure to install that provider in the instructions.
-
 ## <a name="installation"></a>Installation
 
 Execute the Maven goal of _package_. Executing _clean_ as well is never a bad idea.  For example:
@@ -57,8 +52,8 @@ There are two commands which have a number of actions they can perform.
 
 ### <a name="service"></a>Service User Session Management
 
-The example CLI provides the ability to manage a user session for an Application. Applications are managed utilizing
-application credentials for the Application ID you provide in the calls.
+The example CLI provides the ability to manage a User Session for a Service. Services are managed utilizing
+Service credentials for the Service ID you provide in the calls.
 
   1. Login
   
@@ -82,8 +77,8 @@ application credentials for the Application ID you provide in the calls.
         ..............
         ```
 
-        One of three scenarios will occur.  The request will timeout or the user will accept or reject the request.  Here are
-        examples of each:
+        One of three scenarios will occur.  The request will timeout or the user will accept or reject the request.  
+        Here are examples of each:
 
         Request timed out:
 
@@ -123,7 +118,7 @@ application credentials for the Application ID you provide in the calls.
         User session is started.
         ```
 
-  3. Ebd a user session
+  3. End a user session
   
         Pass the Username to the session-end action
 
@@ -141,7 +136,7 @@ application credentials for the Application ID you provide in the calls.
 ### <a name="directory"></a>Directory User Device Management
 
 Directory User devices are authenticators utilizing the Authenticator SDK.  The linking and unlinking of devices for 
-users in your application can be achieved via "directory" commands.
+users in your application can be achieved via "Directory" commands.
 
 Directory commands a performed utilizing credentials for the Directory.
 
@@ -190,13 +185,13 @@ Directory commands a performed utilizing credentials for the Directory.
         Response when the credentials are invalid:
 
         ```
-        There was an error executing your command: Invalid Credentials: WL-DEV-P-4-03
+        There was an error executing your command: Invalid Credentials
         ```
 
         Response when your SDK is not valid:
 
         ```
-        There was an error executing your command: Invalid Request: WL-DEV-P-4-00
+        There was an error executing your command: Invalid Request
         ```
 
         Response when White Label Group User is successfully created:

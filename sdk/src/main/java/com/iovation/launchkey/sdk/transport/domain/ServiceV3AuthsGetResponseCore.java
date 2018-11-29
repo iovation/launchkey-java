@@ -16,9 +16,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ServiceV3AuthsGetResponseCore {
     private final String encryptedDeviceResponse;
+    private final String jweEncryptedDeviceResponse;
     private final String serviceUserHash;
     private final String orgUserHash;
     private final String userPushId;
@@ -27,12 +30,14 @@ public class ServiceV3AuthsGetResponseCore {
     @JsonCreator
     public ServiceV3AuthsGetResponseCore(
             @JsonProperty(value = "auth", required = true) String encryptedDeviceResponse,
+            @JsonProperty(value = "auth_jwe", required = false) String jweEncryptedDeviceResponse,
             @JsonProperty(value = "service_user_hash", required = true) String serviceUserHash,
             @JsonProperty(value = "org_user_hash") String orgUserHash,
             @JsonProperty(value = "user_push_id", required = true) String userPushId,
             @JsonProperty(value = "public_key_id", required = true) String publicKeyId
     ) {
         this.encryptedDeviceResponse = encryptedDeviceResponse;
+        this.jweEncryptedDeviceResponse = jweEncryptedDeviceResponse;
         this.serviceUserHash = serviceUserHash;
         this.orgUserHash = orgUserHash;
         this.userPushId = userPushId;
@@ -41,6 +46,10 @@ public class ServiceV3AuthsGetResponseCore {
 
     public String getEncryptedDeviceResponse() {
         return encryptedDeviceResponse;
+    }
+
+    public String getJweEncryptedDeviceResponse() {
+        return jweEncryptedDeviceResponse;
     }
 
     public String getServiceUserHash() {
@@ -63,34 +72,25 @@ public class ServiceV3AuthsGetResponseCore {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ServiceV3AuthsGetResponseCore)) return false;
-
         ServiceV3AuthsGetResponseCore that = (ServiceV3AuthsGetResponseCore) o;
-
-        if (getEncryptedDeviceResponse() != null ? !getEncryptedDeviceResponse().equals(that.getEncryptedDeviceResponse()) : that.getEncryptedDeviceResponse() != null)
-            return false;
-        if (getServiceUserHash() != null ? !getServiceUserHash().equals(that.getServiceUserHash()) : that.getServiceUserHash() != null)
-            return false;
-        if (getOrgUserHash() != null ? !getOrgUserHash().equals(that.getOrgUserHash()) : that.getOrgUserHash() != null)
-            return false;
-        if (getUserPushId() != null ? !getUserPushId().equals(that.getUserPushId()) : that.getUserPushId() != null)
-            return false;
-        return getPublicKeyId() != null ? getPublicKeyId().equals(that.getPublicKeyId()) : that.getPublicKeyId() == null;
+        return Objects.equals(getEncryptedDeviceResponse(), that.getEncryptedDeviceResponse()) &&
+                Objects.equals(getJweEncryptedDeviceResponse(), that.getJweEncryptedDeviceResponse()) &&
+                Objects.equals(getServiceUserHash(), that.getServiceUserHash()) &&
+                Objects.equals(getOrgUserHash(), that.getOrgUserHash()) &&
+                Objects.equals(getUserPushId(), that.getUserPushId()) &&
+                Objects.equals(getPublicKeyId(), that.getPublicKeyId());
     }
 
     @Override
     public int hashCode() {
-        int result = getEncryptedDeviceResponse() != null ? getEncryptedDeviceResponse().hashCode() : 0;
-        result = 31 * result + (getServiceUserHash() != null ? getServiceUserHash().hashCode() : 0);
-        result = 31 * result + (getOrgUserHash() != null ? getOrgUserHash().hashCode() : 0);
-        result = 31 * result + (getUserPushId() != null ? getUserPushId().hashCode() : 0);
-        result = 31 * result + (getPublicKeyId() != null ? getPublicKeyId().hashCode() : 0);
-        return result;
+        return Objects.hash(getEncryptedDeviceResponse(), getJweEncryptedDeviceResponse(), getServiceUserHash(), getOrgUserHash(), getUserPushId(), getPublicKeyId());
     }
 
     @Override
     public String toString() {
         return "ServiceV3AuthsGetResponseCore{" +
                 "encryptedDeviceResponse='" + encryptedDeviceResponse + '\'' +
+                ", jweEncryptedDeviceResponse='" + jweEncryptedDeviceResponse + '\'' +
                 ", serviceUserHash='" + serviceUserHash + '\'' +
                 ", orgUserHash='" + orgUserHash + '\'' +
                 ", userPushId='" + userPushId + '\'' +

@@ -12,24 +12,27 @@
 
 package com.iovation.launchkey.sdk.transport.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.UUID;
 
-@JsonPropertyOrder({"directory_id", "active", "android_key", "ios_p12"})
+@JsonPropertyOrder({"directory_id", "active", "android_key", "ios_p12", "denial_context_inquiry_enabled"})
 public class OrganizationV3DirectoriesPatchRequest {
     private final UUID directoryId;
     private final Boolean active;
     private final String androidKey;
     private final String iosP12;
+    private final Boolean denialContextInquiryEnabled;
 
     public OrganizationV3DirectoriesPatchRequest(UUID directoryId, Boolean active, String androidKey,
-                                                 String iosP12) {
+                                                 String iosP12, Boolean denialContextInquiryEnabled) {
         this.directoryId = directoryId;
         this.active = active;
         this.androidKey = androidKey;
         this.iosP12 = iosP12;
+        this.denialContextInquiryEnabled = denialContextInquiryEnabled;
     }
 
     @JsonProperty("directory_id")
@@ -50,5 +53,11 @@ public class OrganizationV3DirectoriesPatchRequest {
     @JsonProperty("ios_p12")
     public String getIosP12() {
         return iosP12;
+    }
+
+    @JsonProperty("denial_context_inquiry_enabled")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Boolean isDenialContextInquiryEnabled() {
+        return denialContextInquiryEnabled;
     }
 }

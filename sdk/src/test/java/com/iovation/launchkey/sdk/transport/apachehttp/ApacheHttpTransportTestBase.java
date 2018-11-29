@@ -61,12 +61,12 @@ public class ApacheHttpTransportTestBase {
     @Mock protected ObjectMapper objectMapper;
     @Mock protected EntityIdentifier issuer;
     @Mock protected JWTService jwtService;
-    @Mock private JWTData jwtData;
+    @Mock protected JWTData jwtData;
     @Mock protected JWTClaims jwtClaims;
     @Mock protected JWEService jweService;
     @Mock protected Crypto crypto;
     @Mock private Cache publicKeyCache;
-    @Mock private EntityKeyMap entityKeyMap;
+    @Mock protected EntityKeyMap entityKeyMap;
     @Mock private PublicV3PingGetResponse pingResponse;
     @Mock private RSAPublicKey publicKey;
     @Captor protected ArgumentCaptor<HttpUriRequest> requestCaptor;
