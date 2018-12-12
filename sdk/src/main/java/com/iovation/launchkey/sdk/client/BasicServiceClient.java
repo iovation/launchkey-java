@@ -182,7 +182,8 @@ public class BasicServiceClient implements ServiceClient {
                     Arrays.asList(transportResponse.getServicePins()),
                     type,
                     reason,
-                    transportResponse.getDenialReason());
+                    transportResponse.getDenialReason(),
+                    reason == AuthorizationResponse.Reason.FRAUDULENT);
         }
         return response;
     }

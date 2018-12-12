@@ -91,7 +91,7 @@ public class ApacheHttpTransportServiceV3AuthGetTest extends ApacheHttpTransport
     }
 
     @Test
-    public void returnsAudienceFromJweResponseWhenJweResponseIsPresent() throws Exception {
+    public void returnsAudienceFromJwtResponseWhenJweResponseIsPresent() throws Exception {
         when(response.getJweEncryptedDeviceResponse()).thenReturn("JWE Encrypted Value");
         ServiceV3AuthsGetResponse response = transport.serviceV3AuthsGet(
                 UUID.randomUUID(),
@@ -99,7 +99,7 @@ public class ApacheHttpTransportServiceV3AuthGetTest extends ApacheHttpTransport
         );
 
         EntityIdentifier expected = new EntityIdentifier(EntityIdentifier.EntityType.SERVICE,
-                UUID.fromString("5e9aaee6-f1db-11e8-ac7a-fa001d282e01"));
+                UUID.fromString("767e72d9-e7aa-11e8-a951-fa001d282e01"));
         assertEquals(expected, response.getRequestingEntity());
     }
 
