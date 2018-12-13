@@ -103,7 +103,7 @@ public class InvalidRequestException extends CommunicationErrorException {
                 } else {
                     authorizationRequestId = (String) errorData.get("auth_request");
                     try {
-                        myAuthorizationRequest = (Boolean) errorData.get("my_auth");
+                        myAuthorizationRequest = (Boolean) errorData.get("from_same_service");
                     } catch (ClassCastException e) {
                         myAuthorizationRequest = false;
                     }

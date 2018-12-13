@@ -151,7 +151,7 @@ public class InvalidRequestExceptionTest {
         InvalidRequestException actual = InvalidRequestException.fromError(
                 new Error("SVC-005", "Message", new HashMap<Object, Object>(){{
                     put("auth_request", "adc0d351-d8a8-11e8-9fe8-acde48001122");
-                    put("my_auth", true);
+                    put("from_same_service", true);
                     put("expires", "1970-01-01T00:00:00Z");
                 }})
         );
@@ -187,7 +187,7 @@ public class InvalidRequestExceptionTest {
         InvalidRequestException actual = InvalidRequestException.fromError(
                 new Error("SVC-005", "Message", new HashMap<Object, Object>(){{
                     put("auth_request", "adc0d351-d8a8-11e8-9fe8-acde48001122");
-                    put("my_auth", true);
+                    put("from_same_service", true);
                     put("expires", "Not a valid Date");
                 }})
         );
@@ -201,7 +201,7 @@ public class InvalidRequestExceptionTest {
         InvalidRequestException actual = InvalidRequestException.fromError(
                 new Error("SVC-005", "Message", new HashMap<Object, Object>(){{
                     put("auth_request", "adc0d351-d8a8-11e8-9fe8-acde48001122");
-                    put("my_auth", "Not a boolean");
+                    put("from_same_service", "Not a boolean");
                     put("expires", "1970-01-01T00:00:00Z");
                 }})
         );
