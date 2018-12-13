@@ -328,12 +328,14 @@ public class DemoApp {
             if (authorizationResponse != null) {
                 System.out.println();
                 System.out.println("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
-                System.out.println("    Auth Request:  " + authorizationResponse.getAuthorizationRequestId());
+                System.out.println("    Type:          " + naForNull(authorizationResponse.getType()));
+                System.out.println("    Reason:        " + naForNull(authorizationResponse.getReason()));
+                System.out.println("    Denial Reason: " + naForNull(authorizationResponse.getDenialReason()));
+                System.out.println("    Fraud:         " + naForNull(authorizationResponse.isFraud()));
                 System.out.println("    Device ID:     " + authorizationResponse.getDeviceId());
                 System.out.println("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
                 System.out.println("    User Push ID:  " + authorizationResponse.getUserPushId());
-                String orgHash = authorizationResponse.getOrganizationUserHash() == null ? "N/A" : authorizationResponse.getOrganizationUserHash();
-                System.out.println("    Org User Hash: " + orgHash);
+                System.out.println("    Org User Hash: " + naForNull(authorizationResponse.getOrganizationUserHash()));
                 System.out.println();
                 return;
             }
@@ -341,6 +343,18 @@ public class DemoApp {
         System.out.println();
         System.out.println("Authorization request timed out");
         System.out.println();
+    }
+
+    private static String naForNull(String value) {
+        return value == null ? "N/A" : value;
+    }
+
+    private static String naForNull(Enum value) {
+        return value == null ? "N/A" : value.name();
+    }
+
+    private static String naForNull(Boolean value) {
+        return value == null ? "N/A" : value.toString();
     }
 
     private static void printHelp(JSAP jsap) {

@@ -15,7 +15,6 @@ import java.util.*;
 
 @Controller
 public class DemoController {
-    private static final Logger LOG = LoggerFactory.getLogger(DemoController.class);
     private final AuthManager authManager;
 
     @Autowired
