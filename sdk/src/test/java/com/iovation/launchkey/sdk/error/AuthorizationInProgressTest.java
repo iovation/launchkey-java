@@ -42,7 +42,7 @@ public class AuthorizationInProgressTest {
 
     @Test
     public void isMyAuthorizationRequest() {
-        assertTrue(exception.isMyAuthorizationRequest());
+        assertTrue(exception.isFromSameService());
     }
 
     @Test

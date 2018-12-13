@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class AuthorizationInProgress extends InvalidRequestException {
     private final String authorizationRequestId;
-    private final boolean myAuthorizationRequest;
+    private final boolean fromSameService;
     private final Date expires;
 
     /**
@@ -17,16 +17,16 @@ public class AuthorizationInProgress extends InvalidRequestException {
      *                               unknown.)
      * @param errorCode              HTTP status code or 0 if no HTTP status code was returned
      * @param authorizationRequestId Identifier of the existing Authorization Request that caused this exception
-     * @param myAuthorizationRequest Is the authorization in progress from the same Service requesting the new
+     * @param fromSameService        Is the authorization in progress from the same Service requesting the new
      *                               Authorization Request
      * @param expires                When the Authorization Request identified by authorizationRequestId will expire.
      */
     public AuthorizationInProgress(
             String message, Throwable cause, String errorCode, String authorizationRequestId,
-            boolean myAuthorizationRequest, Date expires) {
+            boolean fromSameService, Date expires) {
         super(message, cause, errorCode);
         this.authorizationRequestId = authorizationRequestId;
-        this.myAuthorizationRequest = myAuthorizationRequest;
+        this.fromSameService = fromSameService;
         this.expires = expires;
     }
 
@@ -44,8 +44,8 @@ public class AuthorizationInProgress extends InvalidRequestException {
      *
      * @return Is the authorization in progress from the same Service requesting the new Authorization Request
      */
-    public boolean isMyAuthorizationRequest() {
-        return myAuthorizationRequest;
+    public boolean isFromSameService() {
+        return fromSameService;
     }
 
     /**
@@ -63,21 +63,21 @@ public class AuthorizationInProgress extends InvalidRequestException {
         if (!(o instanceof AuthorizationInProgress)) return false;
         if (!super.equals(o)) return false;
         AuthorizationInProgress that = (AuthorizationInProgress) o;
-        return isMyAuthorizationRequest() == that.isMyAuthorizationRequest() &&
+        return isFromSameService() == that.isFromSameService() &&
                 Objects.equals(getAuthorizationRequestId(), that.getAuthorizationRequestId()) &&
                 Objects.equals(getExpires(), that.getExpires());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getAuthorizationRequestId(), isMyAuthorizationRequest(), getExpires());
+        return Objects.hash(super.hashCode(), getAuthorizationRequestId(), isFromSameService(), getExpires());
     }
 
     @Override
     public String toString() {
         return "AuthorizationInProgress{" +
                 "authorizationRequestId='" + authorizationRequestId + '\'' +
-                ", myAuthorizationRequest=" + myAuthorizationRequest +
+                ", fromSameService=" + fromSameService +
                 ", expires=" + expires +
                 "} " + super.toString();
     }
