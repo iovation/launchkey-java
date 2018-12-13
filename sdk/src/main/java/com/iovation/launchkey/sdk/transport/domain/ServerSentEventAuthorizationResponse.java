@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ServerSentEventAuthorizationResponse implements ServerSentEvent {
+public class ServerSentEventAuthorizationResponse implements ServerSentEvent, AuthsResponse {
     private final EntityIdentifier requestingEntity;
     private final UUID serviceId;
     private final String serviceUserHash;

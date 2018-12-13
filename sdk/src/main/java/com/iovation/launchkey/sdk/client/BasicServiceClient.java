@@ -138,52 +138,59 @@ public class BasicServiceClient implements ServiceClient {
         if (transportResponse == null) {
             response = null;
         } else {
-            AuthorizationResponse.Type type;
-            if (transportResponse.getType() == null) {
-                type = null;
-            } else if (transportResponse.getType().equals("AUTHORIZED")) {
-                type = AuthorizationResponse.Type.AUTHORIZED;
-            } else if (transportResponse.getType().equals("DENIED")) {
-                type = AuthorizationResponse.Type.DENIED;
-            } else if (transportResponse.getType().equals("FAILED")) {
-                type = AuthorizationResponse.Type.FAILED;
-            } else {
-                type = AuthorizationResponse.Type.OTHER;
-            }
-            AuthorizationResponse.Reason reason;
-            if (transportResponse.getReason() == null) {
-                reason = null;
-            } else if (transportResponse.getReason().equals("APPROVED")) {
-                reason = AuthorizationResponse.Reason.APPROVED;
-            } else if (transportResponse.getReason().equals("DISAPPROVED")) {
-                reason = AuthorizationResponse.Reason.DISAPPROVED;
-            } else if (transportResponse.getReason().equals("FRAUDULENT")) {
-                reason = AuthorizationResponse.Reason.FRAUDULENT;
-            } else if (transportResponse.getReason().equals("POLICY")) {
-                reason = AuthorizationResponse.Reason.POLICY;
-            } else if (transportResponse.getReason().equals("PERMISSION")) {
-                reason = AuthorizationResponse.Reason.PERMISSION;
-            } else if (transportResponse.getReason().equals("AUTHENTICATION")) {
-                reason = AuthorizationResponse.Reason.AUTHENTICATION;
-            } else if (transportResponse.getReason().equals("CONFIGURATION")) {
-                reason = AuthorizationResponse.Reason.CONFIGURATION;
-            } else if (transportResponse.getReason().equals("BUSY_LOCAL")) {
-                reason = AuthorizationResponse.Reason.BUSY_LOCAL;
-            } else {
-                reason = AuthorizationResponse.Reason.OTHER;
-            }
-            response = new AuthorizationResponse(
-                    transportResponse.getAuthorizationRequestId().toString(),
-                    transportResponse.getResponse(),
-                    transportResponse.getServiceUserHash(),
-                    transportResponse.getOrganizationUserHash(),
-                    transportResponse.getUserPushId(),
-                    transportResponse.getDeviceId(),
-                    Arrays.asList(transportResponse.getServicePins()),
-                    type,
-                    reason,
-                    transportResponse.getDenialReason());
+            response = getAuthorizationResponse(transportResponse);
         }
+        return response;
+    }
+
+    private AuthorizationResponse getAuthorizationResponse(AuthsResponse authsResponse) {
+        AuthorizationResponse response;
+        AuthorizationResponse.Type type;
+        if (authsResponse.getType() == null) {
+            type = null;
+        } else if (authsResponse.getType().equals("AUTHORIZED")) {
+            type = AuthorizationResponse.Type.AUTHORIZED;
+        } else if (authsResponse.getType().equals("DENIED")) {
+            type = AuthorizationResponse.Type.DENIED;
+        } else if (authsResponse.getType().equals("FAILED")) {
+            type = AuthorizationResponse.Type.FAILED;
+        } else {
+            type = AuthorizationResponse.Type.OTHER;
+        }
+        AuthorizationResponse.Reason reason;
+        if (authsResponse.getReason() == null) {
+            reason = null;
+        } else if (authsResponse.getReason().equals("APPROVED")) {
+            reason = AuthorizationResponse.Reason.APPROVED;
+        } else if (authsResponse.getReason().equals("DISAPPROVED")) {
+            reason = AuthorizationResponse.Reason.DISAPPROVED;
+        } else if (authsResponse.getReason().equals("FRAUDULENT")) {
+            reason = AuthorizationResponse.Reason.FRAUDULENT;
+        } else if (authsResponse.getReason().equals("POLICY")) {
+            reason = AuthorizationResponse.Reason.POLICY;
+        } else if (authsResponse.getReason().equals("PERMISSION")) {
+            reason = AuthorizationResponse.Reason.PERMISSION;
+        } else if (authsResponse.getReason().equals("AUTHENTICATION")) {
+            reason = AuthorizationResponse.Reason.AUTHENTICATION;
+        } else if (authsResponse.getReason().equals("CONFIGURATION")) {
+            reason = AuthorizationResponse.Reason.CONFIGURATION;
+        } else if (authsResponse.getReason().equals("BUSY_LOCAL")) {
+            reason = AuthorizationResponse.Reason.BUSY_LOCAL;
+        } else {
+            reason = AuthorizationResponse.Reason.OTHER;
+        }
+        response = new AuthorizationResponse(
+                authsResponse.getAuthorizationRequestId().toString(),
+                authsResponse.getResponse(),
+                authsResponse.getServiceUserHash(),
+                authsResponse.getOrganizationUserHash(),
+                authsResponse.getUserPushId(),
+                authsResponse.getDeviceId(),
+                Arrays.asList(authsResponse.getServicePins()),
+                type,
+                reason,
+                authsResponse.getDenialReason(),
+                reason == AuthorizationResponse.Reason.FRAUDULENT);
         return response;
     }
 
@@ -238,15 +245,7 @@ public class BasicServiceClient implements ServiceClient {
             response = null;
         } else if (transportResponse instanceof ServerSentEventAuthorizationResponse) {
             response = new AuthorizationResponseWebhookPackage(
-                    new AuthorizationResponse(
-                            ((ServerSentEventAuthorizationResponse) transportResponse).getAuthorizationRequestId().toString(),
-                            ((ServerSentEventAuthorizationResponse) transportResponse).getResponse(),
-                            ((ServerSentEventAuthorizationResponse) transportResponse).getServiceUserHash(),
-                            ((ServerSentEventAuthorizationResponse) transportResponse).getOrganizationUserHash(),
-                            ((ServerSentEventAuthorizationResponse) transportResponse).getUserPushId(),
-                            ((ServerSentEventAuthorizationResponse) transportResponse).getDeviceId(),
-                            Arrays.asList(((ServerSentEventAuthorizationResponse) transportResponse).getServicePins())
-                    )
+                    getAuthorizationResponse((ServerSentEventAuthorizationResponse) transportResponse)
             );
         } else if (transportResponse instanceof ServerSentEventUserServiceSessionEnd) {
             response = new ServiceUserSessionEndWebhookPackage(

@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class AuthManager {
+    private static final Logger LOG = LoggerFactory.getLogger(AuthManager.class);
     private final ServiceClient serviceClient;
     private final Map<String, String> sessionAuthRequestMap;
     private final Map<String, Boolean> sessionAuthenticationMap;
@@ -64,7 +65,8 @@ public class AuthManager {
         String privateKey = sb.toString();
 
         FactoryFactoryBuilder builder = new FactoryFactoryBuilder()
-                .setJCEProvider(new BouncyCastleProvider());
+                .setJCEProvider(new BouncyCastleProvider())
+                .setOffsetTTL(60);
         if (baseURL != null) {
             builder.setAPIBaseURL(baseURL);
         }
@@ -115,6 +117,17 @@ public class AuthManager {
             }
         }
     }
+    private static String naForNull(String value) {
+        return value == null ? "N/A" : value;
+    }
+
+    private static String naForNull(Enum value) {
+        return value == null ? "N/A" : value.name();
+    }
+
+    private static String naForNull(Boolean value) {
+        return value == null ? "N/A" : value.toString();
+    }
 
     void handleWebhook(Map<String, List<String>> headers, String body, String method, String path) throws AuthException {
         try {
@@ -129,6 +142,15 @@ public class AuthManager {
                         break;
                     }
                 }
+                LOG.debug("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
+                LOG.debug("    Type:          " + naForNull(authorizationResponse.getType()));
+                LOG.debug("    Reason:        " + naForNull(authorizationResponse.getReason()));
+                LOG.debug("    Denial Reason: " + naForNull(authorizationResponse.getDenialReason()));
+                LOG.debug("    Fraud:         " + naForNull(authorizationResponse.isFraud()));
+                LOG.debug("    Device ID:     " + authorizationResponse.getDeviceId());
+                LOG.debug("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
+                LOG.debug("    User Push ID:  " + authorizationResponse.getUserPushId());
+                LOG.debug("    Org User Hash: " + naForNull(authorizationResponse.getOrganizationUserHash()));
                 if (null == sessionId) {
                     throw new AuthException("No session found for getServiceService request: " + authRequestId);
                 }

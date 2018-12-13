@@ -212,4 +212,51 @@ public class BasicServiceClientTestGetAuthorizationResponse extends TestCase {
         }
     }
 
+    @RunWith(Parameterized.class)
+    public static class FraudTests {
+        private final String input;
+        private final Boolean expectedOutput;
+
+        @Parameterized.Parameters()
+        public static Iterable<Object[]> data() {
+            return Arrays.asList(new Object[][] {
+                    { "APPROVED", false },
+                    { "DISAPPROVED", false },
+                    { "FRAUDULENT", true },
+                    { "POLICY", false },
+                    { "PERMISSION", false },
+                    { "AUTHENTICATION", false },
+                    { "CONFIGURATION", false },
+                    { "UNKNOWN", false },
+            });
+        }
+
+        public FraudTests(String input, boolean expectedOutput) {
+            this.input = input;
+            this.expectedOutput = expectedOutput;
+        }
+
+        @Test
+        public void properlyMapsFraud() throws Exception {
+            Transport transport = mock(Transport.class);
+            when(transport.serviceV3AuthsGet(any(UUID.class), any(EntityIdentifier.class))).thenReturn(new ServiceV3AuthsGetResponse(
+                    new EntityIdentifier(EntityIdentifier.EntityType.SERVICE, UUID.randomUUID()),
+                    UUID.randomUUID(),
+                    "service-user-hash",
+                    "org-user-hash",
+                    "user-push-id",
+                    UUID.randomUUID(),
+                    true,
+                    "device-id",
+                    new String[]{"service", "pins"},
+                    "type",
+                    this.input,
+                    "denial-reason"
+            ));
+            ServiceClient client = new BasicServiceClient(UUID.randomUUID(), transport);
+            AuthorizationResponse response = client.getAuthorizationResponse(UUID.randomUUID().toString());
+            assertEquals(this.expectedOutput, response.isFraud());
+        }
+    }
+
 }

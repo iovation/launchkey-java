@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ServiceV3AuthsGetResponse {
+public class ServiceV3AuthsGetResponse implements AuthsResponse {
     private final EntityIdentifier requestingEntity;
     private final UUID serviceId;
     private final String serviceUserHash;
@@ -69,38 +69,47 @@ public class ServiceV3AuthsGetResponse {
         return serviceUserHash;
     }
 
+    @Override
     public String getOrganizationUserHash() {
         return organizationUserHash;
     }
 
+    @Override
     public String getUserPushId() {
         return userPushId;
     }
 
+    @Override
     public UUID getAuthorizationRequestId() {
         return authorizationRequestId;
     }
 
+    @Override
     public boolean getResponse() {
         return response;
     }
 
+    @Override
     public String getDeviceId() {
         return deviceId;
     }
 
+    @Override
     public String[] getServicePins() {
         return servicePins;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public String getReason() {
         return reason;
     }
 
+    @Override
     public String getDenialReason() {
         return denialReason;
     }

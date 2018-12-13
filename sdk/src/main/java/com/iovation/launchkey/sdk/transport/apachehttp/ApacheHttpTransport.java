@@ -146,14 +146,18 @@ public class ApacheHttpTransport implements Transport {
             ServiceV3AuthsGetResponseCore apiResponse =
                     decryptResponse(httpResponse, ServiceV3AuthsGetResponseCore.class);
 
+            EntityIdentifier audience;
+            try {
+                JWTData jwtData = jwtService.getJWTData(getJWT(httpResponse));
+                audience = EntityIdentifier.fromString(jwtData.getAudience());
+            } catch (JWTError jwtError){
+                    throw new CryptographyError("Unable to parse JWT to get key info!", jwtError);
+            }
             try {
                 if (apiResponse.getJweEncryptedDeviceResponse() != null) {
                     String decrypted = jweService.decrypt(apiResponse.getJweEncryptedDeviceResponse());
                     ServiceV3AuthsGetResponseDeviceJWE deviceResponse =
                             objectMapper.readValue(decrypted, ServiceV3AuthsGetResponseDeviceJWE.class);
-                    Map<String, String> jweHeaders = jweService.getHeaders(decrypted);
-                    String jweAudience = jweHeaders.get("aud");
-                    EntityIdentifier audience = EntityIdentifier.fromString(jweAudience);
                     response =  new ServiceV3AuthsGetResponse(
                             audience,
                             subject.getId(),
@@ -169,8 +173,6 @@ public class ApacheHttpTransport implements Transport {
                             deviceResponse.getDenialReason());
 
                 } else {
-                    JWTData jwtData = jwtService.getJWTData(getJWT(httpResponse));
-                    EntityIdentifier audience = EntityIdentifier.fromString(jwtData.getAudience());
                     RSAPrivateKey key = entityKeyMap.getKey(audience, apiResponse.getPublicKeyId());
                     byte[] decrypted;
                     try {
@@ -197,8 +199,6 @@ public class ApacheHttpTransport implements Transport {
 
                     );
                 }
-            } catch (JWTError jwtError) {
-                throw new CryptographyError("Unable to parse JWT to get key info!", jwtError);
             } catch (JsonParseException e) {
                 throw new MarshallingError("Unable to parse the decrypted device response!", e);
             } catch (JsonMappingException e) {
