@@ -25,22 +25,30 @@ import java.security.cert.X509Certificate;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This is the "root" command. It is automatically executed when the JAR is run. The real commands are in
+ * its sub-commands. If there is not sub-command specified, it will print out the help."
+ */
 @CommandLine.Command(subcommands = {
-        ServiceCommand.class
+        DirectoryCommand.class,
+        ServiceCommand.class,
 })
-public class LaunchKeyCommand implements Callable<Void> {
+public class RootCommand implements Callable<Void> {
 
 
     @CommandLine.Option(names = {"-u", "--base-url"}, defaultValue = "https://api.launchkey.com",
             description = "Base URL to the iovation LaunchKey API")
-    String baseUrl;
+    private String baseUrl;
 
-    @CommandLine.Option(names={"-n", "--no-verify"}, description =
+    @CommandLine.Option(names = {"-n", "--no-verify"}, description =
             "Disable SSL certificate verification. Required for getting past certificate verification errors for " +
                     "self-signed certs or local CA's")
-    boolean noVerify;
+    private boolean noVerify;
 
 
+    /**
+     * This should never be called unless you are just looking for help. So, print the help.
+     */
     @Override
     public Void call() throws Exception {
         CommandLine.usage(this, System.out);
