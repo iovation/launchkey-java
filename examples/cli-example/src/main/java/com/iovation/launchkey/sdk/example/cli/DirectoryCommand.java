@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Scanner;
 
 @CommandLine.Command(name = "directory")
-public class DirectoryCommand {
+class DirectoryCommand {
 
     @CommandLine.ParentCommand
-    LaunchKeyCommand launchKeyCommand;
+    private RootCommand rootCommand;
 
     @CommandLine.Parameters(index = "0", paramLabel = "<DIR_ID>",
             description = "Directory ID. It is found in the Keys section of the Directory's page in Dashboard.")
-    String directoryId;
+    private String directoryId;
 
     @CommandLine.Parameters(index = "1", paramLabel = "<KEY_FILE>",
             description = "File location of the RSA Private Key of the RSA public/private key pair whose public key " +
                     "is associated with the Directory.")
-    File privateKeyFile;
+    private File privateKeyFile;
 
     @CommandLine.Command(name = "device-link")
     void deviceLink(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
@@ -72,19 +72,7 @@ public class DirectoryCommand {
         }
         String key = buffer.toString();
 
-        return launchKeyCommand.getFactoryFactory()
+        return rootCommand.getFactoryFactory()
                 .makeDirectoryFactory(directoryId, key).makeDirectoryClient();
-    }
-
-    private static String naForNull(String value) {
-        return value == null ? "N/A" : value;
-    }
-
-    private static String naForNull(Enum value) {
-        return naForNull(value.name());
-    }
-
-    private static String naForNull(Boolean value) {
-        return naForNull(value.toString());
     }
 }

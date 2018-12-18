@@ -3,26 +3,27 @@ package com.iovation.launchkey.sdk.example.cli;
 import com.iovation.launchkey.sdk.client.ServiceClient;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
+import com.iovation.launchkey.sdk.domain.service.DenialReason;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.util.Date;
-import java.util.Scanner;
+import java.nio.charset.Charset;
+import java.util.*;
 
 @CommandLine.Command(name = "service")
-public class ServiceCommand {
+class ServiceCommand {
 
     @CommandLine.ParentCommand
-    LaunchKeyCommand launchKeyCommand;
+    private RootCommand rootCommand;
 
     @CommandLine.Parameters(index = "0", paramLabel = "<SVC_ID>",
             description = "Service ID. It is found in the Keys section of the Service's profile page in Dashboard.")
-    String serviceId;
+    private String serviceId;
 
     @CommandLine.Parameters(index = "1", paramLabel = "<KEY_FILE>",
             description = "File location of the RSA Private Key of the RSA public/private key pair whose public key " +
                     "is associated with the Service.")
-    File privateKeyFile;
+    private File privateKeyFile;
 
     @CommandLine.Command(name = "session-start")
     void sessionStart(@CommandLine.Parameters(paramLabel = "<USER_NAME>") String username) throws Exception {
@@ -41,10 +42,27 @@ public class ServiceCommand {
     }
 
     @CommandLine.Command(name = "authorize")
-    void authorize(@CommandLine.Parameters(paramLabel = "<USER_NAME>") String username,
-                   @CommandLine.Parameters(paramLabel = "<CONTEXT>", arity = "0..1") String context) throws Exception {
+    void authorize(
+            @CommandLine.Parameters(paramLabel = "<USER_NAME>",
+                    description = "The username to authorize") String username,
+            @CommandLine.Parameters(paramLabel = "<CONTEXT>", arity = "0..1",
+                    description = "The context value of the authorization request.") String context,
+            @CommandLine.Option(names = {"-t", "--title"}, arity = "0..1",
+                    description = "[Directory Service Only] Title of the authorization request.") String title,
+            @CommandLine.Option(names = {"-l", "--ttl"}, arity = "0..1",
+                    description = "Time to Live in seconds for the request. This must be between 30 and 600.") Integer ttl,
+            @CommandLine.Option(names = {"-h", "--push-title"}, arity = "0..1",
+                    description = "[Directory Service Only] Title of the push message for the authorization request.") String pushTitle,
+            @CommandLine.Option(names = {"-b", "--push-body"}, arity = "0..1",
+                    description = "[Directory Service Only] Body of the push message for the authorization request.") String pushBody,
+            @CommandLine.Option(names = {"-f", "--fraud-denial-reasons"}, arity = "0..1",
+                    description = "[Directory Service Only] The number of denial reasons flagged as fraud for the authorization request.") Integer fraudReasons,
+            @CommandLine.Option(names = {"-n", "--non-fraud-denial-reasons"}, arity = "0..1",
+                    description = "[Directory Service Only] The number of denial reasons not flagged as fraud for the authorization request.") Integer nonFraudReasons
+    ) throws Exception {
         ServiceClient serviceClient = getServiceClient();
-        AuthorizationRequest authRequest = serviceClient.createAuthorizationRequest(username, context);
+        AuthorizationRequest authRequest = serviceClient.createAuthorizationRequest(
+                username, context, null, title, ttl, pushTitle, pushBody, getDenialReasons(fraudReasons, nonFraudReasons));
         System.out.println();
         System.out.println("Authorization request successful");
         System.out.println("    Auth Request: " + authRequest);
@@ -84,7 +102,7 @@ public class ServiceCommand {
         }
         String key = buffer.toString();
 
-        return launchKeyCommand.getFactoryFactory()
+        return rootCommand.getFactoryFactory()
                 .makeServiceFactory(serviceId, key).makeServiceClient();
     }
 
@@ -98,5 +116,40 @@ public class ServiceCommand {
 
     private static String naForNull(Boolean value) {
         return naForNull(value.toString());
+    }
+
+    private static List<DenialReason> getDenialReasons(Integer fraud, Integer nonFraud)
+    {
+        List<DenialReason> denialReasons;
+        if (fraud == null && nonFraud == null) {
+            denialReasons = null;
+        } else {
+            fraud = fraud == null ? 0 : fraud;
+            nonFraud = nonFraud == null ? 0 : fraud;
+            denialReasons = new ArrayList<>();
+            for (int i = 0; i < Math.max(fraud, nonFraud); i++)
+            {
+                if (i < fraud)
+                {
+                    String reason = getRandomString();
+                    String id = "F" + i;
+                    denialReasons.add(new DenialReason(id, reason + " - " + id, true));
+                }
+                if (i < nonFraud)
+                {
+                    String reason = getRandomString();
+                    String id = "NF" + i;
+                    denialReasons.add(new DenialReason(id, reason + " - " + id, false));
+                }
+            }
+        }
+        return denialReasons;
+    }
+
+    private static String getRandomString() {
+        Random random = new Random();
+        byte[] array = new byte[random.nextInt(6)];
+        random.nextBytes(array);
+        return new String(array, Charset.forName("UTF-8"));
     }
 }
