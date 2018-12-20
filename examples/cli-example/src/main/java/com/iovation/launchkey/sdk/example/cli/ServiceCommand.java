@@ -4,6 +4,9 @@ import com.iovation.launchkey.sdk.client.ServiceClient;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.service.DenialReason;
+import com.iovation.launchkey.sdk.error.AuthorizationInProgress;
+import com.iovation.launchkey.sdk.error.AuthorizationRequestTimedOutError;
+import com.iovation.launchkey.sdk.error.RequestTimedOut;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -60,37 +63,44 @@ class ServiceCommand {
             @CommandLine.Option(names = {"-n", "--non-fraud-denial-reasons"}, arity = "0..1",
                     description = "[Directory Service Only] The number of denial reasons not flagged as fraud for the authorization request.") Integer nonFraudReasons
     ) throws Exception {
-        ServiceClient serviceClient = getServiceClient();
-        AuthorizationRequest authRequest = serviceClient.createAuthorizationRequest(
-                username, context, null, title, ttl, pushTitle, pushBody, getDenialReasons(fraudReasons, nonFraudReasons));
-        System.out.println();
-        System.out.println("Authorization request successful");
-        System.out.println("    Auth Request: " + authRequest);
-        System.out.print("Checking for response from the End User");
-        System.out.println();
-        AuthorizationResponse authorizationResponse;
-        long started = new Date().getTime();
-        while (new Date().getTime() - started < 30000) {
-            Thread.sleep(1000L);
-            System.out.print(".");
-            authorizationResponse = serviceClient.getAuthorizationResponse(authRequest.getId());
-            if (authorizationResponse != null) {
-                System.out.println();
-                System.out.println("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
-                System.out.println("    Type:          " + naForNull(authorizationResponse.getType()));
-                System.out.println("    Reason:        " + naForNull(authorizationResponse.getReason()));
-                System.out.println("    Denial Reason: " + naForNull(authorizationResponse.getDenialReason()));
-                System.out.println("    Fraud:         " + naForNull(authorizationResponse.isFraud()));
-                System.out.println("    Device ID:     " + authorizationResponse.getDeviceId());
-                System.out.println("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
-                System.out.println("    User Push ID:  " + authorizationResponse.getUserPushId());
-                System.out.println("    Org User Hash: " + naForNull(authorizationResponse.getOrganizationUserHash()));
-                System.out.println();
-                return;
+        try {
+            ServiceClient serviceClient = getServiceClient();
+            AuthorizationRequest authRequest = serviceClient.createAuthorizationRequest(
+                    username, context, null, title, ttl, pushTitle, pushBody, getDenialReasons(fraudReasons, nonFraudReasons));
+            System.out.println();
+            System.out.println("Authorization request successful");
+            System.out.println("    Auth Request: " + authRequest);
+            System.out.print("Checking for response from the End User");
+            System.out.println();
+            AuthorizationResponse authorizationResponse;
+            long started = new Date().getTime();
+            while (new Date().getTime() - started <= 600000) {
+                    Thread.sleep(1000L);
+                    System.out.print(".");
+                    authorizationResponse = serviceClient.getAuthorizationResponse(authRequest.getId());
+                    if (authorizationResponse != null) {
+                        System.out.println("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
+                        System.out.println("    Type:          " + naForNull(authorizationResponse.getType()));
+                        System.out.println("    Reason:        " + naForNull(authorizationResponse.getReason()));
+                        System.out.println("    Denial Reason: " + naForNull(authorizationResponse.getDenialReason()));
+                        System.out.println("    Fraud:         " + naForNull(authorizationResponse.isFraud()));
+                        System.out.println("    Device ID:     " + authorizationResponse.getDeviceId());
+                        System.out.println("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
+                        System.out.println("    User Push ID:  " + authorizationResponse.getUserPushId());
+                        System.out.println("    Org User Hash: " + naForNull(authorizationResponse.getOrganizationUserHash()));
+                    }
             }
+        } catch (AuthorizationRequestTimedOutError e) {
+            System.out.println();
+            System.out.println("Authorization request timed out!");
+        } catch (AuthorizationInProgress e) {
+            System.out.println();
+            System.out.println("Authorization already in progress!");
+            System.out.println("    Auth Request: " + e.getAuthorizationRequestId());
+            System.out.println("    Expires:      " + e.getExpires());
+            System.out.println("    Same Service: " + e.isFromSameService());
         }
-        System.out.println();
-        System.out.println("Authorization request timed out");
+
         System.out.println();
     }
 
