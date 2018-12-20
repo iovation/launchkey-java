@@ -1,7 +1,9 @@
 package com.iovation.launchkey.sdk.transport.apachehttp;
 
+import com.iovation.launchkey.sdk.error.AuthorizationInProgress;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestTimedOutError;
 import com.iovation.launchkey.sdk.transport.domain.*;
+import com.iovation.launchkey.sdk.transport.domain.Error;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -17,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.InputStream;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -43,6 +46,9 @@ public class ApacheHttpTransportServiceV3AuthGetTest extends ApacheHttpTransport
     @Mock
     public static RSAPrivateKey privateKey;
 
+    @Mock
+    public static Error errorResponse;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -55,6 +61,8 @@ public class ApacheHttpTransportServiceV3AuthGetTest extends ApacheHttpTransport
                 .thenReturn(deviceResponse);
         when(objectMapper.readValue(anyString(), eq(ServiceV3AuthsGetResponseDeviceJWE.class)))
                 .thenReturn(deviceJweResponse);
+        when(objectMapper.readValue(anyString(), eq(Error.class)))
+                .thenReturn(errorResponse);
         when(crypto.decryptRSA(any(byte[].class), any(PrivateKey.class))).thenReturn("RSA decrypted".getBytes());
         when(response.getEncryptedDeviceResponse()).thenReturn(
                 new String(Base64.encodeBase64("encrypted device response".getBytes())));
@@ -78,7 +86,7 @@ public class ApacheHttpTransportServiceV3AuthGetTest extends ApacheHttpTransport
     }
 
     @Test(expected = AuthorizationRequestTimedOutError.class)
-    public void throwsAuthorizationRequestTimedOutErrorWhenResponseStatusIs400() throws Exception {
+    public void throwsAuthorizationRequestTimedOutErrorWhenResponseStatusIs408() throws Exception {
         StatusLine statusLine = mock(StatusLine.class);
         when(jwtClaims.getStatusCode()).thenReturn(408);
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
@@ -88,6 +96,34 @@ public class ApacheHttpTransportServiceV3AuthGetTest extends ApacheHttpTransport
                 UUID.randomUUID(),
                 new EntityIdentifier(EntityIdentifier.EntityType.SERVICE, UUID.randomUUID())
         );
+    }
+
+    @Test
+    public void throwsAuthorizationInProgressErrorWhenResponseStatusIs409() throws Exception {
+        StatusLine statusLine = mock(StatusLine.class);
+        when(jwtClaims.getStatusCode()).thenReturn(409);
+        when(httpResponse.getStatusLine()).thenReturn(statusLine);
+        when(statusLine.getStatusCode()).thenReturn(409);
+        when(errorResponse.getErrorCode()).thenReturn("SVC-005");
+        Map<String, Object> errorData = new HashMap<String, Object>() {{
+            put("auth_request", "Auth Request ID");
+            put("expires", "1970-01-01T00:00:00Z");
+            put("from_same_service", true);
+        }};
+        when(errorResponse.getErrorData()).thenReturn(errorData);
+
+        try {
+            transport.serviceV3AuthsGet(
+                    UUID.randomUUID(),
+                    new EntityIdentifier(EntityIdentifier.EntityType.SERVICE, UUID.randomUUID())
+            );
+            fail("Expected " + AuthorizationInProgress.class + " but was not thrown");
+        } catch (AuthorizationInProgress e) {
+            assertEquals("Unexpected Auth Request ID value!", "Auth Request ID", e.getAuthorizationRequestId());
+            assertTrue("Unexpected from same service value!", e.isFromSameService());
+            Date expectedDate = new Date(){{setTime(0L);}};
+            assertEquals("Unexpected expires value!", expectedDate, e.getExpires());
+        }
     }
 
     @Test

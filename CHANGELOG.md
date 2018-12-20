@@ -13,6 +13,9 @@ This changelog references the relevant changes (bug and security fixes) for the 
     * Added verification of webhook headers.
     * Added dynamic authorization request title
     * Added authorization response context
+    * Fix bug when attempting to retrieve and authorization response after an authorization request timed out. The transport
+      would throw a JWE exception when attempting to decrypt an unencrypted response rather than throwing the expected
+      AuthorizationRequestTimedOutError.
 
   * 4.2.1
 

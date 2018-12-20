@@ -134,7 +134,7 @@ public class ApacheHttpTransport implements Transport {
 
         String path = "/service/v3/auths/" + authRequestId.toString();
         try {
-            httpResponse = getHttpResponse("GET", path, subject, null, true, Collections.singletonList(408));
+            httpResponse = getHttpResponse("GET", path, subject, null, true, null);
         } catch (RequestTimedOut e) {
             throw new AuthorizationRequestTimedOutError();
         }
@@ -719,13 +719,13 @@ public class ApacheHttpTransport implements Transport {
         final int statusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCodeWhiteList.contains(statusCode)) {
             logger.debug("Did not throw for status as it was in white list");
-        } else if (statusCode == 400) {
+        } else if (statusCode == 400 || statusCode == 409) {
             final HttpEntity httpEntity = response.getEntity();
             if (httpEntity == null || httpEntity.getContentLength() == 0) {
                 throw new InvalidRequestException(
                         response.getStatusLine().getReasonPhrase(),
                         null,
-                        "HTTP-400"
+                        "HTTP-" + statusCode
                 );
             } else {
                 com.iovation.launchkey.sdk.transport.domain.Error error = decryptResponse(response, Error.class);
@@ -735,7 +735,6 @@ public class ApacheHttpTransport implements Transport {
             String message = "HTTP Error: [" + String.valueOf(statusCode)
                     + "] " + response.getStatusLine().getReasonPhrase();
             throw CommunicationErrorException.fromStatusCode(statusCode, message);
-
         }
     }
 
