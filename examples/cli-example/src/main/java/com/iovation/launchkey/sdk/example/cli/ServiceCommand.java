@@ -88,6 +88,7 @@ class ServiceCommand {
                         System.out.println("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
                         System.out.println("    User Push ID:  " + authorizationResponse.getUserPushId());
                         System.out.println("    Org User Hash: " + naForNull(authorizationResponse.getOrganizationUserHash()));
+                        break;
                     }
             }
         } catch (AuthorizationRequestTimedOutError e) {
