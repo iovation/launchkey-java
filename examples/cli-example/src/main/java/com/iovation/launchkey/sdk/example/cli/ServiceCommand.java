@@ -122,11 +122,13 @@ class ServiceCommand {
     }
 
     private static String naForNull(Enum value) {
-        return naForNull(value.name());
+        String name = value == null ? null : value.name();
+        return naForNull(name);
     }
 
     private static String naForNull(Boolean value) {
-        return naForNull(value.toString());
+        String name = value == null ? null : value.toString();
+        return naForNull(name);
     }
 
     private static List<DenialReason> getDenialReasons(Integer fraud, Integer nonFraud)
