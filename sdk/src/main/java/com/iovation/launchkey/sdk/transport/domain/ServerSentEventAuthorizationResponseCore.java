@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ServerSentEventAuthorizationResponseCore {
     private final String auth;
     private final String userPushId;
@@ -27,7 +28,6 @@ public class ServerSentEventAuthorizationResponseCore {
     private final String authJwe;
 
     @JsonCreator
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public ServerSentEventAuthorizationResponseCore(
             @JsonProperty(value = "auth", required = true) String auth,
             @JsonProperty(value = "auth_jwe", required = false) String authJwe,

@@ -1,48 +1,106 @@
 package com.iovation.launchkey.sdk.transport.domain;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
 public class ServerSentEventAuthorizationResponseCoreTest {
-
     @Test
-    public void getEncryptedDeviceResponse() {
-        ServerSentEventAuthorizationResponseCore actual = new ServerSentEventAuthorizationResponseCore(
-                "Auth Value", "JWE Auth Value", "User Push ID", "Service User Hash", "Public Key ID", "Org User Hash");
-        assertEquals("Auth Value", actual.getAuth());
+    public void testAuth() {
+        assertEquals("Auth", new ServerSentEventAuthorizationResponseCore("Auth", null, null, null, null, null).getAuth());
     }
 
     @Test
-    public void getJweEncryptedDeviceResponse() {
-        ServerSentEventAuthorizationResponseCore actual = new ServerSentEventAuthorizationResponseCore(
-                "Auth Value", "JWE Auth Value", "User Push ID", "Service User Hash", "Public Key ID", "Org User Hash");
-        assertEquals("JWE Auth Value", actual.getAuthJwe());
+    public void testAuthJWE() {
+        assertEquals("Auth JWE", new ServerSentEventAuthorizationResponseCore(null, "Auth JWE", null, null, null, null).getAuthJwe());
     }
 
     @Test
-    public void verifyJsonParseWithoutJweResponse() throws Exception {
-        String json = "{\"auth\":\"Auth Value\",\"user_push_id\":\"User Push ID\"," +
-                "\"service_user_hash\":\"Service User Hash\",\"public_key_id\":\"Public Key ID\"," +
-                "\"org_user_hash\":\"Org User Hash\"}";
+    public void testUserPushId() {
+        assertEquals("UPID", new ServerSentEventAuthorizationResponseCore(null, null, "UPID", null, null, null).getUserPushId());
+    }
+
+    @Test
+    public void testServiceUserHash() {
+        assertEquals("SUH", new ServerSentEventAuthorizationResponseCore(null, null, null, "SUH", null, null).getServiceUserHash());
+    }
+
+    @Test
+    public void testOrgUserHash() {
+        assertEquals("OUH", new ServerSentEventAuthorizationResponseCore(null, null, null, null, null, "OUH").getOrgUserHash());
+    }
+
+    @Test
+    public void testPublicKeyId() {
+        assertEquals("PKID", new ServerSentEventAuthorizationResponseCore(null, null, null, null, "PKID", null).getPublicKeyId());
+    }
+
+    @Test
+    public void testParseWithAllValuesPasses() throws IOException {
+        String json = "{\"auth\":\"Auth\", \"auth_jwe\":\"Auth JWE\", \"user_push_id\":\"UPID\"," +
+                "\"service_user_hash\":\"SUH\",\"public_key_id\":\"PKID\",\"org_user_hash\":\"OUH\"}";
+        ServerSentEventAuthorizationResponseCore expected = new ServerSentEventAuthorizationResponseCore(
+                "Auth", "Auth JWE", "UPID", "SUH", "PKID", "OUH");
         ServerSentEventAuthorizationResponseCore actual = new ObjectMapper().readValue(
                 json, ServerSentEventAuthorizationResponseCore.class);
-        ServerSentEventAuthorizationResponseCore expected = new ServerSentEventAuthorizationResponseCore(
-                "Auth Value", null, "User Push ID", "Service User Hash", "Public Key ID", "Org User Hash");
         assertEquals(expected, actual);
     }
 
-    @Test
-    public void verifyJsonParseWithJweResponse() throws Exception {
-        String json = "{\"auth\":\"Auth Value\",\"user_push_id\":\"User Push ID\"," +
-                "\"service_user_hash\":\"Service User Hash\",\"public_key_id\":\"Public Key ID\"," +
-                "\"org_user_hash\":\"Org User Hash\",\"auth_jwe\":\"JWE Auth Value\"}";
-        ServerSentEventAuthorizationResponseCore actual = new ObjectMapper().readValue(
-                json, ServerSentEventAuthorizationResponseCore.class);
-        ServerSentEventAuthorizationResponseCore expected = new ServerSentEventAuthorizationResponseCore(
-                "Auth Value", "JWE Auth Value", "User Push ID", "Service User Hash", "Public Key ID", "Org User Hash");
-        assertEquals(expected, actual);
+    @Test(expected = JsonMappingException.class)
+    public void testParseWithoutAuthRaisesException() throws IOException {
+        String json = "{\"user_push_id\":\"UPID\",\"service_user_hash\":\"SUH\"," +
+                "\"public_key_id\":\"PKID\",\"org_user_hash\":\"OUH\"}";
+        new ObjectMapper().readValue(json, ServerSentEventAuthorizationResponseCore.class);
     }
 
+    @Test(expected = JsonMappingException.class)
+    public void testParseWithoutUsePushIdhRaisesException() throws IOException {
+        String json = "{\"auth\":\"Auth\",\"service_user_hash\":\"SUH\"," +
+                "\"public_key_id\":\"PKID\",\"org_user_hash\":\"OUH\"}";
+        new ObjectMapper().readValue(json, ServerSentEventAuthorizationResponseCore.class);
+    }
+
+    @Test(expected = JsonMappingException.class)
+    public void testParseWithoutServiceUserHashRaisesException() throws IOException {
+        String json = "{\"auth\":\"Auth\", \"user_push_id\":\"UPID\"," +
+                "\"public_key_id\":\"PKID\",\"org_user_hash\":\"OUH\"}";
+        new ObjectMapper().readValue(json, ServerSentEventAuthorizationResponseCore.class);
+    }
+
+    @Test(expected = JsonMappingException.class)
+    public void testParseWithoutPublicKeyIdRaisesException() throws IOException {
+        String json = "{\"auth\":\"Auth\", \"user_push_id\":\"UPID\",\"service_user_hash\":\"SUH\"," +
+                "\"org_user_hash\":\"OUH\"}";
+        new ObjectMapper().readValue(json, ServerSentEventAuthorizationResponseCore.class);
+    }
+
+    @Test
+    public void testParseWithoutOrgUserHashIsNull() throws IOException {
+        String json = "{\"auth\":\"Auth\", \"user_push_id\":\"UPID\",\"service_user_hash\":\"SUH\"," +
+                "\"public_key_id\":\"PKID\"}";
+        assertNull(new ObjectMapper().readValue(json, ServerSentEventAuthorizationResponseCore.class).getOrgUserHash());
+    }
+
+    @Test
+    public void testParseWithoutAuthJweIsNull() throws IOException {
+        String json = "{\"auth\":\"Auth\", \"user_push_id\":\"UPID\",\"service_user_hash\":\"SUH\"," +
+                "\"public_key_id\":\"PKID\"}";
+        assertNull(new ObjectMapper().readValue(json, ServerSentEventAuthorizationResponseCore.class).getAuthJwe());
+    }
+
+    @Test
+    public void testParseWithAdditionalFieldDoesEffectParsing() throws IOException {
+        String json = "{\"auth\":\"Auth\", \"user_push_id\":\"UPID\",\"service_user_hash\":\"SUH\"," +
+                "\"public_key_id\":\"PKID\",\"org_user_hash\":\"OUH\"," +
+                "\"UNKNOWN_FIELD\":null}";
+        ServerSentEventAuthorizationResponseCore expected = new ServerSentEventAuthorizationResponseCore("" +
+                "Auth", null, "UPID", "SUH", "PKID", "OUH");
+        ServerSentEventAuthorizationResponseCore actual = new ObjectMapper().readValue(
+                json, ServerSentEventAuthorizationResponseCore.class);
+        assertEquals(expected, actual);
+    }
 }
