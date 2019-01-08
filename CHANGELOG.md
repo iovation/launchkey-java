@@ -2,6 +2,11 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.2.2
+  
+    * Fix bug in Jackson Databind annotation of ServerSentEventAuthorizationResponseCore that would throw a 
+        JsonMappingException when unknown attributes were returned in the response.
+
   * 4.2.1
 
     * Fixed bug in Jose4jJWTService#decode which caused null pointer exception when decoding a request JWT from a webhook
