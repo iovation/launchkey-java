@@ -79,7 +79,9 @@ class ServiceCommand {
                     System.out.print(".");
                     authorizationResponse = serviceClient.getAuthorizationResponse(authRequest.getId());
                     if (authorizationResponse != null) {
-                        System.out.println("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
+                        System.out.println("Authorization request response received:");
+                        System.out.println("    Request ID:    " + authorizationResponse.getAuthorizationRequestId());
+                        System.out.println("    Authorized:    " + naForNull(authorizationResponse.isAuthorized()));
                         System.out.println("    Type:          " + naForNull(authorizationResponse.getType()));
                         System.out.println("    Reason:        " + naForNull(authorizationResponse.getReason()));
                         System.out.println("    Denial Reason: " + naForNull(authorizationResponse.getDenialReason()));
