@@ -80,4 +80,12 @@ public class ErrorTest {
         assertEquals(true, data.get("my_auth"));
         assertEquals("2018-11-28T22:04:44Z", data.get("expires"));
     }
+
+    @Test
+    public void objectMapperIgnoresUnknown() throws Exception {
+        String json = "{\"error_code\":\"Error Code\",\"error_detail\":{\"one\":1,\"two\":2.0,\"three\":\"three\"},\"unknown\":null}";
+        Error error = mapper.readValue(json, Error.class);
+        assertNotNull(error.getErrorDetail());
+    }
+
 }
