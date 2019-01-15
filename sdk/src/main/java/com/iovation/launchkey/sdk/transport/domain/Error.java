@@ -13,8 +13,10 @@
 package com.iovation.launchkey.sdk.transport.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Error {
     private final String errorCode;
     private final Object errorDetail;
