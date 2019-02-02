@@ -40,7 +40,13 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
     public DirectoryUserDeviceLinkData linkDevice(String userId) throws PlatformErrorException, UnknownEntityException,
             InvalidResponseException, InvalidStateException, InvalidCredentialsException,
             CommunicationErrorException, MarshallingError, CryptographyError {
-        DirectoryV3DevicesPostRequest request = new DirectoryV3DevicesPostRequest(userId);
+        return linkDevice(userId, null);
+    }
+
+    public DirectoryUserDeviceLinkData linkDevice(String userId, Integer ttl) throws PlatformErrorException,
+            UnknownEntityException, InvalidResponseException, InvalidStateException, InvalidCredentialsException,
+            CommunicationErrorException, MarshallingError, CryptographyError {
+        DirectoryV3DevicesPostRequest request = new DirectoryV3DevicesPostRequest(userId, ttl);
         DirectoryV3DevicesPostResponse response = transport.directoryV3DevicesPost(request, directory);
         return new DirectoryUserDeviceLinkData(response.getCode(), response.getQRCode());
     }
