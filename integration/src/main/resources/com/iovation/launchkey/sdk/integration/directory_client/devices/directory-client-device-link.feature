@@ -11,6 +11,11 @@ Feature: Directory Client can link Devices
     Then the Device linking response contains a valid QR Code URL
     And the Device linking response contains a valid Linking Code
 
+  Scenario: Linking Devices with TTL returns QR Code URL and linking code
+    When I make a Device linking request with a TTL of 300 seconds
+    Then the Device linking response contains a valid QR Code URL
+    And the Device linking response contains a valid Linking Code
+
   Scenario: Linking Devices adds the device to the User's Device list
     When I make a Device linking request
     And I retrieve the Devices list for the current User
