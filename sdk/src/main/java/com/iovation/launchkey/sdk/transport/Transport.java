@@ -91,6 +91,24 @@ public interface Transport {
             NoKeyFoundException;
 
     /**
+     * @param authRequestId Identifier for the authorization request as returned by
+     * {@link #serviceV3AuthsPost(ServiceV3AuthsPostRequest, EntityIdentifier)}
+     * @param subject Service entity for the subject
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @throws AuthorizationResponseExists When the authorization request has already received a response
+     * @throws EntityNotFound When the #authRequestId does not exits
+     * @throws AuthorizationRequestCanceled When the authorization request was previously canceled.
+     */
+    void serviceV3AuthsDelete(UUID authRequestId, EntityIdentifier subject)
+            throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
+            InvalidCredentialsException, AuthorizationResponseExists, EntityNotFound, AuthorizationRequestCanceled;
+
+    /**
      * Begin a user service session which will optionally be associated with an authorization request.
      *
      * @param request Transport object with information that will be marshaled for the request.

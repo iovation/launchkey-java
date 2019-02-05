@@ -24,6 +24,7 @@ import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("DuplicateThrows")
 public interface ServiceClient {
     /**
      * Authorize a transaction for the provided user.  This getServiceService method would be utilized if you are using this
@@ -231,6 +232,19 @@ public interface ServiceClient {
             InvalidCredentialsException, CryptographyError;
 
     /**
+     * Cancel an existing authorization request
+     * @param authorizationRequestId Identifier of the authorization request to cancel
+     * @throws EntityNotFound When the authorization request does not exist.
+     * @throws AuthorizationRequestCanceled When the authorization request has been previously canceled.
+     * @throws AuthorizationResponseExists When the authorization request has been responded to abd can no longer
+     * be canceled.
+     */
+    void cancelAuthorizationRequest(String authorizationRequestId)
+            throws EntityNotFound, AuthorizationRequestCanceled, AuthorizationResponseExists,
+            CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError;
+
+    /**
      * Request the response for a previous authorization call.
      *
      * @param authorizationRequestId Unique identifier returned by {@link #authorize(String)}
@@ -238,6 +252,7 @@ public interface ServiceClient {
      * that decision
      * @throws AuthorizationRequestTimedOutError When the user did not respond to the authorization request in the
      * allotted time.
+     * @throws AuthorizationRequestCanceled When the authorization request has been canceled.
      * @throws NoKeyFoundException When the Entity and Key ID identifying the public key used to encrypt authorization
      * response is not found in the known keys mapping.
      * @throws CommunicationErrorException If there was an error communicating with the endpoint
@@ -249,7 +264,8 @@ public interface ServiceClient {
      */
     AuthorizationResponse getAuthorizationResponse(String authorizationRequestId)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
-            InvalidCredentialsException, CryptographyError, AuthorizationRequestTimedOutError, NoKeyFoundException;
+            InvalidCredentialsException, CryptographyError, AuthorizationRequestTimedOutError, NoKeyFoundException,
+            AuthorizationRequestCanceled;
 
     /**
      * Request to start a Service Session for the End User which was derived from a authorization request
