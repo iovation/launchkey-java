@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(Enclosed.class)
-public class BasicServiceClientTestGetAuthorizationResponse extends TestCase {
+public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
     @RunWith(MockitoJUnitRunner.class)
     public static class StandardTests {
