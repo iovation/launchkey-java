@@ -236,7 +236,7 @@ public interface ServiceClient {
      * @param authorizationRequestId Identifier of the authorization request to cancel
      * @throws EntityNotFound When the authorization request does not exist.
      * @throws AuthorizationRequestCanceled When the authorization request has been previously canceled.
-     * @throws AuthorizationResponseExists When the authorization request has been responded to abd can no longer
+     * @throws AuthorizationResponseExists When the authorization request has been responded to and can no longer
      * be canceled.
      */
     void cancelAuthorizationRequest(String authorizationRequestId)
