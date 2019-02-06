@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("DuplicateThrows")
 public class BasicServiceClient implements ServiceClient {
     private final EntityIdentifier serviceEntity;
     private final Transport transport;
@@ -123,6 +124,14 @@ public class BasicServiceClient implements ServiceClient {
     @Override
     public AuthorizationRequest createAuthorizationRequest(String userIdentifier) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
         return createAuthorizationRequest(userIdentifier, null, null, null, null, null, null, null);
+    }
+
+    @Override
+    public void cancelAuthorizationRequest(String authorizationRequestId)
+            throws EntityNotFound, AuthorizationRequestCanceled, AuthorizationResponseExists,
+            CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException,
+            CryptographyError {
+        transport.serviceV3AuthsDelete(UUID.fromString(authorizationRequestId), serviceEntity);
     }
 
     @Override

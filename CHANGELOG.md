@@ -2,6 +2,11 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.4.0
+  
+    * Added dynamic TTL to DirectoryClient::linkDevice to allow for variable lifespan for linking codes
+    * Added ServiceClient::cancelAuthorizationRequest to allow for cancelling an existing authorization request. 
+
   * 4.3.0
 
     * Added busy signal processing 

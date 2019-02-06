@@ -44,6 +44,8 @@ public class InvalidRequestException extends CommunicationErrorException {
         ERROR_MAP.put("SVC-003", PolicyFailure.class);
         ERROR_MAP.put("SVC-004", ServiceNotFound.class);
         ERROR_MAP.put("SVC-005", AuthorizationInProgress.class);
+        ERROR_MAP.put("SVC-006", AuthorizationResponseExists.class);
+        ERROR_MAP.put("SVC-007", AuthorizationRequestCanceled.class);
         ERROR_MAP.put("DIR-001", InvalidDirectoryIdentifier.class);
         ERROR_MAP.put("KEY-001", InvalidPublicKey.class);
         ERROR_MAP.put("KEY-002", PublicKeyAlreadyInUse.class);
