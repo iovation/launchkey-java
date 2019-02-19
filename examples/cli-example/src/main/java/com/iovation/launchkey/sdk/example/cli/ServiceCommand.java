@@ -6,13 +6,13 @@ import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.service.DenialReason;
 import com.iovation.launchkey.sdk.error.AuthorizationInProgress;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestTimedOutError;
+import com.iovation.launchkey.sdk.error.RequestTimedOut;
 import picocli.CommandLine;
 
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
 
-@SuppressWarnings("unused")
 @CommandLine.Command(name = "service")
 class ServiceCommand {
 
@@ -104,14 +104,6 @@ class ServiceCommand {
             System.out.println("    Same Service: " + e.isFromSameService());
         }
 
-        System.out.println();
-    }
-
-    @CommandLine.Command(name = "cancel-auth-request")
-    void cancelAuthRequest(@CommandLine.Parameters(paramLabel = "<AUTH_REQUEST>") String authRequestId) throws Exception {
-        getServiceClient().cancelAuthorizationRequest(authRequestId);
-        System.out.println();
-        System.out.println("Auth Cancelled.");
         System.out.println();
     }
 

@@ -213,14 +213,6 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
-    public void serviceV3AuthsDelete(UUID authRequestId, EntityIdentifier subject)
-            throws CommunicationErrorException, InvalidResponseException, MarshallingError,
-            CryptographyError, InvalidCredentialsException {
-        String path = "/service/v3/auths/" + authRequestId.toString();
-        getHttpResponse("DELETE", path, subject, null, true, null);
-    }
-
-    @Override
     public void serviceV3SessionsPost(ServiceV3SessionsPostRequest request, EntityIdentifier subject)
             throws CommunicationErrorException, InvalidResponseException, MarshallingError,
             CryptographyError, InvalidCredentialsException {

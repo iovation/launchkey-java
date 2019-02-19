@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BasicServiceClientSessionStartTest {
+public class BasicServiceClientTestSessionStart {
     private final static UUID serviceId = UUID.fromString("67c87654-aed9-11e7-98e9-0469f8dc10a5");
     private final static UUID authRequestId = UUID.fromString("3e3dd6f8-a24e-11e8-b600-8c85909ffbde");
     private final static String user = "User Name";
