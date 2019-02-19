@@ -25,13 +25,9 @@ class DirectoryCommand {
     private File privateKeyFile;
 
     @CommandLine.Command(name = "device-link")
-    void deviceLink(
-            @CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
-                    description = "Unique identifier of the user for your application") String identifier,
-            @CommandLine.Option(names = {"-t", "--ttl"}, arity = "0..1",
-                    description = "[Directory Service Only] Title of the authorization request.") Integer ttl
-    ) throws Exception {
-        DirectoryUserDeviceLinkData result = getDirectoryClient().linkDevice(identifier, ttl);
+    void deviceLink(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
+            description = "Unique identifier of the user for your application") String identifier) throws Exception {
+        DirectoryUserDeviceLinkData result = getDirectoryClient().linkDevice(identifier);
         System.out.println();
         System.out.println("Device link request successful");
         System.out.println("    QR Code URL: " + result.getQrCodeUrl());

@@ -26,7 +26,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,20 +60,6 @@ public class BasicDirectoryClientLinkDeviceTest {
         client.linkDevice("Expected Username");
         verify(transport).directoryV3DevicesPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("Expected Username", requestCaptor.getValue().getIdentifier());
-    }
-
-    @Test
-    public void putsTtlInRequestForOverloadWithTtl() throws Exception {
-        client.linkDevice("Expected Username", 360);
-        verify(transport).directoryV3DevicesPost(requestCaptor.capture(), any(EntityIdentifier.class));
-        assertEquals(Integer.valueOf(360), requestCaptor.getValue().getTTL());
-    }
-
-    @Test
-    public void putsNullTtlInRequestForOverloadWithouTtl() throws Exception {
-        client.linkDevice("Expected Username");
-        verify(transport).directoryV3DevicesPost(requestCaptor.capture(), any(EntityIdentifier.class));
-        assertNull(requestCaptor.getValue().getTTL());
     }
 
     @Test

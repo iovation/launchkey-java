@@ -64,14 +64,10 @@ public class DirectoryDeviceManager {
         }
     }
 
-    void createLinkingRequest(String userIdentifier, Integer ttl) throws Throwable {
+    void createLinkingRequest(String userIdentifier) throws Throwable {
         UUID directoryId = directoryManager.getCurrentDirectoryEntity().getId();
-        DirectoryUserDeviceLinkData response;
-        if (ttl == null) {
-            response = directoryManager.getDirectoryClient(directoryId).linkDevice(userIdentifier);
-        } else {
-            response = directoryManager.getDirectoryClient(directoryId).linkDevice(userIdentifier, ttl);
-        }
+        DirectoryUserDeviceLinkData response =
+                directoryManager.getDirectoryClient(directoryId).linkDevice(userIdentifier);
         currentUserIdentifier = userIdentifier;
         if (!directoryUserIdentifiers.containsKey(directoryId)) {
             directoryUserIdentifiers.put(directoryId, new HashSet<String>());

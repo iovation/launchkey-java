@@ -12,18 +12,13 @@
 
 package com.iovation.launchkey.sdk.transport.domain;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Objects;
 
 public class DirectoryV3DevicesPostRequest {
     public final String identifier;
-    private final Integer ttl;
 
-    public DirectoryV3DevicesPostRequest(String identifier, Integer ttl) {
+    public DirectoryV3DevicesPostRequest(String identifier) {
         this.identifier = identifier;
-        this.ttl = ttl;
     }
 
     @JsonProperty("identifier")
@@ -31,31 +26,25 @@ public class DirectoryV3DevicesPostRequest {
         return identifier;
     }
 
-    @JsonProperty("ttl")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public Integer getTTL() {
-        return ttl;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DirectoryV3DevicesPostRequest)) return false;
+
         DirectoryV3DevicesPostRequest that = (DirectoryV3DevicesPostRequest) o;
-        return Objects.equals(getIdentifier(), that.getIdentifier()) &&
-                Objects.equals(getTTL(), that.getTTL());
+
+        return getIdentifier() != null ? getIdentifier().equals(that.getIdentifier()) : that.getIdentifier() == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIdentifier(), getTTL());
+        return getIdentifier() != null ? getIdentifier().hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return "DirectoryV3DevicesPostRequest{" +
                 "identifier='" + identifier + '\'' +
-                ", ttl=" + ttl +
                 '}';
     }
 }

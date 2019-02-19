@@ -40,12 +40,7 @@ public class DirectoryDeviceSteps {
 
     @When("^I ma[k|d]e a Device linking request$")
     public void iMakeADeviceLinkingRequest() throws Throwable {
-        directoryDeviceManager.createLinkingRequest(Utils.createRandomDirectoryUserName(), null);
-    }
-
-    @When("^I ma[k|d]e a Device linking request with a TTL of (\\d+) seconds$")
-    public void iMakeADeviceLinkingRequest(int seconds) throws Throwable {
-        directoryDeviceManager.createLinkingRequest(Utils.createRandomDirectoryUserName(), seconds);
+        directoryDeviceManager.createLinkingRequest(Utils.createRandomDirectoryUserName());
     }
 
     @And("^I retrieve the Devices list for the current User$")
