@@ -5,7 +5,6 @@ import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.service.DenialReason;
 import com.iovation.launchkey.sdk.error.AuthorizationInProgress;
-import com.iovation.launchkey.sdk.error.AuthorizationRequestCanceled;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestTimedOutError;
 import picocli.CommandLine;
 
@@ -97,9 +96,6 @@ class ServiceCommand {
         } catch (AuthorizationRequestTimedOutError e) {
             System.out.println();
             System.out.println("Authorization request timed out!");
-        } catch (AuthorizationRequestCanceled e) {
-            System.out.println();
-            System.out.println("Authorization request was cancelled!");
         } catch (AuthorizationInProgress e) {
             System.out.println();
             System.out.println("Authorization already in progress!");
