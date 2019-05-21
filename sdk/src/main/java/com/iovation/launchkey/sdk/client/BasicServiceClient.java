@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.domain.service.AuthMethod;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.DenialReason;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
@@ -22,6 +23,7 @@ import com.iovation.launchkey.sdk.transport.domain.*;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
+import com.iovation.launchkey.sdk.transport.domain.AuthPolicy.MinimumRequirement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -153,19 +155,119 @@ public class BasicServiceClient implements ServiceClient {
     }
 
     private AuthorizationResponse getAuthorizationResponse(AuthsResponse authsResponse) {
-        AuthorizationResponse response;
-        AuthorizationResponse.Type type;
-        if (authsResponse.getType() == null) {
-            type = null;
-        } else if (authsResponse.getType().equals("AUTHORIZED")) {
-            type = AuthorizationResponse.Type.AUTHORIZED;
-        } else if (authsResponse.getType().equals("DENIED")) {
-            type = AuthorizationResponse.Type.DENIED;
-        } else if (authsResponse.getType().equals("FAILED")) {
-            type = AuthorizationResponse.Type.FAILED;
+        AuthorizationResponse.Type type = getType(authsResponse);
+        AuthorizationResponse.Reason reason = getReason(authsResponse);
+        AuthPolicy policy = getAuthPolicy(authsResponse);
+        List<AuthMethod> authMethods = getMethods(authsResponse);
+
+        AuthorizationResponse response = new AuthorizationResponse(
+                authsResponse.getAuthorizationRequestId().toString(),
+                authsResponse.getResponse(),
+                authsResponse.getServiceUserHash(),
+                authsResponse.getOrganizationUserHash(),
+                authsResponse.getUserPushId(),
+                authsResponse.getDeviceId(),
+                Arrays.asList(authsResponse.getServicePins()),
+                type,
+                reason,
+                authsResponse.getDenialReason(),
+                reason == AuthorizationResponse.Reason.FRAUDULENT,
+                policy,
+                authMethods);
+        return response;
+    }
+
+    private AuthPolicy getAuthPolicy(AuthsResponse authsResponse) {
+        AuthPolicy policy;
+
+        if (authsResponse.getAuthPolicy() == null) {
+            policy = null;
         } else {
-            type = AuthorizationResponse.Type.OTHER;
+            List<AuthPolicy.Location> locations = getLocations(authsResponse);
+
+            Boolean inherence = null;
+            Boolean knowledge = null;
+            Boolean possession = null;
+            Integer any = null;
+            for (MinimumRequirement minumumRequrement : authsResponse.getAuthPolicy().getMinimumRequirements()) {
+                if (minumumRequrement.getInherence() != null) {
+                    inherence = minumumRequrement.getInherence().equals(1);
+                }
+                if (minumumRequrement.getKnowledge() != null) {
+                    knowledge = minumumRequrement.getKnowledge().equals(1);
+                }
+                if (minumumRequrement.getPossession() != null) {
+                    possession = minumumRequrement.getPossession().equals(1);
+                }
+                if (minumumRequrement.getAny() != null) {
+                    any = minumumRequrement.getAny();
+                }
+            }
+
+            if (any != null) {
+                policy = new AuthPolicy(any, authsResponse.getAuthPolicy().getDeviceIntegrity(), locations);
+            } else if (inherence != null || knowledge != null || possession != null) {
+                policy = new AuthPolicy(
+                        knowledge != null && knowledge,
+                        inherence != null && inherence,
+                        possession != null && possession,
+                        authsResponse.getAuthPolicy().getDeviceIntegrity(),
+                        locations);
+            } else {
+                policy = new AuthPolicy(locations);
+            }
         }
+        return policy;
+    }
+
+    private List<AuthMethod> getMethods(AuthsResponse authsResponse) {
+        List<AuthMethod> authMethods;
+        if (authsResponse.getAuthMethods() == null) {
+            authMethods = null;
+        } else {
+            authMethods = new ArrayList<>();
+            for (com.iovation.launchkey.sdk.transport.domain.AuthMethod authMethod : authsResponse.getAuthMethods()) {
+                AuthMethod.Type authMethodType;
+                if ("PIN_CODE".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.PIN_CODE;
+                } else if ("CIRCLE_CODE".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.CIRCLE_CODE;
+                } else if ("GEOFENCING".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.GEOFENCING;
+                } else if ("LOCATIONS".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.LOCATIONS;
+                } else if ("WEARABLES".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.WEARABLES;
+                } else if ("FINGERPRINT".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.FINGERPRINT;
+                } else if ("FACE".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.FACE;
+                } else {
+                    authMethodType = AuthMethod.Type.OTHER;
+                }
+                authMethods.add(new AuthMethod(authMethodType, authMethod.getSet(), authMethod.getActive(),
+                        authMethod.getAllowed(), authMethod.getSupported(), authMethod.getUserRequired(),
+                        authMethod.getPassed(), authMethod.getError()));
+            }
+        }
+        return authMethods;
+    }
+
+    private List<AuthPolicy.Location> getLocations(AuthsResponse authsResponse) {
+        List<AuthPolicy.Location> locations;
+        if (authsResponse.getAuthPolicy().getGeoFences() == null) {
+            locations = null;
+        } else {
+            locations = new ArrayList<>();
+            for (com.iovation.launchkey.sdk.transport.domain.AuthPolicy.Location location : authsResponse.getAuthPolicy().getGeoFences()) {
+                locations.add(new AuthPolicy.Location(location.getName(), location.getRadius(), location.getLatitude(),
+                        location.getLongitude()));
+            }
+        }
+        return locations;
+    }
+
+    private AuthorizationResponse.Reason getReason(AuthsResponse authsResponse) {
         AuthorizationResponse.Reason reason;
         if (authsResponse.getReason() == null) {
             reason = null;
@@ -188,19 +290,23 @@ public class BasicServiceClient implements ServiceClient {
         } else {
             reason = AuthorizationResponse.Reason.OTHER;
         }
-        response = new AuthorizationResponse(
-                authsResponse.getAuthorizationRequestId().toString(),
-                authsResponse.getResponse(),
-                authsResponse.getServiceUserHash(),
-                authsResponse.getOrganizationUserHash(),
-                authsResponse.getUserPushId(),
-                authsResponse.getDeviceId(),
-                Arrays.asList(authsResponse.getServicePins()),
-                type,
-                reason,
-                authsResponse.getDenialReason(),
-                reason == AuthorizationResponse.Reason.FRAUDULENT);
-        return response;
+        return reason;
+    }
+
+    private AuthorizationResponse.Type getType(AuthsResponse authsResponse) {
+        AuthorizationResponse.Type type;
+        if (authsResponse.getType() == null) {
+            type = null;
+        } else if (authsResponse.getType().equals("AUTHORIZED")) {
+            type = AuthorizationResponse.Type.AUTHORIZED;
+        } else if (authsResponse.getType().equals("DENIED")) {
+            type = AuthorizationResponse.Type.DENIED;
+        } else if (authsResponse.getType().equals("FAILED")) {
+            type = AuthorizationResponse.Type.FAILED;
+        } else {
+            type = AuthorizationResponse.Type.OTHER;
+        }
+        return type;
     }
 
     private UUID getAuthRequestIdFromString(String uuid) {

@@ -34,7 +34,7 @@ public class ServicePolicy extends AuthPolicy {
     @JsonCreator
     public ServicePolicy(@JsonProperty("minimum_requirements") List<MinimumRequirement> minimumRequirements,
                          @JsonProperty("factors") ArrayNode factors) {
-        super(minimumRequirements, factors);
+        super(minimumRequirements, factors, null, null, null);
         List<TimeFence> timeFences = new ArrayList<>();
         try {
             for (JsonNode factor : factors) {

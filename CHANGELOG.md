@@ -2,6 +2,14 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.5.0
+  
+    * Added Auth Response Insights
+        * These enhancements will only be added for responses from Mobile Auth SDK versions
+          that return the data in the response.
+        * Added auth policy to auth response
+        * Added auth methods to auth response
+ 
   * 4.4.0
   
     * Added dynamic TTL to DirectoryClient::linkDevice to allow for variable lifespan for linking codes

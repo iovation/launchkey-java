@@ -13,11 +13,14 @@ package com.iovation.launchkey.sdk.transport.domain; /**
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 
 public class AuthPolicyTest {
     @Test
-    public void objectMapperMapsAsExpected() throws Exception {
+    public void objectMapperMapsAsExpectedForServicePolicy() throws Exception {
         String expected =
                 "{" +
                     "\"minimum_requirements\":[{" +

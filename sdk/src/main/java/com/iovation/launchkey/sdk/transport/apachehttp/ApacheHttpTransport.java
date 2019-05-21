@@ -170,7 +170,9 @@ public class ApacheHttpTransport implements Transport {
                             deviceResponse.getServicePins(),
                             deviceResponse.getType(),
                             deviceResponse.getReason(),
-                            deviceResponse.getDenialReason());
+                            deviceResponse.getDenialReason(),
+                            deviceResponse.getAuthPolicy(),
+                            deviceResponse.getAuthMethods());
 
                 } else {
                     RSAPrivateKey key = entityKeyMap.getKey(audience, apiResponse.getPublicKeyId());
@@ -193,6 +195,8 @@ public class ApacheHttpTransport implements Transport {
                             deviceResponse.getResponse(),
                             deviceResponse.getDeviceId(),
                             deviceResponse.getServicePins(),
+                            null,
+                            null,
                             null,
                             null,
                             null

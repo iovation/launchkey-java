@@ -1,9 +1,7 @@
 package com.iovation.launchkey.sdk.example.cli;
 
 import com.iovation.launchkey.sdk.client.ServiceClient;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
-import com.iovation.launchkey.sdk.domain.service.DenialReason;
+import com.iovation.launchkey.sdk.domain.service.*;
 import com.iovation.launchkey.sdk.error.AuthorizationInProgress;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestCanceled;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestTimedOutError;
@@ -82,15 +80,59 @@ class ServiceCommand {
                     if (authorizationResponse != null) {
                         System.out.println("Authorization request response received:");
                         System.out.println("    Request ID:    " + authorizationResponse.getAuthorizationRequestId());
-                        System.out.println("    Authorized:    " + naForNull(authorizationResponse.isAuthorized()));
-                        System.out.println("    Type:          " + naForNull(authorizationResponse.getType()));
-                        System.out.println("    Reason:        " + naForNull(authorizationResponse.getReason()));
-                        System.out.println("    Denial Reason: " + naForNull(authorizationResponse.getDenialReason()));
-                        System.out.println("    Fraud:         " + naForNull(authorizationResponse.isFraud()));
+                        System.out.println("    Authorized:    " + safeNull(authorizationResponse.isAuthorized()));
+                        System.out.println("    Type:          " + safeNull(authorizationResponse.getType()));
+                        System.out.println("    Reason:        " + safeNull(authorizationResponse.getReason()));
+                        System.out.println("    Denial Reason: " + safeNull(authorizationResponse.getDenialReason()));
+                        System.out.println("    Fraud:         " + safeNull(authorizationResponse.isFraud()));
                         System.out.println("    Device ID:     " + authorizationResponse.getDeviceId());
                         System.out.println("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
                         System.out.println("    User Push ID:  " + authorizationResponse.getUserPushId());
-                        System.out.println("    Org User Hash: " + naForNull(authorizationResponse.getOrganizationUserHash()));
+                        System.out.println("    Org User Hash: " + safeNull(authorizationResponse.getOrganizationUserHash()));
+
+                        System.out.print("    Auth Policy: ");
+                        AuthPolicy policy = authorizationResponse.getPolicy();
+                        if (policy == null) {
+                            System.out.println("None");
+                        } else {
+                            System.out.println();
+                            System.out.println("        Factors:    " + safeNull(policy.getRequiredFactors()));
+                            System.out.println("        Inherence:  " + safeNull(policy.isInherenceFactorRequired()));
+                            System.out.println("        Knowledge:  " + safeNull(policy.isKnowledgeFactorRequired()));
+                            System.out.println("        Possession: " + safeNull(policy.isPossessionFactorRequired()));
+
+                            System.out.print("        Locations: ");
+                            List<AuthPolicy.Location> locations = authorizationResponse.getPolicy().getLocations();
+                            if (locations == null || locations.size() < 1) {
+                                System.out.println("None");
+                            } else {
+                                System.out.println();
+                                for (AuthPolicy.Location location : locations) {
+                                    System.out.println("            Name: " + safeNull(location.getName()));
+                                    System.out.println("                Radius:    " + safeNull(location.getRadius()));
+                                    System.out.println("                Latitude:  " + safeNull(location.getLatitude()));
+                                    System.out.println("                Longitude: " + safeNull(location.getLongitude()));
+                                }
+                            }
+                        }
+
+                        System.out.print("    Auth Methods: ");
+                        List<AuthMethod> methods = authorizationResponse.getAuthMethods();
+                        if (methods == null || methods.size() < 1) {
+                            System.out.println("None");
+                        } else {
+                            System.out.println();
+                            for (AuthMethod method : methods) {
+                                System.out.println("        Method: " + method.getMethod().name());
+                                System.out.println("            Set:        " + safeNull(method.getSet()));
+                                System.out.println("            Active:     " + safeNull(method.getActive()));
+                                System.out.println("            Allowed:    " + safeNull(method.getAllowed()));
+                                System.out.println("            Supported:  " + safeNull(method.getSupported()));
+                                System.out.println("            Required:   " + safeNull(method.getUserRequired()));
+                                System.out.println("            Passed:     " + safeNull(method.getPassed()));
+                                System.out.println("            Error:      " + safeNull(method.getError()));
+                            }
+                        }
                         break;
                     }
             }
@@ -131,18 +173,28 @@ class ServiceCommand {
                 .makeServiceFactory(serviceId, key).makeServiceClient();
     }
 
-    private static String naForNull(String value) {
-        return value == null ? "N/A" : value;
+    private static String safeNull(String value) {
+        return value == null ? "None" : value;
     }
 
-    private static String naForNull(Enum value) {
+    private static String safeNull(Enum value) {
         String name = value == null ? null : value.name();
-        return naForNull(name);
+        return safeNull(name);
     }
 
-    private static String naForNull(Boolean value) {
+    private static String safeNull(Boolean value) {
         String name = value == null ? null : value.toString();
-        return naForNull(name);
+        return safeNull(name);
+    }
+
+    private static String safeNull(Integer value) {
+        String name = value == null ? null : value.toString();
+        return safeNull(name);
+    }
+
+    private static String safeNull(Double value) {
+        String name = value == null ? null : value.toString();
+        return safeNull(name);
     }
 
     private static List<DenialReason> getDenialReasons(Integer fraud, Integer nonFraud)
