@@ -14,10 +14,8 @@ package com.iovation.launchkey.sdk.integration.entities;
 
 import com.iovation.launchkey.sdk.domain.organization.Directory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.net.URI;
+import java.util.*;
 
 public class DirectoryEntity {
 
@@ -31,11 +29,13 @@ public class DirectoryEntity {
     private final String iosCertificate;
     private final List<PublicKeyEntity> publicKeys;
     private final Boolean denialContextInquiryEnabled;
+    private final URI webhookUrl;
 
     public DirectoryEntity(UUID id, String name, Boolean active, List<UUID> serviceIds, List<UUID> sdkKeys,
                            String androidKey,
                            String iosCertificateFingerprint, String iosCertificate,
-                           Boolean denialContextInquiryEnabled) {
+                           Boolean denialContextInquiryEnabled,
+                           URI webhookUrl) {
         if (id == null) throw new IllegalArgumentException("Argument \"id\" cannot be null.");
         this.id = id;
         this.name = name;
@@ -46,6 +46,7 @@ public class DirectoryEntity {
         this.iosCertificate = iosCertificate;
         this.iosCertificateFingerprint = iosCertificateFingerprint;
         this.denialContextInquiryEnabled = denialContextInquiryEnabled;
+        this.webhookUrl = webhookUrl;
         publicKeys = new ArrayList<>();
     }
 
@@ -89,37 +90,41 @@ public class DirectoryEntity {
         return denialContextInquiryEnabled;
     }
 
+    public URI getWebhookUrl() {
+        return webhookUrl;
+    }
+
     public static DirectoryEntity fromDirectory(Directory directory) {
         return new DirectoryEntity(directory.getId(), directory.getName(), directory.isActive(),
                 directory.getServiceIds(), directory.getSdkKeys(), directory.getAndroidKey(),
-                directory.getIosCertificateFingerprint(), null, directory.isDenialContextInquiryEnabled());
+                directory.getIosCertificateFingerprint(), null, directory.isDenialContextInquiryEnabled(),
+                directory.getWebhookUrl());
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DirectoryEntity)) return false;
-
         DirectoryEntity that = (DirectoryEntity) o;
 
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (active != null ? !active.equals(that.active) : that.active != null) return false;
+        if (!Objects.equals(id, that.id)) return false;
+        if (!Objects.equals(name, that.name)) return false;
+        if (!Objects.equals(active, that.active)) return false;
         if (serviceIds != null) Collections.sort(serviceIds);
         if (that.serviceIds != null) Collections.sort(that.serviceIds);
-        if (serviceIds != null ? !serviceIds.equals(that.serviceIds) : that.serviceIds != null) return false;
+        if (!Objects.equals(serviceIds, that.serviceIds)) return false;
         if (sdkKeys != null) Collections.sort(sdkKeys);
         if (that.sdkKeys != null) Collections.sort(that.sdkKeys);
-        if (sdkKeys != null ? !sdkKeys.equals(that.sdkKeys) : that.sdkKeys != null) return false;
-        if (androidKey != null ? !androidKey.equals(that.androidKey) : that.androidKey != null) return false;
-        if (denialContextInquiryEnabled != null ? !denialContextInquiryEnabled.equals(that.denialContextInquiryEnabled) : that.denialContextInquiryEnabled != null) return false;
-        return iosCertificateFingerprint != null ? iosCertificateFingerprint.equals(that.iosCertificateFingerprint) :
-                that.iosCertificateFingerprint == null;
+        if (!Objects.equals(sdkKeys, that.sdkKeys)) return false;
+        if (!Objects.equals(androidKey, that.androidKey)) return false;
+        if (!Objects.equals(denialContextInquiryEnabled, that.denialContextInquiryEnabled)) return false;
+        if (!Objects.equals(iosCertificateFingerprint, that.iosCertificateFingerprint)) return false;
+        return Objects.equals(webhookUrl, that.webhookUrl);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() * 31 : 0;
+        return Objects.hash(getId());
     }
 
     @Override
@@ -133,8 +138,9 @@ public class DirectoryEntity {
                 ", androidKey='" + androidKey + '\'' +
                 ", iosCertificateFingerprint='" + iosCertificateFingerprint + '\'' +
                 ", iosCertificate='" + iosCertificate + '\'' +
-                ", denialContextInquiryEnabled='" + denialContextInquiryEnabled + "'" +
                 ", publicKeys=" + publicKeys +
+                ", denialContextInquiryEnabled=" + denialContextInquiryEnabled +
+                ", webhookUrl=" + webhookUrl +
                 '}';
     }
 }

@@ -12,15 +12,17 @@
 
 package com.iovation.launchkey.sdk.integration.entities;
 
-import java.net.URI;
+import java.util.UUID;
 
 public class LinkingResponseEntity {
     private final String linkingCode;
     private final String qrCodeURL;
+    private final UUID deviceId;
 
-    public LinkingResponseEntity(String linkingCode, String qrCodeURL) {
+    public LinkingResponseEntity(String linkingCode, String qrCodeURL, UUID deviceId) {
         this.linkingCode = linkingCode;
         this.qrCodeURL = qrCodeURL;
+        this.deviceId = deviceId;
     }
 
     public String getLinkingCode() {
@@ -29,5 +31,9 @@ public class LinkingResponseEntity {
 
     public String getQrCodeURL() {
         return qrCodeURL;
+    }
+
+    public UUID getDeviceId() {
+        return deviceId;
     }
 }

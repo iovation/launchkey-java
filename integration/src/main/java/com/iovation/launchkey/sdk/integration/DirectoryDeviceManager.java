@@ -36,7 +36,7 @@ public class DirectoryDeviceManager {
     private Map<UUID, Set<String>> directoryUserIdentifiers = new HashMap<>();
 
     @Inject
-    public DirectoryDeviceManager(OrganizationFactory factory, DirectoryManager directoryManager) throws Throwable {
+    public DirectoryDeviceManager(OrganizationFactory factory, DirectoryManager directoryManager) {
         this.directoryManager = directoryManager;
         this.organizationClient = factory.makeOrganizationClient();
     }
@@ -45,7 +45,7 @@ public class DirectoryDeviceManager {
     public void tearDown() throws Throwable {
         for (Map.Entry<UUID, Set<String>> entry : directoryUserIdentifiers.entrySet()) {
             UUID directoryId = entry.getKey();
-            organizationClient.updateDirectory(directoryId, true, null, null, null);
+            organizationClient.updateDirectory(directoryId, true, null, null, null, null);
             DirectoryClient directoryClient = directoryManager.getDirectoryClient(directoryId);
             try {
                 for (String userIdentifier : entry.getValue()) {
@@ -60,7 +60,7 @@ public class DirectoryDeviceManager {
             } catch (Exception e) {
                 System.err.println("Unable to unlink all User Devices for Directory " + directoryId);
             }
-            organizationClient.updateDirectory(directoryId, false, null, null, null);
+            organizationClient.updateDirectory(directoryId, false, null, null, null, null);
         }
     }
 
@@ -77,7 +77,8 @@ public class DirectoryDeviceManager {
             directoryUserIdentifiers.put(directoryId, new HashSet<String>());
         }
         directoryUserIdentifiers.get(directoryId).add(userIdentifier);
-        currentLinkingResponse = new LinkingResponseEntity(response.getCode(), response.getQrCodeUrl());
+        currentLinkingResponse = new LinkingResponseEntity(response.getCode(), response.getQrCodeUrl(),
+                response.getDeviceId());
     }
 
     void retrieveUserDevices() throws Throwable {

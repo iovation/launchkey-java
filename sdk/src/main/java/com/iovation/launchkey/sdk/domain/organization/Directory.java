@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.domain.organization;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class Directory {
     private final String androidKey;
     private final String iosCertificateFingerprint;
     private final Boolean denialContextInquiryEnabled;
+    private final URI webhookUrl;
 
     /**
      * @param id The unique identifier for the Directory
@@ -38,13 +40,13 @@ public class Directory {
      * @param sdkKeys List of Mobile SDK Keys for the Directory
      * @param androidKey The key that will be used to send push notifications to Android Devices.
      * @param iosCertificateFingerprint The MD5 certificate fingerprint for the Certificate used to send push
-     * notifications to iOS Devices.
+* notifications to iOS Devices.
      * @param denialContextInquiryEnabled Will the user be prompted for denial context when they deny authorization
-     * requests for any and all child services.
+     * @param webhookUrl The URL to which Directory level webhooks will be sent
      *
      */
     public Directory(UUID id, String name, boolean active, List<UUID> serviceIds, List<UUID> sdkKeys, String androidKey,
-                     String iosCertificateFingerprint, Boolean denialContextInquiryEnabled) {
+                     String iosCertificateFingerprint, Boolean denialContextInquiryEnabled, URI webhookUrl) {
         if (id == null) throw new IllegalArgumentException("Argument \"id\" cannot be null.");
         this.id = id;
         this.name = name;
@@ -54,6 +56,7 @@ public class Directory {
         this.androidKey = androidKey;
         this.iosCertificateFingerprint = iosCertificateFingerprint;
         this.denialContextInquiryEnabled = denialContextInquiryEnabled;
+        this.webhookUrl = webhookUrl;
     }
 
     /**
@@ -122,6 +125,14 @@ public class Directory {
         return denialContextInquiryEnabled;
     }
 
+    /**
+     * Get the URL to which Directory level webhooks will be sent
+     * @return Webhook URL
+     */
+    public URI getWebhookUrl() {
+        return webhookUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -134,7 +145,8 @@ public class Directory {
                 Objects.equals(getSdkKeys(), directory.getSdkKeys()) &&
                 Objects.equals(getAndroidKey(), directory.getAndroidKey()) &&
                 Objects.equals(getIosCertificateFingerprint(), directory.getIosCertificateFingerprint()) &&
-                Objects.equals(isDenialContextInquiryEnabled(), directory.isDenialContextInquiryEnabled());
+                Objects.equals(isDenialContextInquiryEnabled(), directory.isDenialContextInquiryEnabled()) &&
+                Objects.equals(getWebhookUrl(), directory.getWebhookUrl());
     }
 
     @Override
@@ -152,6 +164,7 @@ public class Directory {
                 ", androidKey='" + androidKey + '\'' +
                 ", iosCertificateFingerprint='" + iosCertificateFingerprint + '\'' +
                 ", denialContextInquiryEnabled='" + denialContextInquiryEnabled + "\'" +
+                ", webhookUrl='" + webhookUrl + "\'" +
                 '}';
     }
 }

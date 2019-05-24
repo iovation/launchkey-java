@@ -104,4 +104,11 @@ public class BasicDirectoryClientLinkDeviceTest {
         DirectoryUserDeviceLinkData response = client.linkDevice(null);
         assertEquals("Expected QR Code", response.getQrCodeUrl());
     }
+
+    @Test
+    public void responseReturnsDeviceId() throws Exception {
+        when(response.getDeviceId()).thenReturn(UUID.fromString("f5de8190-8256-11e9-bc42-526af7764f64"));
+        DirectoryUserDeviceLinkData response = client.linkDevice(null);
+        assertEquals(UUID.fromString("f5de8190-8256-11e9-bc42-526af7764f64"), response.getDeviceId());
+    }
 }

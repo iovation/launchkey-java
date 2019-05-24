@@ -16,23 +16,27 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.net.URI;
 import java.util.UUID;
 
-@JsonPropertyOrder({"directory_id", "active", "android_key", "ios_p12", "denial_context_inquiry_enabled"})
+@JsonPropertyOrder({"directory_id", "active", "android_key", "ios_p12", "denial_context_inquiry_enabled", "callback_url"})
 public class OrganizationV3DirectoriesPatchRequest {
     private final UUID directoryId;
     private final Boolean active;
     private final String androidKey;
     private final String iosP12;
     private final Boolean denialContextInquiryEnabled;
+    private final URI webhookUrl;
 
     public OrganizationV3DirectoriesPatchRequest(UUID directoryId, Boolean active, String androidKey,
-                                                 String iosP12, Boolean denialContextInquiryEnabled) {
+                                                 String iosP12, Boolean denialContextInquiryEnabled,
+                                                 URI webhookUrl) {
         this.directoryId = directoryId;
         this.active = active;
         this.androidKey = androidKey;
         this.iosP12 = iosP12;
         this.denialContextInquiryEnabled = denialContextInquiryEnabled;
+        this.webhookUrl = webhookUrl;
     }
 
     @JsonProperty("directory_id")
@@ -41,6 +45,7 @@ public class OrganizationV3DirectoriesPatchRequest {
     }
 
     @JsonProperty("active")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public Boolean isActive() {
         return active;
     }
@@ -59,5 +64,10 @@ public class OrganizationV3DirectoriesPatchRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Boolean isDenialContextInquiryEnabled() {
         return denialContextInquiryEnabled;
+    }
+
+    @JsonProperty("webhook_url")
+    public URI getWebhookUrl() {
+        return webhookUrl;
     }
 }
