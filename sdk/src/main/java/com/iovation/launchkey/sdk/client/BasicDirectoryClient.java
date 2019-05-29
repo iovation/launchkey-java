@@ -12,16 +12,12 @@
 
 package com.iovation.launchkey.sdk.client;
 
-import com.iovation.launchkey.sdk.crypto.Crypto;
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import com.iovation.launchkey.sdk.domain.PublicKey;
-import com.iovation.launchkey.sdk.domain.directory.Device;
-import com.iovation.launchkey.sdk.domain.directory.DeviceStatus;
-import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
-import com.iovation.launchkey.sdk.domain.directory.Session;
+import com.iovation.launchkey.sdk.domain.directory.*;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
-import com.iovation.launchkey.sdk.domain.webhook.ServerSentEventSuccessfulDeviceLinkCompletionPackage;
+import com.iovation.launchkey.sdk.domain.webhook.SuccessfulDeviceLinkCompletionWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.Transport;
@@ -264,13 +260,11 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
         if (transportResponse == null) {
             response = null;
         } else if (transportResponse instanceof ServerSentEventSuccessfulDeviceLinkCompletion) {
-            UUID deviceId = UUID.fromString(((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getDeviceId());
+            UUID deviceId = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getDeviceId();
             String publicKeyId = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getPublicKeyId();
             String publicKey = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getPublicKey();
-            response = new ServerSentEventSuccessfulDeviceLinkCompletionPackage(
-                    deviceId,
-                    publicKeyId,
-                    publicKey
+            response = new SuccessfulDeviceLinkCompletionWebhookPackage(
+                    new DeviceLinkCompletion(deviceId, publicKey, publicKeyId)
             );
         } else {
             throw new InvalidRequestException("Unknown response type was returned by the transport", null, null);

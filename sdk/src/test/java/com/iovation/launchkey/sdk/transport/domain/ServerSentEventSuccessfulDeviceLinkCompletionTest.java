@@ -17,12 +17,13 @@ public class ServerSentEventSuccessfulDeviceLinkCompletionTest {
 
     @Before
     public void setUp() throws Exception {
-        event = new ServerSentEventSuccessfulDeviceLinkCompletion("Device ID", "Key ID", "Public Key");
+        event = new ServerSentEventSuccessfulDeviceLinkCompletion(
+                UUID.fromString("f5de8190-8256-11e9-bc42-526af7764f64"), "Key ID", "Public Key");
     }
 
     @Test
     public void getDeviceId() {
-        assertEquals("Device ID", event.getDeviceId());
+        assertEquals(UUID.fromString("f5de8190-8256-11e9-bc42-526af7764f64"), event.getDeviceId());
     }
 
     @Test
@@ -37,7 +38,7 @@ public class ServerSentEventSuccessfulDeviceLinkCompletionTest {
 
     @Test
     public void canParse() throws Exception {
-        String json = "{\"device_id\":\"Device ID\",\"public_key_id\":\"Key ID\",\"public_key\":\"Public Key\"}";
+        String json = "{\"device_id\":\"f5de8190-8256-11e9-bc42-526af7764f64\",\"public_key_id\":\"Key ID\",\"public_key\":\"Public Key\"}";
         ServerSentEventSuccessfulDeviceLinkCompletion actual = new ObjectMapper().readValue(json, ServerSentEventSuccessfulDeviceLinkCompletion.class);
         assertEquals(event, actual);
     }

@@ -5,16 +5,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ServerSentEventSuccessfulDeviceLinkCompletion implements ServerSentEvent {
-    private final String deviceId;
+    private final UUID deviceId;
     private final String publicKeyId;
     private final String publicKey;
 
     @JsonCreator
     public ServerSentEventSuccessfulDeviceLinkCompletion(
-            @JsonProperty("device_id") String deviceId,
+            @JsonProperty("device_id") UUID deviceId,
             @JsonProperty("public_key_id") String publicKeyId,
             @JsonProperty("public_key") String publicKey) {
         this.deviceId = deviceId;
@@ -22,7 +23,7 @@ public class ServerSentEventSuccessfulDeviceLinkCompletion implements ServerSent
         this.publicKey = publicKey;
     }
 
-    public String getDeviceId() {
+    public UUID getDeviceId() {
         return deviceId;
     }
 
