@@ -394,6 +394,12 @@ public class AuthorizationResponse {
         BUSY_LOCAL,
 
         /**
+         * Authenticator satisfies all request policy requirements, but a sensor issue on device prevents auth method
+         * verification
+         */
+        SENSOR,
+
+        /**
          * Other exists only to allow for forward compatibility to future response reasons
          */
         OTHER

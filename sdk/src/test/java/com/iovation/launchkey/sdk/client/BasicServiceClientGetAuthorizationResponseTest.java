@@ -205,6 +205,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
                     { "AUTHENTICATION", AuthorizationResponse.Reason.AUTHENTICATION },
                     { "CONFIGURATION", AuthorizationResponse.Reason.CONFIGURATION },
                     { "BUSY_LOCAL", AuthorizationResponse.Reason.BUSY_LOCAL },
+                    { "SENSOR", AuthorizationResponse.Reason.SENSOR },
                     { "UNKNOWN", AuthorizationResponse.Reason.OTHER },
             });
         }

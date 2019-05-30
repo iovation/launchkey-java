@@ -9,6 +9,7 @@ This changelog references the relevant changes (bug and security fixes) for the 
           that return the data in the response.
         * Added auth policy to auth response
         * Added auth methods to auth response
+    * Fixed missing SENSOR failure reason in AuthorizationResponse. It will no longer be returned as OTHER
  
   * 4.4.0
   

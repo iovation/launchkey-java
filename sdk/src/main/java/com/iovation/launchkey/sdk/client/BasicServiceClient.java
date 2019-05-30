@@ -287,6 +287,8 @@ public class BasicServiceClient implements ServiceClient {
             reason = AuthorizationResponse.Reason.CONFIGURATION;
         } else if (authsResponse.getReason().equals("BUSY_LOCAL")) {
             reason = AuthorizationResponse.Reason.BUSY_LOCAL;
+        } else if (authsResponse.getReason().equals("SENSOR")) {
+            reason = AuthorizationResponse.Reason.SENSOR;
         } else {
             reason = AuthorizationResponse.Reason.OTHER;
         }
