@@ -7,7 +7,7 @@ This changelog references the relevant changes (bug and security fixes) for the 
     * Added Auth Response Insights
         * These enhancements will only be added for responses from Mobile Auth SDK versions
           that return the data in the response.
-        * Added auth policy to auth response
+        * Added auth authPolicy to auth response
         * Added auth methods to auth response
     * Fixed missing SENSOR failure reason in AuthorizationResponse. It will no longer be returned as OTHER
  
@@ -21,8 +21,8 @@ This changelog references the relevant changes (bug and security fixes) for the 
     * Added busy signal processing 
     * Added dynamic authorization request push messaging
     * Added authorization response context 
-    * Added ability to enable jailbreak protection to authorization policy constructor.
-    * Fixed bug in authorization policy the swapped inherence and knowledge factors.
+    * Added ability to enable jailbreak protection to authorization authPolicy constructor.
+    * Fixed bug in authorization authPolicy the swapped inherence and knowledge factors.
     * Fixed bug where response headers were not being properly validated and verified.
     * Added verification of webhook headers.
     * Added dynamic authorization request title
@@ -91,7 +91,7 @@ This changelog references the relevant changes (bug and security fixes) for the 
     * Refactor classes, interfaces, methods, attributes, and parameters for new terminology. Backwards compatibility
         was maintained and old classes, interfaces, and methods were deprecated. They will be removed in version 3.0.
     * Add context to authorize and login
-    * Add dynamic policy support
+    * Add dynamic authPolicy support
 
   * 2.0.3
     * Update users call in ApacheHttpTransport for proper handling of error responses
