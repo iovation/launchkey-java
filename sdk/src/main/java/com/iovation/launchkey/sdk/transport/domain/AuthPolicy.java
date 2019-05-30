@@ -17,12 +17,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonIgnoreProperties(value = {"geoFenceLocations", "geoFences", "deviceIntegrity"}, ignoreUnknown = true)
 @JsonPropertyOrder({"minimum_requirements", "factors"})
 public class AuthPolicy {
+    private final static Logger logger = Logger.getLogger("com.iovation.launchkey.sdk");
     private final static int ZERO = 0;
     private final static int ONE = 1;
     private final List<MinimumRequirement> minimumRequirements;
@@ -53,23 +55,34 @@ public class AuthPolicy {
 
     @JsonCreator
     public AuthPolicy(@JsonProperty("minimum_requirements") List<MinimumRequirement> minimumRequirements,
-                      @JsonProperty("factors") ArrayNode factors, @JsonProperty("types") List<String> types,
-                      @JsonProperty("amount") Integer amount,
+                      @JsonProperty("factors") ArrayNode factors, @JsonProperty("requirement") String requirement,
+                      @JsonProperty("types") List<String> types, @JsonProperty("amount") Integer input_amount,
                       @JsonProperty("geofences") List<AuthPolicy.Location> geofences) {
-        if (minimumRequirements == null) {
+        if (requirement != null) {
             geoFenceLocations = geofences;
             deviceIntegrity = null;
-            Integer knowledge;
-            Integer possession;
-            Integer inherence;
-            if (types == null) {
-                knowledge = null;
-                possession = null;
-                inherence = null;
+            Integer knowledge = null;
+            Integer possession = null;
+            Integer inherence = null;
+            Integer amount = null;
+
+            if (requirement.equalsIgnoreCase("types")) {
+                inherence = knowledge = possession = ZERO;
+                for (String type : types) {
+                    if (type.equalsIgnoreCase("inherence")) {
+                        inherence = ONE;
+                    } else if (type.equalsIgnoreCase("knowledge")) {
+                        knowledge = ONE;
+                    } else if (type.equalsIgnoreCase("possession")) {
+                        possession = ONE;
+                    } else {
+                        logger.warning("Unknown and unhandled policy method type " + type);
+                    }
+                }
+            } else if (requirement.equalsIgnoreCase("amount")) {
+                amount = input_amount;
             } else {
-                knowledge = types.contains("knowledge") ? ONE : ZERO;
-                possession = types.contains("possession") ? ONE : ZERO;
-                inherence = types.contains("inherence") ? ONE : ZERO;
+                logger.warning("Unknown and unhandled policy requirement " + requirement);
             }
             this.minimumRequirements = new ArrayList<>();
             MinimumRequirement minimumRequirement = new MinimumRequirement(
@@ -82,7 +95,7 @@ public class AuthPolicy {
             this.minimumRequirements.add(minimumRequirement);
 
 
-        } else{
+        } else if (minimumRequirements != null) {
             this.minimumRequirements = minimumRequirements;
             geoFenceLocations = new ArrayList<>();
             Boolean deviceIntegrity = null;
@@ -107,6 +120,10 @@ public class AuthPolicy {
             } catch (ClassCastException | NullPointerException e) {
                 throw new IllegalArgumentException("The argument \"factors\" does not conform to the specification", e);
             }
+        } else {
+            this.minimumRequirements = new ArrayList<>();
+            geoFenceLocations = new ArrayList<>();
+            deviceIntegrity = null;
         }
     }
 

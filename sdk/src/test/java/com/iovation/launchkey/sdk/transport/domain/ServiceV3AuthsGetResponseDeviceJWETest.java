@@ -178,7 +178,7 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
         ServiceV3AuthsGetResponseDeviceJWE expected = new ServiceV3AuthsGetResponseDeviceJWE("DENIED", "FRAUDULENT",
                 "DEN2", UUID.fromString("5d1acf5c-dc5d-11e7-9ea1-0469f8dc10a5"), "c07c4907-dc67-11e7-bb14-0469f8dc10a5",
                 new String[]{"2648", "2046", "0583", "2963", "2046"},
-                new AuthPolicy(null, null, Arrays.asList("knowledge", "inherence", "possession"), null,
+                new AuthPolicy(null, null, "types", Arrays.asList("knowledge", "inherence", "possession"), null,
                         Arrays.asList(
                                 new AuthPolicy.Location(null, 200, 36.120825, -115.157216),
                                 new AuthPolicy.Location("HQ North", 550, 36.121020, -115.156460)
@@ -301,7 +301,7 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
         ServiceV3AuthsGetResponseDeviceJWE expected = new ServiceV3AuthsGetResponseDeviceJWE("DENIED", "FRAUDULENT",
                 "DEN2", UUID.fromString("5d1acf5c-dc5d-11e7-9ea1-0469f8dc10a5"), "c07c4907-dc67-11e7-bb14-0469f8dc10a5",
                 new String[]{"2648", "2046", "0583", "2963", "2046"},
-                new AuthPolicy(null, null, null, 2,
+                new AuthPolicy(null, null, "amount", null, 2,
                         Arrays.asList(
                                 new AuthPolicy.Location(null, 200, 36.120825, -115.157216),
                                 new AuthPolicy.Location("HQ North", 550, 36.121020, -115.156460)
@@ -318,6 +318,34 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
                 }
         );
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void verifyJsonParseWithEmptyPolicyBuildsEmptyPolicy() throws Exception {
+        String json = "{" +
+                "    \"type\": \"FAILED\"," +
+                "    \"reason\": \"CONFIGURATION\"," +
+                "    \"device_id\": \"c07c4907-dc67-11e7-bb14-0469f8dc10a5\"," +
+                "    \"service_pins\": [\"2648\", \"2046\", \"0583\", \"2963\", \"2046\"]," +
+                "    \"auth_request\": \"5d1acf5c-dc5d-11e7-9ea1-0469f8dc10a5\"," +
+                "    \"auth_policy\": {}" +
+                "}";
+        ServiceV3AuthsGetResponseDeviceJWE actual = new ObjectMapper().readValue(json, ServiceV3AuthsGetResponseDeviceJWE.class);
+        assertEquals(new AuthPolicy(null, null, null, null, null), actual.getAuthPolicy());
+    }
+
+    @Test
+    public void verifyJsonParseWithNoPolicyReturnsNullForPolicy() throws Exception {
+        String json = "{" +
+                "    \"type\": \"FAILED\"," +
+                "    \"reason\": \"CONFIGURATION\"," +
+                "    \"device_id\": \"c07c4907-dc67-11e7-bb14-0469f8dc10a5\"," +
+                "    \"service_pins\": [\"2648\", \"2046\", \"0583\", \"2963\", \"2046\"]," +
+                "    \"auth_request\": \"5d1acf5c-dc5d-11e7-9ea1-0469f8dc10a5\"," +
+                "    \"auth_policy\": null" +
+                "}";
+        ServiceV3AuthsGetResponseDeviceJWE actual = new ObjectMapper().readValue(json, ServiceV3AuthsGetResponseDeviceJWE.class);
+        assertNull(actual.getAuthPolicy());
     }
 
     @Test
