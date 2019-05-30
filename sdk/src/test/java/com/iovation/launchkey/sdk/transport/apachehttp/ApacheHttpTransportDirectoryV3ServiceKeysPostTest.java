@@ -11,8 +11,8 @@ package com.iovation.launchkey.sdk.transport.apachehttp; /**
  */
 
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
-import com.iovation.launchkey.sdk.transport.domain.ServiceKeysPostRequest;
 import com.iovation.launchkey.sdk.transport.domain.KeysPostResponse;
+import com.iovation.launchkey.sdk.transport.domain.ServiceKeysPostRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

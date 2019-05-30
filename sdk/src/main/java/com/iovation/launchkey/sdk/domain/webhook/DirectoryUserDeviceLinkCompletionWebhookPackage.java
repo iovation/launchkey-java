@@ -13,21 +13,18 @@
 package com.iovation.launchkey.sdk.domain.webhook;
 
 import com.iovation.launchkey.sdk.domain.directory.DeviceLinkCompletion;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
-
-import java.util.UUID;
 
 /**
  * A Server Sent Event callback used to inform an application that the user has remotely ended their session.
  */
-public class SuccessfulDeviceLinkCompletionWebhookPackage implements WebhookPackage {
+public class DirectoryUserDeviceLinkCompletionWebhookPackage implements WebhookPackage {
 
     private final DeviceLinkCompletion deviceLinkCompletion;
 
     /**
      * @param deviceLinkCompletion Device link completion data
      */
-    public SuccessfulDeviceLinkCompletionWebhookPackage(DeviceLinkCompletion deviceLinkCompletion)
+    public DirectoryUserDeviceLinkCompletionWebhookPackage(DeviceLinkCompletion deviceLinkCompletion)
     {
         this.deviceLinkCompletion = deviceLinkCompletion;
     }

@@ -10,8 +10,8 @@ package com.iovation.launchkey.sdk.transport.apachehttp; /**
  * limitations under the License.
  */
 
-import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectoryKeysDeleteRequest;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectoryKeysDeleteRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

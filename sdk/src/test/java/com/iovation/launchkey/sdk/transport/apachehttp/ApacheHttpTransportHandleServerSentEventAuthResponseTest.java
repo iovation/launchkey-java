@@ -1,15 +1,6 @@
 package com.iovation.launchkey.sdk.transport.apachehttp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iovation.launchkey.sdk.cache.Cache;
-import com.iovation.launchkey.sdk.crypto.Crypto;
-import com.iovation.launchkey.sdk.crypto.jwe.JWEService;
-import com.iovation.launchkey.sdk.crypto.jwt.JWTData;
-import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
 import com.iovation.launchkey.sdk.transport.domain.*;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -21,8 +12,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 

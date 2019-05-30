@@ -11,7 +11,10 @@ package com.iovation.launchkey.sdk.client; /**
  */
 
 import com.iovation.launchkey.sdk.transport.Transport;
-import com.iovation.launchkey.sdk.transport.domain.*;
+import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectoriesListPostRequest;
+import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectoriesListPostResponse;
+import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectoriesListPostResponseDirectory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

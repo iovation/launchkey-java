@@ -1,6 +1,5 @@
 package com.iovation.launchkey.sdk.crypto.jwe;
 
-import com.iovation.launchkey.sdk.crypto.Crypto;
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.After;

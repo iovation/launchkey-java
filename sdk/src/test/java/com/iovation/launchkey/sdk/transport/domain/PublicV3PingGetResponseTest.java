@@ -23,7 +23,7 @@ import org.junit.rules.ExpectedException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class PublicV3PingGetResponseTest {
     private PublicV3PingGetResponse publicPingGetResponse;

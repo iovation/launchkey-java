@@ -12,11 +12,11 @@
 
 package com.iovation.launchkey.sdk.client;
 
-import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
+import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
+import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.service.DenialReason;
 import com.iovation.launchkey.sdk.error.*;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 
 import java.util.List;
 

@@ -1,18 +1,15 @@
 package com.iovation.launchkey.sdk.transport.domain;
 
-import com.apple.eawt.AppEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ServerSentEventSuccessfulDeviceLinkCompletionTest {
 
-    private UUID deviceId = null;
     private ServerSentEventSuccessfulDeviceLinkCompletion event = null;
 
     @Before

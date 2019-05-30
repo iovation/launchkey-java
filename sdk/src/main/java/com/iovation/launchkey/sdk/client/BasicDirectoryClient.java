@@ -17,7 +17,7 @@ import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.directory.*;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
-import com.iovation.launchkey.sdk.domain.webhook.SuccessfulDeviceLinkCompletionWebhookPackage;
+import com.iovation.launchkey.sdk.domain.webhook.DirectoryUserDeviceLinkCompletionWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.Transport;
@@ -263,7 +263,7 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
             UUID deviceId = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getDeviceId();
             String publicKeyId = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getPublicKeyId();
             String publicKey = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getPublicKey();
-            response = new SuccessfulDeviceLinkCompletionWebhookPackage(
+            response = new DirectoryUserDeviceLinkCompletionWebhookPackage(
                     new DeviceLinkCompletion(deviceId, publicKey, publicKeyId)
             );
         } else {

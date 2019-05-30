@@ -1,7 +1,7 @@
 package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.directory.DeviceLinkCompletion;
-import com.iovation.launchkey.sdk.domain.webhook.SuccessfulDeviceLinkCompletionWebhookPackage;
+import com.iovation.launchkey.sdk.domain.webhook.DirectoryUserDeviceLinkCompletionWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import com.iovation.launchkey.sdk.error.InvalidRequestException;
 import com.iovation.launchkey.sdk.transport.Transport;
@@ -92,7 +92,7 @@ public class BasicDirectoryClientHandleWebhookTest {
         when(transport.handleServerSentEvent(any(Map.class), anyString(), anyString(), anyString())).thenReturn(
                 new ServerSentEventSuccessfulDeviceLinkCompletion(deviceId, publicKeyId, publicKey));
         DeviceLinkCompletion expected = new DeviceLinkCompletion(deviceId, publicKey, publicKeyId);
-        DeviceLinkCompletion actual = ((SuccessfulDeviceLinkCompletionWebhookPackage) client.handleWebhook(
+        DeviceLinkCompletion actual = ((DirectoryUserDeviceLinkCompletionWebhookPackage) client.handleWebhook(
                 emptyHeaders, "body", "method", "path")).getDeviceLinkCompletion();
         assertEquals(expected, actual);
     }

@@ -2,21 +2,15 @@ package com.iovation.launchkey.sdk.transport.apachehttp;
 
 import com.iovation.launchkey.sdk.error.AuthorizationInProgress;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestTimedOutError;
-import com.iovation.launchkey.sdk.transport.domain.*;
 import com.iovation.launchkey.sdk.transport.domain.Error;
+import com.iovation.launchkey.sdk.transport.domain.*;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicStatusLine;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.InputStream;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.Date;
@@ -25,9 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

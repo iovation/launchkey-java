@@ -16,8 +16,8 @@ import java.net.URI;
 import java.util.Date;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 
 public class SessionTest {
     @Test
