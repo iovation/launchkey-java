@@ -17,7 +17,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void getPolicy() {
-        AuthPolicy expected = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy expected = new AuthPolicy((Integer) null, null, null, null, null);
         assertEquals(expected, new ServiceV3AuthsPostRequest(null, expected, null, null, null, null, null, null).getPolicy());
     }
 
@@ -56,7 +56,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void equivalentAreEqual() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> reasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -68,7 +68,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void notEquivalentAreNotEqual() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> reasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -80,7 +80,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void notEquivalentForPushTitleAreNotEqual() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> reasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -92,7 +92,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void notEquivalentForPushBodyAreNotEqual() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> reasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -104,7 +104,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void notEquivalentForReasonsAreNotEqual() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> leftReasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -119,7 +119,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void hashCodeIsSameForEquivalent() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> reasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -131,7 +131,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void hashCodeNotSameForNotEquivalent() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> reasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -143,7 +143,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void hashCodeNotSameForNotEquivalentPushTitle() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> reasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -155,7 +155,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void hashCodeNotSameForNotEquivalentPushBody() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> reasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};
@@ -167,7 +167,7 @@ public class ServiceV3AuthsPostRequestTest {
 
     @Test
     public void hashCodeNotSameForNotEquivalentDenialReasons() {
-        AuthPolicy policy = new AuthPolicy(null, null, null, null, null);
+        AuthPolicy policy = new AuthPolicy((Integer) null, null, null, null, null);
         List<DenialReason> leftReasons = new ArrayList<DenialReason>(){{
             add(new DenialReason("1", "a", true));
         }};

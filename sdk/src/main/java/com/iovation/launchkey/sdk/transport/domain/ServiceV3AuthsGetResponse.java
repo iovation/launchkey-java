@@ -29,6 +29,8 @@ public class ServiceV3AuthsGetResponse implements AuthsResponse {
     private final String type;
     private final String reason;
     private final String denialReason;
+    private final AuthPolicy authPolicy;
+    private final AuthMethod[] authMethods;
 
     public ServiceV3AuthsGetResponse(
             EntityIdentifier requestingEntity,
@@ -42,7 +44,10 @@ public class ServiceV3AuthsGetResponse implements AuthsResponse {
             String[] servicePins,
             String type,
             String reason,
-            String denialReason) {
+            String denialReason,
+            AuthPolicy authPolicy,
+            AuthMethod[] authMethods
+    ) {
         this.requestingEntity = requestingEntity;
         this.serviceId = serviceId;
         this.serviceUserHash = serviceUserHash;
@@ -55,6 +60,8 @@ public class ServiceV3AuthsGetResponse implements AuthsResponse {
         this.type = type;
         this.reason = reason;
         this.denialReason = denialReason;
+        this.authPolicy = authPolicy;
+        this.authMethods = authMethods;
     }
 
     public EntityIdentifier getRequestingEntity() {
@@ -112,6 +119,16 @@ public class ServiceV3AuthsGetResponse implements AuthsResponse {
     @Override
     public String getDenialReason() {
         return denialReason;
+    }
+
+    @Override
+    public AuthPolicy getAuthPolicy() {
+        return authPolicy;
+    }
+
+    @Override
+    public AuthMethod[] getAuthMethods() {
+        return authMethods;
     }
 
     @Override

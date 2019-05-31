@@ -98,6 +98,16 @@ public class ServerSentEventAuthorizationResponse implements ServerSentEvent, Au
     }
 
     @Override
+    public AuthPolicy getAuthPolicy() {
+        return null;
+    }
+
+    @Override
+    public AuthMethod[] getAuthMethods() {
+        return new AuthMethod[0];
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ServerSentEventAuthorizationResponse)) return false;
@@ -123,6 +133,7 @@ public class ServerSentEventAuthorizationResponse implements ServerSentEvent, Au
         return result;
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public String toString() {
         return "ServerSentEventAuthorizationResponse{" +
