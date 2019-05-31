@@ -30,11 +30,10 @@ public class ServicePolicy extends AuthPolicy {
         timeFences = new ArrayList<>();
     }
 
-    @SuppressWarnings("unchecked")
     @JsonCreator
     public ServicePolicy(@JsonProperty("minimum_requirements") List<MinimumRequirement> minimumRequirements,
                          @JsonProperty("factors") ArrayNode factors) {
-        super(minimumRequirements, factors);
+        super(minimumRequirements, factors, null, null, null, null);
         List<TimeFence> timeFences = new ArrayList<>();
         try {
             for (JsonNode factor : factors) {
@@ -183,9 +182,9 @@ public class ServicePolicy extends AuthPolicy {
             if (endHour != timeFence.endHour) return false;
             if (startMinute != timeFence.startMinute) return false;
             if (endMinute != timeFence.endMinute) return false;
-            if (name != null ? !name.equals(timeFence.name) : timeFence.name != null) return false;
-            if (days != null ? !days.equals(timeFence.days) : timeFence.days != null) return false;
-            return timezone != null ? timezone.equals(timeFence.timezone) : timeFence.timezone == null;
+            if (!Objects.equals(name, timeFence.name)) return false;
+            if (!Objects.equals(days, timeFence.days)) return false;
+            return Objects.equals(timezone, timeFence.timezone);
         }
 
         @Override

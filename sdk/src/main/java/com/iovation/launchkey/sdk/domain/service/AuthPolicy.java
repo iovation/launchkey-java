@@ -15,6 +15,7 @@ package com.iovation.launchkey.sdk.domain.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class to represent an authentication policy which will be utilized for providing dynamic policies per request.
@@ -66,7 +67,11 @@ public class AuthPolicy {
     public AuthPolicy(Integer requiredFactors, Boolean enableJailbreakProtection, List<Location> locations) {
         this.requiredFactors = requiredFactors;
         this.enableJailbreakProtection = enableJailbreakProtection;
-        this.locations = Collections.unmodifiableList(new ArrayList<>(locations));
+        if (locations == null) {
+            this.locations = null;
+        } else {
+            this.locations = Collections.unmodifiableList(new ArrayList<>(locations));
+        }
         requirePossessionFactor = null;
         requireInherenceFactor = null;
         requireKnowledgeFactor = null;
@@ -175,16 +180,37 @@ public class AuthPolicy {
         private final double longitude;
         private final double latitude;
         private final double radius;
+        private final String name;
 
         /**
-         * @param radius Radius of the location in meters
+         * @param radius Radius of the geolocation in meters
          * @param latitude Latitude of the geolocation
          * @param longitude Longitude of the geolocation
          */
         public Location(double radius, double latitude, double longitude) {
+            this(null, radius, latitude, longitude);
+        }
+
+        /**
+         * @param name Name of the geolocation
+         * @param radius Radius of the geolocation in meters
+         * @param latitude Latitude of the geolocation
+         * @param longitude Longitude of the geolocation
+         */
+        public Location(String name, double radius, double latitude, double longitude) {
             this.radius = radius;
             this.latitude = latitude;
             this.longitude = longitude;
+            this.name = name;
+        }
+
+        /**
+         * Get the name of the geolocation
+         *
+         * @return Name of the geolocation
+         */
+        public String getName() {
+            return name;
         }
 
         /**
@@ -213,37 +239,50 @@ public class AuthPolicy {
         public double getRadius() {
             return radius;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Location)) return false;
+            Location location = (Location) o;
+            return Double.compare(location.getLongitude(), getLongitude()) == 0 &&
+                    Double.compare(location.getLatitude(), getLatitude()) == 0 &&
+                    Double.compare(location.getRadius(), getRadius()) == 0 &&
+                    Objects.equals(getName(), location.getName());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getLongitude(), getLatitude(), getRadius(), getName());
+        }
+
+        @Override
+        public String toString() {
+            return "Location{" +
+                    "longitude=" + longitude +
+                    ", latitude=" + latitude +
+                    ", radius=" + radius +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof AuthPolicy)) return false;
-
         AuthPolicy that = (AuthPolicy) o;
-
-        if (requiredFactors != null ? !requiredFactors.equals(that.requiredFactors) : that.requiredFactors != null)
-            return false;
-        if (requireKnowledgeFactor != null ? !requireKnowledgeFactor.equals(that.requireKnowledgeFactor) :
-                that.requireKnowledgeFactor != null) return false;
-        if (requireInherenceFactor != null ? !requireInherenceFactor.equals(that.requireInherenceFactor) :
-                that.requireInherenceFactor != null) return false;
-        if (requirePossessionFactor != null ? !requirePossessionFactor.equals(that.requirePossessionFactor) :
-                that.requirePossessionFactor != null) return false;
-        if (enableJailbreakProtection != null ? !enableJailbreakProtection.equals(that.enableJailbreakProtection) :
-                that.enableJailbreakProtection != null) return false;
-        return locations != null ? locations.equals(that.locations) : that.locations == null;
+        return Objects.equals(getRequiredFactors(), that.getRequiredFactors()) &&
+                Objects.equals(requireKnowledgeFactor, that.requireKnowledgeFactor) &&
+                Objects.equals(requireInherenceFactor, that.requireInherenceFactor) &&
+                Objects.equals(requirePossessionFactor, that.requirePossessionFactor) &&
+                Objects.equals(getLocations(), that.getLocations()) &&
+                Objects.equals(enableJailbreakProtection, that.enableJailbreakProtection);
     }
 
     @Override
     public int hashCode() {
-        int result = requiredFactors != null ? requiredFactors.hashCode() : 0;
-        result = 31 * result + (requireKnowledgeFactor != null ? requireKnowledgeFactor.hashCode() : 0);
-        result = 31 * result + (requireInherenceFactor != null ? requireInherenceFactor.hashCode() : 0);
-        result = 31 * result + (requirePossessionFactor != null ? requirePossessionFactor.hashCode() : 0);
-        result = 31 * result + (enableJailbreakProtection != null ? enableJailbreakProtection.hashCode() : 0);
-        result = 31 * result + (locations != null ? locations.hashCode() : 0);
-        return result;
+        return Objects.hash(getRequiredFactors(), requireKnowledgeFactor, requireInherenceFactor, requirePossessionFactor, getLocations(), enableJailbreakProtection);
     }
 
     @Override
@@ -253,8 +292,8 @@ public class AuthPolicy {
                 ", requireKnowledgeFactor=" + requireKnowledgeFactor +
                 ", requireInherenceFactor=" + requireInherenceFactor +
                 ", requirePossessionFactor=" + requirePossessionFactor +
-                ", isJailbreakProtectionEnabled=" + enableJailbreakProtection +
                 ", locations=" + locations +
+                ", enableJailbreakProtection=" + enableJailbreakProtection +
                 '}';
     }
 }
