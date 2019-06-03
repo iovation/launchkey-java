@@ -10,6 +10,7 @@ This changelog references the relevant changes (bug and security fixes) for the 
         * Added auth authPolicy to auth response
         * Added auth methods to auth response
     * Fixed missing SENSOR failure reason in AuthorizationResponse. It will no longer be returned as OTHER
+    * Fixed transport issue which would fail JWT validation on 401 responses from API
  
   * 4.4.0
   

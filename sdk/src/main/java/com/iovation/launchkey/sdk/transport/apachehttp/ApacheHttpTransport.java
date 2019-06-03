@@ -305,7 +305,7 @@ public class ApacheHttpTransport implements Transport {
         }
         String jwt = headerGroup.getFirstHeader(IOV_JWT_HEADER).getValue();
         try {
-            JWTClaims jwtClaims = validateJWT(null, jwt);
+            JWTClaims jwtClaims = validateJWT(null, jwt, issuer.toString());
             if (method != null && !method.equals(jwtClaims.getMethod())) {
                 throw new JWTError("JWT request method does not match the method provided", null);
             }
@@ -783,11 +783,16 @@ public class ApacheHttpTransport implements Transport {
         try {
 
             final String jwt = getJWT(response);
-            final JWTClaims claims = validateJWT(expectedTokenId, jwt);
+            String expected_audience;
+            if (response.getStatusLine().getStatusCode() == 401) {
+                expected_audience = "public";
+            } else {
+                expected_audience = issuer.toString();
+            }
+            final JWTClaims claims = validateJWT(expectedTokenId, jwt, expected_audience);
             HttpEntity entity = response.getEntity();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             if (entity != null) entity.writeTo(stream);
-
             if (claims.getStatusCode() != response.getStatusLine().getStatusCode())
                 throw new JWTError("Status code of response content does not match JWT response status code", null);
 
@@ -836,12 +841,12 @@ public class ApacheHttpTransport implements Transport {
         }
     }
 
-    private JWTClaims validateJWT(String expectedTokenId, String jwt)
+    private JWTClaims validateJWT(String expectedTokenId, String jwt, String expected_audience)
             throws JWTError, MarshallingError, InvalidResponseException, CommunicationErrorException, CryptographyError,
             InvalidCredentialsException {
         String keyId = jwtService.getJWTData(jwt).getKeyId();
         return jwtService.decode(
-                getPublicKeyData(keyId).getKey(), issuer.toString(), expectedTokenId, getCurrentDate(), jwt);
+                getPublicKeyData(keyId).getKey(), expected_audience, expectedTokenId, getCurrentDate(), jwt);
     }
 
     private String getJWT(HttpResponse response) {
