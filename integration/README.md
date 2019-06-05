@@ -23,7 +23,7 @@ All of the required tests and libraries use the JAR similar to
 of the JAR file you built via Maven. By default it will be in the `target`
 directory directly under the directory where this file is located.
 
-### <a name="prerequisites></a>Prerequisites
+### <a name="prerequisites"></a>Prerequisites
 
 In order to run the integration tests, a valid Organization with an active Public/Private Key Pair must exist. It is 
 suggested that you use a test organization that is separate from any Organizations you use in production. Creation of
