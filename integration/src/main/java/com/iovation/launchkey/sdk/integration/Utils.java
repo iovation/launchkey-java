@@ -18,23 +18,23 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-class Utils {
+public class Utils {
     private static final SecureRandom random = new SecureRandom();
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    static String createRandomServiceName() {
+    public static String createRandomServiceName() {
         return appendRandomSuffix("Test Service ", 35);
     }
 
-    static String createRandomDirectoryName() {
+    public static String createRandomDirectoryName() {
         return appendRandomSuffix("Test Directory ", 30);
     }
 
-    static String createRandomDirectoryUserName() {
+    public static String createRandomDirectoryUserName() {
         return appendRandomSuffix("TestUser", 25);
     }
 
-    static String appendRandomSuffix(String string, int size) {
+    public static String appendRandomSuffix(String string, int size) {
         StringBuilder result = new StringBuilder(string);
         for (int i = 0; i < size; i++) {
             result.append(String.valueOf(random.nextInt(9)).toCharArray());
@@ -42,11 +42,11 @@ class Utils {
         return result.toString();
     }
 
-    static Date parseDateString(String dateString) throws ParseException {
+    public static Date parseDateString(String dateString) throws ParseException {
         return dateFormat.parse(dateString);
     }
 
-    static Boolean getBooleanFromBooleanTextSwitch(String switchString) {
+    public static Boolean getBooleanFromBooleanTextSwitch(String switchString) {
         Boolean switchValue;
         switch (switchString) {
             case "does not":
