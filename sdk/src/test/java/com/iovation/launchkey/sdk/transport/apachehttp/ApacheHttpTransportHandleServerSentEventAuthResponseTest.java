@@ -26,6 +26,7 @@ public class ApacheHttpTransportHandleServerSentEventAuthResponseTest extends Ap
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        when(serverSentEventType.getType()).thenReturn(ServerSentEventType.AUTHORIZATION_RESPONSE_WEBHOOK);
         when(jwtClaims.getAudience()).thenReturn("svc:5e9aaee6-f1db-11e8-ac7a-fa001d282e01");
         when(jwtClaims.getSubject()).thenReturn("svc:767e72d9-e7aa-11e8-a951-fa001d282e01");
         when(jweService.getHeaders(anyString())).thenReturn(new HashMap<String, String>() {{

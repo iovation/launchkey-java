@@ -8,16 +8,16 @@ import java.util.Objects;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ServerSentEventSuccessfulDeviceLinkCompletion implements ServerSentEvent {
+public class ServerSentEventDeviceLinkCompletion implements ServerSentEvent {
     private final UUID deviceId;
     private final String publicKeyId;
     private final String publicKey;
 
     @JsonCreator
-    public ServerSentEventSuccessfulDeviceLinkCompletion(
+    public ServerSentEventDeviceLinkCompletion(
             @JsonProperty("device_id") UUID deviceId,
-            @JsonProperty("public_key_id") String publicKeyId,
-            @JsonProperty("public_key") String publicKey) {
+            @JsonProperty("device_public_key_id") String publicKeyId,
+            @JsonProperty("device_public_key") String publicKey) {
         this.deviceId = deviceId;
         this.publicKeyId = publicKeyId;
         this.publicKey = publicKey;
@@ -38,8 +38,8 @@ public class ServerSentEventSuccessfulDeviceLinkCompletion implements ServerSent
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ServerSentEventSuccessfulDeviceLinkCompletion)) return false;
-        ServerSentEventSuccessfulDeviceLinkCompletion that = (ServerSentEventSuccessfulDeviceLinkCompletion) o;
+        if (!(o instanceof ServerSentEventDeviceLinkCompletion)) return false;
+        ServerSentEventDeviceLinkCompletion that = (ServerSentEventDeviceLinkCompletion) o;
         return Objects.equals(getDeviceId(), that.getDeviceId()) &&
                 Objects.equals(getPublicKeyId(), that.getPublicKeyId()) &&
                 Objects.equals(getPublicKey(), that.getPublicKey());
@@ -52,7 +52,7 @@ public class ServerSentEventSuccessfulDeviceLinkCompletion implements ServerSent
 
     @Override
     public String toString() {
-        return "ServerSentEventSuccessfulDeviceLinkCompletion{" +
+        return "ServerSentEventDeviceLinkCompletion{" +
                 "deviceId='" + deviceId + '\'' +
                 ", publicKeyId='" + publicKeyId + '\'' +
                 ", publicKey='" + publicKey + '\'' +

@@ -1,32 +1,29 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:tiles="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title tiles:fragment="title">Login - Spring MVC Example</title>
+    <title tiles:fragment="title">Link a Device to a User - Spring MVC Example</title>
     <link rel="shortcut icon" href="/images/favicon.ico" />
 </head>
 <body>
 <div tiles:fragment="content">
-    <form name="f" th:action="@{/login}" method="post">
+    <form name="f" th:action="@{/link}" method="post">
         <fieldset>
-            <legend>Please Login</legend>
+            <legend>Link a Device to a User</legend>
             <!--suppress ThymeleafVariablesResolveInspection -->
             <div th:if="${param.error}" class="alert alert-error">
-                <p>Login request was unsuccessful</p>
+                <p>Linking request was unsuccessful</p>
             </div>
             <!--suppress ThymeleafVariablesResolveInspection -->
-            <div th:if="${param.logout}" class="alert alert-success">
-                You have been logged out.
+            <div th:if="${param.linked}" class="alert alert-success">
+                <script>// Poll for success</script>
             </div>
             <label for="username">Username</label>
-            <input id="username" type="text" deviceId="username" name="username"/>
+            <input id="username" type="text" name="username"/>
             <div class="form-actions">
-                <button type="submit" class="btn">Log in</button>
+                <button type="submit" class="btn">Link Device</button>
             </div>
         </fieldset>
     </form>
-</div>
-<div tiles:fragment="content">
-    <a th:href="@{/link}">Link Device</a>
 </div>
 </body>
 </html>

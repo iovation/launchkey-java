@@ -1,12 +1,12 @@
 package com.iovation.launchkey.sdk.client;
 
-import com.iovation.launchkey.sdk.domain.directory.DeviceLinkCompletion;
+import com.iovation.launchkey.sdk.domain.directory.DeviceLinkCompletionResponse;
 import com.iovation.launchkey.sdk.domain.webhook.DirectoryUserDeviceLinkCompletionWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import com.iovation.launchkey.sdk.error.InvalidRequestException;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.ServerSentEvent;
-import com.iovation.launchkey.sdk.transport.domain.ServerSentEventSuccessfulDeviceLinkCompletion;
+import com.iovation.launchkey.sdk.transport.domain.ServerSentEventDeviceLinkCompletion;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,10 +90,10 @@ public class BasicDirectoryClientHandleWebhookTest {
         String publicKey = "Public Key";
         String publicKeyId = "Public Key ID";
         when(transport.handleServerSentEvent(any(Map.class), anyString(), anyString(), anyString())).thenReturn(
-                new ServerSentEventSuccessfulDeviceLinkCompletion(deviceId, publicKeyId, publicKey));
-        DeviceLinkCompletion expected = new DeviceLinkCompletion(deviceId, publicKey, publicKeyId);
-        DeviceLinkCompletion actual = ((DirectoryUserDeviceLinkCompletionWebhookPackage) client.handleWebhook(
-                emptyHeaders, "body", "method", "path")).getDeviceLinkCompletion();
+                new ServerSentEventDeviceLinkCompletion(deviceId, publicKeyId, publicKey));
+        DeviceLinkCompletionResponse expected = new DeviceLinkCompletionResponse(deviceId, publicKey, publicKeyId);
+        DeviceLinkCompletionResponse actual = ((DirectoryUserDeviceLinkCompletionWebhookPackage) client.handleWebhook(
+                emptyHeaders, "body", "method", "path")).getDeviceLinkCompletionResponse();
         assertEquals(expected, actual);
     }
 

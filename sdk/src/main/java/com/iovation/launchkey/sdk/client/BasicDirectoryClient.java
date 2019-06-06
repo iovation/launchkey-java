@@ -233,7 +233,6 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
         com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportPolicy =
                 getTransportServicePolicyFromDomainServicePolicy(policy);
         transport.directoryV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, transportPolicy), directory);
-
     }
 
     @Override
@@ -259,12 +258,12 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
         WebhookPackage response;
         if (transportResponse == null) {
             response = null;
-        } else if (transportResponse instanceof ServerSentEventSuccessfulDeviceLinkCompletion) {
-            UUID deviceId = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getDeviceId();
-            String publicKeyId = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getPublicKeyId();
-            String publicKey = ((ServerSentEventSuccessfulDeviceLinkCompletion) transportResponse).getPublicKey();
+        } else if (transportResponse instanceof ServerSentEventDeviceLinkCompletion) {
+            UUID deviceId = ((ServerSentEventDeviceLinkCompletion) transportResponse).getDeviceId();
+            String publicKeyId = ((ServerSentEventDeviceLinkCompletion) transportResponse).getPublicKeyId();
+            String publicKey = ((ServerSentEventDeviceLinkCompletion) transportResponse).getPublicKey();
             response = new DirectoryUserDeviceLinkCompletionWebhookPackage(
-                    new DeviceLinkCompletion(deviceId, publicKey, publicKeyId)
+                    new DeviceLinkCompletionResponse(deviceId, publicKey, publicKeyId)
             );
         } else {
             throw new InvalidRequestException("Unknown response type was returned by the transport", null, null);

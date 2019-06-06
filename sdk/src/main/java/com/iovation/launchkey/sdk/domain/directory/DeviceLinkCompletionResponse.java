@@ -3,12 +3,12 @@ package com.iovation.launchkey.sdk.domain.directory;
 import java.util.Objects;
 import java.util.UUID;
 
-public class DeviceLinkCompletion {
+public class DeviceLinkCompletionResponse {
     private final UUID deviceId;
     private final String devicePublicKey;
     private final String devicePublicKeyId;
 
-    public DeviceLinkCompletion(UUID deviceId, String devicePublicKey, String devicePublicKeyId) {
+    public DeviceLinkCompletionResponse(UUID deviceId, String devicePublicKey, String devicePublicKeyId) {
         this.deviceId = deviceId;
         this.devicePublicKey = devicePublicKey;
         this.devicePublicKeyId = devicePublicKeyId;
@@ -29,8 +29,8 @@ public class DeviceLinkCompletion {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DeviceLinkCompletion)) return false;
-        DeviceLinkCompletion that = (DeviceLinkCompletion) o;
+        if (!(o instanceof DeviceLinkCompletionResponse)) return false;
+        DeviceLinkCompletionResponse that = (DeviceLinkCompletionResponse) o;
         return Objects.equals(getDeviceId(), that.getDeviceId()) &&
                 Objects.equals(getDevicePublicKey(), that.getDevicePublicKey()) &&
                 Objects.equals(getDevicePublicKeyId(), that.getDevicePublicKeyId());
@@ -43,7 +43,7 @@ public class DeviceLinkCompletion {
 
     @Override
     public String toString() {
-        return "DeviceLinkCompletion{" +
+        return "DeviceLinkCompletionResponse{" +
                 "deviceId=" + deviceId +
                 ", devicePublicKey='" + devicePublicKey + '\'' +
                 ", devicePublicKeyId='" + devicePublicKeyId + '\'' +

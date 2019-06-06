@@ -11,6 +11,7 @@ public class LaunchkeySdkConfig {
     private String directoryId;
     private String serviceId;
     private String privateKeyLocation;
+    private String externalUrl;
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -50,5 +51,13 @@ public class LaunchkeySdkConfig {
 
     public String getPrivateKeyLocation() {
         return privateKeyLocation;
+    }
+
+    public String getExternalUrl() {
+        return externalUrl;
+    }
+
+    public void setExternalUrl(String externalUrl) {
+        this.externalUrl = externalUrl;
     }
 }

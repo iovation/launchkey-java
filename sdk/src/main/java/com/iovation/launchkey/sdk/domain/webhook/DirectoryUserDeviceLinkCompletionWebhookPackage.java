@@ -12,28 +12,28 @@
 
 package com.iovation.launchkey.sdk.domain.webhook;
 
-import com.iovation.launchkey.sdk.domain.directory.DeviceLinkCompletion;
+import com.iovation.launchkey.sdk.domain.directory.DeviceLinkCompletionResponse;
 
 /**
- * A Server Sent Event callback used to inform an application that the user has remotely ended their session.
+ * A Server Sent Event callback used to inform an application that the user has completed linking a Device.
  */
 public class DirectoryUserDeviceLinkCompletionWebhookPackage implements WebhookPackage {
 
-    private final DeviceLinkCompletion deviceLinkCompletion;
+    private final DeviceLinkCompletionResponse deviceLinkCompletionResponse;
 
     /**
-     * @param deviceLinkCompletion Device link completion data
+     * @param deviceLinkCompletionResponse Device link completion response
      */
-    public DirectoryUserDeviceLinkCompletionWebhookPackage(DeviceLinkCompletion deviceLinkCompletion)
+    public DirectoryUserDeviceLinkCompletionWebhookPackage(DeviceLinkCompletionResponse deviceLinkCompletionResponse)
     {
-        this.deviceLinkCompletion = deviceLinkCompletion;
+        this.deviceLinkCompletionResponse = deviceLinkCompletionResponse;
     }
 
     /**
-     * Get the device link completion data
-     * @return The device link completion data
+     * Get the device link completion response
+     * @return The device link completion response
      */
-    public DeviceLinkCompletion getDeviceLinkCompletion() {
-        return deviceLinkCompletion;
+    public DeviceLinkCompletionResponse getDeviceLinkCompletionResponse() {
+        return deviceLinkCompletionResponse;
     }
 }
