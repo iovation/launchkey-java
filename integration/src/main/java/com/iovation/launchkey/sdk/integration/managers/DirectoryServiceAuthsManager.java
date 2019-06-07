@@ -18,13 +18,21 @@ import com.iovation.launchkey.sdk.client.ServiceClient;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.service.DenialReason;
+import cucumber.api.java.After;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
 public class DirectoryServiceAuthsManager {
 
     private DirectoryServiceManager directoryServiceManager;
+
+    private final List<AuthPolicy.Location> locations = new ArrayList<>();
+    private Integer factors;
+    private boolean inherence;
+    private boolean knowledge;
+    private boolean possession;
 
     private String currentAuthRequestId;
     private AuthorizationResponse currentAuthResponse;
@@ -33,6 +41,38 @@ public class DirectoryServiceAuthsManager {
     @Inject
     public DirectoryServiceAuthsManager(DirectoryServiceManager directoryServiceManager) {
         this.directoryServiceManager = directoryServiceManager;
+    }
+
+    @After
+    public void cleanUp() {
+        currentAuthRequestId = null;
+        currentAuthResponse = null;
+        currentAuthPolicy = null;
+        factors = null;
+        inherence = false;
+        knowledge = false;
+        possession = false;
+        locations.clear();
+    }
+
+    public void setFactors(Integer factors) {
+        this.factors = factors;
+    }
+
+    public void setKnowledge() {
+        this.knowledge = true;
+    }
+
+    public void setInherence() {
+        this.inherence = true;
+    }
+
+    public void setPossession() {
+        this.possession = true;
+    }
+
+    public void addLocation(AuthPolicy.Location location) {
+        locations.add(location);
     }
 
     public String createAuthorizationRequest(String userIdentifier) throws Throwable {
@@ -73,6 +113,13 @@ public class DirectoryServiceAuthsManager {
     }
 
     public AuthPolicy getCurrentAuthPolicy() {
+        if (currentAuthPolicy == null) {
+            if (factors != null) {
+                currentAuthPolicy = new AuthPolicy(factors, locations);
+            } else {
+                currentAuthPolicy = new AuthPolicy(knowledge, inherence, possession, locations);
+            }
+        }
         return currentAuthPolicy;
     }
 

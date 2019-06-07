@@ -56,9 +56,6 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
 
     protected class CucumberJuiceModule extends AbstractModule {
 
-        protected OrganizationFactory organizationFactory;
-        protected KobitonManager.KobitonBundle bundle;
-
         @Override
         protected void configure() {
             try (InputStream in = CucumberGuiceInjectorSource.class.getResourceAsStream("/application.properties")) {
@@ -74,7 +71,6 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
             }
 
             Provider provider = new BouncyCastleProvider();
-
 
             bind(Provider.class).toInstance(provider);
 

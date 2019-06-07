@@ -29,67 +29,44 @@ public class ServiceAuthorizationPolicySteps {
     private final DirectoryDeviceManager directoryDeviceManager;
     private final DirectoryServiceAuthsManager directoryServiceAuthsManager;
 
-    private final List<AuthPolicy.Location> locations;
-    private Integer factors;
-    private boolean inherence;
-    private boolean knowledge;
-    private boolean possession;
-
     @Inject
     public ServiceAuthorizationPolicySteps(DirectoryDeviceManager directoryDeviceManager, DirectoryServiceAuthsManager directoryServiceAuthsManager) {
         this.directoryDeviceManager = directoryDeviceManager;
         this.directoryServiceAuthsManager = directoryServiceAuthsManager;
-        locations = new ArrayList<>();
-    }
-
-    @After
-    public void cleanUp() {
-        factors = null;
-        inherence = false;
-        knowledge = false;
-        possession = false;
-        locations.clear();
-
     }
 
     @Given("^the current Authorization Policy requires (\\d+) factors$")
-    public void theCurrentAuthorizationPolicyRequiresFactors(int numberOfFactors) throws Throwable {
-        factors = numberOfFactors;
+    public void theCurrentAuthorizationPolicyRequiresFactors(int numberOfFactors) {
+        directoryServiceAuthsManager.setFactors(numberOfFactors);
     }
 
     @Given("^the current Authorization Policy requires inherence$")
-    public void theCurrentAuthorizationPolicyRequiresInherence() throws Throwable {
-        inherence = true;
+    public void theCurrentAuthorizationPolicyRequiresInherence() {
+        directoryServiceAuthsManager.setInherence();
     }
 
     @And("^the current Authorization Policy requires knowledge$")
-    public void theCurrentAuthorizationPolicyRequiresKnowledge() throws Throwable {
-        knowledge = true;
+    public void theCurrentAuthorizationPolicyRequiresKnowledge() {
+        directoryServiceAuthsManager.setKnowledge();
     }
 
     @And("^the current Authorization Policy requires possession$")
-    public void theCurrentAuthorizationPolicyRequiresPossession() throws Throwable {
-        possession = true;
+    public void theCurrentAuthorizationPolicyRequiresPossession() {
+        directoryServiceAuthsManager.setPossession();
     }
 
     @When("^I make a Policy based Authorization request for the User$")
     public void iMakeAPolicyBasedAuthorizationRequestForTheUser() throws Throwable {
-        directoryServiceAuthsManager.createAuthorizationRequest(directoryDeviceManager.getCurrentUserIdentifier(), null, getCurrentAuthPolicy());
+        directoryServiceAuthsManager.createAuthorizationRequest(directoryDeviceManager.getCurrentUserIdentifier(), null, directoryServiceAuthsManager.getCurrentAuthPolicy());
     }
 
-    @Given("the current Authorization Policy requires a geofence with a radius of {float}, a latitude of {float}, and a longitude of {float}")
-    public void theCurrentAuthorizationPolicyRequiresAGeofenceOf(double radius, double latitude, double longitude)
-            throws Throwable {
-        this.locations.add(new AuthPolicy.Location(radius, latitude, longitude));
+    @Given("the current Authorization Policy requires a geofence with a radius of {double}, a latitude of {double}, and a longitude of {double}")
+    public void theCurrentAuthorizationPolicyRequiresAGeofenceOf(double radius, double latitude, double longitude) {
+        directoryServiceAuthsManager.addLocation(new AuthPolicy.Location(radius, latitude, longitude));
     }
 
-    AuthPolicy getCurrentAuthPolicy() {
-        AuthPolicy policy;
-        if (factors != null) {
-          policy = new AuthPolicy(factors, locations);
-        } else {
-            policy = new AuthPolicy(knowledge, inherence, possession, locations);
-        }
-        return policy;
+    @Given("the current Authorization Policy requires a geofence with a radius of {double}, a latitude of {double}, a longitude of {double}, and named {string}")
+    public void theCurrentAuthorizationPolicyRequiresAGeofenceOfName(double radius, double latitude, double longitude, String name) {
+        directoryServiceAuthsManager.addLocation(new AuthPolicy.Location(name, radius, latitude, longitude));
     }
 }

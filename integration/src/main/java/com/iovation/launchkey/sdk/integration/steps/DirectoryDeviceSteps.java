@@ -158,13 +158,15 @@ public class DirectoryDeviceSteps {
     }
 
     @When("^I approve the auth request$")
-    public void iApproveTheAuthRequest() {
+    public void iApproveTheAuthRequest() throws Throwable {
         driver.approveRequest();
+        Thread.sleep(3000);
     }
 
     @When("^I deny the auth request$")
-    public void iDenyTheAuthRequest() {
+    public void iDenyTheAuthRequest() throws Throwable {
         driver.denyRequest();
+        Thread.sleep(3000);
     }
 
     @When("^I receive the auth request and acknowledge the failure message$")

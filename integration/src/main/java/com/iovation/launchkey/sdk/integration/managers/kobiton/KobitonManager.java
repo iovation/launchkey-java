@@ -13,6 +13,7 @@ import com.iovation.launchkey.sdk.integration.managers.kobiton.transport.Generic
 import com.iovation.launchkey.sdk.integration.managers.kobiton.transport.RequestFactory;
 import org.jose4j.base64url.Base64;
 
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,8 @@ public class KobitonManager {
             this.appLocation = "kobiton-store:" + this.appId;
         }
     }
+
+    private String appId = null;
 
     private final RequestFactory requestFactory;
     private final String kobitonUploadUrl;
@@ -119,6 +122,8 @@ public class KobitonManager {
         int appId = object2.get("appId").getAsInt();
 
         KobitonBundle bundle = new KobitonBundle(appId);
+
+        this.appId = bundle.appId;
 
         // Kobiton's appium server sometimes takes a second to realize the app is uploaded
         System.out.println("App finished uploading, giving Kobiton some time to process the uploaded app...");

@@ -13,6 +13,7 @@
 package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
+import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.MethodsListConverter;
 import com.iovation.launchkey.sdk.integration.entities.AuthorizationResponseEntity;
@@ -34,17 +35,14 @@ public class DirectoryServiceAuthSteps {
     private final GenericSteps genericSteps;
     private final DirectoryServiceAuthsManager directoryServiceAuthsManager;
     private final DirectoryDeviceManager directoryDeviceManager;
-    private final ServiceAuthorizationPolicySteps policySteps;
 
     @Inject
     public DirectoryServiceAuthSteps(GenericSteps genericSteps,
                                      DirectoryServiceAuthsManager directoryServiceAuthsManager,
-                                     DirectoryDeviceManager directoryDeviceManager,
-                                     ServiceAuthorizationPolicySteps policySteps) {
+                                     DirectoryDeviceManager directoryDeviceManager) {
         this.genericSteps = genericSteps;
         this.directoryServiceAuthsManager = directoryServiceAuthsManager;
         this.directoryDeviceManager = directoryDeviceManager;
-        this.policySteps = policySteps;
     }
 
 
@@ -112,36 +110,71 @@ public class DirectoryServiceAuthSteps {
     public void theAuthorizationResponseShouldRequireNFactors(int n) {
         AuthorizationResponse response = directoryServiceAuthsManager.getCurrentAuthResponse();
         assertNotNull(response);
-        //assertEquals(response.getPolicy?().getCount?());
+        assertEquals(response.getPolicy().getRequiredFactors(), Integer.valueOf(n));
     }
 
-    @Then("the Authorization response should contain a geofence with a radius of {float}, a latitude of {float}, and a longitude of {float}")
+    @Then("the Authorization response should contain a geofence with a radius of {double}, a latitude of {double}, and a longitude of {double}")
     public void theAuthorizationResponseShouldContainAGeofenceWithARadiusOfXALatitudeOfYAndALongitudeOfZ(double radius, double latitude, double longitude) {
-        // Get geofence from auth response
+        boolean containsAGeofenceWithGivenParameters = false;
         AuthorizationResponse response = directoryServiceAuthsManager.getCurrentAuthResponse();
-//        Geofence geofence = response.getGeofence?();
-//        assertTrue(geofence.radius == radius);
-//        assertTrue(geofence.latitude == latitude);
-//        assertTrue(geofence.longitude == longitude);
+        for (AuthPolicy.Location location : response.getPolicy().getLocations()) {
+            if (location.getLatitude() == latitude && location.getLongitude() == longitude && location.getRadius() == radius) {
+                containsAGeofenceWithGivenParameters = true;
+                break;
+            }
+        }
+        assertTrue(containsAGeofenceWithGivenParameters);
+    }
 
+    @Then("the Authorization response should contain a geofence with a radius of {double}, a latitude of {double}, a longitude of {double}, and a name of {string}")
+    public void theAuthorizationResponseShouldContainAGeofenceWithARadiusOfXALatitudeOfYALongitudeOfZAndANameOfZ(double radius, double latitude, double longitude, String name) {
+        boolean containsAGeofenceWithGivenParameters = false;
+        AuthorizationResponse response = directoryServiceAuthsManager.getCurrentAuthResponse();
+        for (AuthPolicy.Location location : response.getPolicy().getLocations()) {
+            if (location.getLatitude() == latitude && location.getLongitude() == longitude && location.getRadius() == radius && location.getName().equals(name)) {
+                containsAGeofenceWithGivenParameters = true;
+                break;
+            }
+        }
+        assertTrue(containsAGeofenceWithGivenParameters);
     }
 
     @Then("^the Authorization response should require (knowledge|inherence|possession)$")
-    public void theAuthorizationResponseShouldRequireFactor(String requiredString, String factor) {
-        AuthorizationResponse response = directoryServiceAuthsManager.getCurrentAuthResponse();
-        //assertTrue(response.getFactorType?().equals(factor));
+    public void theAuthorizationResponseShouldRequireFactor(String factor) {
+        AuthPolicy policy = directoryServiceAuthsManager.getCurrentAuthResponse().getPolicy();
+        switch (factor) {
+            case "knowledge":
+                assertTrue(policy.isKnowledgeFactorRequired());
+                break;
+            case "inherence":
+                assertTrue(policy.isInherenceFactorRequired());
+                break;
+            case "possession":
+                assertTrue(policy.isPossessionFactorRequired());
+                break;
+        }
     }
 
     @Then("^the Authorization response should not require (knowledge|inherence|possession)$")
     public void theAuthorizationResponseShouldNotRequireFactor(String factor) {
-        AuthorizationResponse response = directoryServiceAuthsManager.getCurrentAuthResponse();
-        //assertTrue(!response.getFactorType?().equals(factor));
+        AuthPolicy policy = directoryServiceAuthsManager.getCurrentAuthResponse().getPolicy();
+        switch (factor) {
+            case "knowledge":
+                assertFalse(policy.isKnowledgeFactorRequired());
+                break;
+            case "inherence":
+                assertFalse(policy.isInherenceFactorRequired());
+                break;
+            case "possession":
+                assertFalse(policy.isPossessionFactorRequired());
+                break;
+        }
     }
 
-    @Then("the Authorization response should contain the following methods")
+    @Then("the Authorization response should contain the following methods:")
     public void theAuthorizationResponseShouldContainTheFollowingMethods(DataTable dataTable) {
         AuthorizationResponse response = directoryServiceAuthsManager.getCurrentAuthResponse();
-        //assertThat(response.getMethods?(), is(equalTo(MethodsListConverter.fromDataTable(dataTable))));
+        assertThat(response.getAuthMethods(), is(equalTo(MethodsListConverter.fromDataTable(dataTable))));
     }
 
     @When("^I attempt to make an Policy based Authorization request for the User identified by \"([^\"]*)\"$")
@@ -149,7 +182,7 @@ public class DirectoryServiceAuthSteps {
             throws Throwable {
         try {
             directoryServiceAuthsManager
-                    .createAuthorizationRequest(userIdentifier, null, policySteps.getCurrentAuthPolicy());
+                    .createAuthorizationRequest(userIdentifier, null, directoryServiceAuthsManager.getCurrentAuthPolicy());
         } catch (Exception e) {
             genericSteps.setCurrentException(e);
         }

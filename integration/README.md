@@ -46,7 +46,18 @@ values:
  
 Example:
 ```
-java -DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 -DLaunchkey.Organization.private_key=/tmp/private-key.pem -DAppium.url=https://billy.jean:5e449dd9-2720-4767-babb-cf29eddecb94@api.kobiton.com/wd/hub -DAppium.Kobiton.use_kobiton=true -DAppium.Kobiton.auth=billy.jean:5e449dd9-2720-4767-babb-cf29eddecb94 -jar sdk-integration-tests-4.5.0-SNAPSHOT-jar-with-dependencies.jar
+java \
+-DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \
+-DLaunchkey.Organization.private_key=/tmp/private-key.pem \
+-DAppium.url=https://billy.jean:5e449dd9-2720-4767-babb-cf29eddecb94@api.kobiton.com/wd/hub \
+-DAppium.Kobiton.use_kobiton=true \
+-DAppium.Kobiton.auth=billy.jean:5e449dd9-2720-4767-babb-cf29eddecb94 \
+-jar sdk-integration-tests-4.5.0-SNAPSHOT-jar-with-dependencies.jar \
+classpath:features \
+--glue classpath:com.iovation.launchkey.mobile.integration \
+--plugin pretty \
+--plugin html:target/cucumber-htmlreport \
+--plugin json:target/cucumber-report.json
 ```
 
 ### <a name="help"></a>Help
