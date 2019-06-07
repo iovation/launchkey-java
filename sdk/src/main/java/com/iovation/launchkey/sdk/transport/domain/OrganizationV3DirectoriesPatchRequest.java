@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.UUID;
 
-@JsonPropertyOrder({"directory_id", "active", "android_key", "ios_p12", "denial_context_inquiry_enabled", "callback_url"})
+@JsonPropertyOrder({"directory_id", "active", "android_key", "ios_p12", "denial_context_inquiry_enabled", "webhook_url"})
 public class OrganizationV3DirectoriesPatchRequest {
     private final UUID directoryId;
     private final Boolean active;
