@@ -60,7 +60,7 @@ public class DirectoryV3DevicesPostResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCode(), qrcode, getDeviceId());
+        return Objects.hash(getCode(), getQRCode(), getDeviceId());
     }
 
     @Override
