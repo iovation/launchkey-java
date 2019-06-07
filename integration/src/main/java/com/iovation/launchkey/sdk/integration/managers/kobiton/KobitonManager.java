@@ -13,24 +13,13 @@ import com.iovation.launchkey.sdk.integration.managers.kobiton.transport.Generic
 import com.iovation.launchkey.sdk.integration.managers.kobiton.transport.RequestFactory;
 import org.jose4j.base64url.Base64;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class KobitonManager {
 
-    public class KobitonBundle {
-        public final String appId;
-        public final String appLocation;
-
-        public KobitonBundle(int appId) {
-            this.appId = String.valueOf(appId);
-            this.appLocation = "kobiton-store:" + this.appId;
-        }
-    }
-
-    private String appId = null;
+    private String currentAppId;
 
     private final RequestFactory requestFactory;
     private final String kobitonUploadUrl;
@@ -103,7 +92,7 @@ public class KobitonManager {
         return response;
     }
 
-    public KobitonBundle createApplication(String appName, String appLocation) {
+    public void createApplication(String appName, String appLocation) {
 
         // Generate upload URL
         GenericResponse response = generateUploadUrl(appName);
@@ -119,11 +108,7 @@ public class KobitonManager {
         response = createApplicationOnKobiton(appName, appPath);
 
         JsonObject object2 = new JsonParser().parse(response.getBody()).getAsJsonObject();
-        int appId = object2.get("appId").getAsInt();
-
-        KobitonBundle bundle = new KobitonBundle(appId);
-
-        this.appId = bundle.appId;
+        currentAppId = String.valueOf(object2.get("appId").getAsInt());
 
         // Kobiton's appium server sometimes takes a second to realize the app is uploaded
         System.out.println("App finished uploading, giving Kobiton some time to process the uploaded app...");
@@ -133,16 +118,14 @@ public class KobitonManager {
             System.out.println("Error sleeping this thread, continuing anyways");
         }
         System.out.println("...Time's up");
-
-        return bundle;
     }
 
-    public void deleteApplication(String appId) {
+    public void deleteApplication() {
 
         // Delete the app on Kobiton
         GenericResponse response = requestFactory.getDefaultRequestBuilder()
                 .setRequestType(GenericRequest.RequestType.DELETE)
-                .setURL(kobitonAppsUrl + appId)
+                .setURL(kobitonAppsUrl + currentAppId)
                 .addHeader(new GenericHeader("Authorization", "Basic ".concat(Base64.encode(kobitonAuthCreds.getBytes()))))
                 .addContentTypeJSONHeader()
                 .build()
@@ -171,7 +154,7 @@ public class KobitonManager {
         JsonArray privateDevices = responseAsJson.getAsJsonArray("privateDevices");
         for (JsonElement element : privateDevices) {
             try {
-                devices.add(new ObjectMapper().readValue(element.toString(), KobitonPrivateDevice.class));
+                devices.add(new ObjectMapper().readValue(element.toString(), KobitonDevice.class));
             } catch (JsonParseException e) {
                 throw new InvalidRequestException("Unable to parse the decrypted body as JSON!", e, null);
             } catch (IOException e) {
@@ -182,7 +165,7 @@ public class KobitonManager {
         JsonArray cloudDevices = responseAsJson.getAsJsonArray("cloudDevices");
         for (JsonElement element : cloudDevices) {
             try {
-                devices.add(new ObjectMapper().readValue(element.toString(), KobitonCloudDevice.class));
+                devices.add(new ObjectMapper().readValue(element.toString(), KobitonDevice.class));
             } catch (JsonParseException e) {
                 throw new InvalidRequestException("Unable to parse the decrypted body as JSON!", e, null);
             } catch (IOException e) {
@@ -193,12 +176,12 @@ public class KobitonManager {
         return devices;
     }
 
-    public void makeApplicationPublic(String appId) {
+    public void makeApplicationPublic() {
 
         // Make app public on kobiton
         GenericResponse response = requestFactory.getDefaultRequestBuilder()
                 .setRequestType(GenericRequest.RequestType.PUT)
-                .setURL(kobitonAppsUrl + appId + "/public")
+                .setURL(kobitonAppsUrl + currentAppId + "/public")
                 .addHeader(new GenericHeader("Authorization", "Basic ".concat(Base64.encode(kobitonAuthCreds.getBytes()))))
                 .build()
                 .send();
@@ -206,16 +189,20 @@ public class KobitonManager {
         throwErrorIfStatusCodeIsBad(response.getStatusCode());
     }
 
-    public void makeApplicationPrivate(String appId) {
+    public void makeApplicationPrivate() {
 
         // Make app private on kobiton
         GenericResponse response = requestFactory.getDefaultRequestBuilder()
                 .setRequestType(GenericRequest.RequestType.PUT)
-                .setURL(kobitonAppsUrl + appId + "/private")
+                .setURL(kobitonAppsUrl + currentAppId + "/private")
                 .addHeader(new GenericHeader("Authorization", "Basic ".concat(Base64.encode(kobitonAuthCreds.getBytes()))))
                 .build()
                 .send();
 
         throwErrorIfStatusCodeIsBad(response.getStatusCode());
+    }
+
+    public String getCurrentAppLocation() {
+        return "kobiton-store:" + currentAppId;
     }
 }

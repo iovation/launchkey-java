@@ -31,7 +31,6 @@ import com.iovation.launchkey.sdk.integration.mobile.driver.SampleAppMobileDrive
 import com.iovation.launchkey.sdk.integration.mobile.driver.android.SampleAppAndroidDriver;
 import cucumber.api.guice.CucumberModules;
 import cucumber.runtime.java.guice.InjectorSource;
-import io.appium.java_client.AppiumDriver;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -154,36 +153,44 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
         private SampleAppMobileDriver getMobileDriver() {
             SampleAppMobileDriver mobileDriver = null;
             URL seleniumUrl;
-            try {
-                boolean useKobiton = getPositiveBooleanPropertyElseAddError(Appium.Kobiton.use_kobiton);
-                if (useKobiton) {
+            boolean useKobiton = getPositiveBooleanPropertyElseAddError(Appium.Kobiton.use_kobiton);
+            if (useKobiton) {
 
-                    String kobitonUploadUrl = getPropertyElseAddError(Appium.Kobiton.upload_url);
-                    String kobitonAuthCreds = getPropertyElseAddError(Appium.Kobiton.auth);
-                    String kobitonAppName = getPropertyElseAddError(Appium.Kobiton.app_name);
-                    String appPhysicalLocation = getPropertyElseAddError(Capability.app);
-                    String kobitonAppsUrl = getPropertyElseAddError(Appium.Kobiton.apps_url);
-                    String kobitonDevicesUrl = getPropertyElseAddError(Appium.Kobiton.devices_url);
-                    KobitonManager kobitonManager = new KobitonManager(new RequestFactory(), kobitonUploadUrl, kobitonAuthCreds, kobitonAppsUrl, kobitonDevicesUrl);
+                String kobitonUploadUrl = getPropertyElseAddError(Appium.Kobiton.upload_url);
+                String kobitonAuthCreds = getPropertyElseAddError(Appium.Kobiton.auth);
+                String kobitonAppName = getPropertyElseAddError(Appium.Kobiton.app_name);
+                String appPhysicalLocation = getPropertyElseAddError(Capability.app);
+                String kobitonAppsUrl = getPropertyElseAddError(Appium.Kobiton.apps_url);
+                String kobitonDevicesUrl = getPropertyElseAddError(Appium.Kobiton.devices_url);
+                KobitonManager kobitonManager = new KobitonManager(new RequestFactory(), kobitonUploadUrl, kobitonAuthCreds, kobitonAppsUrl, kobitonDevicesUrl);
 
-                    KobitonManager.KobitonBundle bundle = kobitonManager.createApplication(
-                            kobitonAppName,
-                            appPhysicalLocation);
+                try {
+                    kobitonManager.createApplication(
+                        kobitonAppName,
+                        appPhysicalLocation);
+                } catch (Exception e) {
+                    addError("Could not create application on Kobiton", e);
+                }
 
-                    System.setProperty(Capability.app, bundle.appLocation);
+                System.setProperty(Capability.app, kobitonManager.getCurrentAppLocation());
 
-                    String platformName = getPropertyElseAddError(Capability.platform_name);
+                String platformName = getPropertyElseAddError(Capability.platform_name);
 
+                try {
                     List<KobitonDevice> devices = kobitonManager.getAllDevices();
                     for (KobitonDevice device : devices) {
-                        if (!device.isBooked && device.platformName.equals(platformName) && Integer.valueOf(String.valueOf(device.platformVersion.charAt(0))) >= 5) {
-                            System.setProperty(Capability.device_name, device.deviceName);
-                            System.setProperty(Capability.platform_version, device.platformVersion);
+                        if (!device.isBooked() && device.getPlatformName().equals(platformName) && Integer.valueOf(String.valueOf(device.getPlatformVersion().charAt(0))) >= 5) {
+                            System.setProperty(Capability.device_name, device.getDeviceName());
+                            System.setProperty(Capability.platform_version, device.getPlatformVersion());
                             break;
                         }
                     }
+                } catch (Exception e) {
+                    addError("Could not get Kobiton Device", e);
                 }
+            }
 
+            try {
                 seleniumUrl = new URL(getPropertyElseAddError(Appium.url));
 
                 SampleAppAndroidDriver driver = new SampleAppAndroidDriver(seleniumUrl, getDesiredCapabilities());
