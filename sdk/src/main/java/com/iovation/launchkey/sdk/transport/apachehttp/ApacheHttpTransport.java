@@ -801,13 +801,13 @@ public class ApacheHttpTransport implements Transport {
         try {
 
             final String jwt = getJWT(response);
-            String expected_audience;
+            String expectedAudience;
             if (response.getStatusLine().getStatusCode() == 401) {
-                expected_audience = "public";
+                expectedAudience = "public";
             } else {
-                expected_audience = issuer.toString();
+                expectedAudience = issuer.toString();
             }
-            final JWTClaims claims = validateJWT(expectedTokenId, jwt, expected_audience);
+            final JWTClaims claims = validateJWT(expectedTokenId, jwt, expectedAudience);
             HttpEntity entity = response.getEntity();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             if (entity != null) entity.writeTo(stream);
