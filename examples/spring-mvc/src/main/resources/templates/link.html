@@ -9,14 +9,6 @@
     <form name="f" th:action="@{/link}" method="post">
         <fieldset>
             <legend>Link a Device to a User</legend>
-            <!--suppress ThymeleafVariablesResolveInspection -->
-            <div th:if="${param.error}" class="alert alert-error">
-                <p>Linking request was unsuccessful</p>
-            </div>
-            <!--suppress ThymeleafVariablesResolveInspection -->
-            <div th:if="${param.linked}" class="alert alert-success">
-                <script>// Poll for success</script>
-            </div>
             <label for="username">Username</label>
             <input id="username" type="text" name="username"/>
             <div class="form-actions">
