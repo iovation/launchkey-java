@@ -59,7 +59,7 @@ public interface OrganizationClient extends ServiceManagingClient {
      * @param iosP12 APNS push certificate in .P12 format that has been Base64 Encoded
      * @param denialContextInquiryEnabled Should the user be prompted for denial context when they deny authorization
      * requests for any and all child services.
-     * @param callbackUrl Callback URL for Directory level webhooks
+     * @param webhookUrl URL for Directory level webhooks
      * @throws InvalidResponseException When the response JWT is missing or does not pass validation, when the response
      * content hash does not match the value in the JWT, or when the JWE in the body fails validation, or the decrypted
      * JWE in the body cannot be parsed or mapped to the expected data.
@@ -77,7 +77,7 @@ public interface OrganizationClient extends ServiceManagingClient {
      * the signature of the response
      */
     void updateDirectory(UUID directoryId, Boolean active, String androidKey, String iosP12,
-                         Boolean denialContextInquiryEnabled, URI callbackUrl)
+                         Boolean denialContextInquiryEnabled, URI webhookUrl)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
                          InvalidCredentialsException, CommunicationErrorException, MarshallingError,
                          CryptographyError;

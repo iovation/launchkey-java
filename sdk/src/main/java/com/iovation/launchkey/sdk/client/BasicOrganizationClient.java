@@ -45,12 +45,12 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
 
     @Override
     public void updateDirectory(UUID directoryId, Boolean active, String androidKey, String iosP12,
-                                Boolean denialContextInquiryEnabled, URI callbackUrl)
+                                Boolean denialContextInquiryEnabled, URI webhookUrl)
         throws CommunicationErrorException, MarshallingError, InvalidResponseException,
                 InvalidCredentialsException, CryptographyError {
         final OrganizationV3DirectoriesPatchRequest request =
                 new OrganizationV3DirectoriesPatchRequest(directoryId, active, androidKey, iosP12,
-                        denialContextInquiryEnabled, callbackUrl);
+                        denialContextInquiryEnabled, webhookUrl);
         transport.organizationV3DirectoriesPatch(request, organization);
     }
 
