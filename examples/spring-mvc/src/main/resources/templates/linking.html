@@ -6,7 +6,7 @@
 </head>
 <body>
 <div tiles:fragment="content">
-    <h1>Linbking in Progress</h1>
+    <h1>Linking in Progress</h1>
     <p th:text="'Device: ' + ${linkingData.deviceId}" />
     <p th:text="'Linking Code: ' + ${linkingData.linkingCode}" />
     <img th:src="${linkingData.getQrCode()}" />
