@@ -54,7 +54,7 @@ public class DirectoryV3DevicesPostResponse {
         if (!(o instanceof DirectoryV3DevicesPostResponse)) return false;
         DirectoryV3DevicesPostResponse that = (DirectoryV3DevicesPostResponse) o;
         return Objects.equals(getCode(), that.getCode()) &&
-                Objects.equals(qrcode, that.qrcode) &&
+                Objects.equals(getQRCode(), that.getQRCode()) &&
                 Objects.equals(getDeviceId(), that.getDeviceId());
     }
 
