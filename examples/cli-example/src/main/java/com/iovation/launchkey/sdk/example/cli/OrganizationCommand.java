@@ -16,7 +16,7 @@ class OrganizationCommand {
 
     @CommandLine.Parameters(index = "0", paramLabel = "<ORG_ID>",
             description = "Organization ID. It is found in the Keys section of the Organization's page in Dashboard.")
-    private String organzationId;
+    private String organizationId;
 
     @CommandLine.Parameters(index = "1", paramLabel = "<KEY_FILE>",
             description = "File location of the RSA Private Key of the RSA public/private key pair whose public key " +
@@ -24,10 +24,10 @@ class OrganizationCommand {
     private File privateKeyFile;
 
     @CommandLine.Command(name = "update-directory")
-    void createDiryory(
+    void updateDirectory(
             @CommandLine.Parameters(index = "2", paramLabel = "<DIRECTORY_ID>",
                     description = "URL for webhooks to contact for Directory level events") String directoryId,
-            @CommandLine.Parameters(index = "3", paramLabel = "<CALLBACK_URL>",
+            @CommandLine.Parameters(index = "3", paramLabel = "<WEBHOOK_URL>",
                     description = "URL for webhooks to contact for Directory level events") String callback_url
     ) throws Exception {
         getOrganizationClient().updateDirectory(UUID.fromString(directoryId), null, null, null, null, URI.create(callback_url));
@@ -45,6 +45,6 @@ class OrganizationCommand {
         String key = buffer.toString();
 
         return rootCommand.getFactoryFactory()
-                .makeOrganizationFactory(organzationId, key).makeOrganizationClient();
+                .makeOrganizationFactory(organizationId, key).makeOrganizationClient();
     }
 }

@@ -172,9 +172,9 @@ public class AuthManager {
             if (webhookPackage instanceof DirectoryUserDeviceLinkCompletionWebhookPackage) {
                 DeviceLinkCompletionResponse response = ((DirectoryUserDeviceLinkCompletionWebhookPackage) webhookPackage).getDeviceLinkCompletionResponse();
                 LOG.info("Directory User Device link completion:");
-                LOG.info("    Device ID:     " + naForNull(response.getDeviceId().toString()));
-                LOG.info("    Public Key ID: " + naForNull(response.getDevicePublicKeyId()));
-                LOG.info("    Public Key:    " + naForNull(response.getDevicePublicKey()));
+                LOG.info("    Device ID:     " + safeNull(response.getDeviceId().toString()));
+                LOG.info("    Public Key ID: " + safeNull(response.getDevicePublicKeyId()));
+                LOG.info("    Public Key:    " + safeNull(response.getDevicePublicKey()));
                 deviceLinkCompletionMap.put(response.getDeviceId().toString(), response);
             }
         } catch (BaseException apiException) {
@@ -196,14 +196,14 @@ public class AuthManager {
                     }
                 }
                 LOG.debug("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
-                LOG.debug("    Type:          " + naForNull(authorizationResponse.getType()));
-                LOG.debug("    Reason:        " + naForNull(authorizationResponse.getReason()));
-                LOG.debug("    Denial Reason: " + naForNull(authorizationResponse.getDenialReason()));
-                LOG.debug("    Fraud:         " + naForNull(authorizationResponse.isFraud()));
+                LOG.debug("    Type:          " + safeNull(authorizationResponse.getType()));
+                LOG.debug("    Reason:        " + safeNull(authorizationResponse.getReason()));
+                LOG.debug("    Denial Reason: " + safeNull(authorizationResponse.getDenialReason()));
+                LOG.debug("    Fraud:         " + safeNull(authorizationResponse.isFraud()));
                 LOG.debug("    Device ID:     " + authorizationResponse.getDeviceId());
                 LOG.debug("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
                 LOG.debug("    User Push ID:  " + authorizationResponse.getUserPushId());
-                LOG.debug("    Org User Hash: " + naForNull(authorizationResponse.getOrganizationUserHash()));
+                LOG.debug("    Org User Hash: " + safeNull(authorizationResponse.getOrganizationUserHash()));
                 if (null == sessionId) {
                     throw new AuthException("No session found for getServiceService request: " + authRequestId);
                 }
@@ -262,16 +262,16 @@ public class AuthManager {
         }
     }
 
-    private static String naForNull(String value) {
-        return value == null ? "N/A" : value;
+    private static String safeNull(String value) {
+        return value == null ? "None" : value;
     }
 
-    private static String naForNull(Enum value) {
-        return value == null ? "N/A" : value.name();
+    private static String safeNull(Enum value) {
+        return value == null ? "None" : value.name();
     }
 
-    private static String naForNull(Boolean value) {
-        return value == null ? "N/A" : value.toString();
+    private static String safeNull(Boolean value) {
+        return value == null ? "None" : value.toString();
     }
 
     private String getSessionId() {
