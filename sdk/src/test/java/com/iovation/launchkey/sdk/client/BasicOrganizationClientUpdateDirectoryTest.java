@@ -21,11 +21,10 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.net.URI;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -91,6 +90,13 @@ public class BasicOrganizationClientUpdateDirectoryTest {
         client.updateDirectory(null, false, null, "p12", null);
         verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals("p12", requestCaptor.getValue().getIosP12());
+    }
+
+    @Test
+    public void sendsCallbackURL() throws Exception {
+        client.updateDirectory(null, null, null, null, null, URI.create("https://foo.bar"));
+        verify(transport).organizationV3DirectoriesPatch(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(URI.create("https://foo.bar"), requestCaptor.getValue().getWebhookUrl());
     }
 
     @Test

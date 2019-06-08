@@ -14,12 +14,11 @@ package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import com.iovation.launchkey.sdk.domain.PublicKey;
-import com.iovation.launchkey.sdk.domain.directory.Device;
-import com.iovation.launchkey.sdk.domain.directory.DeviceStatus;
-import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
-import com.iovation.launchkey.sdk.domain.directory.Session;
+import com.iovation.launchkey.sdk.domain.directory.*;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
+import com.iovation.launchkey.sdk.domain.webhook.DirectoryUserDeviceLinkCompletionWebhookPackage;
+import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.*;
@@ -48,7 +47,7 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
             CommunicationErrorException, MarshallingError, CryptographyError {
         DirectoryV3DevicesPostRequest request = new DirectoryV3DevicesPostRequest(userId, ttl);
         DirectoryV3DevicesPostResponse response = transport.directoryV3DevicesPost(request, directory);
-        return new DirectoryUserDeviceLinkData(response.getCode(), response.getQRCode());
+        return new DirectoryUserDeviceLinkData(response.getCode(), response.getQRCode(), response.getDeviceId());
     }
 
     @Override
@@ -234,7 +233,6 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
         com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportPolicy =
                 getTransportServicePolicyFromDomainServicePolicy(policy);
         transport.directoryV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, transportPolicy), directory);
-
     }
 
     @Override
@@ -243,5 +241,33 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
         transport.directoryV3ServicePolicyDelete(new ServicePolicyDeleteRequest(serviceId), directory);
+    }
+
+    @Override
+    public WebhookPackage handleWebhook(Map<String, List<String>> headers, String body)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError, NoKeyFoundException {
+        return handleWebhook(headers, body, null, null);
+    }
+
+    @Override
+    public WebhookPackage handleWebhook(Map<String, List<String>> headers, String body, String method, String path)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError, NoKeyFoundException {
+        ServerSentEvent transportResponse = transport.handleServerSentEvent(headers, method, path, body);
+        WebhookPackage response;
+        if (transportResponse == null) {
+            response = null;
+        } else if (transportResponse instanceof ServerSentEventDeviceLinkCompletion) {
+            UUID deviceId = ((ServerSentEventDeviceLinkCompletion) transportResponse).getDeviceId();
+            String publicKeyId = ((ServerSentEventDeviceLinkCompletion) transportResponse).getPublicKeyId();
+            String publicKey = ((ServerSentEventDeviceLinkCompletion) transportResponse).getPublicKey();
+            response = new DirectoryUserDeviceLinkCompletionWebhookPackage(
+                    new DeviceLinkCompletionResponse(deviceId, publicKey, publicKeyId)
+            );
+        } else {
+            throw new InvalidRequestException("Unknown response type was returned by the transport", null, null);
+        }
+        return response;
     }
 }

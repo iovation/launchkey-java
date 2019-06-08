@@ -19,7 +19,7 @@ import com.iovation.launchkey.sdk.error.*;
 
 import java.util.List;
 
-public interface DirectoryClient extends ServiceManagingClient {
+public interface DirectoryClient extends ServiceManagingClient, WebhookHandlingClient {
 
     /**
      * Begin the process of Linking a Subscriber Authenticator Device with an End User based on the Directory User ID.

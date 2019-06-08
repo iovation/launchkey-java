@@ -10,9 +10,9 @@ package com.iovation.launchkey.sdk.client; /**
  * limitations under the License.
  */
 
-import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectorySdkKeysPostRequest;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectorySdkKeysPostRequest;
 import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectorySdkKeysPostResponse;
 import org.junit.Before;
 import org.junit.Test;

@@ -12,7 +12,8 @@
 package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.transport.Transport;
-import com.iovation.launchkey.sdk.transport.domain.*;
+import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.ServiceKeysPatchRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +25,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Date;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 

@@ -10,7 +10,10 @@ package com.iovation.launchkey.sdk.transport.apachehttp; /**
  * limitations under the License.
  */
 
-import com.iovation.launchkey.sdk.transport.domain.*;
+import com.iovation.launchkey.sdk.transport.domain.DirectoryV3SessionsListPostRequest;
+import com.iovation.launchkey.sdk.transport.domain.DirectoryV3SessionsListPostResponse;
+import com.iovation.launchkey.sdk.transport.domain.DirectoryV3SessionsListPostResponseSession;
+import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

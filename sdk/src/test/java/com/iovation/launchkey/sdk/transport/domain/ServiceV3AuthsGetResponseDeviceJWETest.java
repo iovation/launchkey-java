@@ -3,7 +3,6 @@ package com.iovation.launchkey.sdk.transport.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -14,21 +13,21 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
     @Test
     public void getType() {
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
-                "Denial Reason", UUID.randomUUID(),"Device ID", new String[]{"1", "2", "3"}, null, null);
+                "Denial Reason", UUID.randomUUID(), "Device ID", new String[]{"1", "2", "3"}, null, null);
         assertEquals("Type", actual.getType());
     }
 
     @Test
     public void getReason() {
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
-                "Denial Reason", UUID.randomUUID(),"Device ID", new String[]{"1", "2", "3"}, null, null);
+                "Denial Reason", UUID.randomUUID(), "Device ID", new String[]{"1", "2", "3"}, null, null);
         assertEquals("Reason", actual.getReason());
     }
 
     @Test
     public void getDenialReason() {
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
-                "Denial Reason", UUID.randomUUID(),"Device ID", new String[]{"1", "2", "3"}, null, null);
+                "Denial Reason", UUID.randomUUID(), "Device ID", new String[]{"1", "2", "3"}, null, null);
         assertEquals("Denial Reason", actual.getDenialReason());
     }
 
@@ -36,21 +35,21 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
     public void getAuthorizationRequestId() {
         UUID expected = UUID.randomUUID();
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
-                "Denial Reason", expected,"Device ID", new String[]{"1", "2", "3"}, null, null);
+                "Denial Reason", expected, "Device ID", new String[]{"1", "2", "3"}, null, null);
         assertEquals(expected, actual.getAuthorizationRequestId());
     }
 
     @Test
     public void getDeviceId() {
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
-                "Denial Reason", UUID.randomUUID(),"Device ID", new String[]{"1", "2", "3"}, null, null);
+                "Denial Reason", UUID.randomUUID(), "Device ID", new String[]{"1", "2", "3"}, null, null);
         assertEquals("Device ID", actual.getDeviceId());
     }
 
     @Test
     public void getServicePins() {
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
-                "Denial Reason", UUID.randomUUID(),"Device ID", new String[]{"1", "2", "3"}, null, null);
+                "Denial Reason", UUID.randomUUID(), "Device ID", new String[]{"1", "2", "3"}, null, null);
         assertArrayEquals(new String[]{"1", "2", "3"}, actual.getServicePins());
     }
 
@@ -58,7 +57,7 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
     public void getAuthPolicy() {
         AuthPolicy expected = new AuthPolicy(2, true, false, true, null);
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
-                "Denial Reason", UUID.randomUUID(),"Device ID", new String[]{"1", "2", "3"}, expected, null);
+                "Denial Reason", UUID.randomUUID(), "Device ID", new String[]{"1", "2", "3"}, expected, null);
         assertEquals(expected, actual.getAuthPolicy());
     }
 
@@ -70,7 +69,7 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
                 new AuthMethod("Method Null", null, null, null, null, null, null, null),
         };
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
-                "Denial Reason", UUID.randomUUID(),"Device ID", new String[]{"1", "2", "3"}, null, expected);
+                "Denial Reason", UUID.randomUUID(), "Device ID", new String[]{"1", "2", "3"}, null, expected);
         assertArrayEquals(expected, actual.getAuthMethods());
     }
 

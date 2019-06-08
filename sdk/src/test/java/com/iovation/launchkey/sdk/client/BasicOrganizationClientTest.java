@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -101,21 +102,22 @@ public class BasicOrganizationClientTest {
     public void getAllDirectoriesReturnsAllDirectoriesInResponse() throws Exception {
         List<OrganizationV3DirectoriesGetResponseDirectory> transportDirectories = Arrays.asList(
                 new OrganizationV3DirectoriesGetResponseDirectory(
-                        UUID.randomUUID(), "Name One", false, null, null, null, null, false),
+                        UUID.randomUUID(), "Name One", false, null, null, null, null, false, URI.create("https://a.b")),
                 new OrganizationV3DirectoriesGetResponseDirectory(
                         UUID.randomUUID(), "Name True", true, Arrays.asList(UUID.randomUUID(), UUID.randomUUID()),
-                        Arrays.asList(UUID.randomUUID(), UUID.randomUUID()), "Android Key", "IOS FP", true)
+                        Arrays.asList(UUID.randomUUID(), UUID.randomUUID()), "Android Key", "IOS FP", true,
+                        URI.create("https://b.c"))
         );
         when(directoriesGetResponse.getDirectories()).thenReturn(transportDirectories);
         List<Directory> expected = Arrays.asList(
                 new Directory(transportDirectories.get(0).getId(), transportDirectories.get(0).getName(),
                         transportDirectories.get(0).isActive(), transportDirectories.get(0).getServiceIds(),
                         transportDirectories.get(0).getSdkKeys(), transportDirectories.get(0).getAndroidKey(),
-                        transportDirectories.get(0).getIosCertificateFingerprint(), false),
+                        transportDirectories.get(0).getIosCertificateFingerprint(), false, URI.create("https://a.b")),
                 new Directory(transportDirectories.get(1).getId(), transportDirectories.get(1).getName(),
                         transportDirectories.get(1).isActive(), transportDirectories.get(1).getServiceIds(),
                         transportDirectories.get(1).getSdkKeys(), transportDirectories.get(1).getAndroidKey(),
-                        transportDirectories.get(1).getIosCertificateFingerprint(), true)
+                        transportDirectories.get(1).getIosCertificateFingerprint(), true, URI.create("https://b.c"))
                 );
         List<Directory> actual = client.getAllDirectories();
         assertEquals(expected, actual);

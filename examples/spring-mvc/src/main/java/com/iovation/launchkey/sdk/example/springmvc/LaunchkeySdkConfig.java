@@ -7,8 +7,11 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "lk")
 public class LaunchkeySdkConfig {
     private String baseUrl;
+    private String organizationId;
+    private String directoryId;
     private String serviceId;
     private String privateKeyLocation;
+    private String externalUrl;
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -16,6 +19,22 @@ public class LaunchkeySdkConfig {
 
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public String getDirectoryId() {
+        return directoryId;
+    }
+
+    public void setDirectoryId(String directoryId) {
+        this.directoryId = directoryId;
     }
 
     public void setServiceId(String serviceId) {
@@ -32,5 +51,13 @@ public class LaunchkeySdkConfig {
 
     public String getPrivateKeyLocation() {
         return privateKeyLocation;
+    }
+
+    public String getExternalUrl() {
+        return externalUrl;
+    }
+
+    public void setExternalUrl(String externalUrl) {
+        this.externalUrl = externalUrl;
     }
 }

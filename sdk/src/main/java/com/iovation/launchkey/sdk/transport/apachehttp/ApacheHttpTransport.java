@@ -15,8 +15,8 @@ import com.iovation.launchkey.sdk.crypto.jwt.JWTError;
 import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.Transport;
-import com.iovation.launchkey.sdk.transport.domain.*;
 import com.iovation.launchkey.sdk.transport.domain.Error;
+import com.iovation.launchkey.sdk.transport.domain.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
@@ -305,7 +305,7 @@ public class ApacheHttpTransport implements Transport {
         }
         String jwt = headerGroup.getFirstHeader(IOV_JWT_HEADER).getValue();
         try {
-            JWTClaims jwtClaims = validateJWT(null, jwt);
+            JWTClaims jwtClaims = validateJWT(null, jwt, issuer.toString());
             if (method != null && !method.equals(jwtClaims.getMethod())) {
                 throw new JWTError("JWT request method does not match the method provided", null);
             }
@@ -323,46 +323,16 @@ public class ApacheHttpTransport implements Transport {
                 final String encryptionKeyId = jweService.getHeaders(body).get("kid");
                 final RSAPrivateKey privateKey = entityKeyMap.getKey(requestingEntity, encryptionKeyId);
                 final String decrypted = jweService.decrypt(body, privateKey);
-                final ServerSentEventAuthorizationResponseCore core =
-                        objectMapper.readValue(decrypted, ServerSentEventAuthorizationResponseCore.class);
-                if (core.getAuthJwe() != null) {
-                    final String decryptedDeviceResponse =
-                            jweService.decrypt(core.getAuthJwe(), privateKey);
-                    final ServiceV3AuthsGetResponseDeviceJWE deviceResponse =
-                            objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDeviceJWE.class);
-                    response = new ServerSentEventAuthorizationResponse(
-                            requestingEntity,
-                            EntityIdentifier.fromString(jwtClaims.getSubject()).getId(),
-                            core.getServiceUserHash(),
-                            core.getOrgUserHash(),
-                            core.getUserPushId(),
-                            deviceResponse.getAuthorizationRequestId(),
-                            "AUTHORIZED".equals(deviceResponse.getType()),
-                            deviceResponse.getDeviceId(),
-                            deviceResponse.getServicePins(),
-                            deviceResponse.getType(),
-                            deviceResponse.getReason(),
-                            deviceResponse.getDenialReason()
-                    );
+
+                ServerSentEventType type = objectMapper.readValue(decrypted, ServerSentEventType.class);
+
+                if (ServerSentEventType.AUTHORIZATION_RESPONSE_WEBHOOK.equals(type.getType())) {
+                    response = handleAuthResponseServerSentEvent(jwtClaims, requestingEntity, privateKey, decrypted);
+                } else if (ServerSentEventType.DEVICE_LINK_COMPLETION_WEBHOOK.equals(type.getType())) {
+                    response = objectMapper.readValue(decrypted, ServerSentEventDeviceLinkCompletion.class);
                 } else {
-                    final byte[] decryptedDeviceResponse =
-                            crypto.decryptRSA(BASE_64.decode(core.getAuth().getBytes()), privateKey);
-                    final ServiceV3AuthsGetResponseDevice deviceResponse =
-                            objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDevice.class);
-                    response = new ServerSentEventAuthorizationResponse(
-                            requestingEntity,
-                            EntityIdentifier.fromString(jwtClaims.getSubject()).getId(),
-                            core.getServiceUserHash(),
-                            core.getOrgUserHash(),
-                            core.getUserPushId(),
-                            deviceResponse.getAuthorizationRequestId(),
-                            deviceResponse.getResponse(),
-                            deviceResponse.getDeviceId(),
-                            deviceResponse.getServicePins(),
-                            null,
-                            null,
-                            null
-                    );
+                    response = null;
+                    logger.warn("Unknown Webhook Type \"" + type.getType() + "\". Did not process.");
                 }
             } else {
                 // Session end is not encrypted
@@ -381,6 +351,54 @@ public class ApacheHttpTransport implements Transport {
             throw new InvalidRequestException("Unable to read the body due to an I/O error!", e, null);
         } catch (NoSuchAlgorithmException e) {
             throw new InvalidRequestException("Invalid hash algorithm", e, null);
+        }
+        return response;
+    }
+
+    private ServerSentEvent handleAuthResponseServerSentEvent(JWTClaims jwtClaims, EntityIdentifier requestingEntity,
+                                                              RSAPrivateKey privateKey, String decrypted
+    ) throws IOException, JWEFailure {
+        ServerSentEvent response;
+        final ServerSentEventAuthorizationResponseCore core =
+                objectMapper.readValue(decrypted, ServerSentEventAuthorizationResponseCore.class);
+        if (core.getAuthJwe() != null) {
+            final String decryptedDeviceResponse =
+                    jweService.decrypt(core.getAuthJwe(), privateKey);
+            final ServiceV3AuthsGetResponseDeviceJWE deviceResponse =
+                    objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDeviceJWE.class);
+            response = new ServerSentEventAuthorizationResponse(
+                    requestingEntity,
+                    EntityIdentifier.fromString(jwtClaims.getSubject()).getId(),
+                    core.getServiceUserHash(),
+                    core.getOrgUserHash(),
+                    core.getUserPushId(),
+                    deviceResponse.getAuthorizationRequestId(),
+                    "AUTHORIZED".equals(deviceResponse.getType()),
+                    deviceResponse.getDeviceId(),
+                    deviceResponse.getServicePins(),
+                    deviceResponse.getType(),
+                    deviceResponse.getReason(),
+                    deviceResponse.getDenialReason()
+            );
+        } else {
+            final byte[] decryptedDeviceResponse =
+                    crypto.decryptRSA(BASE_64.decode(core.getAuth().getBytes()), privateKey);
+            final ServiceV3AuthsGetResponseDevice deviceResponse =
+                    objectMapper.readValue(decryptedDeviceResponse, ServiceV3AuthsGetResponseDevice.class);
+            response = new ServerSentEventAuthorizationResponse(
+                    requestingEntity,
+                    EntityIdentifier.fromString(jwtClaims.getSubject()).getId(),
+                    core.getServiceUserHash(),
+                    core.getOrgUserHash(),
+                    core.getUserPushId(),
+                    deviceResponse.getAuthorizationRequestId(),
+                    deviceResponse.getResponse(),
+                    deviceResponse.getDeviceId(),
+                    deviceResponse.getServicePins(),
+                    null,
+                    null,
+                    null
+            );
         }
         return response;
     }
@@ -417,7 +435,7 @@ public class ApacheHttpTransport implements Transport {
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException {
         final HttpResponse httpResponse =
-                getHttpResponse("POST", "/organization/v3/directories/list", subject, request, true, null);
+                    getHttpResponse("POST", "/organization/v3/directories/list", subject, request, true, null);
         return new OrganizationV3DirectoriesListPostResponse(Arrays.asList(
                 decryptResponse(httpResponse, OrganizationV3DirectoriesListPostResponseDirectory[].class)));
     }
@@ -783,11 +801,16 @@ public class ApacheHttpTransport implements Transport {
         try {
 
             final String jwt = getJWT(response);
-            final JWTClaims claims = validateJWT(expectedTokenId, jwt);
+            String expectedAudience;
+            if (response.getStatusLine().getStatusCode() == 401) {
+                expectedAudience = "public";
+            } else {
+                expectedAudience = issuer.toString();
+            }
+            final JWTClaims claims = validateJWT(expectedTokenId, jwt, expectedAudience);
             HttpEntity entity = response.getEntity();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             if (entity != null) entity.writeTo(stream);
-
             if (claims.getStatusCode() != response.getStatusLine().getStatusCode())
                 throw new JWTError("Status code of response content does not match JWT response status code", null);
 
@@ -836,12 +859,12 @@ public class ApacheHttpTransport implements Transport {
         }
     }
 
-    private JWTClaims validateJWT(String expectedTokenId, String jwt)
+    private JWTClaims validateJWT(String expectedTokenId, String jwt, String expected_audience)
             throws JWTError, MarshallingError, InvalidResponseException, CommunicationErrorException, CryptographyError,
             InvalidCredentialsException {
         String keyId = jwtService.getJWTData(jwt).getKeyId();
         return jwtService.decode(
-                getPublicKeyData(keyId).getKey(), issuer.toString(), expectedTokenId, getCurrentDate(), jwt);
+                getPublicKeyData(keyId).getKey(), expected_audience, expectedTokenId, getCurrentDate(), jwt);
     }
 
     private String getJWT(HttpResponse response) {

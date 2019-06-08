@@ -17,16 +17,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/favicon.ico", "/webhook", "/authorized", "/images/**").permitAll()
+                .antMatchers("/favicon.ico", AuthManager.SERVICE_WEBHOOK, AuthManager.DIRECTORY_WEBHOOK, "/authorized",
+                        "/link", "/linked/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login").permitAll()
                 .and().logout().permitAll().logoutSuccessHandler(logoutSuccessHandler)
-                .and().csrf().ignoringAntMatchers("/webhook", "/authorized");
+                .and().csrf().ignoringAntMatchers(AuthManager.SERVICE_WEBHOOK, AuthManager.DIRECTORY_WEBHOOK,
+                        "/authorized", "/link", "/linked/**");
     }
 
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth, AuthManager authManager, LogoutSuccessHandler logoutSuccessHandler) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth, AuthManager authManager,
+                                LogoutSuccessHandler logoutSuccessHandler) throws Exception {
         this.logoutSuccessHandler = logoutSuccessHandler;
         auth.authenticationProvider(new LaunchKeyAuthenticationProvider(authManager));
     }

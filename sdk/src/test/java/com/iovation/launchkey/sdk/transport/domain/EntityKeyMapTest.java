@@ -11,15 +11,15 @@ package com.iovation.launchkey.sdk.transport.domain; /**
  */
 
 import com.iovation.launchkey.sdk.error.NoKeyFoundException;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier.EntityType;
+import org.junit.Test;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
 
 public class EntityKeyMapTest {
 

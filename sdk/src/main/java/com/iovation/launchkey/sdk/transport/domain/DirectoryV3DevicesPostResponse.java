@@ -16,17 +16,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+import java.util.UUID;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DirectoryV3DevicesPostResponse {
-    public final String code;
-    public final String qrcode;
+    private final String code;
+    private final String qrcode;
+    private final UUID deviceId;
 
     @JsonCreator
     public DirectoryV3DevicesPostResponse(
             @JsonProperty(value = "code", required = true) String code,
-            @JsonProperty(value = "qrcode", required = true) String qrcode) {
+            @JsonProperty(value = "qrcode", required = true) String qrcode,
+            @JsonProperty(value = "device_id", required = true) UUID deviceId) {
         this.code = code;
         this.qrcode = qrcode;
+        this.deviceId = deviceId;
     }
 
     public String getCode() {
@@ -37,22 +43,24 @@ public class DirectoryV3DevicesPostResponse {
         return qrcode;
     }
 
+
+    public UUID getDeviceId() {
+        return deviceId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DirectoryV3DevicesPostResponse)) return false;
-
         DirectoryV3DevicesPostResponse that = (DirectoryV3DevicesPostResponse) o;
-
-        if (getCode() != null ? !getCode().equals(that.getCode()) : that.getCode() != null) return false;
-        return getQRCode() != null ? getQRCode().equals(that.getQRCode()) : that.getQRCode() == null;
+        return Objects.equals(getCode(), that.getCode()) &&
+                Objects.equals(getQRCode(), that.getQRCode()) &&
+                Objects.equals(getDeviceId(), that.getDeviceId());
     }
 
     @Override
     public int hashCode() {
-        int result = getCode() != null ? getCode().hashCode() : 0;
-        result = 31 * result + (getQRCode() != null ? getQRCode().hashCode() : 0);
-        return result;
+        return Objects.hash(getCode(), getQRCode(), getDeviceId());
     }
 
     @Override
@@ -60,6 +68,7 @@ public class DirectoryV3DevicesPostResponse {
         return "DirectoryV3DevicesPostResponse{" +
                 "code='" + code + '\'' +
                 ", qrcode='" + qrcode + '\'' +
+                ", deviceId=" + deviceId +
                 '}';
     }
 }

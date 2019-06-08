@@ -77,6 +77,12 @@ public class DirectoryDeviceSteps {
         assertThat(linkingCode, not(isEmptyOrNullString()));
     }
 
+    @And("^the Device linking response contains a valid Device ID$")
+    public void theDeviceLinkingResponseContainsAValidDeviceID() {
+        UUID deviceId = directoryDeviceManager.getCurrentLinkingResponse().getDeviceId();
+        assertThat(deviceId, not(nullValue(UUID.class)));
+    }
+
     @And("^the Device List has (\\d+) Devices?$")
     public void theDeviceListHasNumberOfDevices(int expectedDeviceCount) throws Throwable {
         assertThat(directoryDeviceManager.getCurrentDevicesList().size(), is(equalTo(expectedDeviceCount)));

@@ -15,7 +15,6 @@ import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.KeysPostResponse;
 import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectoryKeysPostRequest;
-import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectoryKeysPostRequest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;

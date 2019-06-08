@@ -1,11 +1,7 @@
 package com.iovation.launchkey.sdk.transport.apachehttp;
 
-import com.iovation.launchkey.sdk.crypto.Crypto;
 import com.iovation.launchkey.sdk.error.CryptographyError;
 import com.iovation.launchkey.sdk.error.InvalidResponseException;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,9 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.security.NoSuchAlgorithmException;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ApacheHttpTransportTestResponseValidationTest extends ApacheHttpTransportTestBase {
