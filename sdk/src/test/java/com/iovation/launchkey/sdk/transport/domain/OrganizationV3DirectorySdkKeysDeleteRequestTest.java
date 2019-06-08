@@ -11,7 +11,6 @@ package com.iovation.launchkey.sdk.transport.domain; /**
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectorySdkKeysDeleteRequest;
 import org.junit.Test;
 
 import java.util.UUID;

@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public class OrganizationV3DirectoriesListPostResponseDirectoryTest {
                 UUID.fromString("fac25a3c-af79-49df-bd65-777e9c86e288"), "Expected Name", true,
                 Collections.singletonList(UUID.fromString("4137af5c-b460-11e7-9bcd-0469f8dc10a5")),
                 Collections.singletonList(UUID.fromString("6a033e54-b460-11e7-a723-0469f8dc10a5")),
-                "Expected Android Key", "Expected iOS Certificate Fingerprint", true);
+                "Expected Android Key", "Expected iOS Certificate Fingerprint", true, URI.create("https://a.b"));
     }
 
     @Test
@@ -61,6 +62,11 @@ public class OrganizationV3DirectoriesListPostResponseDirectoryTest {
     @Test
     public void isDenialContextInquiryEnabled() throws Exception {
         assertTrue(directory.isDenialContextInquiryEnabled());
+    }
+
+    @Test
+    public void testGetWebhookUrl() {
+        assertEquals(URI.create("https://a.b"), directory.getWebhookUrl());
     }
 
     @Test
@@ -150,7 +156,7 @@ public class OrganizationV3DirectoriesListPostResponseDirectoryTest {
     }
 
     @Test
-    public void fromJSONParsesCorrectDenialContextInquireyEnabled() throws Exception {
+    public void fromJSONParsesCorrectDenialContextInquiryEnabled() throws Exception {
         OrganizationV3DirectoriesListPostResponseDirectory actual = new ObjectMapper().readValue(
                 "{\"id\":\"fac25a3c-af79-49df-bd65-777e9c86e288\",\"name\":\"Expected Name\"," +
                         "\"service_ids\":[\"4137af5c-b460-11e7-9bcd-0469f8dc10a5\"]," +
@@ -160,5 +166,19 @@ public class OrganizationV3DirectoriesListPostResponseDirectoryTest {
                         "\"denial_context_inquiry_enabled\":true}",
                 OrganizationV3DirectoriesListPostResponseDirectory.class);
         assertTrue(actual.isDenialContextInquiryEnabled());
+    }
+
+    @Test
+    public void fromJSONParsesCorrectWebhookUrl() throws Exception {
+        OrganizationV3DirectoriesListPostResponseDirectory actual = new ObjectMapper().readValue(
+                "{\"id\":\"fac25a3c-af79-49df-bd65-777e9c86e288\",\"name\":\"Expected Name\"," +
+                        "\"service_ids\":[\"4137af5c-b460-11e7-9bcd-0469f8dc10a5\"]," +
+                        "\"sdk_keys\":[\"6a033e54-b460-11e7-a723-0469f8dc10a5\"]," +
+                        "\"android_key\":\"Expected Android Key\"," +
+                        "\"ios_certificate_fingerprint\":\"Expected iOS Certificate Fingerprint\",\"active\":true," +
+                        "\"denial_context_inquiry_enabled\":true," +
+                        "\"webhook_url\":\"https://a.b\"}",
+                OrganizationV3DirectoriesListPostResponseDirectory.class);
+        assertEquals(URI.create("https://a.b"), actual.getWebhookUrl());
     }
 }

@@ -36,7 +36,8 @@ public class AuthorizationResponseWebhookPackage implements WebhookPackage {
         return authorizationResponse;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof AuthorizationResponseWebhookPackage)) return false;
 

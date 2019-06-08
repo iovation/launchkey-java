@@ -14,14 +14,12 @@ import com.iovation.launchkey.sdk.error.CommunicationErrorException;
 import com.iovation.launchkey.sdk.error.InvalidResponseException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;

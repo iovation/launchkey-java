@@ -89,7 +89,6 @@ public class JCECrypto implements Crypto {
     /**
      * Get an RSA private key utilizing the provided provider and PEM formatted string
      *
-     * @param provider Provider to generate the key
      * @param pem PEM formatted key string
      * @return RSA private key
      */

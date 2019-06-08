@@ -13,14 +13,19 @@ package com.iovation.launchkey.sdk.transport.domain; /**
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 
 public class OrganizationV3DirectoriesGetResponseTest {
     static final List<OrganizationV3DirectoriesGetResponseDirectory> directories = Collections.singletonList(
             new OrganizationV3DirectoriesGetResponseDirectory(UUID.randomUUID(), "Name", true,
-                    new ArrayList<UUID>(), new ArrayList<UUID>(), "Android Key", "IoS Fingerprint", true)
+                    new ArrayList<UUID>(), new ArrayList<UUID>(), "Android Key", "IoS Fingerprint", true,
+                    URI.create("https://a.b"))
     );
     private OrganizationV3DirectoriesGetResponse response;
 

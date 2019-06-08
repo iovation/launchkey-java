@@ -10,6 +10,10 @@ This changelog references the relevant changes (bug and security fixes) for the 
         * Added auth authPolicy to auth response
         * Added auth methods to auth response
     * Fixed missing SENSOR failure reason in AuthorizationResponse. It will no longer be returned as OTHER
+    * Fixed transport issue which would fail JWT validation on 401 responses from API
+    * Add device link completion webhook handling to the Directory client
+    * Updated Organization client to be able to set Directory webhook URL
+    * Updated example app to use Directory Users and have device link completion webhook implementation
  
   * 4.4.0
   

@@ -45,13 +45,21 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
 
     @Override
     public void updateDirectory(UUID directoryId, Boolean active, String androidKey, String iosP12,
+                                Boolean denialContextInquiryEnabled, URI webhookUrl)
+        throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+                InvalidCredentialsException, CryptographyError {
+        final OrganizationV3DirectoriesPatchRequest request =
+                new OrganizationV3DirectoriesPatchRequest(directoryId, active, androidKey, iosP12,
+                        denialContextInquiryEnabled, webhookUrl);
+        transport.organizationV3DirectoriesPatch(request, organization);
+    }
+
+    @Override
+    public void updateDirectory(UUID directoryId, Boolean active, String androidKey, String iosP12,
                                 Boolean denialContextInquiryEnabled)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError {
-        final OrganizationV3DirectoriesPatchRequest request =
-                new OrganizationV3DirectoriesPatchRequest(directoryId, active, androidKey, iosP12,
-                        denialContextInquiryEnabled);
-        transport.organizationV3DirectoriesPatch(request, organization);
+        updateDirectory(directoryId, active, androidKey, iosP12, denialContextInquiryEnabled, null);
     }
 
     @Override
@@ -70,7 +78,8 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
                 transport.organizationV3DirectoriesListPost(request, organization);
         OrganizationV3DirectoriesListPostResponseDirectory directory = response.getDirectories().get(0);
         return new Directory(directory.getId(), directory.getName(), directory.isActive(), directory.getServiceIds(),
-                directory.getSdkKeys(), directory.getAndroidKey(), directory.getIosCertificateFingerprint(), directory.isDenialContextInquiryEnabled());
+                directory.getSdkKeys(), directory.getAndroidKey(), directory.getIosCertificateFingerprint(),
+                directory.isDenialContextInquiryEnabled(), directory.getWebhookUrl());
 
     }
 
@@ -87,7 +96,8 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
         for (OrganizationV3DirectoriesListPostResponseDirectory directory : response.getDirectories()) {
             directories.add(new Directory(directory.getId(), directory.getName(), directory.isActive(),
                     directory.getServiceIds(), directory.getSdkKeys(), directory.getAndroidKey(),
-                    directory.getIosCertificateFingerprint(), directory.isDenialContextInquiryEnabled()));
+                    directory.getIosCertificateFingerprint(), directory.isDenialContextInquiryEnabled(),
+                    directory.getWebhookUrl()));
         }
         return directories;
     }
@@ -103,7 +113,7 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             directories.add(new Directory(responseDirectory.getId(), responseDirectory.getName(),
                     responseDirectory.isActive(), responseDirectory.getServiceIds(), responseDirectory.getSdkKeys(),
                     responseDirectory.getAndroidKey(), responseDirectory.getIosCertificateFingerprint(),
-                    responseDirectory.isDenialContextInquiryEnabled()));
+                    responseDirectory.isDenialContextInquiryEnabled(), responseDirectory.getWebhookUrl()));
         }
         return directories;
     }

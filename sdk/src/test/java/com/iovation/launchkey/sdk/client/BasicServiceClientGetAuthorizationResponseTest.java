@@ -3,7 +3,10 @@ package com.iovation.launchkey.sdk.client;
 import com.iovation.launchkey.sdk.domain.service.AuthMethod.Type;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.transport.Transport;
-import com.iovation.launchkey.sdk.transport.domain.*;
+import com.iovation.launchkey.sdk.transport.domain.AuthMethod;
+import com.iovation.launchkey.sdk.transport.domain.AuthPolicy;
+import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.ServiceV3AuthsGetResponse;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,15 +16,14 @@ import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(Enclosed.class)

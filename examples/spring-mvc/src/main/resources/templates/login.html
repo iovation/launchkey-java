@@ -9,9 +9,11 @@
     <form name="f" th:action="@{/login}" method="post">
         <fieldset>
             <legend>Please Login</legend>
+            <!--suppress ThymeleafVariablesResolveInspection -->
             <div th:if="${param.error}" class="alert alert-error">
                 <p>Login request was unsuccessful</p>
             </div>
+            <!--suppress ThymeleafVariablesResolveInspection -->
             <div th:if="${param.logout}" class="alert alert-success">
                 You have been logged out.
             </div>
@@ -22,6 +24,9 @@
             </div>
         </fieldset>
     </form>
+</div>
+<div tiles:fragment="content">
+    <a th:href="@{/link}">Link Device</a>
 </div>
 </body>
 </html>

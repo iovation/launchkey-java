@@ -12,8 +12,7 @@ package com.iovation.launchkey.sdk.transport.domain; /**
 
 import org.junit.Test;
 
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class PublicV3PublicKeyGetResponseTest {
     @Test

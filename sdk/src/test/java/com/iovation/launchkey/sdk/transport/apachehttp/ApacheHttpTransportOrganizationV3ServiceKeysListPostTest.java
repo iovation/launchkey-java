@@ -10,7 +10,10 @@ package com.iovation.launchkey.sdk.transport.apachehttp; /**
  * limitations under the License.
  */
 
-import com.iovation.launchkey.sdk.transport.domain.*;
+import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.KeysListPostResponse;
+import com.iovation.launchkey.sdk.transport.domain.KeysListPostResponsePublicKey;
+import com.iovation.launchkey.sdk.transport.domain.ServiceKeysListPostRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,13 +25,9 @@ import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ApacheHttpTransportOrganizationV3ServiceKeysListPostTest extends ApacheHttpTransportTestBase {

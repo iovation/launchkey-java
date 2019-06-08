@@ -14,8 +14,8 @@ package com.iovation.launchkey.sdk.transport.apachehttp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iovation.launchkey.sdk.crypto.Crypto;
-import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
 import com.iovation.launchkey.sdk.crypto.jwe.JWEService;
+import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
 
 import java.security.PublicKey;
 import java.util.Date;

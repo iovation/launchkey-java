@@ -25,6 +25,7 @@ import com.iovation.launchkey.sdk.integration.entities.DirectoryEntity;
 import com.iovation.launchkey.sdk.integration.entities.PublicKeyEntity;
 import cucumber.api.java.After;
 
+import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 
@@ -101,7 +102,7 @@ public class DirectoryManager {
     UUID createDirectory(String name) throws Throwable {
         UUID id = client.createDirectory(name);
         previousDirectoryEntity = currentDirectoryEntity;
-        currentDirectoryEntity = new DirectoryEntity(id, name, null, null, null, null, null, null, true);
+        currentDirectoryEntity = new DirectoryEntity(id, name, null, null, null, null, null, null, true, null);
         directories.add(currentDirectoryEntity);
         return id;
     }
@@ -126,9 +127,9 @@ public class DirectoryManager {
     }
 
     void updateCurrentDirectory(Boolean active, String androidKey, String p12, String p12Fingerprint,
-                                Boolean denialContextInquiryEnabled) throws Throwable {
+                                Boolean denialContextInquiryEnabled, URI webhookUrl) throws Throwable {
         updateDirectory(currentDirectoryEntity.getId(), active, androidKey, p12, p12Fingerprint,
-                denialContextInquiryEnabled);
+                denialContextInquiryEnabled, webhookUrl);
     }
 
     void generateAndAddDirectorySdkKeyToCurrentDirectory() throws Throwable {
@@ -169,11 +170,11 @@ public class DirectoryManager {
     }
 
     void updateDirectory(UUID directoryId, Boolean active, String androidKey, String p12,
-                         String p12Fingerprint, Boolean denialContextInquiryEnabled) throws Throwable {
-        client.updateDirectory(directoryId, active, androidKey, p12, denialContextInquiryEnabled);
+                         String p12Fingerprint, Boolean denialContextInquiryEnabled, URI webhookUrl) throws Throwable {
+        client.updateDirectory(directoryId, active, androidKey, p12, denialContextInquiryEnabled, webhookUrl);
         currentDirectoryEntity = new DirectoryEntity(currentDirectoryEntity.getId(), currentDirectoryEntity.getName(),
                 active, currentDirectoryEntity.getServiceIds(), currentDirectoryEntity.getSdkKeys(), androidKey,
-                p12Fingerprint, p12, denialContextInquiryEnabled);
+                p12Fingerprint, p12, denialContextInquiryEnabled, webhookUrl);
     }
 
     void updateDirectory(UUID directoryId, boolean active) throws Throwable {

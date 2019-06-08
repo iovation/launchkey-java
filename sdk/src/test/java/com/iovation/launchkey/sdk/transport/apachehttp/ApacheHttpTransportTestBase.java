@@ -22,6 +22,7 @@ import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.EntityKeyMap;
 import com.iovation.launchkey.sdk.transport.domain.PublicV3PingGetResponse;
+import com.iovation.launchkey.sdk.transport.domain.ServerSentEventType;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -67,6 +68,7 @@ public class ApacheHttpTransportTestBase {
     @Mock protected Crypto crypto;
     @Mock private Cache publicKeyCache;
     @Mock protected EntityKeyMap entityKeyMap;
+    @Mock protected ServerSentEventType serverSentEventType;
     @Mock private PublicV3PingGetResponse pingResponse;
     @Mock private RSAPublicKey publicKey;
     @Captor protected ArgumentCaptor<HttpUriRequest> requestCaptor;
@@ -79,6 +81,7 @@ public class ApacheHttpTransportTestBase {
                 .thenReturn(new BasicHeader("Content-Type", "application/jose"));
         when(objectMapper.readValue(any(InputStream.class), any(Class.class))).thenReturn(new Object());
         when(objectMapper.readValue(any(InputStream.class), eq(PublicV3PingGetResponse.class))).thenReturn(pingResponse);
+        when(objectMapper.readValue(anyString(), eq(ServerSentEventType.class))).thenReturn(serverSentEventType);
         when(objectMapper.writeValueAsString(any(Object.class))).thenReturn("Marshaled Value");
         when(publicKeyCache.get(anyString())).thenReturn("Public Key");
         when(pingResponse.getApiTime()).thenReturn(new Date());

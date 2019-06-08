@@ -3,6 +3,7 @@ package com.iovation.launchkey.sdk.domain.service;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.containsString;

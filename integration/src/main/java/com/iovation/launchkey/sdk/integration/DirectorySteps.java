@@ -1,6 +1,7 @@
 package com.iovation.launchkey.sdk.integration;
 
 import com.google.inject.Inject;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -8,6 +9,7 @@ import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
 import org.hamcrest.Matcher;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -102,7 +104,8 @@ public class DirectorySteps {
                 .updateCurrentDirectory(true, directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
-                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
+                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled(),
+                        directoryManager.getCurrentDirectoryEntity().getWebhookUrl());
     }
 
     @When("^I updated? the Directory as inactive$")
@@ -111,7 +114,8 @@ public class DirectorySteps {
                 .updateCurrentDirectory(false, directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
-                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
+                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled(),
+                        directoryManager.getCurrentDirectoryEntity().getWebhookUrl());
     }
 
     @Then("^the Directory is active$")
@@ -139,7 +143,8 @@ public class DirectorySteps {
         directoryManager.updateCurrentDirectory(directoryManager.getCurrentDirectoryEntity().getActive(), androidKey,
                 directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
                 directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
-                directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
+                directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled(),
+                directoryManager.getCurrentDirectoryEntity().getWebhookUrl());
     }
 
     @When("^I updated? the Directory Android Key with null$")
@@ -163,7 +168,8 @@ public class DirectorySteps {
                 .updateCurrentDirectory(true, directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
                         directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
-                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
+                        directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled(),
+                        directoryManager.getCurrentDirectoryEntity().getWebhookUrl());
     }
 
     @When("^I updated? the Directory iOS P12 with a valid certificate$")
@@ -171,7 +177,8 @@ public class DirectorySteps {
         directoryManager.updateCurrentDirectory(directoryManager.getCurrentDirectoryEntity().getActive(),
                 directoryManager.getCurrentDirectoryEntity().getAndroidKey(), keysManager.getBase64EncodedAlphaP12(),
                 keysManager.getAlphaCertificateFingerprint(),
-                directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled());
+                directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled(),
+                directoryManager.getCurrentDirectoryEntity().getWebhookUrl());
     }
 
     @Then("^Directory the iOS Certificate Fingerprint matches the provided certificate$")
@@ -192,13 +199,47 @@ public class DirectorySteps {
                 directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
                 directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
                 directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
-                false);
+                false,
+                directoryManager.getCurrentDirectoryEntity().getWebhookUrl());
     }
 
     @Then("^Directory denial context inquiry enabled flag is false")
     public void directoryTheDirectoryDenialContextInquiryEnabledFlagIsValue() throws Throwable {
         assertThat(Boolean.FALSE,
                 is(equalTo(directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled())));
+    }
+
+    @When("^I updated? the Directory webhook url to \"([^\"]*)\"$")
+    public void iUpdatedTheDirectoryWebhookUrlTo(String webhookUrl) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        directoryManager.updateCurrentDirectory(directoryManager.getCurrentDirectoryEntity().getActive(),
+                directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
+                directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
+                directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
+                directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled(),
+                URI.create(webhookUrl));
+    }
+
+    @When("^I updated? the Directory webhook url to null$")
+    public void iUpdatedTheDirectoryWebhookUrlToNull() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        directoryManager.updateCurrentDirectory(directoryManager.getCurrentDirectoryEntity().getActive(),
+                directoryManager.getCurrentDirectoryEntity().getAndroidKey(),
+                directoryManager.getCurrentDirectoryEntity().getIosCertificate(),
+                directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
+                directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled(),
+               null);
+    }
+
+    @And("^the Directory webhook url is \"([^\"]*)\"$")
+    public void theDirectoryWebhookUrlIs(String webhookUrl) throws Throwable {
+        assertThat(URI.create(webhookUrl),
+                is(equalTo(directoryManager.getCurrentDirectoryEntity().getWebhookUrl())));
+    }
+
+    @And("^the Directory webhook url is empty$")
+    public void theDirectoryWebhookUrlIsEmpty() throws Throwable {
+        assertThat(null, is(equalTo(directoryManager.getCurrentDirectoryEntity().getWebhookUrl())));
     }
 
     @And("^the Directory has the added SDK Keys?$")
