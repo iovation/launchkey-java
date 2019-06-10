@@ -38,6 +38,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.security.Provider;
@@ -92,7 +93,6 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
                 organizationFactory = null;
             }
             bind(OrganizationFactory.class).toInstance(organizationFactory);
-
             bind(SampleAppMobileDriver.class).toInstance(getMobileDriver());
         }
 
@@ -152,7 +152,6 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
 
         private SampleAppMobileDriver getMobileDriver() {
             SampleAppMobileDriver mobileDriver = null;
-            URL seleniumUrl;
             boolean useKobiton = getPositiveBooleanPropertyElseAddError(Appium.Kobiton.use_kobiton);
             if (useKobiton) {
 
@@ -190,20 +189,27 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
                 }
             }
 
+            URL appiumUrl = null;
             try {
-                seleniumUrl = new URL(getPropertyElseAddError(Appium.url));
+                appiumUrl = new URL(getPropertyElseAddError(Appium.url));
+            } catch (MalformedURLException e) {
+                addError("Appium URL provided is invalid", e);
+            }
 
-                SampleAppAndroidDriver driver = new SampleAppAndroidDriver(seleniumUrl, getDesiredCapabilities());
+            SampleAppAndroidDriver driver = null;
+            try {
+                driver = new SampleAppAndroidDriver(appiumUrl, getDesiredCapabilities());
                 mobileDriver = driver;
-                String commandTimeoutString = getPropertyElseAddError(Capability.new_command_timeout);
-                try {
-                    int commandTimeout = Integer.valueOf(commandTimeoutString);
-                    driver.manage().timeouts().implicitlyWait(commandTimeout, TimeUnit.SECONDS);
-                } catch (NumberFormatException e) {
-                    addInvalidPropertyError(Capability.new_command_timeout);
-                }
             } catch (Exception e) {
-                addError("Could not load platform driver", e);
+                addError("Could not load platform driver, make sure Appium.url is set to the correct value", e);
+            }
+
+            String commandTimeoutString = getPropertyElseAddError(Capability.new_command_timeout);
+            try {
+                int commandTimeout = Integer.valueOf(commandTimeoutString);
+                driver.manage().timeouts().implicitlyWait(commandTimeout, TimeUnit.SECONDS);
+            } catch (NumberFormatException e) {
+                addInvalidPropertyError(Capability.new_command_timeout);
             }
             return mobileDriver;
         }

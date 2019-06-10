@@ -97,9 +97,6 @@ public class BaseAndroidDriver extends AndroidDriver<AndroidElement> {
     public void resetTheApp() {
         resetApp();
         appWasReset();
-        try {
-            Thread.sleep(10000);
-        } catch (Throwable t) {}
     }
 
     public void screenshot() throws Exception {

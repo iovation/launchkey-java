@@ -50,29 +50,7 @@ public class DirectoryServiceManager {
         previousServiceEntity = null;
         currentServiceEntities.clear();
         currentServicePublicKeys.clear();
-    }
-
-    @After(order = 20000)
-    public void cleanupServices() throws Throwable {
-        Set<UUID> directoryIds = directoryClients.keySet();
-        for (UUID directoryId : directoryIds) {
-            try {
-                DirectoryClient client = directoryClients.get(directoryId);
-                for (Service service : client.getAllServices()) {
-                    client.updateService(service.getId(), service.getName(), "Ready for deletion", null, null, false);
-                }
-                directoryClients.remove(directoryId);
-            } catch (Forbidden e) {
-                System.err.println(
-                        "Unable to set all Directory Services to inactive for Directory " + directoryId + " due to error " + e);
-                // There is no recovering from this, do not attempt to deactivate the Services for this Directory again
-                directoryClients.remove(directoryId);
-            } catch (Exception e) {
-                System.err.println(
-                        "Unable to set all Directory Services to inactive for Directory " + directoryId +
-                                " due to error " + e);
-            }
-        }
+        directoryClients.clear();
     }
 
     public ServiceEntity getCurrentServiceEntity() {

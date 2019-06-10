@@ -15,14 +15,11 @@ package com.iovation.launchkey.sdk.integration.managers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.DirectoryClient;
-import com.iovation.launchkey.sdk.client.OrganizationClient;
-import com.iovation.launchkey.sdk.client.OrganizationFactory;
 import com.iovation.launchkey.sdk.domain.directory.Device;
 import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
 import com.iovation.launchkey.sdk.error.EntityNotFound;
 import com.iovation.launchkey.sdk.integration.entities.DeviceEntity;
 import com.iovation.launchkey.sdk.integration.entities.LinkingResponseEntity;
-import com.iovation.launchkey.sdk.integration.managers.DirectoryManager;
 import cucumber.api.java.After;
 
 import java.util.*;
@@ -44,7 +41,6 @@ public class DirectoryDeviceManager {
     public void tearDown() throws Throwable {
         for (Map.Entry<UUID, Set<String>> entry : directoryUserIdentifiers.entrySet()) {
             UUID directoryId = entry.getKey();
-            directoryManager.updateDirectory(directoryId, true, null, null, null, null);
             DirectoryClient directoryClient = directoryManager.getDirectoryClient(directoryId);
             try {
                 for (String userIdentifier : entry.getValue()) {
@@ -59,7 +55,6 @@ public class DirectoryDeviceManager {
             } catch (Exception e) {
                 System.err.println("Unable to unlink all User Devices for Directory " + directoryId);
             }
-            directoryManager.updateDirectory(directoryId, false, null, null, null, null);
         }
     }
 

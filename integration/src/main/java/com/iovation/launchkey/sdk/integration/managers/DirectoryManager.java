@@ -49,47 +49,14 @@ public class DirectoryManager {
         client = factory.makeOrganizationClient();
     }
 
-    @After
+    @After(order = 10000)
     public void cleanupState() {
         currentDirectoryEntity = null;
         previousDirectoryEntity = null;
         currentDirectoryEntityList.clear();
         currentSdkKeys.clear();
         currentPublicKeys.clear();
-    }
-
-    @After(order = 15000)
-    public void cleanupDirectories() throws Throwable {
-        List<DirectoryEntity> cleanup = new ArrayList<>();
-        cleanup.addAll(directories);
-        for (DirectoryEntity directoryEntity : cleanup) {
-            client.updateDirectory(directoryEntity.getId(), true, null, null, null);
-            try {
-                DirectoryClient directoryClient = getDirectoryClient(directoryEntity.getId());
-                try {
-                    for (Service service : directoryClient.getAllServices()) {
-                        directoryClient
-                                .updateService(service.getId(), service.getName(), "Ready for deletion", null, null,
-                                        false);
-                    }
-                } catch (Forbidden e) {
-                    System.err.println(
-                            "Unable Directory Services to inactive for Directory " + directoryEntity.getId() +
-                                    " due to error " + e);
-                    // There is no recovering from this, do not attempt to deactivate the Services for this Directory again
-                } catch (Exception e) {
-                    System.err.println(
-                            "Unable to set all Directory Services to inactive for Directory " +
-                                    directoryEntity.getId() + " due to error " + e);
-                }
-                client.updateDirectory(directoryEntity.getId(), false, null, null, null);
-            } catch (Exception e) {
-                System.err.println(
-                        "Unable to set Directory " + directoryEntity.getId() + " as inactive due to error " + e);
-            } finally {
-                directories.remove(directoryEntity);
-            }
-        }
+        directories.clear();
     }
 
     public DirectoryClient getDirectoryClient(UUID directoryId) {

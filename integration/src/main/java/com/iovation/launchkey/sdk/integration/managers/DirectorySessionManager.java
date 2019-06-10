@@ -16,7 +16,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.domain.directory.Session;
 import com.iovation.launchkey.sdk.integration.entities.SessionEntity;
-import com.iovation.launchkey.sdk.integration.managers.DirectoryManager;
 
 import java.util.ArrayList;
 import java.util.List;
