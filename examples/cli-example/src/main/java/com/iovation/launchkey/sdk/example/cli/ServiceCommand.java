@@ -101,7 +101,7 @@ class ServiceCommand {
                             System.out.println("        Knowledge:  " + safeNull(policy.isKnowledgeFactorRequired()));
                             System.out.println("        Possession: " + safeNull(policy.isPossessionFactorRequired()));
 
-                            System.out.print("        Locations: ");
+                            System.out.print("        Geofences: ");
                             List<AuthPolicy.Location> locations = authorizationResponse.getPolicy().getLocations();
                             if (locations == null || locations.size() < 1) {
                                 System.out.println("None");
