@@ -94,4 +94,82 @@ public class AuthPolicyTest {
         AuthPolicy actual = new ObjectMapper().readValue(json, AuthPolicy.class);
         assertEquals(expected, actual);
     }
+    @Test
+    public void objectMapperMapsAsExpectedForAuthResponsePolicyWithAmount() throws Exception {
+        String policy =
+                "{\n" +
+                        "  \"requirement\": \"amount\",\n" +
+                        "  \"amount\": 2,\n" +
+                        "  \"geofences\": [\n" +
+                        "    {\n" +
+                        "      \"name\": null,\n" +
+                        "      \"latitude\": 36.120825,\n" +
+                        "      \"longitude\": -115.157216,\n" +
+                        "      \"radius\": 200\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
+        AuthPolicy expected = new AuthPolicy(2, null, null, null, null);
+        expected.addGeoFence(200.0, 36.120825, -115.157216);
+        AuthPolicy actual = new ObjectMapper().readValue(policy, AuthPolicy.class);
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void objectMapperMapsAsExpectedForAuthResponsePolicyWithTypes() throws Exception {
+        String policy =
+                "{\n" +
+                        "  \"requirement\": \"types\",\n" +
+                        "  \"types\": [\"knowledge\"],\n" +
+                        "  \"geofences\": [\n" +
+                        "    {\n" +
+                        "      \"name\": null,\n" +
+                        "      \"latitude\": 36.120825,\n" +
+                        "      \"longitude\": -115.157216,\n" +
+                        "      \"radius\": 200\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
+        AuthPolicy expected = new AuthPolicy(null, false, true, false, null);
+        expected.addGeoFence(200.0, 36.120825, -115.157216);
+        AuthPolicy actual = new ObjectMapper().readValue(policy, AuthPolicy.class);
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void objectMapperMapsAsExpectedForAuthResponsePolicyWithJustGeofences() throws Exception {
+        String policy =
+                "{\n" +
+                        "  \"requirement\": null,\n" +
+                        "  \"geofences\": [\n" +
+                        "    {\n" +
+                        "      \"name\": null,\n" +
+                        "      \"latitude\": 36.120825,\n" +
+                        "      \"longitude\": -115.157216,\n" +
+                        "      \"radius\": 200\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
+        AuthPolicy expected = new AuthPolicy(null, null, null, null, null);
+        expected.addGeoFence(200.0, 36.120825, -115.157216);
+        AuthPolicy actual = new ObjectMapper().readValue(policy, AuthPolicy.class);
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void objectMapperMapsAsExpectedForAuthResponsePolicyWithJustGeofencesAndANonNullGeofenceName() throws Exception {
+        String policy =
+                "{\n" +
+                        "  \"requirement\": null,\n" +
+                        "  \"geofences\": [\n" +
+                        "    {\n" +
+                        "      \"name\": \"asdf\",\n" +
+                        "      \"latitude\": 36.120825,\n" +
+                        "      \"longitude\": -115.157216,\n" +
+                        "      \"radius\": 200\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
+        AuthPolicy expected = new AuthPolicy(null, null, null, null, null);
+        expected.addGeoFence("asdf", 200.0, 36.120825, -115.157216);
+        AuthPolicy actual = new ObjectMapper().readValue(policy, AuthPolicy.class);
+        assertEquals(expected, actual);
+    }
 }

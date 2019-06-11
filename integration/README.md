@@ -19,11 +19,11 @@ mvn clean package
 ## <a name="usage"></a>Usage
 
 All of the required tests and libraries use the JAR similar to 
-`sdk-integration-tests-4.2.0-SNAPSHOT-jar-with-dependencies.jar`. Replace that value with the name and location
+`sdk-integration-tests-4.5.0-SNAPSHOT-jar-with-dependencies.jar`. Replace that value with the name and location
 of the JAR file you built via Maven. By default it will be in the `target`
 directory directly under the directory where this file is located.
 
-### <a name="prerequisites></a>Prerequisites
+### <a name="prerequisites"></a>Prerequisites
 
 In order to run the integration tests, a valid Organization with an active Public/Private Key Pair must exist. It is 
 suggested that you use a test organization that is separate from any Organizations you use in production. Creation of
@@ -34,15 +34,30 @@ Organizations is managed by [Admin Center](https://admin.launchkey.com).
 Running the full suite of integration tests can be run by executing the JAR and including the following environment
 values:
 
-* `lk.organization.id` - Organization ID from Admin Center.
-* `lk.organization.private_key` - File name of the PEM formatted RSA private key of the Public/Private Key Pair
-    of the Organization with the ID in the `lk.organization.id` property.
-* _(OPTIONAL)_ `lk.api.base_url` - Base URL for the LaunchKey API. This will only be applicable for LaunchKey 
+* `Launchkey.Organization.id` - Organization ID from Admin Center.
+* `Launchkey.Organization.private_key` - File name of the PEM formatted RSA private key of the Public/Private Key Pair
+    of the Organization with the ID in the `Launchkey.Organization.id` property.
+* `Appium.url` - The url of the Appium server being connected to, in the case of Kobiton this would contain credentials
+	that should not be placed in a file
+* `Appium.Kobiton.use_kobiton` - Whether or not to connect to Kobiton's Appium server
+* _(CONDITIONAL)_ `Appium.Kobiton.auth` - The authorization credentials needed for Kobiton in the format '{USERNAME}:{SDK_KEY}'
+* _(OPTIONAL)_ `Launchkey.API.base_url` - Base URL for the LaunchKey API. This will only be applicable for LaunchKey 
     developers.
  
 Example:
 ```
-java -jar sdk-integration-tests-4.2.0-SNAPSHOT-jar-with-dependencies.jar -Dlk.organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 -Dlk.organization.private_key=/tmp/private-key.pem
+java \
+-DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \
+-DLaunchkey.Organization.private_key=/tmp/private-key.pem \
+-DAppium.url=https://billy.jean:5e449dd9-2720-4767-babb-cf29eddecb94@api.kobiton.com/wd/hub \
+-DAppium.Kobiton.use_kobiton=true \
+-DAppium.Kobiton.auth=billy.jean:5e449dd9-2720-4767-babb-cf29eddecb94 \
+-jar sdk-integration-tests-4.5.0-SNAPSHOT-jar-with-dependencies.jar \
+classpath:features \
+--glue classpath:com.iovation.launchkey.mobile.integration \
+--plugin pretty \
+--plugin html:target/cucumber-htmlreport \
+--plugin json:target/cucumber-report.json
 ```
 
 ### <a name="help"></a>Help
@@ -51,5 +66,5 @@ Help can be obtained by either executing the application without any parameters 
 
 Example:
 ```
-java -jar sdk-integration-tests-4.2.0-SNAPSHOT-jar-with-dependencies.jar -h
+java -jar sdk-integration-tests-4.5.0-SNAPSHOT-jar-with-dependencies.jar -h
 ```

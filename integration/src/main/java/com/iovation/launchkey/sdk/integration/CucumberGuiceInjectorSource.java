@@ -21,18 +21,31 @@ import com.iovation.launchkey.sdk.FactoryFactoryBuilder;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
 import com.iovation.launchkey.sdk.crypto.Crypto;
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
+import com.iovation.launchkey.sdk.integration.constants.Appium;
+import com.iovation.launchkey.sdk.integration.constants.Capability;
+import com.iovation.launchkey.sdk.integration.constants.Launchkey;
+import com.iovation.launchkey.sdk.integration.managers.kobiton.KobitonDevice;
+import com.iovation.launchkey.sdk.integration.managers.kobiton.KobitonManager;
+import com.iovation.launchkey.sdk.integration.managers.kobiton.transport.RequestFactory;
+import com.iovation.launchkey.sdk.integration.mobile.driver.SampleAppMobileDriver;
+import com.iovation.launchkey.sdk.integration.mobile.driver.android.SampleAppAndroidDriver;
 import cucumber.api.guice.CucumberModules;
 import cucumber.runtime.java.guice.InjectorSource;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.security.Provider;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class CucumberGuiceInjectorSource implements InjectorSource {
 
@@ -41,7 +54,7 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
         return Guice.createInjector(Stage.PRODUCTION, CucumberModules.SCENARIO, new CucumberJuiceModule());
     }
 
-    private class CucumberJuiceModule extends AbstractModule {
+    protected class CucumberJuiceModule extends AbstractModule {
 
         @Override
         protected void configure() {
@@ -58,7 +71,6 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
             }
 
             Provider provider = new BouncyCastleProvider();
-
 
             bind(Provider.class).toInstance(provider);
 
@@ -81,10 +93,11 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
                 organizationFactory = null;
             }
             bind(OrganizationFactory.class).toInstance(organizationFactory);
+            bind(SampleAppMobileDriver.class).toInstance(getMobileDriver());
         }
 
         private String getApiBaseUrl() {
-            String baseUrl = System.getProperty("lk.api.base_url");
+            String baseUrl = getPropertyElseAddError(Launchkey.API.base_url);
             try {
                 //noinspection ResultOfMethodCallIgnored
                 URI.create(baseUrl);
@@ -95,13 +108,9 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
         }
 
         private String getPrivateKeyPEM(Provider provider) {
-            String privateKeyFile = System.getProperty("lk.organization.private_key");
+            String privateKeyFile = getPropertyElseAddError(Launchkey.Organization.private_key);
             String privateKey = null;
-            if (privateKeyFile == null || privateKeyFile.isEmpty()) {
-                addError(new Message("No Private Key file location provided in the \"lk.organization.private_key\" " +
-                        "property. A PEM formatted RSA Private key for the provided Organization ID is required " +
-                        "to perform integration tests."));
-            } else {
+            if (privateKeyFile != null && !privateKeyFile.isEmpty()) {
                 try {
                     privateKey = readFile(privateKeyFile);
                     JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKey);
@@ -115,11 +124,8 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
         }
 
         private String getOrganizationId() {
-            String organizationId = System.getProperty("lk.organization.id");
-            if (organizationId == null || organizationId.isEmpty()) {
-                addError(new Message("No Organization ID provided in the property \"lk.organization.id\". " +
-                        "The Organization ID is required to perform integration tests."));
-            } else {
+            String organizationId = getPropertyElseAddError(Launchkey.Organization.id);
+            if (organizationId != null && !organizationId.isEmpty()) {
                 try {
                     //noinspection ResultOfMethodCallIgnored
                     UUID.fromString(organizationId);
@@ -142,6 +148,120 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
                 }
             }
             return sb.toString();
+        }
+
+        private SampleAppMobileDriver getMobileDriver() {
+            SampleAppMobileDriver mobileDriver = null;
+            boolean useKobiton = getPositiveBooleanPropertyElseAddError(Appium.Kobiton.use_kobiton);
+            if (useKobiton) {
+
+                String kobitonUploadUrl = getPropertyElseAddError(Appium.Kobiton.upload_url);
+                String kobitonAuthCreds = getPropertyElseAddError(Appium.Kobiton.auth);
+                String kobitonAppName = getPropertyElseAddError(Appium.Kobiton.app_name);
+                String appPhysicalLocation = getPropertyElseAddError(Capability.app);
+                String kobitonAppsUrl = getPropertyElseAddError(Appium.Kobiton.apps_url);
+                String kobitonDevicesUrl = getPropertyElseAddError(Appium.Kobiton.devices_url);
+                KobitonManager kobitonManager = new KobitonManager(new RequestFactory(), kobitonUploadUrl, kobitonAuthCreds, kobitonAppsUrl, kobitonDevicesUrl);
+
+                try {
+                    kobitonManager.createApplication(
+                        kobitonAppName,
+                        appPhysicalLocation);
+                } catch (Exception e) {
+                    addError("Could not create application on Kobiton", e);
+                }
+
+                System.setProperty(Capability.app, kobitonManager.getCurrentAppLocation());
+
+                String platformName = getPropertyElseAddError(Capability.platform_name);
+
+                try {
+                    List<KobitonDevice> devices = kobitonManager.getAllDevices();
+                    for (KobitonDevice device : devices) {
+                        if (!device.isBooked() && device.getPlatformName().equals(platformName) && Integer.valueOf(String.valueOf(device.getPlatformVersion().charAt(0))) >= 5) {
+                            System.setProperty(Capability.device_name, device.getDeviceName());
+                            System.setProperty(Capability.platform_version, device.getPlatformVersion());
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    addError("Could not get Kobiton Device", e);
+                }
+            }
+
+            URL appiumUrl = null;
+            try {
+                appiumUrl = new URL(getPropertyElseAddError(Appium.url));
+            } catch (MalformedURLException e) {
+                addError("Appium URL provided is invalid", e);
+            }
+
+            SampleAppAndroidDriver driver = null;
+            try {
+                driver = new SampleAppAndroidDriver(appiumUrl, getDesiredCapabilities());
+                mobileDriver = driver;
+            } catch (Exception e) {
+                addError("Could not load platform driver, make sure Appium.url is set to the correct value", e);
+            }
+
+            String commandTimeoutString = getPropertyElseAddError(Capability.new_command_timeout);
+            try {
+                int commandTimeout = Integer.valueOf(commandTimeoutString);
+                driver.manage().timeouts().implicitlyWait(commandTimeout, TimeUnit.SECONDS);
+            } catch (NumberFormatException e) {
+                addInvalidPropertyError(Capability.new_command_timeout);
+            }
+            return mobileDriver;
+        }
+
+        private DesiredCapabilities getDesiredCapabilities() {
+            DesiredCapabilities capabilities = new DesiredCapabilities();
+
+            if (getPropertyElseAddError(Capability.platform_name).equals("Android")) {
+                capabilities.setCapability("gpsEnabled", true);
+                capabilities.setCapability("disableWindowAnimation", true);
+                capabilities.setCapability("appPackage", getPropertyElseAddError(Capability.Android.app_package));
+                capabilities.setCapability("appWaitActivity", getPropertyElseAddError(Capability.Android.appWaitActivity));
+                capabilities.setCapability("appActivity", getPropertyElseAddError(Capability.Android.appActivity));
+            }
+
+            // General
+            capabilities.setCapability("app", getPropertyElseAddError(Capability.app));
+            capabilities.setCapability("automationName", getPropertyElseAddError(Capability.automation_name));
+            capabilities.setCapability("fullReset", getPositiveBooleanPropertyElseAddError(Capability.full_reset));
+            capabilities.setCapability("noReset", getPositiveBooleanPropertyElseAddError(Capability.no_reset));
+            capabilities.setCapability("applicationCacheEnabled",  getPositiveBooleanPropertyElseAddError(Capability.application_cache_enabled));
+            capabilities.setCapability("locationContextEnabled", getPropertyElseAddError(Capability.location_context_enabled));
+
+            // Device specific
+            capabilities.setCapability("sessionName", getPropertyElseAddError(Capability.session_name));
+            capabilities.setCapability("deviceOrientation", getPropertyElseAddError(Capability.device_orientation));
+            capabilities.setCapability("captureScreenshots",  getPositiveBooleanPropertyElseAddError(Capability.capture_screenshots));
+            capabilities.setCapability("deviceGroup", getPropertyElseAddError(Capability.device_group));
+            capabilities.setCapability("deviceName", getPropertyElseAddError(Capability.device_name));
+            capabilities.setCapability("platformVersion", getPropertyElseAddError(Capability.platform_version));
+            capabilities.setCapability("platformName", getPropertyElseAddError(Capability.platform_name));
+            return capabilities;
+        }
+
+        private void addInvalidPropertyError(String prop) {
+            addError(new Message("Property \""+ prop + "\"\" not provided or invalid. Cannot run tests without this property"));
+        }
+
+        private String getPropertyElseAddError(String prop) {
+            String propString = System.getProperty(prop);
+            if (propString == null || propString.isEmpty()) {
+                addInvalidPropertyError(prop);
+            }
+            return propString;
+        }
+
+        private boolean getPositiveBooleanPropertyElseAddError(String positiveProp) {
+            String propString = getPropertyElseAddError(positiveProp);
+            if (!propString.equals("true") && !propString.equals("false")) {
+                addError(new Message("Boolean property \"" + positiveProp + "\" has invalid string, true or false are the only accepted values."));
+            }
+            return propString.equals("true");
         }
     }
 }

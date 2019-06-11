@@ -136,13 +136,28 @@ public class AuthMethod {
     }
 
     public enum Type {
-        PIN_CODE,
-        CIRCLE_CODE,
-        GEOFENCING,
-        LOCATIONS,
-        WEARABLES,
-        FINGERPRINT,
-        FACE,
-        OTHER
+        PIN_CODE("pin_code"),
+        CIRCLE_CODE("circle_code"),
+        GEOFENCING("geofencing"),
+        LOCATIONS("locations"),
+        WEARABLES("wearables"),
+        FINGERPRINT("fingerprint"),
+        FACE("face"),
+        OTHER("other");
+
+        private String value;
+
+        Type(String value) {
+            this.value = value;
+        }
+
+        public static Type fromString(String value) {
+            for (Type type : Type.values()) {
+                if (type.value.equals(value)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException(value + " is not a valid type");
+        }
     }
 }
