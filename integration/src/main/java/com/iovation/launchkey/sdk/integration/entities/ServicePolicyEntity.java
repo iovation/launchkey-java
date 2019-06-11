@@ -13,9 +13,6 @@
 package com.iovation.launchkey.sdk.integration.entities;
 
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
-import cucumber.deps.com.thoughtworks.xstream.annotations.XStreamConverter;
-import cucumber.deps.com.thoughtworks.xstream.annotations.XStreamConverters;
-import cucumber.deps.com.thoughtworks.xstream.converters.SingleValueConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -251,14 +248,12 @@ public class ServicePolicyEntity {
     public final static class TimeFence {
         private final String name;
 
-        @XStreamConverter(DaysConverter.class)
         private final List<ServicePolicy.Day> days;
         private final int startHour;
         private final int startMinute;
         private final int endHour;
         private final int endMinute;
 
-        @XStreamConverter(TimeZoneConverter.class)
         private final TimeZone timeZone;
 
         public TimeFence(String name, List<ServicePolicy.Day> days, int startHour, int startMinute, int endHour,

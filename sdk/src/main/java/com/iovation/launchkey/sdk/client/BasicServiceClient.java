@@ -75,6 +75,7 @@ public class BasicServiceClient implements ServiceClient {
             );
             for (AuthPolicy.Location location : policy.getLocations()) {
                 requestPolicy.addGeoFence(
+                        location.getName(),
                         location.getRadius(),
                         location.getLatitude(),
                         location.getLongitude()

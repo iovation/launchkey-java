@@ -122,8 +122,8 @@ public class AuthPolicy {
             }
         } else {
             this.minimumRequirements = new ArrayList<>();
-            geoFenceLocations = new ArrayList<>();
             deviceIntegrity = null;
+            geoFenceLocations = geofences == null ? new ArrayList<Location>() : geofences;
         }
     }
 
