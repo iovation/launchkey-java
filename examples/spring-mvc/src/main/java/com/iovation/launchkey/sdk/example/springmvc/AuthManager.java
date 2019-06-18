@@ -79,7 +79,7 @@ public class AuthManager {
             halt = true;
         }
         if (externalURL == null) {
-            log.error("lk.private-key-location property not provided");
+            log.error("lk.external-url property not provided");
             halt = true;
         }
         if (halt) throw new ConfigurationException("Missing required lk configuration");
