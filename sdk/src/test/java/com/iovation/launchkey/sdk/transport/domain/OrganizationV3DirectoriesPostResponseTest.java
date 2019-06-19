@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class OrganizationV3DirectoriesPostResponseTest {
     private static final UUID id = UUID.randomUUID();

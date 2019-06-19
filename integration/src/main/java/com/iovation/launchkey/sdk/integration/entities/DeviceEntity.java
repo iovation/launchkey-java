@@ -18,14 +18,16 @@ public class DeviceEntity {
     private final String id;
     private final String name;
     private final int status;
+    private final boolean active;
     private final String type;
     private final Date created;
     private final Date updated;
 
-    public DeviceEntity(String id, String name, int status, String type, Date created, Date updated) {
+    public DeviceEntity(String id, String name, int status, boolean active, String type, Date created, Date updated) {
         this.id = id;
         this.name = name;
         this.status = status;
+        this.active = active;
         this.type = type;
         this.created = created;
         this.updated = updated;
@@ -41,6 +43,10 @@ public class DeviceEntity {
 
     public int getStatus() {
         return status;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     public String getType() {

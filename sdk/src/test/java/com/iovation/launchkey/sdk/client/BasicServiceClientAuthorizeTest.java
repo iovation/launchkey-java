@@ -5,7 +5,6 @@ import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.ServiceV3AuthsPostRequest;
 import com.iovation.launchkey.sdk.transport.domain.ServiceV3AuthsPostResponse;
-import com.iovation.launchkey.sdk.transport.domain.ServiceV3SessionsDeleteRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -236,6 +236,21 @@ public class BasicServiceClientAuthorizeTest {
         List<com.iovation.launchkey.sdk.transport.domain.AuthPolicy.Location> expected = Arrays.asList(
                 new com.iovation.launchkey.sdk.transport.domain.AuthPolicy.Location(null, 1, 1.1, 1.2),
                 new com.iovation.launchkey.sdk.transport.domain.AuthPolicy.Location(null, 2, 2.1, 2.2)
+        );
+        assertEquals(expected, requestCaptor.getValue().getPolicy().getGeoFences());
+    }
+
+    @Test
+    public void sendsExpectedPolicyGeoFencesAndTheGeofenceHasANameWithPolicy() throws Exception {
+        client.authorize(user, null, new AuthPolicy(99, true,
+                Arrays.asList(
+                        new AuthPolicy.Location("asdf1", 1, 1.1, 1.2),
+                        new AuthPolicy.Location("asdf2", 2, 2.1, 2.2)
+        )));
+        verify(transport).serviceV3AuthsPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        List<com.iovation.launchkey.sdk.transport.domain.AuthPolicy.Location> expected = Arrays.asList(
+                new com.iovation.launchkey.sdk.transport.domain.AuthPolicy.Location("asdf1", 1, 1.1, 1.2),
+                new com.iovation.launchkey.sdk.transport.domain.AuthPolicy.Location("asdf2", 2, 2.1, 2.2)
         );
         assertEquals(expected, requestCaptor.getValue().getPolicy().getGeoFences());
     }

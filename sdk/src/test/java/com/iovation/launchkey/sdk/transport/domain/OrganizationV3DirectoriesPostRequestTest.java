@@ -13,7 +13,7 @@ package com.iovation.launchkey.sdk.transport.domain; /**
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class OrganizationV3DirectoriesPostRequestTest {
     private static final String name = "Expected Name";

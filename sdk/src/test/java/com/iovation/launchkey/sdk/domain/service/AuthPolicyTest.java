@@ -3,7 +3,6 @@ package com.iovation.launchkey.sdk.domain.service;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;

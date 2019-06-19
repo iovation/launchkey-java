@@ -6,8 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.UUID;
-
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 

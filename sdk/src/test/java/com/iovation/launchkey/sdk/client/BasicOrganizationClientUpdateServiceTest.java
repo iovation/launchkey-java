@@ -11,7 +11,9 @@ package com.iovation.launchkey.sdk.client; /**
  */
 
 import com.iovation.launchkey.sdk.transport.Transport;
-import com.iovation.launchkey.sdk.transport.domain.*;
+import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.ServicesPatchRequest;
+import com.iovation.launchkey.sdk.transport.domain.ServicesPostResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

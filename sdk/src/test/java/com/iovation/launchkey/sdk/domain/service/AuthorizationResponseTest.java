@@ -3,6 +3,7 @@ package com.iovation.launchkey.sdk.domain.service;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.containsString;
@@ -36,7 +37,9 @@ public class AuthorizationResponseTest {
                 AuthorizationResponse.Type.AUTHORIZED,
                 AuthorizationResponse.Reason.AUTHENTICATION,
                 "Denial Reason",
-                true
+                true,
+                new AuthPolicy(true, true, true),
+                Arrays.asList(new AuthMethod(AuthMethod.Type.FACE, true, true, true, true, true, true, true))
             );
     }
 
@@ -102,85 +105,85 @@ public class AuthorizationResponseTest {
 
     @Test
     public void testEqualsForEqualObjectsIsTrue() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse(null, true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse(null, true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
+        AuthorizationResponse left = new AuthorizationResponse(null, true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse(null, true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
         assertTrue(left.equals(right));
     }
 
     @Test
     public void testEqualsForUnEqualObjectsIsFalse() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse("right", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("right", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
         assertFalse(left.equals(right));
     }
 
     @Test
     public void testEqualsForUnEqualTypeIsFalse() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse("lefty", true, null, null, null, null, null, AuthorizationResponse.Type.DENIED, AuthorizationResponse.Reason.APPROVED, "a", null);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("lefty", true, null, null, null, null, null, AuthorizationResponse.Type.DENIED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
         assertFalse(left.equals(right));
     }
 
     @Test
     public void testEqualsForUnEqualReasonIsFalse() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse("lefty", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.AUTHENTICATION, "a", null);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("lefty", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.AUTHENTICATION, "a", null, null, null);
         assertFalse(left.equals(right));
     }
 
     @Test
     public void testEqualsForUnEqualDenialReasonIsFalse() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse("lefty", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "b", null);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("lefty", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "b", null, null, null);
         assertFalse(left.equals(right));
     }
 
     @Test
     public void testEqualsForUnEqualFraudIsFalse() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", true);
-        AuthorizationResponse right = new AuthorizationResponse("lefty", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", false);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", true, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("lefty", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", false, null, null);
         assertFalse(left.equals(right));
     }
 
     @Test
     public void testHashCodeForEqualObjectsAreEqual() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse(null, true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse(null, true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
+        AuthorizationResponse left = new AuthorizationResponse(null, true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse(null, true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
         assertEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void testHasCodeForUnEqualObjectsIsNotEqual() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse("right", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("right", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
         assertNotEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void testHasCodeForUnEqualTypeIsNotEqual() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.DENIED, AuthorizationResponse.Reason.APPROVED, "a", null);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.DENIED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
         assertNotEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void testHasCodeForUnEqualReasonIsNotEqual() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.AUTHENTICATION, "a", null);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.AUTHENTICATION, "a", null, null, null);
         assertNotEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void testHasCodeForUnEqualDenialReasonIsNotEqual() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null);
-        AuthorizationResponse right = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "b", null);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", null, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "b", null, null, null);
         assertNotEquals(left.hashCode(), right.hashCode());
     }
 
     @Test
     public void testHasCodeForUnEqualFraudReasonIsNotEqual() throws Exception {
-        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", true);
-        AuthorizationResponse right = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", false);
+        AuthorizationResponse left = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", true, null, null);
+        AuthorizationResponse right = new AuthorizationResponse("left", true, null, null, null, null, null, AuthorizationResponse.Type.AUTHORIZED, AuthorizationResponse.Reason.APPROVED, "a", false, null, null);
         assertNotEquals(left.hashCode(), right.hashCode());
     }
 

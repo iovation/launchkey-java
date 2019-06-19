@@ -16,6 +16,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * Response given for a White Label device link request
  */
@@ -31,16 +34,32 @@ public class DirectoryUserDeviceLinkData {
      * the QR code on the mobile device.
      */
     private final String qrCodeUrl;
+    private final UUID deviceId;
 
     /**
      * @param code      Code to to be used by the mobile app to link the user and device by manually entering the code.
      * @param qrCodeUrl URL for a QR code image to be used by the mobile app to link the user and device by reading
      *                  the QR code on the mobile device.
+     * @deprecated Please use {@link #DirectoryUserDeviceLinkData(String, String, UUID)}
+     */
+    @Deprecated
+    public DirectoryUserDeviceLinkData(String code, String qrCodeUrl) {
+        this(code, qrCodeUrl, null);
+    }
+
+    /**
+     * @param code      Code to to be used by the mobile app to link the user and device by manually entering the code.
+     * @param qrCodeUrl URL for a QR code image to be used by the mobile app to link the user and device by reading
+     *                  the QR code on the mobile device.
+     * @param deviceId Identifier for the Device to be linked
      */
     @JsonCreator
-    public DirectoryUserDeviceLinkData(@JsonProperty(value = "code", required = true) String code, @JsonProperty(value = "qrcode", required = true) String qrCodeUrl) {
+    public DirectoryUserDeviceLinkData(@JsonProperty(value = "code", required = true) String code,
+                                       @JsonProperty(value = "qrcode", required = true) String qrCodeUrl,
+                                       @JsonProperty(value = "device_id", required = true) UUID deviceId) {
         this.code = code;
         this.qrCodeUrl = qrCodeUrl;
+        this.deviceId = deviceId;
     }
 
     /**
@@ -62,22 +81,27 @@ public class DirectoryUserDeviceLinkData {
         return qrCodeUrl;
     }
 
+    /**
+     * Get the ID of the Device that will be linked
+     * @return Device ID
+     */
+    public UUID getDeviceId() {
+        return deviceId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DirectoryUserDeviceLinkData)) return false;
-
         DirectoryUserDeviceLinkData that = (DirectoryUserDeviceLinkData) o;
-
-        if (getCode() != null ? !getCode().equals(that.getCode()) : that.getCode() != null) return false;
-        return getQrCodeUrl() != null ? getQrCodeUrl().equals(that.getQrCodeUrl()) : that.getQrCodeUrl() == null;
+        return Objects.equals(getCode(), that.getCode()) &&
+                Objects.equals(getQrCodeUrl(), that.getQrCodeUrl()) &&
+                Objects.equals(getDeviceId(), that.getDeviceId());
     }
 
     @Override
     public int hashCode() {
-        int result = getCode() != null ? getCode().hashCode() : 0;
-        result = 31 * result + (getQrCodeUrl() != null ? getQrCodeUrl().hashCode() : 0);
-        return result;
+        return Objects.hash(getCode(), getQrCodeUrl(), getDeviceId());
     }
 
     @Override
@@ -85,6 +109,7 @@ public class DirectoryUserDeviceLinkData {
         return "DirectoryUserDeviceLinkData{" +
                 "code='" + code + '\'' +
                 ", qrCodeUrl='" + qrCodeUrl + '\'' +
+                ", deviceId=" + deviceId +
                 '}';
     }
 }

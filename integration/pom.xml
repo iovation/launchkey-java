@@ -3,7 +3,7 @@
     <parent>
         <artifactId>sdk-root</artifactId>
         <groupId>com.iovation.launchkey</groupId>
-        <version>4.4.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
@@ -11,7 +11,10 @@
     <artifactId>sdk-integration-tests</artifactId>
     <name>iovation LaunchKey SDK Integration Tests</name>
     <properties>
-        <cucumber.version>2.0.1</cucumber.version>
+        <java.version>1.8</java.version>
+        <junit.version>4.12</junit.version>
+        <cucumber.version>4.0.0</cucumber.version>
+        <maven.compiler.version>3.3</maven.compiler.version>
     </properties>
 
     <dependencies>
@@ -31,14 +34,19 @@
             <version>${cucumber.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>4.1.0</version>
+            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.netflix.governator</groupId>
             <artifactId>governator</artifactId>
-            <version>1.17.4</version>
+            <version>1.17.7</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -48,12 +56,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>[1.60,1.999]</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>[2.9.8,2.9.999]</version>
+            <version>1.58</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -61,18 +64,21 @@
             <version>1.7.25</version>
         </dependency>
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>[2.1,3.0)</version>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>7.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.1-jre</version>
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -98,6 +104,13 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

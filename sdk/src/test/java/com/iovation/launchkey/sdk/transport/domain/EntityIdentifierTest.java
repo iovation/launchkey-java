@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class EntityIdentifierTest {
     @Rule

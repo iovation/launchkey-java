@@ -6,6 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static org.junit.Assert.*;
 
 /**
@@ -22,17 +24,26 @@ import static org.junit.Assert.*;
 public class DirectoryUserDeviceLinkDataTest {
     private static final String URL = "Expected URL";
     private static final String CODE = "Expected Code";
+    private static final UUID DEVICE_ID = UUID.randomUUID();
     private DirectoryUserDeviceLinkData deviceAddResponse;
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void setUp() throws Exception {
-        deviceAddResponse = new DirectoryUserDeviceLinkData(CODE, URL);
+        deviceAddResponse = new DirectoryUserDeviceLinkData(CODE, URL, DEVICE_ID);
     }
 
     @After
     public void tearDown() throws Exception {
         deviceAddResponse = null;
+    }
+
+    @Test
+    public void deprecatedConstructorPopulatesValues() throws Exception {
+        deviceAddResponse = new DirectoryUserDeviceLinkData(CODE, URL);
+        assertEquals(CODE, deviceAddResponse.getCode());
+        assertEquals(URL, deviceAddResponse.getQrCodeUrl());
+        assertNull(deviceAddResponse.getDeviceId());
     }
 
     @Test
@@ -43,6 +54,11 @@ public class DirectoryUserDeviceLinkDataTest {
     @Test
     public void getQrCodeUrl() throws Exception {
         assertEquals(URL, deviceAddResponse.getQrCodeUrl());
+    }
+
+    @Test
+    public void getDeviceId() throws Exception {
+        assertEquals(DEVICE_ID, deviceAddResponse.getDeviceId());
     }
 
     @Test
@@ -57,17 +73,22 @@ public class DirectoryUserDeviceLinkDataTest {
 
     @Test
     public void equalsIsTrueForEquivalentObject() throws Exception {
-        assertTrue(deviceAddResponse.equals(new DirectoryUserDeviceLinkData(CODE, URL)));
+        assertTrue(deviceAddResponse.equals(new DirectoryUserDeviceLinkData(CODE, URL, DEVICE_ID)));
     }
 
     @Test
     public void equalsIsFalseForDifferentCode() throws Exception {
-        assertFalse(deviceAddResponse.equals(new DirectoryUserDeviceLinkData(null, URL)));
+        assertFalse(deviceAddResponse.equals(new DirectoryUserDeviceLinkData(null, URL, DEVICE_ID)));
     }
 
     @Test
     public void equalsIsFalseForDifferentUrl() throws Exception {
-        assertFalse(deviceAddResponse.equals(new DirectoryUserDeviceLinkData(CODE, null)));
+        assertFalse(deviceAddResponse.equals(new DirectoryUserDeviceLinkData(CODE, null, DEVICE_ID)));
+    }
+
+    @Test
+    public void equalsIsFalseForDifferentDeviceId() throws Exception {
+        assertFalse(deviceAddResponse.equals(new DirectoryUserDeviceLinkData(CODE, URL, null)));
     }
 
     @Test
@@ -77,24 +98,41 @@ public class DirectoryUserDeviceLinkDataTest {
 
     @Test
     public void hashCodeIsEqualForEquivalentObject() throws Exception {
-        assertEquals(deviceAddResponse.hashCode(), new DirectoryUserDeviceLinkData(CODE, URL).hashCode());
+        assertEquals(deviceAddResponse.hashCode(), new DirectoryUserDeviceLinkData(CODE, URL, DEVICE_ID).hashCode());
     }
 
     @Test
     public void hashCodeIsNotEqualForDifferentCode() throws Exception {
-        assertNotEquals(deviceAddResponse.hashCode(), new DirectoryUserDeviceLinkData(null, URL).hashCode());
+        assertNotEquals(deviceAddResponse.hashCode(), new DirectoryUserDeviceLinkData(null, URL, DEVICE_ID).hashCode());
     }
 
     @Test
     public void hashCodeIsNotEqualForDifferentUrl() throws Exception {
-        assertNotEquals(deviceAddResponse.hashCode(), new DirectoryUserDeviceLinkData(CODE, null).hashCode());
+        assertNotEquals(deviceAddResponse.hashCode(), new DirectoryUserDeviceLinkData(CODE, null, DEVICE_ID).hashCode());
     }
 
     @Test
-    public void jsonDecodeReturnsExpectedData() throws Exception {
+    public void hashCodeIsNotEqualForDifferentDeviceId() throws Exception {
+        assertNotEquals(deviceAddResponse.hashCode(), new DirectoryUserDeviceLinkData(CODE, URL, null).hashCode());
+    }
+
+    @Test
+    public void jsonDecodeReturnsExpectedDataWithoutDeviceId() throws Exception {
         String json = "{" +
                 "\"code\": \"" + deviceAddResponse.getCode() +"\"," +
-                "\"qrcode\": \"" + deviceAddResponse.getQrCodeUrl() + "\"" +
+                "\"qrcode\": \"" + deviceAddResponse.getQrCodeUrl() + "\"," +
+                "\"device_id\": \"" + deviceAddResponse.getDeviceId() + "\"" +
+                "}";
+
+        assertEquals(deviceAddResponse, mapper.readValue(json, deviceAddResponse.getClass()));
+    }
+
+    @Test
+    public void jsonDecodeReturnsExpectedDataWithDeviceId() throws Exception {
+        String json = "{" +
+                "\"code\": \"" + deviceAddResponse.getCode() +"\"," +
+                "\"qrcode\": \"" + deviceAddResponse.getQrCodeUrl() + "\"," +
+                "\"device_id\": \"" + deviceAddResponse.getDeviceId() + "\"" +
                 "}";
 
         assertEquals(deviceAddResponse, mapper.readValue(json, deviceAddResponse.getClass()));
@@ -105,7 +143,8 @@ public class DirectoryUserDeviceLinkDataTest {
         String json = "{" +
                 "\"other\": \"data\"," +
                 "\"code\": \"" + deviceAddResponse.getCode() +"\"," +
-                "\"qrcode\": \"" + deviceAddResponse.getQrCodeUrl() + "\"" +
+                "\"qrcode\": \"" + deviceAddResponse.getQrCodeUrl() + "\"," +
+                "\"device_id\": \"" + deviceAddResponse.getDeviceId() + "\"" +
                 "}";
 
         assertEquals(deviceAddResponse, mapper.readValue(json, deviceAddResponse.getClass()));
@@ -114,7 +153,8 @@ public class DirectoryUserDeviceLinkDataTest {
     @Test(expected = JsonMappingException.class)
     public void jsonDecodeThrowsJsonMappingExceptionWhenNoCode() throws Exception {
         String json = "{" +
-                "\"qrcode\": \"" + deviceAddResponse.getQrCodeUrl() + "\"" +
+                "\"qrcode\": \"" + deviceAddResponse.getQrCodeUrl() + "\"," +
+                "\"device_id\": \"" + deviceAddResponse.getDeviceId() + "\"" +
                 "}";
 
         mapper.readValue(json, deviceAddResponse.getClass());
@@ -123,7 +163,18 @@ public class DirectoryUserDeviceLinkDataTest {
     @Test(expected = JsonMappingException.class)
     public void jsonDecodeThrowsJsonMappingExceptionWhenNoURL() throws Exception {
         String json = "{" +
-                "\"code\": \"" + deviceAddResponse.getCode() +"\"" +
+                "\"code\": \"" + deviceAddResponse.getCode() +"\"," +
+                "\"device_id\": \"" + deviceAddResponse.getDeviceId() + "\"" +
+                "}";
+
+        mapper.readValue(json, deviceAddResponse.getClass());
+    }
+
+    @Test(expected = JsonMappingException.class)
+    public void jsonDecodeThrowsJsonMappingExceptionWhenNoDeviceId() throws Exception {
+        String json = "{" +
+                "\"code\": \"" + deviceAddResponse.getCode() +"\"," +
+                "\"device_id\": \"" + deviceAddResponse.getDeviceId() + "\"" +
                 "}";
 
         mapper.readValue(json, deviceAddResponse.getClass());

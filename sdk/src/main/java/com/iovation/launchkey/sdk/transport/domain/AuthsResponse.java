@@ -29,4 +29,8 @@ public interface AuthsResponse {
     String getReason();
 
     String getDenialReason();
+
+    AuthPolicy getAuthPolicy();
+
+    AuthMethod[] getAuthMethods();
 }

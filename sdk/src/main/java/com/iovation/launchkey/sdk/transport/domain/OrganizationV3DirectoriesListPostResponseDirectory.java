@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +30,7 @@ public class OrganizationV3DirectoriesListPostResponseDirectory {
     private final String androidKey;
     private final String iosCertificateFingerprint;
     private final Boolean denialContextInquiryEnabled;
+    private final URI webhookUrl;
 
     @JsonCreator
     public OrganizationV3DirectoriesListPostResponseDirectory(
@@ -36,7 +38,8 @@ public class OrganizationV3DirectoriesListPostResponseDirectory {
             @JsonProperty("service_ids") List<UUID> serviceIds, @JsonProperty("sdk_keys") List<UUID> sdkKeys,
             @JsonProperty("android_key") String androidKey,
             @JsonProperty("ios_certificate_fingerprint") String iosCertificateFingerprint,
-            @JsonProperty("denial_context_inquiry_enabled") Boolean denialContextInquiryEnabled) {
+            @JsonProperty("denial_context_inquiry_enabled") Boolean denialContextInquiryEnabled,
+            @JsonProperty("webhook_url") URI webhookUrl) {
         this.id = id;
         this.name = name;
         this.active = active;
@@ -45,6 +48,7 @@ public class OrganizationV3DirectoriesListPostResponseDirectory {
         this.androidKey = androidKey;
         this.iosCertificateFingerprint = iosCertificateFingerprint;
         this.denialContextInquiryEnabled = denialContextInquiryEnabled;
+        this.webhookUrl = webhookUrl;
     }
 
     public UUID getId() {
@@ -77,5 +81,9 @@ public class OrganizationV3DirectoriesListPostResponseDirectory {
 
     public Boolean isDenialContextInquiryEnabled() {
         return denialContextInquiryEnabled;
+    }
+
+    public URI getWebhookUrl() {
+        return webhookUrl;
     }
 }

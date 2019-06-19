@@ -13,8 +13,8 @@ package com.iovation.launchkey.sdk.client; /**
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
-import com.iovation.launchkey.sdk.transport.domain.ServiceKeysPostRequest;
 import com.iovation.launchkey.sdk.transport.domain.KeysPostResponse;
+import com.iovation.launchkey.sdk.transport.domain.ServiceKeysPostRequest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Test;

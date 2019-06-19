@@ -1,0 +1,43 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:tiles="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title tiles:fragment="title">Linking in Progress - Spring MVC Example</title>
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+</head>
+<body>
+<div tiles:fragment="content">
+    <h1>Linking in Progress</h1>
+    <p th:text="'Device: ' + ${linkingData.deviceId}" />
+    <p th:text="'Linking Code: ' + ${linkingData.linkingCode}" />
+    <img th:src="${linkingData.getQrCode()}" />
+</div>
+<script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+<script th:inline="JavaScript">
+/*<![CDATA[*/
+    (function ($) {
+        var poll, schedule, processResponse,
+            url = "/linked/" + /*[[${linkingData.deviceId}]]*/;
+        poll = function () {
+            $.ajax({
+                type: "GET",
+                url: url,
+                statusCode: {
+                    204: processResponse,
+                    301: schedule,
+                    302: schedule,
+                    404: schedule
+                }
+            })
+        };
+        schedule = function () {
+            window.setTimeout(poll, 1000)
+        };
+        processResponse = function (data) {
+            window.location = "/login";
+        };
+        schedule();
+    }(jQuery));
+/*]]>*/
+</script>
+</body>
+</html>

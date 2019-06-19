@@ -2,7 +2,8 @@ package com.iovation.launchkey.sdk.cache;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * Copyright 2017 iovation, Inc. All rights reserved.

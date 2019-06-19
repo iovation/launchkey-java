@@ -16,16 +16,15 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Logger;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonIgnoreProperties(value = {"geoFenceLocations", "geoFences", "deviceIntegrity"}, ignoreUnknown = true)
 @JsonPropertyOrder({"minimum_requirements", "factors"})
 public class AuthPolicy {
+    private final static Logger logger = Logger.getLogger("com.iovation.launchkey.sdk");
     private final static int ZERO = 0;
     private final static int ONE = 1;
     private final List<MinimumRequirement> minimumRequirements;
@@ -54,33 +53,77 @@ public class AuthPolicy {
         this.deviceIntegrity = deviceIntegrity;
     }
 
-    @SuppressWarnings("unchecked")
     @JsonCreator
     public AuthPolicy(@JsonProperty("minimum_requirements") List<MinimumRequirement> minimumRequirements,
-                      @JsonProperty("factors") ArrayNode factors) {
-        this.minimumRequirements = minimumRequirements;
-        geoFenceLocations = new ArrayList<>();
-        Boolean deviceIntegrity = null;
-        try {
-            for (JsonNode factor : factors) {
-                final String factorName = factor.get("factor").asText();
-                final JsonNode attributes = factor.get("attributes");
-                if (factorName.equals("geofence")) {
-                    for (JsonNode location : attributes.get("locations")) {
-                        String name = location.has("name") ? location.get("name").asText() : null;
-                        addGeoFence(
-                                name,
-                                location.get("radius").asDouble(),
-                                location.get("latitude").asDouble(),
-                                location.get("longitude").asDouble());
+                      @JsonProperty("factors") ArrayNode factors, @JsonProperty("requirement") String requirement,
+                      @JsonProperty("types") List<String> types, @JsonProperty("amount") Integer input_amount,
+                      @JsonProperty("geofences") List<AuthPolicy.Location> geofences) {
+        if (requirement != null) {
+            geoFenceLocations = geofences;
+            deviceIntegrity = null;
+            Integer knowledge = null;
+            Integer possession = null;
+            Integer inherence = null;
+            Integer amount = null;
+
+            if (requirement.equalsIgnoreCase("types")) {
+                inherence = knowledge = possession = ZERO;
+                for (String type : types) {
+                    if (type.equalsIgnoreCase("inherence")) {
+                        inherence = ONE;
+                    } else if (type.equalsIgnoreCase("knowledge")) {
+                        knowledge = ONE;
+                    } else if (type.equalsIgnoreCase("possession")) {
+                        possession = ONE;
+                    } else {
+                        logger.warning("Unknown and unhandled policy method type " + type);
                     }
-                } else if (factorName.equals("device integrity")) {
-                    deviceIntegrity = attributes.get("factor enabled").asInt() == 1;
                 }
+            } else if (requirement.equalsIgnoreCase("amount")) {
+                amount = input_amount;
+            } else {
+                logger.warning("Unknown and unhandled policy requirement " + requirement);
             }
-            this.deviceIntegrity = deviceIntegrity;
-        } catch (ClassCastException | NullPointerException e) {
-            throw new IllegalArgumentException("The argument \"factors\" does not conform to the specification", e);
+            this.minimumRequirements = new ArrayList<>();
+            MinimumRequirement minimumRequirement = new MinimumRequirement(
+                    MinimumRequirement.Type.AUTHENTICATED,
+                    amount,
+                    knowledge,
+                    inherence,
+                    possession
+            );
+            this.minimumRequirements.add(minimumRequirement);
+
+
+        } else if (minimumRequirements != null) {
+            this.minimumRequirements = minimumRequirements;
+            geoFenceLocations = new ArrayList<>();
+            Boolean deviceIntegrity = null;
+            try {
+                for (JsonNode factor : factors) {
+                    final String factorName = factor.get("factor").asText();
+                    final JsonNode attributes = factor.get("attributes");
+                    if (factorName.equals("geofence")) {
+                        for (JsonNode location : attributes.get("locations")) {
+                            String name = location.has("name") ? location.get("name").asText() : null;
+                            addGeoFence(
+                                    name,
+                                    location.get("radius").asDouble(),
+                                    location.get("latitude").asDouble(),
+                                    location.get("longitude").asDouble());
+                        }
+                    } else if (factorName.equals("device integrity")) {
+                        deviceIntegrity = attributes.get("factor enabled").asInt() == 1;
+                    }
+                }
+                this.deviceIntegrity = deviceIntegrity;
+            } catch (ClassCastException | NullPointerException e) {
+                throw new IllegalArgumentException("The argument \"factors\" does not conform to the specification", e);
+            }
+        } else {
+            this.minimumRequirements = new ArrayList<>();
+            deviceIntegrity = null;
+            geoFenceLocations = geofences == null ? new ArrayList<Location>() : geofences;
         }
     }
 
@@ -127,37 +170,32 @@ public class AuthPolicy {
         return factors;
     }
 
+    public Boolean getDeviceIntegrity() {
+        return deviceIntegrity;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof AuthPolicy)) return false;
-
         AuthPolicy that = (AuthPolicy) o;
-
-        if (getMinimumRequirements() != null ? !getMinimumRequirements().equals(that.getMinimumRequirements()) :
-                that.getMinimumRequirements() != null)
-            return false;
-        return geoFenceLocations != null ? geoFenceLocations.equals(that.geoFenceLocations) :
-                that.geoFenceLocations == null;
+        return Objects.equals(getMinimumRequirements(), that.getMinimumRequirements()) &&
+                Objects.equals(geoFenceLocations, that.geoFenceLocations) &&
+                Objects.equals(getDeviceIntegrity(), that.getDeviceIntegrity());
     }
 
     @Override
     public int hashCode() {
-        int result = getMinimumRequirements() != null ? getMinimumRequirements().hashCode() : 0;
-        result = 31 * result + (geoFenceLocations != null ? geoFenceLocations.hashCode() : 0);
-        return result;
+        return Objects.hash(getMinimumRequirements(), geoFenceLocations, getDeviceIntegrity());
     }
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "{" +
+        return "AuthPolicy{" +
                 "minimumRequirements=" + minimumRequirements +
                 ", geoFenceLocations=" + geoFenceLocations +
+                ", deviceIntegrity=" + deviceIntegrity +
                 '}';
-    }
-
-    public Boolean getDeviceIntegrity() {
-        return deviceIntegrity;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -267,7 +305,9 @@ public class AuthPolicy {
         private final double latitude;
         private final double longitude;
 
-        public Location(String name, double radius, double latitude, double longitude) {
+        @JsonCreator
+        public Location(@JsonProperty("name") String name, @JsonProperty("radius") double radius,
+                        @JsonProperty("latitude") double latitude, @JsonProperty("longitude") double longitude) {
             this.name = name;
             this.radius = radius;
             this.latitude = latitude;
