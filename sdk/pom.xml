@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.iovation.launchkey</groupId>
         <artifactId>sdk-root</artifactId>
-        <version>4.5.0-SNAPSHOT</version>
+        <version>4.5.0</version>
     </parent>
     <artifactId>sdk</artifactId>
     <name>iovation LaunchKey SDK</name>
