@@ -1,4 +1,4 @@
-package com.iovation.launchkey.sdk.domain.servicemanager;
+package com.iovation.launchkey.sdk.domain.policy;
 
 import java.util.List;
 
