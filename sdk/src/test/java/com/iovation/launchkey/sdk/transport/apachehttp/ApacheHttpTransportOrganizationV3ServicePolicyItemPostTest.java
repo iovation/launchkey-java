@@ -10,9 +10,7 @@ package com.iovation.launchkey.sdk.transport.apachehttp; /**
  * limitations under the License.
  */
 
-import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
-import com.iovation.launchkey.sdk.transport.domain.ServicePolicy;
-import com.iovation.launchkey.sdk.transport.domain.ServicePolicyItemPostRequest;
+import com.iovation.launchkey.sdk.transport.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,13 +33,13 @@ public class ApacheHttpTransportOrganizationV3ServicePolicyItemPostTest extends 
     private EntityIdentifier entityIdentifier;
 
     @Mock
-    private ServicePolicy result;
+    private Policy result;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        when(objectMapper.readValue(anyString(), eq(ServicePolicy.class))).thenReturn(result);
+        when(objectMapper.readValue(anyString(), eq(Policy.class))).thenReturn(result);
     }
 
     @Test
@@ -76,9 +74,9 @@ public class ApacheHttpTransportOrganizationV3ServicePolicyItemPostTest extends 
 
     @Test
     public void responseIsParsedProperlyAndReturned() throws Exception {
-        when(objectMapper.readValue(anyString(), eq(ServicePolicy.class))).thenReturn(result);
-        ServicePolicy actual = transport.organizationV3ServicePolicyItemPost(request, entityIdentifier);
-        verify(objectMapper).readValue(anyString(), eq(ServicePolicy.class));
+        when(objectMapper.readValue(anyString(), eq(Policy.class))).thenReturn(result);
+        Policy actual = transport.organizationV3ServicePolicyItemPost(request, entityIdentifier);
+        verify(objectMapper).readValue(anyString(), eq(Policy.class));
         assertEquals(result, actual);
     }
 

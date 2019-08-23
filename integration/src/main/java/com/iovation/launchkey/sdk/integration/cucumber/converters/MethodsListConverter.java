@@ -23,13 +23,13 @@ public class MethodsListConverter {
             String error = map.get("Error").toLowerCase();
             methods.add(new AuthMethod(
                     AuthMethod.Type.fromString(map.get("Method")),
-                    set.equals("null") ? null : Boolean.valueOf(set),
-                    active.equals("null") ? null : Boolean.valueOf(active),
-                    allowed.equals("null") ? null : Boolean.valueOf(allowed),
-                    supported.equals("null") ? null : Boolean.valueOf(supported),
-                    userRequired.equals("null") ? null : Boolean.valueOf(userRequired),
-                    passed.equals("null") ? null : Boolean.valueOf(passed),
-                    error.equals("null") ? null : Boolean.valueOf(error)
+                    set.isEmpty() ? null : Boolean.valueOf(set),
+                    active.isEmpty() ? null : Boolean.valueOf(active),
+                    allowed.isEmpty() ? null : Boolean.valueOf(allowed),
+                    supported.isEmpty() ? null : Boolean.valueOf(supported),
+                    userRequired.isEmpty() ? null : Boolean.valueOf(userRequired),
+                    passed.isEmpty() ? null : Boolean.valueOf(passed),
+                    error.isEmpty() ? null : Boolean.valueOf(error)
             ));
         }
 

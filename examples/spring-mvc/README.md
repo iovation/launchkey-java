@@ -7,11 +7,13 @@
 
 # <a name="overview"></a>Overview
 
-This example project utilizes Spring MVC and Spring Boot to provide a fully self-contained browser based example
-of implementing the SDK in a web application environment.  The example application hooks directly into the 
-Spring MVC Web Security flow.  It implements webhooks to process authentication
-responses and logout requests.  Rudimentary JavaScript exists on the home page to check for remote logout and force
-the user to re-authenticate.
+This example project utilizes Spring MVC and Spring Boot to provide a fully self-contained browser based tool to assist
+with building a Mobile Authenticator utilizing a LaunchKey Mobil Authenticator SDK. It is also an example of best
+practices for building a proper backend implementation utilizing the LaunchKey Service SDK for Java via webhooks.
+
+The application removes some of the configuration headache regarding webhooks in Directories for successful linking
+webhooks and Services for auth response and session end webhooks. Make sure this will not interfere with any other
+implementations as it would alter the configuration in an undesirable way. 
 
 # <a name="prerequisites"></a>Pre-Requisites
 
@@ -33,84 +35,90 @@ mvn clean package
 ```
 
 #  <a name="usage"></a>Usage
-1. Launch the Spring Boot application by running the packaged jar in the target directory.  The following Spring Boot
-  environment properties are required for the example to work:
-   
-  * lk.service-id
-  * lk.private-key-location
-  
-  There are numerous ways to set those properties but the simplest way is usually to pass arguments to the JAR
-  execution.  This is an example of how to run the example app from the main project root with the project version
-  of `4.0.0-SNAPSHOT`:
-  
-  ```
-  java -jar examples/spring-mvc/target/examples-spring-mvc-4.0.0-SNAPSHOT.jar --lk.service-id=3cb7c699-be47-414f-830b-e81b9bb8cc40 --lk.private-key-location=/tmp/private-key.pem
-  ```
 
-The name and location of the JAR file are subject to change. If you downloaded the JAR, substitute that name. If you 
-packaged the JAR with Maven, check the actual name of the version of the JAR build in the `target` directory directly 
-under the directory containing this file. 
-2. Verify the server is running by accessing the URL of your web server: [http://localhost:8080](http://localhost:8080).
 
-3. Start your reverse proxy.
+1. Start your reverse proxy.
 
-  ```bash
-  $ ngrok http 8080
-  ```
+    ```bash
+    $ ngrok http 8080
+    ```
+    
+    Once started, you should see a a screen similar to:
   
-  Once started, you should see a a screen similar to:
-  
-  ```
-ngrok by @inconshreveable                                       (Ctrl+C to quit)
-                                                                                
-Tunnel Status                 online                                            
-Version                       2.0.19/2.0.19                                     
-Web Interface                 http://127.0.0.1:4040                             
-Forwarding                    http://d5caea01.ngrok.io -> localhost:8080        
-Forwarding                    https://d5caea01.ngrok.io -> localhost:8080       
-                                                                                
-Connections                   ttl     opn     rt1     rt5     p50     p90       
-                              0       0       0.00    0.00    0.00    0.00      
- 
-  ```
+    ```
+    ngrok by @inconshreveable                                       (Ctrl+C to quit)
+                                                                                    
+    Tunnel Status                 online                                            
+    Version                       2.0.19/2.0.19                                     
+    Web Interface                 http://127.0.0.1:4040                             
+    Forwarding                    http://d5caea01.ngrok.io -> localhost:8080        
+    Forwarding                    https://d5caea01.ngrok.io -> localhost:8080       
+                                                                                    
+    Connections                   ttl     opn     rt1     rt5     p50     p90       
+                                  0       0       0.00    0.00    0.00    0.00      
+     
+    ```
+
+2. Launch the Spring Boot application by running the packaged jar in the target directory.  The following Spring Boot
+    environment properties are required for the example to work:
+       
+    * lk.organization-id - Organization ID for an organization 
+    * lk.directory-id - Directory ID for a Directory owned by the Organization 
+    * lk.service-id - Service ID of a Service owned by the Directory
+    * lk.private-key-location - a valid and active private key for the Organization
+    * lk.external-url - the https forwarding value from the ngrok output
+    
+    There are numerous ways to set those properties but the simplest way is usually to pass arguments to the JAR
+    execution.  This is an example of how to run the example app from the main project root with the project version
+    of `4.6.0-SNAPSHOT`:
+    
+    ```
+    java -jar examples/spring-mvc/target/examples-spring-mvc-4.6.0-SNAPSHOT.jar -Dlk.organization-id=5e460a6a-974d-11e7-b0c6-6a535e6278de -Dlk.directory-id=7ac4e652-974d-11e7-b0c6-6a535e6278de -Dlk.service-id=69cc4e34-fd9b-11e8-897e-d60562cc216d -Dlk.private-key-location=/tmp/keys/private-key.pem -Dlk.external-url=https://d5caea01.ngrok.io
+    ```
+    
+    The name and location of the JAR file are subject to change. If you downloaded the JAR, substitute that name. If you 
+    packaged the JåAR with Maven, check the actual name of the version of the JAR build in the `target` directory directly 
+    under the directory containing this file. 
+
+3. Verify the server is running by accessing the URL of your web server: [http://localhost:8080](http://localhost:8080).
 
 4. Verify your reverse proxy by accessing the reverse proxy endpoint.  The endpoint will be the first part of one of the
-  Forwarding lines.  Based on the example above it would be ```https://d5caea01.ngrok.com``` or
-  ```http://d5caea01.ngrok.com```.  Copy your value for the Forwarding endpoint into you browser to ensure it is
-  working correctly.  If working correctly, it will displaying the same web page you saw when verifying your web server
-  as well as show 200 OK responses in the HTTP Requests section of the ngrok screen like below:
-
+    Forwarding lines.  Based on the example above it would be ```https://d5caea01.ngrok.com``` or
+    ```http://d5caea01.ngrok.com```.  Copy your value for the Forwarding endpoint into you browser to ensure it is
+    working correctly.  If working correctly, it will displaying the same web page you saw when verifying your web server
+    as well as show 200 OK responses in the HTTP Requests section of the ngrok screen like below:
+    
     ```
-ngrok by @inconshreveable                                       (Ctrl+C to quit)
-                                                                                
-Tunnel Status                 online                                            
-Version                       2.0.19/2.0.19                                     
-Web Interface                 http://127.0.0.1:4040                             
-Forwarding                    http://d5caea01.ngrok.io -> localhost:8080        
-Forwarding                    https://d5caea01.ngrok.io -> localhost:8080       
-                                                                                
-Connections                   ttl     opn     rt1     rt5     p50     p90       
-                              0       1       0.00    0.00    0.00    0.00      
-                                                                                
-HTTP Requests                                                                   
--------------                                                                   
-                                                                                
-GET /                          302 Found                                                                         
-
+    ngrok by @inconshreveable                                       (Ctrl+C to quit)
+                                                                                    
+    Tunnel Status                 online                                            
+    Version                       2.0.19/2.0.19                                     
+    Web Interface                 http://127.0.0.1:4040                             
+    Forwarding                    http://d5caea01.ngrok.io -> localhost:8080        
+    Forwarding                    https://d5caea01.ngrok.io -> localhost:8080       
+                                                                                    
+    Connections                   ttl     opn     rt1     rt5     p50     p90       
+                                  0       1       0.00    0.00    0.00    0.00      
+                                                                                    
+    HTTP Requests                                                                   
+    -------------                                                                   
+                                                                                    
+    GET /                          302 Found                                                                         
+    
     ```
-
-5. Now that your web server and reverse proxy are working, update your Service Profile with the webhook callback URL.
-   This is done by placing the URL you just verified from Ngrok plus the path `/webhook` into the callback field in 
-   the General section of your Application configuration in the Dashboard.
-   Based ion the Ngrok example above the callback URL would be: `https://d5caea01.ngrok.com/webhook`.
-
-6. Access the home page at [http://localhost:8080](http://localhost:8080).  You will be redirected to the `/login`
+    
+5. Access the home page at [http://localhost:8080](http://localhost:8080).  You will be redirected to the `/login`
   page the first time you access the page.
 
-3. Enter your username or, if the Application Key is for a White Label Application, White Label identifier.
+6. Link your device by:
+    1. Clicking on the _Link Device_ link.
+    2. Entering a username in the _Username_ field
+    3. Clicking on the _Link Device_ button
+    4. Provide the _Linking Code_ to the device
+    5. When linking is successful, the page will redirect to the login page 
 
-4. Authorize or deny the request.  Authorizing will redirect you to the home page.  Denying will redirect you to a
+7. Enter your username provided when you linked the device
+
+8. Authorize or deny the request.  Authorizing will redirect you to the home page.  Denying will redirect you to a
   login error page.  Not responding will also redirect you the login error page after the timeout of five (5)
   minutes.
-
-6. __Winning!__ - You should be ready to try the demo and see how to quickly and easily secure your Java application.

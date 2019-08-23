@@ -29,7 +29,7 @@ public class ServiceV3AuthsGetResponse implements AuthsResponse {
     private final String type;
     private final String reason;
     private final String denialReason;
-    private final AuthPolicy authPolicy;
+    private final AuthResponsePolicy authPolicy;
     private final AuthMethod[] authMethods;
 
     public ServiceV3AuthsGetResponse(
@@ -45,7 +45,7 @@ public class ServiceV3AuthsGetResponse implements AuthsResponse {
             String type,
             String reason,
             String denialReason,
-            AuthPolicy authPolicy,
+            AuthResponsePolicy authPolicy,
             AuthMethod[] authMethods
     ) {
         this.requestingEntity = requestingEntity;
@@ -122,7 +122,7 @@ public class ServiceV3AuthsGetResponse implements AuthsResponse {
     }
 
     @Override
-    public AuthPolicy getAuthPolicy() {
+    public AuthResponsePolicy getAuthPolicy() {
         return authPolicy;
     }
 

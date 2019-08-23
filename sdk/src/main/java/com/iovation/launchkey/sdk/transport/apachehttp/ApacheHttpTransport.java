@@ -13,6 +13,7 @@ import com.iovation.launchkey.sdk.crypto.jwt.JWTClaims;
 import com.iovation.launchkey.sdk.crypto.jwt.JWTData;
 import com.iovation.launchkey.sdk.crypto.jwt.JWTError;
 import com.iovation.launchkey.sdk.crypto.jwt.JWTService;
+import com.iovation.launchkey.sdk.domain.policy.LegacyPolicy;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.Error;
@@ -172,7 +173,8 @@ public class ApacheHttpTransport implements Transport {
                             deviceResponse.getReason(),
                             deviceResponse.getDenialReason(),
                             deviceResponse.getAuthPolicy(),
-                            deviceResponse.getAuthMethods());
+                            deviceResponse.getAuthMethods()
+                    );
 
                 } else {
                     RSAPrivateKey key = entityKeyMap.getKey(audience, apiResponse.getPublicKeyId());
@@ -586,14 +588,15 @@ public class ApacheHttpTransport implements Transport {
         getHttpResponse("PUT", "/organization/v3/service/policy", subject, request, true, null);
     }
 
-    @Override
-    public ServicePolicy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
+     @Override
+    public Policy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
                                                              EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException {
         final HttpResponse response =
                 getHttpResponse("POST", "/organization/v3/service/policy/item", subject, request, true, null);
-        return decryptResponse(response, ServicePolicy.class);
+        Policy policy = decryptResponse(response, Policy.class);
+        return policy;
     }
 
     @Override
@@ -682,13 +685,14 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
-    public ServicePolicy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
-                                                          EntityIdentifier subject)
+    public Policy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
+                                                   EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException {
         HttpResponse response =
                 getHttpResponse("POST", "/directory/v3/service/policy/item", subject, request, true, null);
-        return decryptResponse(response, ServicePolicy.class);
+        Policy policy = decryptResponse(response, Policy.class);
+        return policy;
     }
 
     @Override

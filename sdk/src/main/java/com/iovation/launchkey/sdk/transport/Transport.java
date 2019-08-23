@@ -393,7 +393,7 @@ public interface Transport {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      */
-    ServicePolicy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request, EntityIdentifier subject)
+    Policy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request, EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException;
 
@@ -808,10 +808,10 @@ public interface Transport {
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      */
-    ServicePolicy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request, EntityIdentifier subject)
+    Policy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
+                                               EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException;
-
     /**
      * Delete the default Policy of an Organization Service
      *

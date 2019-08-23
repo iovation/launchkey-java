@@ -117,6 +117,7 @@ public class SampleAppAndroidDriver extends BaseAndroidDriver implements SampleA
     public void receiveAndAcknowledgeAuthFailure() {
         openAuthMenu();
         tapRefresh();
+        approveAuth();
         dismissFailureMessage();
     }
 

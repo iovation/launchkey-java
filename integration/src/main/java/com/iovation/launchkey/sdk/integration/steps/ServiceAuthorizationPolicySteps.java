@@ -15,14 +15,10 @@ package com.iovation.launchkey.sdk.integration.steps;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryDeviceManager;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServiceAuthsManager;
-import cucumber.api.java.After;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ServiceAuthorizationPolicySteps {
 
@@ -45,12 +41,12 @@ public class ServiceAuthorizationPolicySteps {
         directoryServiceAuthsManager.setInherence();
     }
 
-    @And("^the current Authorization Policy requires knowledge$")
+    @Given("^the current Authorization Policy requires knowledge$")
     public void theCurrentAuthorizationPolicyRequiresKnowledge() {
         directoryServiceAuthsManager.setKnowledge();
     }
 
-    @And("^the current Authorization Policy requires possession$")
+    @Given("^the current Authorization Policy requires possession$")
     public void theCurrentAuthorizationPolicyRequiresPossession() {
         directoryServiceAuthsManager.setPossession();
     }
@@ -65,8 +61,8 @@ public class ServiceAuthorizationPolicySteps {
         directoryServiceAuthsManager.addLocation(new AuthPolicy.Location(radius, latitude, longitude));
     }
 
-    @Given("the current Authorization Policy requires a geofence with a radius of {double}, a latitude of {double}, a longitude of {double}, and named {string}")
-    public void theCurrentAuthorizationPolicyRequiresAGeofenceOfName(double radius, double latitude, double longitude, String name) {
+    @Given("^the current Authorization Policy requires a geofence with a radius of (-?\\d+\\.?\\d*), a latitude of (-?\\d+\\.?\\d*), a longitude of (-?\\d+\\.?\\d*), and (a name of|named) \"([^\"]+)\"$")
+    public void theCurrentAuthorizationPolicyRequiresAGeofenceOfName(double radius, double latitude, double longitude, @SuppressWarnings("unused") String unused, String name) {
         directoryServiceAuthsManager.addLocation(new AuthPolicy.Location(name, radius, latitude, longitude));
     }
 }

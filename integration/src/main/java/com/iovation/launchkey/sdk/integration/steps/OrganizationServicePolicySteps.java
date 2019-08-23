@@ -14,17 +14,20 @@ package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.iovation.launchkey.sdk.domain.policy.*;
 import com.iovation.launchkey.sdk.integration.Utils;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.LocationListConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TimeFenceListConverter;
-import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
+import com.iovation.launchkey.sdk.integration.managers.MutablePolicy;
 import com.iovation.launchkey.sdk.integration.managers.OrganizationServicePolicyManager;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import com.iovation.launchkey.sdk.integration.managers.PolicyContext;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.cucumber.datatable.DataTable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,18 +37,26 @@ import static org.hamcrest.Matchers.hasSize;
 public class OrganizationServicePolicySteps {
     private OrganizationServicePolicyManager organizationServicePolicyManager;
     private GenericSteps genericSteps;
+    private PolicyContext policyContext;
 
     @Inject
     public OrganizationServicePolicySteps(
             OrganizationServicePolicyManager organizationServicePolicyManager,
-            GenericSteps genericSteps) {
+            GenericSteps genericSteps,
+            PolicyContext policyContext) {
         this.organizationServicePolicyManager = organizationServicePolicyManager;
         this.genericSteps = genericSteps;
+        this.policyContext = policyContext;
     }
 
     @When("^I retrieve the Policy for the Current Organization Service$")
     public void iRetrieveTheOrganizationServicePolicy() throws Throwable {
         organizationServicePolicyManager.retrievePolicyForCurrentService();
+    }
+
+    @When("^I retrieve the Advanced Policy for the Current Organization Service$")
+    public void iRetrieveTheOrganizationServiceAdvancedPolicy() throws Throwable {
+        policyContext.setCurrentPolicy(organizationServicePolicyManager.getCurrentlySetOrganizationServiceAdvancedPolicy());
     }
 
     @When("^I attempt to remove the Policy for the Organization Service with the ID \"([^\"]*)\"$")
@@ -85,7 +96,7 @@ public class OrganizationServicePolicySteps {
 
     @When("^I set the Policy for the Organization Service$")
     public void iSetThePolicyForTheOrganizationService() throws Throwable {
-        organizationServicePolicyManager.setPolicyForCurrentService();
+        organizationServicePolicyManager.setAdvancedPolicyForCurrentService();
     }
 
     @When("^the Organization Service Policy is set to require (\\d+) factors?$")
@@ -95,7 +106,7 @@ public class OrganizationServicePolicySteps {
 
     @When("^I set the Policy for the Current Organization Service$")
     public void iSetThePolicyForTheCurrentOrganizationService() throws Throwable {
-        organizationServicePolicyManager.setPolicyForCurrentService();
+        organizationServicePolicyManager.setAdvancedPolicyForCurrentService();
     }
 
     @When("^the Organization Service Policy is (not set|set) to require inherence$")
@@ -187,5 +198,54 @@ public class OrganizationServicePolicySteps {
     @Given("^the Organization Service Policy has the following Geofence locations:$")
     public void theOrganizationServicePolicyHasTheFollowingGeofenceLocations(DataTable dataTable) throws Throwable {
         assertThat(organizationServicePolicyManager.getCurrentServicePolicyEntity().getLocations(), is(equalTo(LocationListConverter.fromDataTable(dataTable))));
+    }
+
+    @Given("I set the Advanced Policy for the Current Organization Service to the new policy")
+    public void iSetThePolicyForTheCurrentOrganizationServiceToTheNewPolicy() throws Throwable {
+        organizationServicePolicyManager.setAdvancedPolicyForCurrentService(policyContext.currentPolicy.toImmutablePolicy());
+    }
+
+    @Then("^the Organization Service Policy has \"(\\d+)\" fence(?:s)?$")
+    public void theOrganizationServicePolicyHasFences(int amount) throws Throwable {
+        Policy policy = organizationServicePolicyManager.getCurrentlySetOrganizationServiceAdvancedPolicy();
+        assertThat(policy.getFences().size(), is(equalTo(amount)));
+    }
+
+    @Then("the Organization Service Policy contains the GeoCircleFence {string}")
+    public void theOrganizationServicePolicyContainsTheGeoCircleFence(String arg0) throws Throwable {
+        Policy policy = organizationServicePolicyManager.getCurrentlySetOrganizationServiceAdvancedPolicy();
+        boolean fenceNameMatches = false;
+        for (Fence fence : policy.getFences()) {
+            if (fence.getName().equals(arg0)) {
+                fenceNameMatches = true;
+                policyContext.fenceCache = fence;
+            }
+        }
+        assertThat(fenceNameMatches, is(equalTo(true)));
+    }
+
+    @Then("the Organization Service Policy contains the TerritoryFence {string}")
+    public void theOrganizationServicePolicyContainsTheTerritoryFence(String arg0) throws Throwable {
+        Policy policy = organizationServicePolicyManager.getCurrentlySetOrganizationServiceAdvancedPolicy();
+        boolean fenceNameMatches = false;
+        for (Fence fence : policy.getFences()) {
+            if (fence.getName().equals(arg0)) {
+                fenceNameMatches = true;
+                policyContext.fenceCache = fence;
+                break;
+            }
+        }
+        assertThat(fenceNameMatches, is(equalTo(true)));
+    }
+
+    @Given("the Organization Service is set to any Conditional Geofence Policy")
+    public void theOrganizationServiceIsSetToAnyConditionalGeofencePolicy() throws Throwable {
+        policyContext.currentPolicy = new MutablePolicy(new ConditionalGeoFencePolicy(
+                false, false,
+                Arrays.asList(new TerritoryFence("US", "US", null, null)),
+                new MethodAmountPolicy(false, false, null, 0),
+                new MethodAmountPolicy(false, false, null, 0)
+        ));
+        organizationServicePolicyManager.setAdvancedPolicyForCurrentService(policyContext.currentPolicy.toImmutablePolicy());
     }
 }

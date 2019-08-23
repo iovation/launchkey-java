@@ -13,19 +13,19 @@
 package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
+import com.iovation.launchkey.sdk.domain.policy.GeoCircleFence;
+import com.iovation.launchkey.sdk.domain.policy.TerritoryFence;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
+import com.iovation.launchkey.sdk.domain.service.AuthorizationResponsePolicy;
+import com.iovation.launchkey.sdk.domain.service.Requirement;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.MethodsListConverter;
-import com.iovation.launchkey.sdk.integration.entities.AuthorizationResponseEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryDeviceManager;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServiceAuthsManager;
-import cucumber.api.java.After;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
-
-import java.util.UUID;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -84,7 +84,17 @@ public class DirectoryServiceAuthSteps {
 
     @When("^I get the response for Authorization request \"([^\"]*)\"$")
     public void iGetTheResponseForAuthorizationRequest(String authRequest) throws Throwable {
-        directoryServiceAuthsManager.getAuthorizationResponse();
+        directoryServiceAuthsManager.getAuthorizationResponse(authRequest);
+    }
+
+    @When("^I get the response for the Advanced Authorization request \"([^\"]*)\"$")
+    public void iGetTheResponseForAdvancedAuthorizationRequest(String authRequest) throws Throwable {
+        directoryServiceAuthsManager.getAdvancedAuthorizationResponse(authRequest);
+    }
+
+    @When("I get the response for the Advanced Authorization request")
+    public void iGetTheResponseForTheAdvancedAuthorizationRequest() throws Throwable {
+        directoryServiceAuthsManager.getAdvancedAuthorizationResponse();
     }
 
     @Then("^the Authorization response is not returned$")
@@ -115,28 +125,16 @@ public class DirectoryServiceAuthSteps {
 
     @Then("the Authorization response should contain a geofence with a radius of {double}, a latitude of {double}, and a longitude of {double}")
     public void theAuthorizationResponseShouldContainAGeofenceWithARadiusOfXALatitudeOfYAndALongitudeOfZ(double radius, double latitude, double longitude) {
-        boolean containsAGeofenceWithGivenParameters = false;
         AuthorizationResponse response = directoryServiceAuthsManager.getCurrentAuthResponse();
-        for (AuthPolicy.Location location : response.getPolicy().getLocations()) {
-            if (location.getLatitude() == latitude && location.getLongitude() == longitude && location.getRadius() == radius) {
-                containsAGeofenceWithGivenParameters = true;
-                break;
-            }
-        }
-        assertTrue(containsAGeofenceWithGivenParameters);
+        AuthPolicy.Location expected = new AuthPolicy.Location(radius, latitude, longitude);
+        assertThat(response.getPolicy().getLocations(), hasItem(expected));
     }
 
     @Then("the Authorization response should contain a geofence with a radius of {double}, a latitude of {double}, a longitude of {double}, and a name of {string}")
     public void theAuthorizationResponseShouldContainAGeofenceWithARadiusOfXALatitudeOfYALongitudeOfZAndANameOfZ(double radius, double latitude, double longitude, String name) {
-        boolean containsAGeofenceWithGivenParameters = false;
         AuthorizationResponse response = directoryServiceAuthsManager.getCurrentAuthResponse();
-        for (AuthPolicy.Location location : response.getPolicy().getLocations()) {
-            if (location.getLatitude() == latitude && location.getLongitude() == longitude && location.getRadius() == radius && location.getName().equals(name)) {
-                containsAGeofenceWithGivenParameters = true;
-                break;
-            }
-        }
-        assertTrue(containsAGeofenceWithGivenParameters);
+        AuthPolicy.Location expected = new AuthPolicy.Location(name, radius, latitude, longitude);
+        assertThat(response.getPolicy().getLocations(), hasItem(expected));
     }
 
     @Then("^the Authorization response should require (knowledge|inherence|possession)$")
@@ -186,5 +184,47 @@ public class DirectoryServiceAuthSteps {
         } catch (Exception e) {
             genericSteps.setCurrentException(e);
         }
+    }
+
+    @Then("the Advanced Authorization response should have the requirement {string}")
+    public void theAdvancedAuthorizationResponseShouldHaveTheRequirement(String name) {
+        AuthorizationResponsePolicy policy = directoryServiceAuthsManager.getCurrentAdvancedAuthorizationResponse().getPolicy();
+        assertEquals(Requirement.valueOf(name), policy.getRequirement());
+    }
+
+    @Then("^the Advanced Authorization response should require (Knowledge|Inherence|Possession)$")
+    public void theAdvancedAuthorizationResponseShouldRequireFactor(String factor) {
+        AuthorizationResponsePolicy policy = directoryServiceAuthsManager.getCurrentAdvancedAuthorizationResponse().getPolicy();
+        switch (factor) {
+            case "Knowledge":
+                assertTrue(policy.wasKnowledgeRequired());
+                break;
+            case "Inherence":
+                assertTrue(policy.wasInherenceRequired());
+                break;
+            case "Possession":
+                assertTrue(policy.wasPossessionRequired());
+                break;
+        }
+    }
+
+    @Then("the Advanced Authorization response should have amount set to {int}")
+    public void theAdvancedAuthorizationResponseShouldHaveAmountSetTo(int amount) {
+        AuthorizationResponsePolicy policy = directoryServiceAuthsManager.getCurrentAdvancedAuthorizationResponse().getPolicy();
+        assertEquals(amount, policy.getAmount());
+    }
+
+    @Then("^the Advanced Authorization response should contain a GeoCircleFence with a radius of (\\d+\\.?\\d*), a latitude of (-?\\d+\\.?\\d*), a longitude of (-?\\d+\\.?\\d*), and a name of \"([^\"]+)\"$")
+    public void theAdvancedAuthorizationResponseShouldContainAGeoCircleFenceWithARadiusOfALatitudeOfALongitudeOfAndANameOf(double radius, double latitude, double longitude, String name) {
+        GeoCircleFence expected = new GeoCircleFence(name, latitude, longitude, radius);
+        AuthorizationResponsePolicy policy = directoryServiceAuthsManager.getCurrentAdvancedAuthorizationResponse().getPolicy();
+        assertThat(policy.getFences(), hasItem(expected));
+    }
+
+    @Then("the Advanced Authorization response should contain a TerritoryFence with a country of {string}, a administrative area of {string}, a postal code of {string}, and a name of {string}")
+    public void theAdvancedAuthorizationResponseShouldContainATerritoryFenceWithACountryOfAAdministrativeAreaOfAPostalCodeOfAndANameOf(String country, String admin, String postal_code, String name) {
+        TerritoryFence expected = new TerritoryFence(name, country, admin, postal_code);
+        AuthorizationResponsePolicy policy = directoryServiceAuthsManager.getCurrentAdvancedAuthorizationResponse().getPolicy();
+        assertThat(policy.getFences(), hasItem(expected));
     }
 }

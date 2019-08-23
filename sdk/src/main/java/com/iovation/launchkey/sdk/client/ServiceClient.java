@@ -12,13 +12,12 @@
 
 package com.iovation.launchkey.sdk.client;
 
-import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
-import com.iovation.launchkey.sdk.domain.service.DenialReason;
+import com.iovation.launchkey.sdk.domain.service.*;
+import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
 
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("DuplicateThrows")
 public interface ServiceClient extends WebhookHandlingClient {
@@ -257,8 +256,33 @@ public interface ServiceClient extends WebhookHandlingClient {
      * @throws InvalidResponseException When the response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @deprecated Use {@link #getAdvancedAuthorizationResponse(String)} instead
      */
+    @Deprecated
     AuthorizationResponse getAuthorizationResponse(String authorizationRequestId)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError, AuthorizationRequestTimedOutError, NoKeyFoundException,
+            AuthorizationRequestCanceled;
+
+    /**
+     * Request the response for a previous authorization call.
+     *
+     * @param authorizationRequestId Unique identifier returned by {@link #authorize(String)}
+     * @return Null is returned if the user has not responded otherwise an AuthResponse is returned with the data for
+     * that decision
+     * @throws AuthorizationRequestTimedOutError When the user did not respond to the authorization request in the
+     * allotted time.
+     * @throws AuthorizationRequestCanceled When the authorization request has been canceled.
+     * @throws NoKeyFoundException When the Entity and Key ID identifying the public key used to encrypt authorization
+     * response is not found in the known keys mapping.
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    AdvancedAuthorizationResponse getAdvancedAuthorizationResponse(String authorizationRequestId)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError, AuthorizationRequestTimedOutError, NoKeyFoundException,
             AuthorizationRequestCanceled;

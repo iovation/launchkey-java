@@ -2,11 +2,9 @@ package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.service.AuthMethod.Type;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
+import com.iovation.launchkey.sdk.domain.service.Requirement;
 import com.iovation.launchkey.sdk.transport.Transport;
-import com.iovation.launchkey.sdk.transport.domain.AuthMethod;
-import com.iovation.launchkey.sdk.transport.domain.AuthPolicy;
-import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
-import com.iovation.launchkey.sdk.transport.domain.ServiceV3AuthsGetResponse;
+import com.iovation.launchkey.sdk.transport.domain.*;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,9 +54,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
                     "type",
                     "reason",
                     "denial-reason",
-                    new AuthPolicy(
-                            1, true, true, true, null
-                    ),
+                    new AuthResponsePolicy("AMOUNT", 1, null, null),
                     new AuthMethod[]{
                             new AuthMethod("meth-true", true, true, true, true, true, true, true),
                             new AuthMethod("meth-false", false, false, false, false, false, false, false),
@@ -176,9 +172,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
                     this.input,
                     "reason",
                     "denial-reason",
-                    new AuthPolicy(
-                            1, true, true, true, null
-                    ),
+                    new AuthResponsePolicy("AMOUNT", 1, null, null),
                     new AuthMethod[]{
                             new AuthMethod("meth-true", true, true, true, true, true, true, true),
                             new AuthMethod("meth-false", false, false, false, false, false, false, false),
@@ -233,9 +227,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
                     "type",
                     this.input,
                     "denial-reason",
-                    new AuthPolicy(
-                            1, true, true, true, null
-                    ),
+                    new AuthResponsePolicy("AMOUNT", 1, null, null),
                     new AuthMethod[]{
                             new AuthMethod("meth-true", true, true, true, true, true, true, true),
                             new AuthMethod("meth-false", false, false, false, false, false, false, false),
@@ -289,9 +281,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
                     "type",
                     this.input,
                     "denial-reason",
-                    new AuthPolicy(
-                            1, true, true, true, null
-                    ),
+                    new AuthResponsePolicy("AMOUNT", 1, null, null),
                     new AuthMethod[]{
                             new AuthMethod("meth-true", true, true, true, true, true, true, true),
                             new AuthMethod("meth-false", false, false, false, false, false, false, false),
@@ -337,7 +327,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void transportResponsePolicyWithRequirementCountReturnsSameValue() throws Exception {
-            AuthPolicy policy = new AuthPolicy(1, null, null, null, null);
+            AuthResponsePolicy policy = new AuthResponsePolicy("amount", 1, null, null);
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
             AuthorizationResponse response = client.getAuthorizationResponse(authRequestId.toString());
             assertEquals(Integer.valueOf(1), response.getPolicy().getRequiredFactors());
@@ -345,7 +335,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void transportResponsePolicyWithRequirementCountReturnsNullForInherenceRequired() throws Exception {
-            AuthPolicy policy = new AuthPolicy(1, null, null, null, null);
+            AuthResponsePolicy policy = new AuthResponsePolicy("amount", 1, null, null);
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
             AuthorizationResponse response = client.getAuthorizationResponse(authRequestId.toString());
             assertNull(response.getPolicy().isInherenceFactorRequired());
@@ -353,7 +343,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void transportResponsePolicyWithRequirementCountReturnsNullForKnowledgeRequired() throws Exception {
-            AuthPolicy policy = new AuthPolicy(1, null, null, null, null);
+            AuthResponsePolicy policy = new AuthResponsePolicy("amount", 1, null, null);
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
             AuthorizationResponse response = client.getAuthorizationResponse(authRequestId.toString());
             assertNull(response.getPolicy().isKnowledgeFactorRequired());
@@ -361,7 +351,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void transportResponsePolicyWithRequirementCountReturnsNullForPossessionRequired() throws Exception {
-            AuthPolicy policy = new AuthPolicy(1, null, null, null, null);
+            AuthResponsePolicy policy = new AuthResponsePolicy("amount", 1, null, null);
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
             AuthorizationResponse response = client.getAuthorizationResponse(authRequestId.toString());
             assertNull(response.getPolicy().isPossessionFactorRequired());
@@ -369,7 +359,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void transportResponsePolicyWithTypeRequiredHasNullForRequirementCount() throws Exception {
-            AuthPolicy policy = new AuthPolicy(null, true, true, true, null);
+            AuthResponsePolicy policy = new AuthResponsePolicy("types", 0, null, null);
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
             AuthorizationResponse response = client.getAuthorizationResponse(authRequestId.toString());
             assertNull(response.getPolicy().getRequiredFactors());
@@ -377,7 +367,9 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void transportResponsePolicyWithInherenceRequiredReturnsInherenceRequiredWithSameValue() throws Exception {
-            AuthPolicy policy = new AuthPolicy(null, true, false, false, null);
+            AuthResponsePolicy policy = new AuthResponsePolicy("types", 0, new ArrayList<String>(){{
+                add("inherence");
+            }}, null);
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
             AuthorizationResponse response = client.getAuthorizationResponse(authRequestId.toString());
             assertTrue(response.getPolicy().isInherenceFactorRequired());
@@ -385,7 +377,9 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void transportResponsePolicyWithKnowledgeRequiredReturnsKnowledgeRequiredWithSameValue() throws Exception {
-            AuthPolicy policy = new AuthPolicy(null, false, true, false, null);
+            AuthResponsePolicy policy = new AuthResponsePolicy("types", 0, new ArrayList<String>(){{
+                add("knowledge");
+            }}, null);
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
             AuthorizationResponse response = client.getAuthorizationResponse(authRequestId.toString());
             assertTrue(response.getPolicy().isKnowledgeFactorRequired());
@@ -393,7 +387,9 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void transportResponsePolicyWithPossessionRequiredReturnsPossessionRequiredWithSAmeValue() throws Exception {
-            AuthPolicy policy = new AuthPolicy(null, false, false, true, null);
+            AuthResponsePolicy policy = new AuthResponsePolicy("types", 0, new ArrayList<String>(){{
+                add("possession");
+            }}, null);
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
             AuthorizationResponse response = client.getAuthorizationResponse(authRequestId.toString());
             assertTrue(response.getPolicy().isPossessionFactorRequired());
@@ -592,7 +588,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
         private ServiceV3AuthsGetResponse transportResponse;
 
         @Mock
-        private AuthPolicy policy;
+        private AuthResponsePolicy policy;
 
         private BasicServiceClient client;
 
@@ -606,6 +602,7 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
             when(transportResponse.getAuthorizationRequestId()).thenReturn(authRequestId);
             when(transportResponse.getServicePins()).thenReturn(new String[]{});
             when(transportResponse.getAuthPolicy()).thenReturn(policy);
+            when(policy.getRequirement()).thenReturn("amount");
             client = new BasicServiceClient(serviceId, transport);
         }
 
@@ -617,44 +614,56 @@ public class BasicServiceClientGetAuthorizationResponseTest extends TestCase {
 
         @Test
         public void testEmptyArrayReturnsEmptyList() throws Exception {
-            when(policy.getGeoFences()).thenReturn(new ArrayList<AuthPolicy.Location>());
+            when(policy.getFences()).thenReturn(new ArrayList<Fence>());
             AuthorizationResponse response = client.getAuthorizationResponse(UUID.randomUUID().toString());
             assertThat(response.getPolicy().getLocations(), is(empty()));
         }
 
         @Test
         public void testNullNameTransfers() throws Exception {
-            when(policy.getGeoFences()).thenReturn(Arrays.asList(new AuthPolicy.Location(null, 1.0, 2.0, 3.0)));
+            when(policy.getFences()).thenReturn(Arrays.asList(new Fence(null, "GEO_CIRCLE", 1.0, 2.0, 3.0, null, null, null)));
             AuthorizationResponse response = client.getAuthorizationResponse(UUID.randomUUID().toString());
             assertNull(response.getPolicy().getLocations().get(0).getName());
         }
 
         @Test
         public void testNameTransfers() throws Exception {
-            when(policy.getGeoFences()).thenReturn(Arrays.asList(new AuthPolicy.Location("name", 1.0, 2.0, 3.0)));
+            when(policy.getFences()).thenReturn(Arrays.asList(new Fence("name", "GEO_CIRCLE", 1.0, 2.0, 3.0, null, null, null)));
             AuthorizationResponse response = client.getAuthorizationResponse(UUID.randomUUID().toString());
             assertEquals("name", response.getPolicy().getLocations().get(0).getName());
         }
 
         @Test
         public void testRadiusTransfers() throws Exception {
-            when(policy.getGeoFences()).thenReturn(Arrays.asList(new AuthPolicy.Location("name", 1.0, 2.0, 3.0)));
+            when(policy.getFences()).thenReturn(Arrays.asList(new Fence(null, "GEO_CIRCLE", 1.0, 2.0, 3.0, null, null, null)));
             AuthorizationResponse response = client.getAuthorizationResponse(UUID.randomUUID().toString());
-            assertEquals(1.0, response.getPolicy().getLocations().get(0).getRadius());
+            assertEquals(3.0, response.getPolicy().getLocations().get(0).getRadius());
         }
 
         @Test
         public void testLatitudeTransfers() throws Exception {
-            when(policy.getGeoFences()).thenReturn(Arrays.asList(new AuthPolicy.Location("name", 1.0, 2.0, 3.0)));
+            when(policy.getFences()).thenReturn(Arrays.asList(new Fence(null, "GEO_CIRCLE", 1.0, 2.0, 3.0, null, null, null)));
             AuthorizationResponse response = client.getAuthorizationResponse(UUID.randomUUID().toString());
-            assertEquals(2.0, response.getPolicy().getLocations().get(0).getLatitude());
+            assertEquals(1.0, response.getPolicy().getLocations().get(0).getLatitude());
         }
 
         @Test
         public void testLongitudeTransfers() throws Exception {
-            when(policy.getGeoFences()).thenReturn(Arrays.asList(new AuthPolicy.Location("name", 1.0, 2.0, 3.0)));
+            when(policy.getFences()).thenReturn(Arrays.asList(new Fence(null, "GEO_CIRCLE", 1.0, 2.0, 3.0, null, null, null)));
             AuthorizationResponse response = client.getAuthorizationResponse(UUID.randomUUID().toString());
-            assertEquals(3.0, response.getPolicy().getLocations().get(0).getLongitude());
+            assertEquals(2.0, response.getPolicy().getLocations().get(0).getLongitude());
+        }
+
+        @Test
+        public void testNullRequirementReturnsPolicy() throws Exception {
+            when(policy.getRequirement()).thenReturn(null);
+            assertNotNull(client.getAuthorizationResponse(UUID.randomUUID().toString()).getPolicy());
+        }
+
+        @Test
+        public void testCondGeoReturnsNullPolicy() throws Exception {
+            when(policy.getRequirement()).thenReturn("COND_GEO");
+            assertNull(client.getAuthorizationResponse(UUID.randomUUID().toString()).getPolicy());
         }
     }
 }

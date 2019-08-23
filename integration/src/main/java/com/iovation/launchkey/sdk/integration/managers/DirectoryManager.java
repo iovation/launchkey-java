@@ -137,7 +137,7 @@ public class DirectoryManager {
         currentDirectoryEntity.getSdkKeys().add(sdkKey);
     }
 
-    void updateDirectory(UUID directoryId, Boolean active, String androidKey, String p12,
+    public void updateDirectory(UUID directoryId, Boolean active, String androidKey, String p12,
                          String p12Fingerprint, Boolean denialContextInquiryEnabled, URI webhookUrl) throws Throwable {
         client.updateDirectory(directoryId, active, androidKey, p12, denialContextInquiryEnabled, webhookUrl);
         currentDirectoryEntity = new DirectoryEntity(currentDirectoryEntity.getId(), currentDirectoryEntity.getName(),
