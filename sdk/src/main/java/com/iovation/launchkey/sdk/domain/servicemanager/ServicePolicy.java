@@ -19,7 +19,7 @@ import java.util.TimeZone;
 /**
  * Class to represent an authentication policy which will be utilized for providing dynamic policies per request.
  */
-public class ServicePolicy {
+public class ServicePolicy implements PolicyAdapter {
     private final Integer requiredFactors;
     private final Boolean requireKnowledgeFactor;
     private final Boolean requireInherenceFactor;
