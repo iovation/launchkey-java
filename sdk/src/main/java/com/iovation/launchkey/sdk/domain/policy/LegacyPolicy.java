@@ -1,5 +1,5 @@
-package com.iovation.launchkey.sdk.domain.LegacyPolicy;
+package com.iovation.launchkey.sdk.domain.policy;
 
-public interface LegacyPolicy implements PolicyAdapter {
+public interface LegacyPolicy extends PolicyAdapter {
 
 }

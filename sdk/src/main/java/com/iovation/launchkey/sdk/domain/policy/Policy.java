@@ -2,7 +2,7 @@ package com.iovation.launchkey.sdk.domain.policy;
 
 import java.util.List;
 
-public interface Policy implements PolicyAdapter {
+public interface Policy extends PolicyAdapter {
 
     Boolean getDenyRootedJailbroken();
 

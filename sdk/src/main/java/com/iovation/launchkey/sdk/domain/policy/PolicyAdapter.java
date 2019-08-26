@@ -1,4 +1,4 @@
-package com.iovation.launchkey.sdk.domain.PolicyAdapter;
+package com.iovation.launchkey.sdk.domain.policy;
 
 public interface PolicyAdapter {
 
