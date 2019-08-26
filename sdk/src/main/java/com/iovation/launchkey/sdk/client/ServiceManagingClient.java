@@ -13,8 +13,8 @@
 package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.PublicKey;
+import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
-import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.error.*;
 
 import java.net.URI;
@@ -298,7 +298,7 @@ public interface ServiceManagingClient {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
      */
-    ServicePolicy getServicePolicy(UUID serviceId)
+    PolicyAdapter getServicePolicy(UUID serviceId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError;
@@ -324,7 +324,7 @@ public interface ServiceManagingClient {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
      */
-    void setServicePolicy(UUID serviceId, ServicePolicy policy)
+    void setServicePolicy(UUID serviceId, PolicyAdapter policy)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError;
