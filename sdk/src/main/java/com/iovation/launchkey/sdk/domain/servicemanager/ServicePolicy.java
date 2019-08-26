@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.domain.servicemanager;
 
+import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
