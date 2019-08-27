@@ -4,9 +4,21 @@ import java.util.List;
 
 public class MethodAmountPolicy implements Policy, InOrOutPolicy {
 
-    private Boolean denyRootedJailbroken = false;
-    private Boolean denyEmulatorSimulator = false;
+    private Boolean denyRootedJailbroken;
+    private Boolean denyEmulatorSimulator;
     private List<Fence> fences;
+
+    public MethodAmountPolicy() {
+        this.denyEmulatorSimulator = false;
+        this.denyEmulatorSimulator = false;
+        this.fences = null;
+    }
+
+    public MethodAmountPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences) {
+        this.denyRootedJailbroken = denyRootedJailbroken;
+        this.denyEmulatorSimulator = denyEmulatorSimulator;
+        this.fences = fences;
+    }
 
     @Override
     public String getPolicyType() {
@@ -19,28 +31,13 @@ public class MethodAmountPolicy implements Policy, InOrOutPolicy {
     }
 
     @Override
-    public void setDenyRootedJailbroken(Boolean denyRootedJailbroken) {
-        this.denyRootedJailbroken = denyRootedJailbroken;
-    }
-
-    @Override
     public Boolean getDenyEmulatorSimulator() {
         return this.denyEmulatorSimulator;
     }
 
     @Override
-    public void setDenyEmulatorSimulator(Boolean denyEmulatorSimulator) {
-        this.denyEmulatorSimulator = denyEmulatorSimulator;
-    }
-
-    @Override
     public List<Fence> getFences() {
         return this.fences;
-    }
-
-    @Override
-    public void setFences(List<Fence> fences) {
-        this.fences = fences;
     }
 
 }

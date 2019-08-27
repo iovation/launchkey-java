@@ -2,45 +2,43 @@ package com.iovation.launchkey.sdk.domain.policy;
 
 public class TerritoryFence implements Fence {
 
-    private String fenceName;
+    private final String fenceName;
 
-    private String country;
+    private final String country;
 
-    private String administrativeArea;
+    private final String administrativeArea;
 
-    private String postalCode;
+    private final String postalCode;
+
+    public TerritoryFence(String country) {
+        this.country = country;
+        this.administrativeArea = null;
+        this.postalCode = null;
+        this.fenceName = null;
+    }
+
+    public TerritoryFence(String country, String administrativeArea, String postalCode, String fenceName) {
+        this.country = country;
+        this.administrativeArea = administrativeArea;
+        this.postalCode = postalCode;
+        this.fenceName = fenceName;
+    }
 
     @Override
     public String getFenceName() {
         return fenceName;
     }
 
-    @Override
-    public void setFenceName(String fenceName) {
-        this.fenceName = fenceName;
-    }
-
     public String getCountry() {
         return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
     }
 
     public String getAdministrativeArea() {
         return administrativeArea;
     }
 
-    public void setAdministrativeArea(String administrativeArea) {
-        this.administrativeArea = administrativeArea;
-    }
-
     public String getPostalCode() {
         return postalCode;
     }
 
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
 }

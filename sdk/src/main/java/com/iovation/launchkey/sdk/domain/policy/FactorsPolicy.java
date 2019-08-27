@@ -10,6 +10,20 @@ public class FactorsPolicy implements Policy, InOrOutPolicy {
     private List<Fence> fences;
     private Set<Factor> factors;
 
+    public FactorsPolicy() {
+        this.denyRootedJailbroken = false;
+        this.denyEmulatorSimulator = false;
+        this.fences = null;
+        this.factors = null;
+    }
+
+    public FactorsPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Set<Factor> factors) {
+        this.denyRootedJailbroken = denyRootedJailbroken;
+        this.denyEmulatorSimulator = denyEmulatorSimulator;
+        this.fences = fences;
+        this.factors = factors;
+    }
+
     @Override
     public String getPolicyType() {
         return "FACTORS";
@@ -21,32 +35,13 @@ public class FactorsPolicy implements Policy, InOrOutPolicy {
     }
 
     @Override
-    public void setDenyRootedJailbroken(Boolean denyRootedJailbroken) {
-        this.denyRootedJailbroken = denyRootedJailbroken;
-    }
-
-    @Override
     public Boolean getDenyEmulatorSimulator() {
         return this.denyEmulatorSimulator;
     }
 
     @Override
-    public void setDenyEmulatorSimulator(Boolean denyEmulatorSimulator) {
-        this.denyEmulatorSimulator = denyEmulatorSimulator;
-    }
-
-    @Override
     public List<Fence> getFences() {
         return this.fences;
-    }
-
-    @Override
-    public void setFences(List<Fence> fences) {
-        this.fences = fences;
-    }
-
-    public void setFactors(Set<Factor> factors) {
-        this.factors = factors;
     }
 
     public Set<Factor> getFactors() {

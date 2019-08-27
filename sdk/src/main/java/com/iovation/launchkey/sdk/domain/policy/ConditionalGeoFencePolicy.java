@@ -10,6 +10,22 @@ public class ConditionalGeoFencePolicy implements Policy {
     private InOrOutPolicy inPolicy;
     private InOrOutPolicy outPolicy;
 
+    public ConditionalGeoFencePolicy() {
+        this.denyEmulatorSimulator = null;
+        this.denyEmulatorSimulator = null;
+        this.fences = null;
+        this.inPolicy = null;
+        this.outPolicy = null;
+    }
+
+    public ConditionalGeoFencePolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, InOrOutPolicy inPolicy, InOrOutPolicy outPolicy) {
+        this.denyRootedJailbroken = denyRootedJailbroken;
+        this.denyEmulatorSimulator = denyEmulatorSimulator;
+        this.fences = fences;
+        this.inPolicy = inPolicy;
+        this.outPolicy = outPolicy;
+    }
+
     @Override
     public String getPolicyType() {
         return "COND_GEO";
@@ -17,12 +33,7 @@ public class ConditionalGeoFencePolicy implements Policy {
 
     @Override
     public Boolean getDenyRootedJailbroken() {
-        return this.denyRootedJailbroken;
-    }
-
-    @Override
-    public void setDenyRootedJailbroken(Boolean denyRootedJailbroken) {
-        this.denyRootedJailbroken = denyRootedJailbroken;
+        return denyRootedJailbroken;
     }
 
     @Override
@@ -31,33 +42,16 @@ public class ConditionalGeoFencePolicy implements Policy {
     }
 
     @Override
-    public void setDenyEmulatorSimulator(Boolean denyEmulatorSimulator) {
-        this.denyEmulatorSimulator = denyEmulatorSimulator;
-    }
-
-    @Override
     public List<Fence> getFences() {
         return this.fences;
-    }
-
-    @Override
-    public void setFences(List<Fence> fences) {
-        this.fences = fences;
-    }
-
-    public void setInPolicy(InOrOutPolicy inPolicy) {
-        this.inPolicy = inPolicy;
     }
 
     public InOrOutPolicy getInPolicy() {
         return this.inPolicy;
     }
 
-    public void setOutPolicy(InOrOutPolicy outPolicy) {
-        this.outPolicy = outPolicy;
-    }
-
     public InOrOutPolicy getOutPolicy() {
         return this.outPolicy;
     }
+
 }
