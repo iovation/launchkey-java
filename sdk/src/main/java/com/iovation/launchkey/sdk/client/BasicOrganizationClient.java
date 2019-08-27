@@ -15,6 +15,8 @@ package com.iovation.launchkey.sdk.client;
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.organization.Directory;
+import com.iovation.launchkey.sdk.domain.policy.LegacyPolicy;
+import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.error.*;
@@ -304,7 +306,7 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
     }
 
     @Override
-    public ServicePolicy getServicePolicy(UUID serviceId)
+    public PolicyAdapter getServicePolicy(UUID serviceId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
@@ -316,12 +318,18 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
     }
 
     @Override
-    public void setServicePolicy(UUID serviceId, ServicePolicy policy)
+    public void setServicePolicy(UUID serviceId, PolicyAdapter policy)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
-        com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportPolicy =
-                getTransportServicePolicyFromDomainServicePolicy(policy);
+        com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportPolicy = null;
+        if (policy instanceof LegacyPolicy) {
+            ServicePolicy legacyPolicy = (ServicePolicy) policy;
+            transportPolicy = getTransportServicePolicyFromDomainServicePolicy(legacyPolicy);
+        }
+        else {
+            // TODO: Process new policy types
+        }
         transport.organizationV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, transportPolicy), organization);
     }
 
