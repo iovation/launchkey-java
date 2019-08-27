@@ -11,6 +11,11 @@ public class ConditionalGeoFencePolicy implements Policy {
     private InOrOutPolicy outPolicy;
 
     @Override
+    public String getPolicyType() {
+        return "COND_GEO";
+    }
+
+    @Override
     public Boolean getDenyRootedJailbroken() {
         return this.denyRootedJailbroken;
     }

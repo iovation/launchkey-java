@@ -11,6 +11,11 @@ public class FactorsPolicy implements Policy, InOrOutPolicy {
     private Set<Factor> factors;
 
     @Override
+    public String getPolicyType() {
+        return "FACTORS";
+    }
+
+    @Override
     public Boolean getDenyRootedJailbroken() {
         return this.denyRootedJailbroken;
     }
@@ -47,4 +52,5 @@ public class FactorsPolicy implements Policy, InOrOutPolicy {
     public Set<Factor> getFactors() {
         return this.factors;
     }
+
 }

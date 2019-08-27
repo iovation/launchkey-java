@@ -9,6 +9,11 @@ public class MethodAmountPolicy implements Policy, InOrOutPolicy {
     private List<Fence> fences;
 
     @Override
+    public String getPolicyType() {
+        return "METHOD_AMOUNT";
+    }
+
+    @Override
     public Boolean getDenyRootedJailbroken() {
         return this.denyRootedJailbroken;
     }
