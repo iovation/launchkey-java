@@ -15,7 +15,6 @@ package com.iovation.launchkey.sdk.client;
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.organization.Directory;
-import com.iovation.launchkey.sdk.domain.policy.LegacyPolicy;
 import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
@@ -323,7 +322,7 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
         com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportPolicy = null;
-        if (policy instanceof LegacyPolicy) {
+        if (policy instanceof ServicePolicy) {
             ServicePolicy legacyPolicy = (ServicePolicy) policy;
             transportPolicy = getTransportServicePolicyFromDomainServicePolicy(legacyPolicy);
         }
