@@ -44,7 +44,7 @@ public class FactorsPolicy implements Policy, InOrOutPolicy {
         this.factors = factors;
     }
 
-    public Set<Factor>  getFactors() {
+    public Set<Factor> getFactors() {
         return this.factors;
     }
 }
