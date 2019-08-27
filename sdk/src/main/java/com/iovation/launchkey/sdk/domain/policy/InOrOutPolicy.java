@@ -1,4 +1,4 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
-public interface OutsidePolicy {
+public interface InOrOutPolicy extends Policy {
 }

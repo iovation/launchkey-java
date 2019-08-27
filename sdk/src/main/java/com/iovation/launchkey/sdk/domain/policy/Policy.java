@@ -6,11 +6,11 @@ public interface Policy extends PolicyAdapter {
 
     Boolean getDenyRootedJailbroken();
 
-    void setDenyRootedJailbroken();
+    void setDenyRootedJailbroken(Boolean denyRootedJailbroken);
 
     Boolean getDenyEmulatorSimulator();
 
-    void setDenyEmulatorSimulator();
+    void setDenyEmulatorSimulator(Boolean denyEmulatorSimulator);
 
     List<Fence> getFences();
 
