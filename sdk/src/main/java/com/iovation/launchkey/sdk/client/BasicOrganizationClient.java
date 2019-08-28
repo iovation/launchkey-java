@@ -309,11 +309,19 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
-        com.iovation.launchkey.sdk.transport.domain.ServicePolicy policy =
+        com.iovation.launchkey.sdk.transport.domain.PolicyAdapter policy =
                 transport
-                        .organizationV3ServicePolicyItemPost(new ServicePolicyItemPostRequest(serviceId), organization);
-
-        return getDomainServicePolicyFromTransportServicePolicy(policy);
+                        .organizationV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), organization);
+        PolicyAdapter returnValue = null;
+        if (policy instanceof com.iovation.launchkey.sdk.transport.domain.Policy) {
+            // TODO: need to write method getDomainPolicyFromTransportPolicy
+        }
+        else if (policy instanceof com.iovation.launchkey.sdk.transport.domain.ServicePolicy) {
+            com.iovation.launchkey.sdk.transport.domain.ServicePolicy servicePolicy =
+                    (com.iovation.launchkey.sdk.transport.domain.ServicePolicy) policy;
+            returnValue = getDomainServicePolicyFromTransportServicePolicy(servicePolicy);
+        }
+        return returnValue;
     }
 
     @Override
@@ -327,7 +335,7 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             transportPolicy = getTransportServicePolicyFromDomainServicePolicy(legacyPolicy);
         }
         else {
-            // TODO: Process new policy types
+            // TODO: need to write method getTransportPolicyFromDomainPolicy
         }
         transport.organizationV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, transportPolicy), organization);
     }

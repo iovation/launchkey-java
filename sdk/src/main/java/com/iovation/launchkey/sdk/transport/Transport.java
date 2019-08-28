@@ -392,8 +392,28 @@ public interface Transport {
      * @throws InvalidResponseException When the response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     *
+     * @deprecated This method is deprecated. Use directoryV3PolicyItemPost
      */
+    @Deprecated
     ServicePolicy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException;
+
+    /**
+     * Get the default Policy of a Directory Service
+     *
+     * @param request Transport object with information that will be marshaled for the request.
+     * @param subject Organization entity for the subject
+     * @return The default Policy for the Directory Service
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    PolicyAdapter directoryV3PolicyItemPost(ServicePolicyItemPostRequest request, EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException;
 
@@ -807,11 +827,31 @@ public interface Transport {
      * @throws InvalidResponseException When the response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     *
+     * @deprecated This method is deprecated. New policy objects use organizationV3PolicyItemPost
      */
+    @Deprecated
     ServicePolicy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request, EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException;
 
+    /**
+     * Get the default Policy of an Organization Service
+     *
+     * @param request Transport object with information that will be marshaled for the request.
+     * @param subject Organization entity for the subject
+     * @return The default Policy for the Organization Service
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    PolicyAdapter organizationV3PolicyItemPost(ServicePolicyItemPostRequest request,
+                                               EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException;
     /**
      * Delete the default Policy of an Organization Service
      *

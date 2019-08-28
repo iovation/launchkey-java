@@ -587,13 +587,34 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
+    @Deprecated
     public ServicePolicy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
+                                                             EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        PolicyAdapter policy = organizationV3PolicyItemPost(request,subject);
+        if (!(policy instanceof ServicePolicy)) {
+            throw new MarshallingError("You are using deprecated method for new policy objects. " +
+                    "Update to use new organizationV3ServicePolicyItemPost for all policy objects.", null);
+        }
+        return (ServicePolicy) policy;
+    }
+
+    @Override
+    public PolicyAdapter organizationV3PolicyItemPost(ServicePolicyItemPostRequest request,
                                                              EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException {
         final HttpResponse response =
                 getHttpResponse("POST", "/organization/v3/service/policy/item", subject, request, true, null);
-        return decryptResponse(response, ServicePolicy.class);
+        PolicyAdapter policy;
+        try {
+            policy = decryptResponse(response, Policy.class);
+        } catch(Exception e) {
+            // Support legacy policies
+            policy = decryptResponse(response, ServicePolicy.class);
+        }
+        return policy;
     }
 
     @Override
@@ -682,13 +703,34 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
+    @Deprecated
     public ServicePolicy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
+                                                          EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        PolicyAdapter policy = directoryV3PolicyItemPost(request,subject);
+        if (!(policy instanceof ServicePolicy)) {
+            throw new MarshallingError("You are using deprecated method for new policy objects. " +
+                    "Update to use new directoryV3PolicyItemPost for all policy objects.", null);
+        }
+        return (ServicePolicy) policy;
+    }
+
+    @Override
+    public PolicyAdapter directoryV3PolicyItemPost(ServicePolicyItemPostRequest request,
                                                           EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException {
         HttpResponse response =
                 getHttpResponse("POST", "/directory/v3/service/policy/item", subject, request, true, null);
-        return decryptResponse(response, ServicePolicy.class);
+        PolicyAdapter policy;
+        try {
+            policy = decryptResponse(response, Policy.class);
+        } catch(Exception e) {
+            // Support legacy policies
+            policy = decryptResponse(response, ServicePolicy.class);
+        }
+        return policy;
     }
 
     @Override

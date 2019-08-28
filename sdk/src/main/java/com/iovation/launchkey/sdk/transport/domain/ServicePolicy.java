@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.*;
 
 @JsonIgnoreProperties(value = {"geoFenceLocations", "geoFences", "timeFences", "deviceIntegrity"}, ignoreUnknown = true)
-public class ServicePolicy extends AuthPolicy {
+public class ServicePolicy extends AuthPolicy implements PolicyAdapter {
     private final List<TimeFence> timeFences;
 
     public ServicePolicy(Integer any, Boolean inherence, Boolean knowledge, Boolean possession, Boolean deviceIntegrity) {

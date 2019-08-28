@@ -220,10 +220,19 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
-        com.iovation.launchkey.sdk.transport.domain.ServicePolicy policy =
-                transport.directoryV3ServicePolicyItemPost(new ServicePolicyItemPostRequest(serviceId), directory);
+        com.iovation.launchkey.sdk.transport.domain.PolicyAdapter policy =
+                transport.directoryV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), directory);
 
-       return this.getDomainServicePolicyFromTransportServicePolicy(policy);
+        PolicyAdapter returnValue = null;
+        if (policy instanceof com.iovation.launchkey.sdk.transport.domain.Policy) {
+            // TODO: need to write method getDomainPolicyFromTransportPolicy
+        }
+        else if (policy instanceof com.iovation.launchkey.sdk.transport.domain.ServicePolicy) {
+            com.iovation.launchkey.sdk.transport.domain.ServicePolicy servicePolicy =
+                    (com.iovation.launchkey.sdk.transport.domain.ServicePolicy) policy;
+            returnValue = getDomainServicePolicyFromTransportServicePolicy(servicePolicy);
+        }
+        return returnValue;
     }
 
     @Override
@@ -237,7 +246,7 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
             transportPolicy = getTransportServicePolicyFromDomainServicePolicy(legacyPolicy);
         }
         else {
-            // TODO: Process new policy types
+            // TODO: need to write method getTransportPolicyFromDomainPolicy
         }
         transport.directoryV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, transportPolicy), directory);
     }
