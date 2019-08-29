@@ -27,11 +27,6 @@ public class ConditionalGeoFencePolicy implements Policy {
     }
 
     @Override
-    public String getPolicyType() {
-        return "COND_GEO";
-    }
-
-    @Override
     public Boolean getDenyRootedJailbroken() {
         return denyRootedJailbroken;
     }

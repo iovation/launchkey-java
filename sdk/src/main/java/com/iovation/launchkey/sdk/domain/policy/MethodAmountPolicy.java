@@ -21,11 +21,6 @@ public class MethodAmountPolicy implements Policy {
     }
 
     @Override
-    public String getPolicyType() {
-        return "METHOD_AMOUNT";
-    }
-
-    @Override
     public Boolean getDenyRootedJailbroken() {
         return this.denyRootedJailbroken;
     }

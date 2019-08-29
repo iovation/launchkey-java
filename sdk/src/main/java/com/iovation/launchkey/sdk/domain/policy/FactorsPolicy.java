@@ -24,11 +24,6 @@ public class FactorsPolicy implements Policy {
     }
 
     @Override
-    public String getPolicyType() {
-        return "FACTORS";
-    }
-
-    @Override
     public Boolean getDenyRootedJailbroken() {
         return this.denyRootedJailbroken;
     }

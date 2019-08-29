@@ -14,6 +14,7 @@ package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.policy.*;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
+import com.iovation.launchkey.sdk.error.UnknownPolicyException;
 import com.iovation.launchkey.sdk.transport.domain.AuthPolicy;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ class ServiceManagingBaseClient {
     }
 
     Policy getDomainPolicyFromTransportPolicy(
-            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) {
+            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) throws UnknownPolicyException  {
 
         String policyType = transportPolicy.getPolicyType();
         Boolean denyRootedJailbroken = transportPolicy.getDenyRootedJailbroken();
@@ -88,7 +89,7 @@ class ServiceManagingBaseClient {
         if (policyType.equals("COND_GEO")) {
             Policy inPolicy = getDomainPolicyFromTransportPolicy(transportPolicy.getInPolicy());
             Policy outPolicy = getDomainPolicyFromTransportPolicy(transportPolicy.getOutPolicy());
-            // TODO: Throw error if policy wrong type
+            checkForUnknownPolicyFormat(inPolicy,outPolicy);
             domainPolicy = new ConditionalGeoFencePolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy);
         }
         else if (policyType.equals("METHOD_AMOUNT")) {
@@ -105,9 +106,9 @@ class ServiceManagingBaseClient {
         return domainPolicy;
     }
 
-    com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) {
+    com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException {
 
-        String policyType = domainPolicy.getPolicyType();
+        String policyType = null;
         Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
         List<Fence> fences = domainPolicy.getFences();
@@ -116,17 +117,19 @@ class ServiceManagingBaseClient {
         List<String> factors = new ArrayList<>();
 
         if (domainPolicy instanceof ConditionalGeoFencePolicy) {
+            policyType = "COND_GEO";
             ConditionalGeoFencePolicy condGeoPolicy = (ConditionalGeoFencePolicy) domainPolicy;
             Policy condInPolicy = condGeoPolicy.getInPolicy();
             Policy condOutPolicy = condGeoPolicy.getOutPolicy();
-            // TODO: Throw error if policy wrong type
+            checkForUnknownPolicyFormat(condInPolicy, condOutPolicy);
             inPolicy = getTransportPolicyFromDomainPolicy(condInPolicy);
             outPolicy = getTransportPolicyFromDomainPolicy(condOutPolicy);
         }
         else if (domainPolicy instanceof MethodAmountPolicy) {
-            // TODO: Fill in or remove
+            policyType = "METHOD_AMOUNT";
         }
         else if (domainPolicy instanceof FactorsPolicy) {
+            policyType = "FACTORS";
             List<Factor> domainFactors = ((FactorsPolicy) domainPolicy).getFactors();
             for (Factor factor : domainFactors) {
                 factors.add(factor.toString());
@@ -134,5 +137,22 @@ class ServiceManagingBaseClient {
         }
 
         return new com.iovation.launchkey.sdk.transport.domain.Policy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy,policyType,factors);
+    }
+
+    private void checkForUnknownPolicyFormat(Policy condInPolicy, Policy condOutPolicy) throws UnknownPolicyException {
+        // Prevent unknown policy types from being converted
+        ArrayList<Boolean> everythingShouldEvalFalse = new ArrayList<>();
+        everythingShouldEvalFalse.add(condInPolicy.getDenyEmulatorSimulator());
+        everythingShouldEvalFalse.add(condInPolicy.getDenyRootedJailbroken());
+        everythingShouldEvalFalse.add(condOutPolicy.getDenyEmulatorSimulator());
+        everythingShouldEvalFalse.add(condOutPolicy.getDenyRootedJailbroken());
+        for (Boolean o : everythingShouldEvalFalse) {
+            if (o) {
+                throw new UnknownPolicyException("Unknown policy type",null,null);
+            }
+            else if ((condInPolicy.getFences() != null) || (condOutPolicy.getFences() != null)) {
+                throw new UnknownPolicyException("Unknown policy type",null,null);
+            }
+        }
     }
 }
