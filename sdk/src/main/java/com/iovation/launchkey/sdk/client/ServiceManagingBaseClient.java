@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.transport.domain.AuthPolicy;
 
@@ -72,6 +73,21 @@ class ServiceManagingBaseClient {
             transportPolicy.addGeoFence(location.getName(), location.getRadius(), location.getLatitude(),
                     location.getLongitude());
         }
+        return transportPolicy;
+    }
+
+    Policy getDomainPolicyFromTransportPolicy(
+            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) {
+
+        // TODO: Fill in logic
+        Policy domainPolicy = null;
+        return domainPolicy;
+    }
+
+    com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) {
+
+        // TODO: Fill in logic
+        com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = null;
         return transportPolicy;
     }
 }
