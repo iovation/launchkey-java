@@ -251,8 +251,7 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
             com.iovation.launchkey.sdk.domain.policy.Policy newPolicyType =
                     (com.iovation.launchkey.sdk.domain.policy.Policy) policy;
             com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = getTransportPolicyFromDomainPolicy(newPolicyType);
-            // TODO: transport.organizationV3ServicePolicyPut accept new put request type
-            // transport.directoryV3ServicePolicyPut(new PolicyPutRequest(serviceId, transportPolicy), organization);
+             transport.directoryV3PolicyPut(new PolicyPutRequest(serviceId, transportPolicy), directory);
         }
     }
 

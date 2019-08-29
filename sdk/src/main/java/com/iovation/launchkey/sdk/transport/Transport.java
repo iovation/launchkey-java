@@ -381,6 +381,22 @@ public interface Transport {
             InvalidCredentialsException;
 
     /**
+     * Set the default Policy for a Directory Service
+     *
+     * @param request Transport object with information that will be marshaled for the request.
+     * @param subject Organization entity for the subject
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    void directoryV3PolicyPut(PolicyPutRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException;
+
+    /**
      * Get the default Policy of a Directory Service
      *
      * @param request Transport object with information that will be marshaled for the request.
@@ -812,6 +828,22 @@ public interface Transport {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      */
     void organizationV3ServicePolicyPut(ServicePolicyPutRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException;
+
+    /**
+     * Set the default Policy for an Organization Service
+     *
+     * @param request Transport object with information that will be marshaled for the request.
+     * @param subject Organization entity for the subject
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    void organizationV3PolicyPut(PolicyPutRequest request, EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException;
 

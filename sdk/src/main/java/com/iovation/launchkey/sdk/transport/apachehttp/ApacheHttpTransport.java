@@ -587,6 +587,13 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
+    public void organizationV3PolicyPut(PolicyPutRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PUT", "/organization/v3/service/policy", subject, request, true, null);
+    }
+
+    @Override
     @Deprecated
     public ServicePolicy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
                                                              EntityIdentifier subject)
@@ -697,6 +704,13 @@ public class ApacheHttpTransport implements Transport {
 
     @Override
     public void directoryV3ServicePolicyPut(ServicePolicyPutRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("PUT", "/directory/v3/service/policy", subject, request, true, null);
+    }
+
+    @Override
+    public void directoryV3PolicyPut(PolicyPutRequest request, EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException {
         getHttpResponse("PUT", "/directory/v3/service/policy", subject, request, true, null);

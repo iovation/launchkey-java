@@ -341,8 +341,7 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             com.iovation.launchkey.sdk.domain.policy.Policy newPolicyType =
                     (com.iovation.launchkey.sdk.domain.policy.Policy) policy;
             com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = getTransportPolicyFromDomainPolicy(newPolicyType);
-            // TODO: transport.organizationV3ServicePolicyPut accept new put request type
-            // transport.organizationV3ServicePolicyPut(new PolicyPutRequest(serviceId, transportPolicy), organization);
+             transport.organizationV3PolicyPut(new PolicyPutRequest(serviceId, transportPolicy), organization);
         }
     }
 
