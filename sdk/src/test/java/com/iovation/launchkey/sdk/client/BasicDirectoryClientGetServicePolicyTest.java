@@ -175,9 +175,9 @@ public class BasicDirectoryClientGetServicePolicyTest {
     @SuppressWarnings("Duplicates")
     @Test
     public void getRequiredFactorsNullWhenNoMinimumRequirements() throws Exception {
-        when(response.getMinimumRequirements()).thenReturn(new ArrayList<>());
-        when(response.getTimeFences()).thenReturn(new ArrayList<>());
-        when(response.getGeoFences()).thenReturn(new ArrayList<>());
+        when(response.getMinimumRequirements()).thenReturn(new ArrayList<AuthPolicy.MinimumRequirement>());
+        when(response.getTimeFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.TimeFence>());
+        when(response.getGeoFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.Location>());
         when(response.getDeviceIntegrity()).thenReturn(null);
         PolicyAdapter adapter = client.getServicePolicy(serviceId);
         ServicePolicy servicePolicy = (ServicePolicy) adapter;
@@ -187,9 +187,9 @@ public class BasicDirectoryClientGetServicePolicyTest {
     @SuppressWarnings("Duplicates")
     @Test
     public void isInherenceFactorRequiredNullWhenNoMinimumRequirements() throws Exception {
-        when(response.getMinimumRequirements()).thenReturn(new ArrayList<>());
-        when(response.getTimeFences()).thenReturn(new ArrayList<>());
-        when(response.getGeoFences()).thenReturn(new ArrayList<>());
+        when(response.getMinimumRequirements()).thenReturn(new ArrayList<AuthPolicy.MinimumRequirement>());
+        when(response.getTimeFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.TimeFence>());
+        when(response.getGeoFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.Location>());
         when(response.getDeviceIntegrity()).thenReturn(null);
         PolicyAdapter adapter = client.getServicePolicy(serviceId);
         ServicePolicy servicePolicy = (ServicePolicy) adapter;
@@ -199,9 +199,9 @@ public class BasicDirectoryClientGetServicePolicyTest {
     @SuppressWarnings("Duplicates")
     @Test
     public void isKnowledgeFactorRequiredNullWhenNoMinimumRequirements() throws Exception {
-        when(response.getMinimumRequirements()).thenReturn(new ArrayList<>());
-        when(response.getTimeFences()).thenReturn(new ArrayList<>());
-        when(response.getGeoFences()).thenReturn(new ArrayList<>());
+        when(response.getMinimumRequirements()).thenReturn(new ArrayList<AuthPolicy.MinimumRequirement>());
+        when(response.getTimeFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.TimeFence>());
+        when(response.getGeoFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.Location>());
         when(response.getDeviceIntegrity()).thenReturn(null);
         PolicyAdapter adapter = client.getServicePolicy(serviceId);
         ServicePolicy servicePolicy = (ServicePolicy) adapter;
@@ -211,9 +211,9 @@ public class BasicDirectoryClientGetServicePolicyTest {
     @SuppressWarnings("Duplicates")
     @Test
     public void isPossessionFactorRequiredNullWhenNoMinimumRequirements() throws Exception {
-        when(response.getMinimumRequirements()).thenReturn(new ArrayList<>());
-        when(response.getTimeFences()).thenReturn(new ArrayList<>());
-        when(response.getGeoFences()).thenReturn(new ArrayList<>());
+        when(response.getMinimumRequirements()).thenReturn(new ArrayList<AuthPolicy.MinimumRequirement>());
+        when(response.getTimeFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.TimeFence>());
+        when(response.getGeoFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.Location>());
         when(response.getDeviceIntegrity()).thenReturn(null);
         PolicyAdapter adapter = client.getServicePolicy(serviceId);
         ServicePolicy servicePolicy = (ServicePolicy) adapter;
