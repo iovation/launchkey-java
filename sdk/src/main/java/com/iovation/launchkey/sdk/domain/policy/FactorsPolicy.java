@@ -1,14 +1,13 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
 import java.util.List;
-import java.util.Set;
 
-public class FactorsPolicy implements Policy, InOrOutPolicy {
+public class FactorsPolicy implements Policy {
 
     private Boolean denyRootedJailbroken = false;
     private Boolean denyEmulatorSimulator = false;
     private List<Fence> fences;
-    private Set<Factor> factors;
+    private List<Factor> factors;
 
     public FactorsPolicy() {
         this.denyRootedJailbroken = false;
@@ -17,7 +16,7 @@ public class FactorsPolicy implements Policy, InOrOutPolicy {
         this.factors = null;
     }
 
-    public FactorsPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Set<Factor> factors) {
+    public FactorsPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, List<Factor> factors) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
@@ -44,7 +43,7 @@ public class FactorsPolicy implements Policy, InOrOutPolicy {
         return this.fences;
     }
 
-    public Set<Factor> getFactors() {
+    public List<Factor> getFactors() {
         return this.factors;
     }
 

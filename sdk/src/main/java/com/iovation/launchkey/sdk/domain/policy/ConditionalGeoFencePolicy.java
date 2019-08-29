@@ -7,8 +7,8 @@ public class ConditionalGeoFencePolicy implements Policy {
     private Boolean denyRootedJailbroken = false;
     private Boolean denyEmulatorSimulator = false;
     private List<Fence> fences;
-    private InOrOutPolicy inPolicy;
-    private InOrOutPolicy outPolicy;
+    private Policy inPolicy;
+    private Policy outPolicy;
 
     public ConditionalGeoFencePolicy() {
         this.denyEmulatorSimulator = null;
@@ -18,7 +18,7 @@ public class ConditionalGeoFencePolicy implements Policy {
         this.outPolicy = null;
     }
 
-    public ConditionalGeoFencePolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, InOrOutPolicy inPolicy, InOrOutPolicy outPolicy) {
+    public ConditionalGeoFencePolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
@@ -46,11 +46,11 @@ public class ConditionalGeoFencePolicy implements Policy {
         return this.fences;
     }
 
-    public InOrOutPolicy getInPolicy() {
+    public Policy getInPolicy() {
         return this.inPolicy;
     }
 
-    public InOrOutPolicy getOutPolicy() {
+    public Policy getOutPolicy() {
         return this.outPolicy;
     }
 

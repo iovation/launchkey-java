@@ -14,29 +14,61 @@ import java.util.List;
 public class Policy implements PolicyAdapter {
 
     @JsonProperty("type")
-    private String policyType;
+    private final String policyType;
 
     @JsonProperty("deny_rooted_jailbroken")
-    private Boolean denyRootedJailbroken;
+    private final Boolean denyRootedJailbroken;
 
     @JsonProperty("deny_emulator_simulator")
-    private Boolean denyEmulatorSimulator;
+    private final Boolean denyEmulatorSimulator;
 
     @JsonProperty("fences")
-    private List<Fence> fences;
+    private final List<Fence> fences;
 
     @JsonProperty("inside")
-    private Policy inPolicy;
+    private final Policy inPolicy;
 
     @JsonProperty("outside")
-    private Policy outPolicy;
+    private final Policy outPolicy;
 
-    public Policy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy, String policyType) {
+    @JsonProperty("factors")
+    private final List<String> factors;
+
+    public Policy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy, String policyType, List<String> factors) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
         this.inPolicy = inPolicy;
         this.outPolicy = outPolicy;
         this.policyType = policyType;
+        this.factors = factors;
+    }
+
+    public String getPolicyType() {
+        return policyType;
+    }
+
+    public Boolean getDenyRootedJailbroken() {
+        return denyRootedJailbroken;
+    }
+
+    public Boolean getDenyEmulatorSimulator() {
+        return denyEmulatorSimulator;
+    }
+
+    public List<Fence> getFences() {
+        return fences;
+    }
+
+    public Policy getInPolicy() {
+        return inPolicy;
+    }
+
+    public Policy getOutPolicy() {
+        return outPolicy;
+    }
+
+    public List<String> getFactors() {
+        return factors;
     }
 }

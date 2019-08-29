@@ -2,7 +2,7 @@ package com.iovation.launchkey.sdk.domain.policy;
 
 import java.util.List;
 
-public class MethodAmountPolicy implements Policy, InOrOutPolicy {
+public class MethodAmountPolicy implements Policy {
 
     private Boolean denyRootedJailbroken;
     private Boolean denyEmulatorSimulator;

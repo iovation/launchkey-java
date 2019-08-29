@@ -12,7 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
-import com.iovation.launchkey.sdk.domain.policy.Policy;
+import com.iovation.launchkey.sdk.domain.policy.*;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.transport.domain.AuthPolicy;
 
@@ -79,15 +79,60 @@ class ServiceManagingBaseClient {
     Policy getDomainPolicyFromTransportPolicy(
             com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) {
 
-        // TODO: Fill in logic
+        String policyType = transportPolicy.getPolicyType();
+        Boolean denyRootedJailbroken = transportPolicy.getDenyRootedJailbroken();
+        Boolean denyEmulatorSimulator = transportPolicy.getDenyEmulatorSimulator();
+        List<Fence> fences = transportPolicy.getFences();
         Policy domainPolicy = null;
+
+        if (policyType.equals("COND_GEO")) {
+            Policy inPolicy = getDomainPolicyFromTransportPolicy(transportPolicy.getInPolicy());
+            Policy outPolicy = getDomainPolicyFromTransportPolicy(transportPolicy.getOutPolicy());
+            // TODO: Throw error if policy wrong type
+            domainPolicy = new ConditionalGeoFencePolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy);
+        }
+        else if (policyType.equals("METHOD_AMOUNT")) {
+            domainPolicy = new MethodAmountPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences);
+        }
+        else if (policyType.equals("FACTORS")) {
+            List<String> transportFactors = transportPolicy.getFactors();
+            List<Factor> factors = new ArrayList<>();
+            for (String factor : transportFactors) {
+                factors.add(Factor.valueOf(factor));
+            }
+            domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
+        }
         return domainPolicy;
     }
 
     com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) {
 
-        // TODO: Fill in logic
-        com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = null;
-        return transportPolicy;
+        String policyType = domainPolicy.getPolicyType();
+        Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
+        Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
+        List<Fence> fences = domainPolicy.getFences();
+        com.iovation.launchkey.sdk.transport.domain.Policy inPolicy = null;
+        com.iovation.launchkey.sdk.transport.domain.Policy outPolicy = null;
+        List<String> factors = new ArrayList<>();
+
+        if (domainPolicy instanceof ConditionalGeoFencePolicy) {
+            ConditionalGeoFencePolicy condGeoPolicy = (ConditionalGeoFencePolicy) domainPolicy;
+            Policy condInPolicy = condGeoPolicy.getInPolicy();
+            Policy condOutPolicy = condGeoPolicy.getOutPolicy();
+            // TODO: Throw error if policy wrong type
+            inPolicy = getTransportPolicyFromDomainPolicy(condInPolicy);
+            outPolicy = getTransportPolicyFromDomainPolicy(condOutPolicy);
+        }
+        else if (domainPolicy instanceof MethodAmountPolicy) {
+            // TODO: Fill in or remove
+        }
+        else if (domainPolicy instanceof FactorsPolicy) {
+            List<Factor> domainFactors = ((FactorsPolicy) domainPolicy).getFactors();
+            for (Factor factor : domainFactors) {
+                factors.add(factor.toString());
+            }
+        }
+
+        return new com.iovation.launchkey.sdk.transport.domain.Policy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy,policyType,factors);
     }
 }
