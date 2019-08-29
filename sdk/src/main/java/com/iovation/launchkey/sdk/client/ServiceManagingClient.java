@@ -297,11 +297,12 @@ public interface ServiceManagingClient {
      * @throws MarshallingError When the response cannot be marshaled
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
+     * @throws UnknownPolicyException When an unknown policy type is received.
      */
     PolicyAdapter getServicePolicy(UUID serviceId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError;
+            CryptographyError, UnknownPolicyException;
 
     /**
      * Update the default authorization policy for a Service
@@ -322,12 +323,13 @@ public interface ServiceManagingClient {
      * often due to invalid dependencies being provided or algorithms not being supported by the JCE provider.
      * @throws MarshallingError When the response cannot be marshaled
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @throws UnknownPolicyException When an unknown policy type is passed in.
      * the signature of the response
      */
     void setServicePolicy(UUID serviceId, PolicyAdapter policy)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError;
+            CryptographyError, UnknownPolicyException;
 
     /**
      * Remove the dDefault authorization policy for a Service
