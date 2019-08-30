@@ -408,7 +408,9 @@ public interface Transport {
      * @throws InvalidResponseException When the response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @deprecated Use directoryV3PolicyItemPost instead
      */
+    @Deprecated
     ServicePolicy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request, EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException;
@@ -856,7 +858,9 @@ public interface Transport {
      * @throws InvalidResponseException When the response received cannot be processed
      * @throws InvalidCredentialsException When the credentials supplied are not valid
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * @deprecated Use organizationV3PolicyItemPost
      */
+    @Deprecated
     ServicePolicy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request, EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException;

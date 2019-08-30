@@ -53,7 +53,7 @@ public class BasicDirectoryClientGetServicePolicyTest {
     @Before
     public void setUp() throws Exception {
         client = new BasicDirectoryClient(directoryId, transport);
-        when(transport.directoryV3ServicePolicyItemPost(any(ServicePolicyItemPostRequest.class),
+        when(transport.directoryV3PolicyItemPost(any(ServicePolicyItemPostRequest.class),
                 any(EntityIdentifier.class))).thenReturn(response);
     }
 
@@ -61,7 +61,7 @@ public class BasicDirectoryClientGetServicePolicyTest {
     public void sendsSubjectEntityType() throws Exception {
         client.getServicePolicy(serviceId);
         verify(transport)
-                .directoryV3ServicePolicyItemPost(any(ServicePolicyItemPostRequest.class), entityCaptor.capture());
+                .directoryV3PolicyItemPost(any(ServicePolicyItemPostRequest.class), entityCaptor.capture());
         assertEquals(EntityIdentifier.EntityType.DIRECTORY, entityCaptor.getValue().getType());
     }
 
@@ -69,14 +69,14 @@ public class BasicDirectoryClientGetServicePolicyTest {
     public void sendsSubjectEntityId() throws Exception {
         client.getServicePolicy(serviceId);
         verify(transport)
-                .directoryV3ServicePolicyItemPost(any(ServicePolicyItemPostRequest.class), entityCaptor.capture());
+                .directoryV3PolicyItemPost(any(ServicePolicyItemPostRequest.class), entityCaptor.capture());
         assertEquals(directoryId, entityCaptor.getValue().getId());
     }
 
     @Test
     public void sendsServiceId() throws Exception {
         client.getServicePolicy(serviceId);
-        verify(transport).directoryV3ServicePolicyItemPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        verify(transport).directoryV3PolicyItemPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(serviceId, requestCaptor.getValue().getServiceId());
     }
 

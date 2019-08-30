@@ -55,7 +55,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
     @Before
     public void setUp() throws Exception {
         client = new BasicOrganizationClient(organizationId, transport);
-        when(transport.organizationV3ServicePolicyItemPost(any(ServicePolicyItemPostRequest.class),
+        when(transport.organizationV3PolicyItemPost(any(ServicePolicyItemPostRequest.class),
                 any(EntityIdentifier.class))).thenReturn(response);
     }
 
@@ -63,7 +63,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
     public void sendsSubjectEntityType() throws Exception {
         client.getServicePolicy(serviceId);
         verify(transport)
-                .organizationV3ServicePolicyItemPost(any(ServicePolicyItemPostRequest.class), entityCaptor.capture());
+                .organizationV3PolicyItemPost(any(ServicePolicyItemPostRequest.class), entityCaptor.capture());
         assertEquals(EntityIdentifier.EntityType.ORGANIZATION, entityCaptor.getValue().getType());
     }
 
@@ -71,14 +71,14 @@ public class BasicOrganizationClientGetServicePolicyTest {
     public void sendsSubjectEntityId() throws Exception {
         client.getServicePolicy(serviceId);
         verify(transport)
-                .organizationV3ServicePolicyItemPost(any(ServicePolicyItemPostRequest.class), entityCaptor.capture());
+                .organizationV3PolicyItemPost(any(ServicePolicyItemPostRequest.class), entityCaptor.capture());
         assertEquals(organizationId, entityCaptor.getValue().getId());
     }
 
     @Test
     public void sendsServiceId() throws Exception {
         client.getServicePolicy(serviceId);
-        verify(transport).organizationV3ServicePolicyItemPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        verify(transport).organizationV3PolicyItemPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(serviceId, requestCaptor.getValue().getServiceId());
     }
 

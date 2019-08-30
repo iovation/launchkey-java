@@ -594,7 +594,6 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
-    @Deprecated
     public ServicePolicy organizationV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
                                                              EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
@@ -716,7 +715,6 @@ public class ApacheHttpTransport implements Transport {
     }
 
     @Override
-    @Deprecated
     public ServicePolicy directoryV3ServicePolicyItemPost(ServicePolicyItemPostRequest request,
                                                           EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
