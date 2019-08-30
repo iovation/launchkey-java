@@ -11,6 +11,7 @@ package com.iovation.launchkey.sdk.transport.apachehttp; /**
  */
 
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
+import com.iovation.launchkey.sdk.transport.domain.PolicyAdapter;
 import com.iovation.launchkey.sdk.transport.domain.ServicePolicy;
 import com.iovation.launchkey.sdk.transport.domain.ServicePolicyItemPostRequest;
 import org.junit.Before;
@@ -46,27 +47,27 @@ public class ApacheHttpTransportOrganizationV3ServicePolicyItemPostTest extends 
 
     @Test
     public void sendsRequestWithProperMethodAndPath() throws Exception {
-        transport.organizationV3ServicePolicyItemPost(request, entityIdentifier);
+        transport.organizationV3PolicyItemPost(request, entityIdentifier);
         verifyCall("POST", URI.create(baseUrl.concat("/organization/v3/service/policy/item")));
     }
 
     @Test
     public void marshalsExpectedRequestData() throws Exception {
-        transport.organizationV3ServicePolicyItemPost(request, entityIdentifier);
+        transport.organizationV3PolicyItemPost(request, entityIdentifier);
         verify(objectMapper).writeValueAsString(request);
     }
 
     @Test
     public void encryptsDataWithMarshaledValue() throws Exception {
         when(objectMapper.writeValueAsString(any(Object.class))).thenReturn("Expected");
-        transport.organizationV3ServicePolicyItemPost(request, entityIdentifier);
+        transport.organizationV3PolicyItemPost(request, entityIdentifier);
         verify(jweService).encrypt(eq("Expected"), any(PublicKey.class), anyString(), anyString());
     }
 
     @Test
     public void requestSubjectIsUsedForSignature() throws Exception {
         when(entityIdentifier.toString()).thenReturn("Expected");
-        transport.organizationV3ServicePolicyItemPost(request, entityIdentifier);
+        transport.organizationV3PolicyItemPost(request, entityIdentifier);
         verify(jwtService)
                 .encode(anyString(), anyString(), eq("Expected"), any(Date.class), anyString(), anyString(),
                         anyString(),
@@ -77,7 +78,8 @@ public class ApacheHttpTransportOrganizationV3ServicePolicyItemPostTest extends 
     @Test
     public void responseIsParsedProperlyAndReturned() throws Exception {
         when(objectMapper.readValue(anyString(), eq(ServicePolicy.class))).thenReturn(result);
-        ServicePolicy actual = transport.organizationV3ServicePolicyItemPost(request, entityIdentifier);
+        PolicyAdapter adapter = transport.organizationV3PolicyItemPost(request, entityIdentifier);
+        ServicePolicy actual = (ServicePolicy) adapter;
         verify(objectMapper).readValue(anyString(), eq(ServicePolicy.class));
         assertEquals(result, actual);
     }

@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.DirectoryClient;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
 import cucumber.api.java.After;
@@ -46,7 +47,8 @@ public class DirectoryServicePolicyManager {
     }
 
     public void retrievePolicyForService(UUID serviceId) throws Throwable {
-        ServicePolicy policy = getDirectoryClient().getServicePolicy(serviceId);
+        PolicyAdapter adapter = getDirectoryClient().getServicePolicy(serviceId);
+        ServicePolicy policy = (ServicePolicy) adapter;
         currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
     }
 
