@@ -7,6 +7,7 @@ public class MethodAmountPolicy implements Policy {
     private Boolean denyRootedJailbroken;
     private Boolean denyEmulatorSimulator;
     private List<Fence> fences;
+    private int amount;
 
     public MethodAmountPolicy() {
         this.denyEmulatorSimulator = false;
@@ -14,10 +15,11 @@ public class MethodAmountPolicy implements Policy {
         this.fences = null;
     }
 
-    public MethodAmountPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences) {
+    public MethodAmountPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, int amountOfFactors) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
+        this.amount = amountOfFactors;
     }
 
     @Override
@@ -34,5 +36,7 @@ public class MethodAmountPolicy implements Policy {
     public List<Fence> getFences() {
         return this.fences;
     }
+
+    public int getAmount() { return amount; }
 
 }

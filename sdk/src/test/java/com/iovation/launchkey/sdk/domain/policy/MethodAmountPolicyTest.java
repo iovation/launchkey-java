@@ -11,20 +11,25 @@ public class MethodAmountPolicyTest {
 
     @Test
     public void getDenyRootedJailbroken() throws Exception {
-        assertTrue(new MethodAmountPolicy(true,false,null).getDenyRootedJailbroken());
+        assertTrue(new MethodAmountPolicy(true,false,null, 0).getDenyRootedJailbroken());
         assertFalse(new MethodAmountPolicy().getDenyEmulatorSimulator());
     }
 
     @Test
     public void getDenyEmulatorSimulator() throws Exception {
-        assertTrue(new MethodAmountPolicy(false,true,null).getDenyEmulatorSimulator());
+        assertTrue(new MethodAmountPolicy(false,true,null,0).getDenyEmulatorSimulator());
+    }
+
+    @Test
+    public void getAmount() throws Exception {
+        assertEquals(new MethodAmountPolicy(false,true,null,5).getAmount(), 5);
     }
 
     @Test
     public void getFences() throws Exception {
         List<Fence> fences = new ArrayList<>();
         fences.add(new GeoCircleFence("aFence", 0,0,5));
-        MethodAmountPolicy methodPolicy = new MethodAmountPolicy(false,false, fences);
+        MethodAmountPolicy methodPolicy = new MethodAmountPolicy(false,false, fences, 0);
         assertEquals(fences,methodPolicy.getFences());
     }
 }

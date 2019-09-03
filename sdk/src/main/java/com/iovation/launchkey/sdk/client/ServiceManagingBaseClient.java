@@ -80,30 +80,33 @@ class ServiceManagingBaseClient {
     Policy getDomainPolicyFromTransportPolicy(
             com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) throws UnknownPolicyException  {
 
-        String policyType = transportPolicy.getPolicyType();
-        Boolean denyRootedJailbroken = transportPolicy.getDenyRootedJailbroken();
-        Boolean denyEmulatorSimulator = transportPolicy.getDenyEmulatorSimulator();
-        // TODO: Need a seralizer for fences
-        List<Fence> fences = null; // transportPolicy.getFences();
+        // TODO: Write conversion after domain and transport objects are finalized
         Policy domainPolicy = null;
-
-        if (policyType.equals("COND_GEO")) {
-            Policy inPolicy = getDomainPolicyFromTransportPolicy(transportPolicy.getInPolicy());
-            Policy outPolicy = getDomainPolicyFromTransportPolicy(transportPolicy.getOutPolicy());
-            checkForUnknownPolicyFormat(inPolicy,outPolicy);
-            domainPolicy = new ConditionalGeoFencePolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy);
-        }
-        else if (policyType.equals("METHOD_AMOUNT")) {
-            domainPolicy = new MethodAmountPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences);
-        }
-        else if (policyType.equals("FACTORS")) {
-            List<String> transportFactors = transportPolicy.getFactors();
-            List<Factor> factors = new ArrayList<>();
-            for (String factor : transportFactors) {
-                factors.add(Factor.valueOf(factor));
-            }
-            domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
-        }
+//        String policyType = transportPolicy.getPolicyType();
+//        Boolean denyRootedJailbroken = transportPolicy.getDenyRootedJailbroken();
+//        Boolean denyEmulatorSimulator = transportPolicy.getDenyEmulatorSimulator();
+//        // TODO: Need a seralizer for fences
+//        List<Fence> fences = null; // transportPolicy.getFences();
+//
+//
+//        if (policyType.equals("COND_GEO")) {
+//            Policy inPolicy = getDomainPolicyFromTransportPolicy(transportPolicy.getInPolicy());
+//            Policy outPolicy = getDomainPolicyFromTransportPolicy(transportPolicy.getOutPolicy());
+//            checkForUnknownPolicyFormat(inPolicy,outPolicy);
+//            domainPolicy = new ConditionalGeoFencePolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy);
+//        }
+//        else if (policyType.equals("METHOD_AMOUNT")) {
+//            // TODO: Get amount of factors
+//            domainPolicy = new MethodAmountPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,0);
+//        }
+//        else if (policyType.equals("FACTORS")) {
+//            List<String> transportFactors = transportPolicy.getFactors();
+//            List<Factor> factors = new ArrayList<>();
+//            for (String factor : transportFactors) {
+//                factors.add(Factor.valueOf(factor));
+//            }
+//            domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
+//        }
         return domainPolicy;
     }
 
@@ -138,8 +141,9 @@ class ServiceManagingBaseClient {
                 factors.add(factor.toString());
             }
         }
-
-        return new com.iovation.launchkey.sdk.transport.domain.Policy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy,policyType,factors);
+        // TODO: Write conversion after domain and transport objects are finalized
+        //return new com.iovation.launchkey.sdk.transport.domain.Policy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy,policyType,factors);
+        return null;
     }
 
     private void checkForUnknownPolicyFormat(Policy condInPolicy, Policy condOutPolicy) throws UnknownPolicyException {

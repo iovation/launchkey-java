@@ -20,7 +20,7 @@ public class ConditionalGeoFencePolicyTest {
 
     @Test
     public void getInPolicy() throws Exception {
-        Policy inPolicy = new MethodAmountPolicy(true,false,null);
+        Policy inPolicy = new MethodAmountPolicy(true,false,null,0);
         ConditionalGeoFencePolicy conGeoPolicy = new ConditionalGeoFencePolicy(false,false,null, inPolicy,null);
         assertEquals(conGeoPolicy.getInPolicy(),inPolicy);
         assertTrue(conGeoPolicy.getInPolicy().getDenyRootedJailbroken());
@@ -28,7 +28,7 @@ public class ConditionalGeoFencePolicyTest {
 
     @Test
     public void getOutPolicy() throws Exception {
-        Policy outPolicy = new MethodAmountPolicy(false,true,null);
+        Policy outPolicy = new MethodAmountPolicy(false,true,null,0);
         ConditionalGeoFencePolicy conGeoPolicy = new ConditionalGeoFencePolicy(false,false,null, null, outPolicy);
         assertEquals(conGeoPolicy.getOutPolicy(),outPolicy);
         assertTrue(conGeoPolicy.getOutPolicy().getDenyEmulatorSimulator());

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"name", "type", "latitude", "longitude", "radius"})
+@JsonPropertyOrder({"type", "name", "latitude", "longitude", "radius"})
 public class GeoCircleFence implements Fence {
 
     @JsonProperty("name")
