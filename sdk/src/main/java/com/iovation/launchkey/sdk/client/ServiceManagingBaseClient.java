@@ -83,7 +83,8 @@ class ServiceManagingBaseClient {
         String policyType = transportPolicy.getPolicyType();
         Boolean denyRootedJailbroken = transportPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = transportPolicy.getDenyEmulatorSimulator();
-        List<Fence> fences = transportPolicy.getFences();
+        // TODO: Need a seralizer for fences
+        List<Fence> fences = null; // transportPolicy.getFences();
         Policy domainPolicy = null;
 
         if (policyType.equals("COND_GEO")) {
@@ -111,7 +112,9 @@ class ServiceManagingBaseClient {
         String policyType = null;
         Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
-        List<Fence> fences = domainPolicy.getFences();
+        // TODO: Need seralizer for fences
+        //List<Fence> fences = domainPolicy.getFences();
+        List<com.iovation.launchkey.sdk.transport.domain.Fence> fences = null;
         com.iovation.launchkey.sdk.transport.domain.Policy inPolicy = null;
         com.iovation.launchkey.sdk.transport.domain.Policy outPolicy = null;
         List<String> factors = new ArrayList<>();

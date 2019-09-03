@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"name", "type", "country", "administrative_area", "postal_code"})
-public class TerritoryFence {
+public class TerritoryFence implements Fence {
 
     @JsonProperty("name")
     private final String fenceName;
