@@ -160,14 +160,14 @@ class ServiceManagingBaseClient {
         return transportPolicy;
     }
 
-    Fence getDomainFenceFromTransportFence(com.iovation.launchkey.sdk.transport.domain.Fence transportFence) throws UnknownPolicyException {
+    private Fence getDomainFenceFromTransportFence(com.iovation.launchkey.sdk.transport.domain.Fence transportFence) throws UnknownPolicyException {
         Fence domainFence = null;
         if (transportFence instanceof com.iovation.launchkey.sdk.transport.domain.GeoCircleFence) {
             com.iovation.launchkey.sdk.transport.domain.GeoCircleFence geoCircleFence = (com.iovation.launchkey.sdk.transport.domain.GeoCircleFence) transportFence;
             String name = geoCircleFence.getFenceName();
-            Double latitude = geoCircleFence.getLatitude();
-            Double longitude = geoCircleFence.getLongitude();
-            Double radius = geoCircleFence.getRadius();
+            double latitude = geoCircleFence.getLatitude();
+            double longitude = geoCircleFence.getLongitude();
+            double radius = geoCircleFence.getRadius();
             domainFence = new GeoCircleFence(name,latitude,longitude,radius);
         }
         else if (transportFence instanceof com.iovation.launchkey.sdk.transport.domain.TerritoryFence) {
@@ -181,18 +181,17 @@ class ServiceManagingBaseClient {
         else {
             throw new UnknownPolicyException("Unknown fence type",null,null);
         }
-
         return domainFence;
     }
 
-    com.iovation.launchkey.sdk.transport.domain.Fence getTransportFenceFromDomainFence(Fence domainFence) throws UnknownPolicyException {
+    private com.iovation.launchkey.sdk.transport.domain.Fence getTransportFenceFromDomainFence(Fence domainFence) throws UnknownPolicyException {
         com.iovation.launchkey.sdk.transport.domain.Fence transportFence = null;
         if (domainFence instanceof GeoCircleFence) {
             GeoCircleFence geoCircleFence = (GeoCircleFence) domainFence;
             String name = geoCircleFence.getFenceName();
-            Double latitude = geoCircleFence.getLatitude();
-            Double longitude = geoCircleFence.getLongitude();
-            Double radius = geoCircleFence.getRadius();
+            double latitude = geoCircleFence.getLatitude();
+            double longitude = geoCircleFence.getLongitude();
+            double radius = geoCircleFence.getRadius();
             transportFence = new com.iovation.launchkey.sdk.transport.domain.GeoCircleFence(name,latitude,longitude,radius);
         }
         else if (domainFence instanceof TerritoryFence) {
