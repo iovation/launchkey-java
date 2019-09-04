@@ -29,4 +29,24 @@ public class GeoCircleFence implements Fence {
         this.longitude = longitude;
         this.radius = radius;
     }
+
+    public String getFenceName() {
+        return fenceName;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

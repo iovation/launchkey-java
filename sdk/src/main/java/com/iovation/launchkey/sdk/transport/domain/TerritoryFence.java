@@ -28,4 +28,24 @@ public class TerritoryFence implements Fence {
         this.administrativeArea = administrativeArea;
         this.postalCode = postalCode;
     }
+
+    public String getFenceName() {
+        return fenceName;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getAdministrativeArea() {
+        return administrativeArea;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public String getType() {
+        return type;
+    }
 }
