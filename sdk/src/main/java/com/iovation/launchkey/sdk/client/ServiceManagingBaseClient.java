@@ -220,10 +220,9 @@ class ServiceManagingBaseClient {
             if (o) {
                 throw new UnknownPolicyException("Unknown policy type",null,null);
             }
-            // TODO: What is this check for???
-            else if ((condInPolicy.getFences() != null) || (condOutPolicy.getFences() != null)) {
-                throw new UnknownPolicyException("Unknown policy type",null,null);
-            }
+        }
+        if ((condInPolicy.getFences() != null) || (condOutPolicy.getFences() != null)) {
+            throw new UnknownPolicyException("Fences are not allowed on Inside or Outside Policy objects",null,null);
         }
     }
 }
