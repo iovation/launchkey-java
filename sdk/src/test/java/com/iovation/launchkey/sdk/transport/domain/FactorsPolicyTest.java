@@ -35,4 +35,44 @@ public class FactorsPolicyTest {
 
         assertEquals(expected,actual);
     }
+
+    @Test
+    public void getPolicyType() {
+        FactorsPolicy policy = new FactorsPolicy(null,null,null,null);
+        assertEquals(policy.getPolicyType(),"FACTORS");
+    }
+
+    @Test
+    public void getDenyRootedJailbroken() {
+        Boolean expected = true;
+        FactorsPolicy policy = new FactorsPolicy(expected,null,null,null);
+        assertEquals(policy.getDenyRootedJailbroken(),expected);
+    }
+
+    @Test
+    public void getDenyEmulatorSimulator() {
+        Boolean expected = true;
+        FactorsPolicy policy = new FactorsPolicy(null,expected,null,null);
+        assertEquals(policy.getDenyEmulatorSimulator(),expected);
+    }
+
+    @Test
+    public void getFences() {
+        List<Fence> expected = new ArrayList<>();
+        Fence geoCircleFence = new GeoCircleFence("a GeoCircle Fence", 1,1,1);
+        Fence territorialFence = new TerritoryFence("a Territory Fence", "country", "Admin Area", "ABCDE6");
+        expected.add(geoCircleFence);
+        expected.add(territorialFence);
+        FactorsPolicy policy = new FactorsPolicy(null,null,expected,null);
+        assertEquals(policy.getFences(),expected);
+    }
+
+    @Test
+    public void getFactors() {
+        List<String> expected = new ArrayList<>();
+        expected.add(Factor.INHERENCE.toString());
+        expected.add(Factor.POSSESSION.toString());
+        FactorsPolicy policy = new FactorsPolicy(null,null,null,expected);
+        assertEquals(policy.getFactors(),expected);
+    }
 }
