@@ -9,11 +9,17 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class PolicyTest {
+public class ConditionalGeoFencePolicyTest {
     @Test
     public void fullObjectMapperMapsAsExpected() throws Exception {
 
-        String expected = "";
+        String expected = "{\"type\":\"COND_GEO\",\"deny_rooted_jailbroken\":true,\"deny_emulator_simulator\":true," +
+                "\"fences\":[{\"type\":\"GEO_CIRCLE\",\"name\":\"a GeoCircle Fence\",\"latitude\":1.0," +
+                "\"longitude\":1.0,\"radius\":1.0},{\"type\":\"TERRITORY\",\"name\":\"a Territory Fence\"," +
+                "\"country\":\"country\",\"administrative_area\":\"Admin Area\",\"postal_code\":\"ABCDE6\"}]," +
+                "\"inside\":{\"type\":\"FACTORS\",\"deny_rooted_jailbroken\":false,\"deny_emulator_simulator\":false," +
+                "\"factors\":[\"KNOWLEDGE\"]},\"outside\":{\"type\":\"FACTORS\",\"deny_rooted_jailbroken\":false," +
+                "\"deny_emulator_simulator\":false,\"factors\":[\"INHERENCE\",\"POSSESSION\"]}}";
 
         List<String> inPolicyFactors = new ArrayList<>();
         inPolicyFactors.add(Factor.KNOWLEDGE.toString());
@@ -34,7 +40,7 @@ public class PolicyTest {
 
         String actual = new ObjectMapper().writeValueAsString(policy);
 
-       // assertEquals(expected,actual);
+        assertEquals(expected,actual);
     }
 
 
