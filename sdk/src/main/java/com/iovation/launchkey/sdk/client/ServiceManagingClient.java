@@ -302,7 +302,7 @@ public interface ServiceManagingClient {
     PolicyAdapter getServicePolicy(UUID serviceId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError, UnknownPolicyException;
+            CryptographyError, UnknownPolicyException, UnknownFenceTypeException;
 
     /**
      * Update the default authorization policy for a Service
@@ -329,7 +329,7 @@ public interface ServiceManagingClient {
     void setServicePolicy(UUID serviceId, PolicyAdapter policy)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError, UnknownPolicyException;
+            CryptographyError, UnknownPolicyException, UnknownFenceTypeException;
 
     /**
      * Remove the dDefault authorization policy for a Service
