@@ -1,9 +1,8 @@
 package com.iovation.launchkey.sdk.transport.domain;
-import com.fasterxml.jackson.annotation.JsonInclude;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"type", "name", "country", "administrative_area", "postal_code"})
 public class TerritoryFence implements Fence {
 
