@@ -10,8 +10,6 @@ public class FactorsPolicy implements Policy {
     private List<Factor> factors;
 
     public FactorsPolicy() {
-        this.denyRootedJailbroken = false;
-        this.denyEmulatorSimulator = false;
         this.fences = null;
         this.factors = null;
     }

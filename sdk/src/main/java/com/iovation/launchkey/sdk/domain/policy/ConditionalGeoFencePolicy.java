@@ -11,8 +11,6 @@ public class ConditionalGeoFencePolicy implements Policy {
     private Policy outPolicy;
 
     public ConditionalGeoFencePolicy() {
-        this.denyEmulatorSimulator = null;
-        this.denyEmulatorSimulator = null;
         this.fences = null;
         this.inPolicy = null;
         this.outPolicy = null;

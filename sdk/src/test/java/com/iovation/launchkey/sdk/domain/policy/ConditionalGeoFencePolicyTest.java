@@ -42,4 +42,14 @@ public class ConditionalGeoFencePolicyTest {
         assertEquals(fences,conGeoPolicy.getFences());
     }
 
+    @Test
+    public void defaultConstructor() throws Exception {
+        ConditionalGeoFencePolicy policy = new ConditionalGeoFencePolicy();
+        assertNull(policy.getInPolicy());
+        assertNull(policy.getOutPolicy());
+        assertFalse(policy.getDenyEmulatorSimulator());
+        assertFalse(policy.getDenyRootedJailbroken());
+        assertNull(policy.getFences());
+    }
+
 }

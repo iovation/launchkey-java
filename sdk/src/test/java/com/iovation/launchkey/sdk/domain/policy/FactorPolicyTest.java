@@ -5,8 +5,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
 
 public class FactorPolicyTest {
 
@@ -35,5 +35,14 @@ public class FactorPolicyTest {
         factors.add(Factor.POSSESSION);
         FactorsPolicy factorsPolicy = new FactorsPolicy(false,false, null, factors);
         assertEquals(factors,factorsPolicy.getFactors());
+    }
+
+    @Test
+    public void defaultConstructor() throws Exception {
+        FactorsPolicy policy = new FactorsPolicy();
+        assertFalse(policy.getDenyEmulatorSimulator());
+        assertFalse(policy.getDenyRootedJailbroken());
+        assertNull(policy.getFences());
+        assertNull(policy.getFactors());
     }
 }

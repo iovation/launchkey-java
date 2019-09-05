@@ -4,15 +4,14 @@ import java.util.List;
 
 public class MethodAmountPolicy implements Policy {
 
-    private Boolean denyRootedJailbroken;
-    private Boolean denyEmulatorSimulator;
+    private Boolean denyRootedJailbroken = false;
+    private Boolean denyEmulatorSimulator = false;
     private List<Fence> fences;
     private int amount;
 
     public MethodAmountPolicy() {
-        this.denyEmulatorSimulator = false;
-        this.denyEmulatorSimulator = false;
         this.fences = null;
+        this.amount = 0;
     }
 
     public MethodAmountPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, int amountOfFactors) {

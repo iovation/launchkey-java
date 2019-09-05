@@ -32,4 +32,13 @@ public class MethodAmountPolicyTest {
         MethodAmountPolicy methodPolicy = new MethodAmountPolicy(false,false, fences, 0);
         assertEquals(fences,methodPolicy.getFences());
     }
+
+    @Test
+    public void defaultConstructor() throws Exception {
+        MethodAmountPolicy policy = new MethodAmountPolicy();
+        assertFalse(policy.getDenyEmulatorSimulator());
+        assertFalse(policy.getDenyRootedJailbroken());
+        assertNull(policy.getFences());
+        assertEquals(policy.getAmount(), 0);
+    }
 }
