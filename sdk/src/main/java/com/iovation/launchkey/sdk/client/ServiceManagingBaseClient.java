@@ -14,6 +14,7 @@ package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.policy.*;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
+import com.iovation.launchkey.sdk.error.UnknownFenceTypeException;
 import com.iovation.launchkey.sdk.error.UnknownPolicyException;
 import com.iovation.launchkey.sdk.transport.domain.AuthPolicy;
 
@@ -78,7 +79,7 @@ class ServiceManagingBaseClient {
     }
 
     Policy getDomainPolicyFromTransportPolicy(
-            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) throws UnknownPolicyException  {
+            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) throws UnknownPolicyException, UnknownFenceTypeException  {
 
         Policy domainPolicy = null;
         String policyType = transportPolicy.getPolicyType();
@@ -118,7 +119,7 @@ class ServiceManagingBaseClient {
         return domainPolicy;
     }
 
-    com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException {
+    com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
         Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
         List<Fence> domainPolicyFences = domainPolicy.getFences();
@@ -160,7 +161,7 @@ class ServiceManagingBaseClient {
         return transportPolicy;
     }
 
-    private Fence getDomainFenceFromTransportFence(com.iovation.launchkey.sdk.transport.domain.Fence transportFence) throws UnknownPolicyException {
+    private Fence getDomainFenceFromTransportFence(com.iovation.launchkey.sdk.transport.domain.Fence transportFence) throws UnknownFenceTypeException {
         Fence domainFence = null;
         if (transportFence instanceof com.iovation.launchkey.sdk.transport.domain.GeoCircleFence) {
             com.iovation.launchkey.sdk.transport.domain.GeoCircleFence geoCircleFence = (com.iovation.launchkey.sdk.transport.domain.GeoCircleFence) transportFence;
@@ -179,12 +180,12 @@ class ServiceManagingBaseClient {
             domainFence = new TerritoryFence(country,adminArea,postalCode,name);
         }
         else {
-            throw new UnknownPolicyException("Unknown fence type",null,null);
+            throw new UnknownFenceTypeException("Unknown fence type",null,null);
         }
         return domainFence;
     }
 
-    private com.iovation.launchkey.sdk.transport.domain.Fence getTransportFenceFromDomainFence(Fence domainFence) throws UnknownPolicyException {
+    private com.iovation.launchkey.sdk.transport.domain.Fence getTransportFenceFromDomainFence(Fence domainFence) throws UnknownFenceTypeException {
         com.iovation.launchkey.sdk.transport.domain.Fence transportFence = null;
         if (domainFence instanceof GeoCircleFence) {
             GeoCircleFence geoCircleFence = (GeoCircleFence) domainFence;
@@ -204,7 +205,7 @@ class ServiceManagingBaseClient {
 
         }
         else {
-            throw new UnknownPolicyException("Unknown fence type",null,null);
+            throw new UnknownFenceTypeException("Unknown fence type",null,null);
         }
         return transportFence;
     }
@@ -222,7 +223,7 @@ class ServiceManagingBaseClient {
             }
         }
         if ((condInPolicy.getFences() != null) || (condOutPolicy.getFences() != null)) {
-            throw new UnknownPolicyException("Fences are not allowed on Inside or Outside Policy objects",null,null);
+            throw new UnknownPolicyException("Fences are not supported on Inside or Outside Policy objects",null,null);
         }
     }
 }
