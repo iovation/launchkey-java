@@ -125,13 +125,16 @@ class ServiceManagingBaseClient {
         Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
         List<Fence> domainPolicyFences = domainPolicy.getFences();
-        List<com.iovation.launchkey.sdk.transport.domain.Fence> fences = new ArrayList<>();
-        for (Fence domainFence : domainPolicyFences) {
-            fences.add(getTransportFenceFromDomainFence(domainFence));
+        List<com.iovation.launchkey.sdk.transport.domain.Fence> fences = null;
+        if (domainPolicyFences != null) {
+            fences = new ArrayList<>();
+            for (Fence domainFence : domainPolicyFences) {
+                fences.add(getTransportFenceFromDomainFence(domainFence));
+            }
         }
         com.iovation.launchkey.sdk.transport.domain.Policy inPolicy = null;
         com.iovation.launchkey.sdk.transport.domain.Policy outPolicy = null;
-        List<String> factors = new ArrayList<>();
+
         com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = null;
 
         if (domainPolicy instanceof ConditionalGeoFencePolicy) {
@@ -151,8 +154,12 @@ class ServiceManagingBaseClient {
         }
         else if (domainPolicy instanceof FactorsPolicy) {
             List<Factor> domainFactors = ((FactorsPolicy) domainPolicy).getFactors();
-            for (Factor factor : domainFactors) {
-                factors.add(factor.toString());
+            List<String> factors = null;
+            if (domainFactors != null) {
+                factors = new ArrayList<>();
+                for (Factor factor : domainFactors) {
+                    factors.add(factor.toString());
+                }
             }
             transportPolicy = new com.iovation.launchkey.sdk.transport.domain.FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
         }
