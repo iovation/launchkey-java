@@ -86,11 +86,13 @@ class ServiceManagingBaseClient {
         Boolean denyRootedJailbroken = transportPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = transportPolicy.getDenyEmulatorSimulator();
         List<com.iovation.launchkey.sdk.transport.domain.Fence> transportPolicyFences = transportPolicy.getFences();
-        List<Fence> fences = new ArrayList<>();
-        for (com.iovation.launchkey.sdk.transport.domain.Fence transportFence : transportPolicyFences ) {
-            fences.add(getDomainFenceFromTransportFence(transportFence));
+        List<Fence> fences = null;
+        if (transportPolicyFences != null) {
+            fences = new ArrayList<>();
+            for (com.iovation.launchkey.sdk.transport.domain.Fence transportFence : transportPolicyFences ) {
+                fences.add(getDomainFenceFromTransportFence(transportFence));
+            }
         }
-
         if (policyType.equals("COND_GEO")) {
             com.iovation.launchkey.sdk.transport.domain.ConditionalGeoFencePolicy conGeoPolicy =
                     (com.iovation.launchkey.sdk.transport.domain.ConditionalGeoFencePolicy) transportPolicy;
@@ -223,6 +225,7 @@ class ServiceManagingBaseClient {
             }
         }
         if ((condInPolicy.getFences() != null) || (condOutPolicy.getFences() != null)) {
+            System.out.println(condInPolicy.getFences().toString());
             throw new UnknownPolicyException("Fences are not supported on Inside or Outside Policy objects",null,null);
         }
     }
