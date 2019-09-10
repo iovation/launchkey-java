@@ -218,7 +218,7 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
     @Override
     public PolicyAdapter getServicePolicy(UUID serviceId)
             throws InvalidResponseException, InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError, UnknownPolicyException, UnknownFenceTypeException {
+            CryptographyError, UnknownPolicyException, UnknownFenceTypeException, InvalidPolicyAttributes {
         com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy =
                 transport.directoryV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), directory);
         PolicyAdapter returnValue = null;

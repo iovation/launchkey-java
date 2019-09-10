@@ -308,7 +308,7 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
     public PolicyAdapter getServicePolicy(UUID serviceId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError, UnknownPolicyException, UnknownFenceTypeException {
+            CryptographyError, UnknownPolicyException, UnknownFenceTypeException, InvalidPolicyAttributes {
         com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy =
                 transport
                         .organizationV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), organization);

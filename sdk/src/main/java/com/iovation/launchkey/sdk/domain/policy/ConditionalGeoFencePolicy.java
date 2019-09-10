@@ -1,5 +1,7 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
+import com.iovation.launchkey.sdk.error.InvalidPolicyAttributes;
+
 import java.util.List;
 
 public class ConditionalGeoFencePolicy implements Policy {
@@ -16,12 +18,21 @@ public class ConditionalGeoFencePolicy implements Policy {
         this.outPolicy = null;
     }
 
-    public ConditionalGeoFencePolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy) {
+    public ConditionalGeoFencePolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy) throws InvalidPolicyAttributes {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
-        this.inPolicy = inPolicy;
-        this.outPolicy = outPolicy;
+        if ((inPolicy instanceof FactorsPolicy) || (inPolicy instanceof MethodAmountPolicy) || (inPolicy == null)) {
+            this.inPolicy = inPolicy;
+        } else {
+            throw new InvalidPolicyAttributes("inPolicy must be of type FactorsPolicy or MethodAmountPolicy", null, null);
+        }
+        if ((outPolicy instanceof FactorsPolicy) || (outPolicy instanceof MethodAmountPolicy) || (outPolicy == null)) {
+            this.outPolicy = outPolicy;
+        } else {
+            throw new InvalidPolicyAttributes("outPolicy must be of type FactorsPolicy or MethodAmountPolicy", null, null);
+        }
+        // TODO: Do I check fences??? If not where are fences checked
     }
 
     @Override

@@ -302,7 +302,7 @@ public interface ServiceManagingClient {
     PolicyAdapter getServicePolicy(UUID serviceId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError, UnknownPolicyException, UnknownFenceTypeException;
+            CryptographyError, UnknownPolicyException, UnknownFenceTypeException, InvalidPolicyAttributes;
 
     /**
      * Update the default authorization policy for a Service

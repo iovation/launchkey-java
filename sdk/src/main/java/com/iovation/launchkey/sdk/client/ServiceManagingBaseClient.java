@@ -14,6 +14,7 @@ package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.policy.*;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
+import com.iovation.launchkey.sdk.error.InvalidPolicyAttributes;
 import com.iovation.launchkey.sdk.error.UnknownFenceTypeException;
 import com.iovation.launchkey.sdk.error.UnknownPolicyException;
 import com.iovation.launchkey.sdk.transport.domain.AuthPolicy;
@@ -79,7 +80,7 @@ class ServiceManagingBaseClient {
     }
 
     Policy getDomainPolicyFromTransportPolicy(
-            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) throws UnknownPolicyException, UnknownFenceTypeException  {
+            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) throws UnknownPolicyException, UnknownFenceTypeException, InvalidPolicyAttributes {
 
         Policy domainPolicy = null;
         String policyType = transportPolicy.getPolicyType();
@@ -141,6 +142,7 @@ class ServiceManagingBaseClient {
             ConditionalGeoFencePolicy condGeoPolicy = (ConditionalGeoFencePolicy) domainPolicy;
             Policy condInPolicy = condGeoPolicy.getInPolicy();
             Policy condOutPolicy = condGeoPolicy.getOutPolicy();
+            // TODO: Is this check necessary??
             checkForUnknownPolicyFormat(condInPolicy, condOutPolicy);
             inPolicy = getTransportPolicyFromDomainPolicy(condInPolicy);
             outPolicy = getTransportPolicyFromDomainPolicy(condOutPolicy);
@@ -232,7 +234,6 @@ class ServiceManagingBaseClient {
             }
         }
         if ((condInPolicy.getFences() != null) || (condOutPolicy.getFences() != null)) {
-            System.out.println(condInPolicy.getFences().toString());
             throw new UnknownPolicyException("Fences are not supported on Inside or Outside Policy objects",null,null);
         }
     }
