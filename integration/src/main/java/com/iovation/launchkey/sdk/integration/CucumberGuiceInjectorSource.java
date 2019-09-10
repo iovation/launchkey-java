@@ -27,6 +27,7 @@ import com.iovation.launchkey.sdk.integration.constants.Launchkey;
 import com.iovation.launchkey.sdk.integration.managers.kobiton.KobitonDevice;
 import com.iovation.launchkey.sdk.integration.managers.kobiton.KobitonManager;
 import com.iovation.launchkey.sdk.integration.managers.kobiton.transport.RequestFactory;
+import com.iovation.launchkey.sdk.integration.mobile.driver.MockSampleAppMobileDriver;
 import com.iovation.launchkey.sdk.integration.mobile.driver.SampleAppMobileDriver;
 import com.iovation.launchkey.sdk.integration.mobile.driver.android.SampleAppAndroidDriver;
 import cucumber.api.guice.CucumberModules;
@@ -151,6 +152,9 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
         }
 
         private SampleAppMobileDriver getMobileDriver() {
+            if (!getPositiveBooleanPropertyElseAddError(Capability.run_device_required_tests)) {
+                return new MockSampleAppMobileDriver();
+            }
             SampleAppMobileDriver mobileDriver = null;
             boolean useKobiton = getPositiveBooleanPropertyElseAddError(Appium.Kobiton.use_kobiton);
             if (useKobiton) {

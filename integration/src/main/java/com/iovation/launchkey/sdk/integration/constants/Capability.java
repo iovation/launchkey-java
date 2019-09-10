@@ -16,6 +16,7 @@ public final class Capability {
     public static final String device_orientation = "Capability.device_orientation";
     public static final String platform_name = "Capability.platform_name";
     public static final String automation_name = "Capability.automation_name";
+    public static final String run_device_required_tests = "Capability.run_device_required_tests";
 
     public static final class Android {
         public static final String app_package = "Capability.android.app_package";
