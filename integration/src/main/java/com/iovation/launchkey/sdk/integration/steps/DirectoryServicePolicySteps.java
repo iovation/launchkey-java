@@ -14,16 +14,22 @@ package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.iovation.launchkey.sdk.domain.policy.Fence;
+import com.iovation.launchkey.sdk.domain.policy.GeoCircleFence;
 import com.iovation.launchkey.sdk.integration.Utils;
+import com.iovation.launchkey.sdk.integration.cucumber.converters.GeoCircleFenceConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.LocationListConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TimeFenceListConverter;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServicePolicyManager;
+import com.iovation.launchkey.sdk.integration.managers.PolicyManager;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,13 +43,15 @@ import static org.hamcrest.Matchers.hasSize;
 public class DirectoryServicePolicySteps {
     private DirectoryServicePolicyManager directoryServicePolicyManager;
     private GenericSteps genericSteps;
+    private PolicyManager policyManager;
 
     @Inject
     public DirectoryServicePolicySteps(
             DirectoryServicePolicyManager directoryServicePolicyManager,
-            GenericSteps genericSteps) {
+            GenericSteps genericSteps, PolicyManager policyManager) {
         this.directoryServicePolicyManager = directoryServicePolicyManager;
         this.genericSteps = genericSteps;
+        this.policyManager = policyManager;
     }
 
     @When("^I retrieve the Policy for the Current Directory Service$")
@@ -191,5 +199,18 @@ public class DirectoryServicePolicySteps {
     @Given("^the Directory Service Policy has the following Geofence locations:$")
     public void theDirectoryServicePolicyHasTheFollowingGeofenceLocations(DataTable dataTable) throws Throwable {
         assertThat(directoryServicePolicyManager.getCurrentServicePolicyEntity().getLocations(), is(equalTo(LocationListConverter.fromDataTable(dataTable))));
+    }
+
+    // TODO: New policy object tests
+    @When("I create a new MethodAmountPolicy")
+    public void iCreateNewMethodAmountPolicy() throws Throwable {
+        policyManager.createMethodAmountPolicy();
+    }
+
+    @And("^I add the following GeoCircleFence items:$")
+    public void iAddGeoCircleFenceToCurrentPolicy(DataTable dataTable) throws Throwable {
+        List<GeoCircleFence> fencesFromFeatureFile = (GeoCircleFenceConverter.fromDataTable(dataTable));
+        List<Fence> fences = new ArrayList<>(fencesFromFeatureFile);
+        policyManager.addFences(fences);
     }
 }
