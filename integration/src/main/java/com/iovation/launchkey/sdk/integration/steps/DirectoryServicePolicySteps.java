@@ -16,13 +16,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.domain.policy.Fence;
 import com.iovation.launchkey.sdk.domain.policy.GeoCircleFence;
+import com.iovation.launchkey.sdk.domain.policy.TerritoryFence;
 import com.iovation.launchkey.sdk.integration.Utils;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.GeoCircleFenceConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.LocationListConverter;
+import com.iovation.launchkey.sdk.integration.cucumber.converters.TerritoryFenceConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TimeFenceListConverter;
-import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServicePolicyManager;
-import com.iovation.launchkey.sdk.integration.managers.PolicyManager;
+import com.iovation.launchkey.sdk.integration.managers.PolicyCache;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -43,15 +44,13 @@ import static org.hamcrest.Matchers.hasSize;
 public class DirectoryServicePolicySteps {
     private DirectoryServicePolicyManager directoryServicePolicyManager;
     private GenericSteps genericSteps;
-    private PolicyManager policyManager;
 
     @Inject
     public DirectoryServicePolicySteps(
             DirectoryServicePolicyManager directoryServicePolicyManager,
-            GenericSteps genericSteps, PolicyManager policyManager) {
+            GenericSteps genericSteps, PolicyCache policyCache) {
         this.directoryServicePolicyManager = directoryServicePolicyManager;
         this.genericSteps = genericSteps;
-        this.policyManager = policyManager;
     }
 
     @When("^I retrieve the Policy for the Current Directory Service$")
@@ -71,7 +70,7 @@ public class DirectoryServicePolicySteps {
 
     @When("^I remove the Policy for the Directory Service$")
     public void iRemoveThePolicyForTheDirectoryService() throws Throwable {
-        directoryServicePolicyManager.removePolicyForCurrentService();
+        directoryServicePolicyManager.removeServicePolicyForCurrentService();
     }
 
     @When("^I attempt to retrieve the Policy for the Directory Service with the ID \"([^\"]*)\"$")
@@ -88,7 +87,7 @@ public class DirectoryServicePolicySteps {
     public void iAttemptToSetThePolicyForTheDirectoryServiceWithTheID(String uuid) throws Throwable {
         UUID serviceId = UUID.fromString(uuid);
         try {
-            directoryServicePolicyManager.setPolicyForService(serviceId);
+            directoryServicePolicyManager.setServicePolicyForService(serviceId);
         } catch (Exception e) {
             genericSteps.setCurrentException(e);
         }
@@ -96,7 +95,7 @@ public class DirectoryServicePolicySteps {
 
     @When("^I set the Policy for the Directory Service$")
     public void iSetThePolicyForTheDirectoryService() throws Throwable {
-        directoryServicePolicyManager.setPolicyForCurrentService();
+        directoryServicePolicyManager.setServicePolicyForCurrentService();
     }
 
     @When("^the Directory Service Policy is set to require (\\d+) factors?$")
@@ -106,7 +105,7 @@ public class DirectoryServicePolicySteps {
 
     @When("^I set the Policy for the Current Directory Service$")
     public void iSetThePolicyForTheCurrentDirectoryService() throws Throwable {
-        directoryServicePolicyManager.setPolicyForCurrentService();
+        directoryServicePolicyManager.setServicePolicyForCurrentService();
     }
 
     @When("^the Directory Service Policy is (not set|set) to require inherence$")
@@ -204,13 +203,25 @@ public class DirectoryServicePolicySteps {
     // TODO: New policy object tests
     @When("I create a new MethodAmountPolicy")
     public void iCreateNewMethodAmountPolicy() throws Throwable {
-        policyManager.createMethodAmountPolicy();
+        directoryServicePolicyManager.policyCache.createMethodAmountPolicy();
     }
 
-    @And("^I add the following GeoCircleFence items:$")
+    @And("^I add the following GeoCircleFence items$")
     public void iAddGeoCircleFenceToCurrentPolicy(DataTable dataTable) throws Throwable {
         List<GeoCircleFence> fencesFromFeatureFile = (GeoCircleFenceConverter.fromDataTable(dataTable));
         List<Fence> fences = new ArrayList<>(fencesFromFeatureFile);
-        policyManager.addFences(fences);
+        directoryServicePolicyManager.policyCache.addFences(fences);
+    }
+
+    @And("^I add the following TerritoryFence items$")
+    public void iAddTerritoryFenceToCurrentPolicy(DataTable dataTable) throws Throwable {
+        List<TerritoryFence> fencesFromFeatureFile = (TerritoryFenceConverter.fromDataTable(dataTable));
+        List<Fence> fences = new ArrayList<>(fencesFromFeatureFile);
+        directoryServicePolicyManager.policyCache.addFences(fences);
+    }
+
+    @And("I set the Policy for the Current Directory Service to the new policy")
+    public void iSetPolicyForCurrentDirectory() throws Throwable {
+        directoryServicePolicyManager.setPolicyForCurrentService();
     }
 }

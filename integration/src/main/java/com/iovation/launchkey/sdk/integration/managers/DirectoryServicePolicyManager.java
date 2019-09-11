@@ -15,7 +15,7 @@ package com.iovation.launchkey.sdk.integration.managers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.DirectoryClient;
-import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
@@ -28,12 +28,16 @@ public class DirectoryServicePolicyManager {
     private final DirectoryManager directoryManager;
     private final DirectoryServiceManager directoryServiceManager;
     private ServicePolicyEntity currentServicePolicyEntity;
+    public PolicyCache policyCache;
+    private Boolean usingNewPolicyFormat;
 
     @Inject
     public DirectoryServicePolicyManager(DirectoryManager directoryManager,
-                                         DirectoryServiceManager directoryServiceManager) {
+                                         DirectoryServiceManager directoryServiceManager,
+                                         PolicyCache policyCache) {
         this.directoryManager = directoryManager;
         this.directoryServiceManager = directoryServiceManager;
+        this.policyCache = policyCache;
         cleanUp();
     }
 
@@ -41,39 +45,60 @@ public class DirectoryServicePolicyManager {
     public void cleanUp() {
         this.currentServicePolicyEntity = new ServicePolicyEntity();
     }
-
-    public ServicePolicyEntity getCurrentServicePolicyEntity() {
-        return currentServicePolicyEntity;
+    private DirectoryClient getDirectoryClient() {
+        return directoryManager.getDirectoryClient();
     }
 
+    // Any Policy
     public void retrievePolicyForService(UUID serviceId) throws Throwable {
         PolicyAdapter adapter = getDirectoryClient().getServicePolicy(serviceId);
-        ServicePolicy policy = (ServicePolicy) adapter;
-        currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
-    }
-
-    public void retrievePolicyForCurrentService() throws Throwable {
-        retrievePolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
+        if (adapter instanceof ServicePolicy) {
+            ServicePolicy policy = (ServicePolicy) adapter;
+            currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
+        }
+        else if (adapter instanceof Policy) {
+            policyCache.setCachedPolicy((Policy) adapter);
+        }
+        else {
+            throw new Throwable("Retrieved Policy of unknown type");
+        }
     }
 
     public void removePolicyForService(UUID serviceId) throws Throwable {
         getDirectoryClient().removeServicePolicy(serviceId);
     }
 
-    public void removePolicyForCurrentService() throws Throwable {
+    public void retrievePolicyForCurrentService() throws Throwable {
+        retrievePolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
+    }
+
+    // Legacy Policy
+
+    public ServicePolicyEntity getCurrentServicePolicyEntity() {
+        return currentServicePolicyEntity;
+    }
+
+    public void removeServicePolicyForCurrentService() throws Throwable {
         removePolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
     }
 
-    public void setPolicyForService(UUID serviceId) throws Throwable {
+    public void setServicePolicyForService(UUID serviceId) throws Throwable {
         getDirectoryClient().setServicePolicy(serviceId, currentServicePolicyEntity.toServicePolicy());
+    }
+
+    public void setServicePolicyForCurrentService() throws Throwable {
+        setServicePolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
+    }
+
+    // New Policy Objects
+
+    private void setPolicyForService(UUID serviceId) throws Throwable {
+        getDirectoryClient().setServicePolicy(serviceId, policyCache.cachedPolicy);
     }
 
     public void setPolicyForCurrentService() throws Throwable {
         setPolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
     }
 
-    private DirectoryClient getDirectoryClient() {
-        return directoryManager.getDirectoryClient();
-    }
 
 }

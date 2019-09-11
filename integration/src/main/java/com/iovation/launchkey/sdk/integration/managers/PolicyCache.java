@@ -13,9 +13,9 @@ import java.util.List;
  * Stores context of policy objects when running feature files
  */
 @Singleton
-public class PolicyManager {
+public class PolicyCache {
 
-    private Policy cachedPolicy;
+    public Policy cachedPolicy;
 
     public void createMethodAmountPolicy() {
         cachedPolicy = new MethodAmountPolicy();
@@ -27,6 +27,10 @@ public class PolicyManager {
 
     public void createConditionalGeoFencePolicy() {
         cachedPolicy = new ConditionalGeoFencePolicy();
+    }
+
+    public void setCachedPolicy(Policy cachedPolicy) {
+        this.cachedPolicy = cachedPolicy;
     }
 
     public void setDenyRootedJailBroken(Boolean newValue) throws InvalidPolicyAttributes {
