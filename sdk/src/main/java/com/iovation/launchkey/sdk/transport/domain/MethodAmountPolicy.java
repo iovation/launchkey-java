@@ -1,5 +1,6 @@
 package com.iovation.launchkey.sdk.transport.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -25,7 +26,11 @@ public class MethodAmountPolicy implements Policy {
     @JsonProperty("amount")
     private final int amount;
 
-    public MethodAmountPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, int amount) {
+    @JsonCreator
+    public MethodAmountPolicy(@JsonProperty("deny_rooted_jailbroken") Boolean denyRootedJailbroken,
+                              @JsonProperty("deny_emulator_simulator") Boolean denyEmulatorSimulator,
+                              @JsonProperty("fences") List<Fence> fences,
+                              @JsonProperty("amount") int amount) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;

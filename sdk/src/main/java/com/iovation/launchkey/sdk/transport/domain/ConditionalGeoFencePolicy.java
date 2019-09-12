@@ -1,5 +1,6 @@
 package com.iovation.launchkey.sdk.transport.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -28,7 +29,12 @@ public class ConditionalGeoFencePolicy implements Policy {
     @JsonProperty("outside")
     private final Policy outPolicy;
 
-    public ConditionalGeoFencePolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy) {
+    @JsonCreator
+    public ConditionalGeoFencePolicy(@JsonProperty("deny_rooted_jailbroken") Boolean denyRootedJailbroken,
+                                     @JsonProperty("deny_emulator_simulator") Boolean denyEmulatorSimulator,
+                                     @JsonProperty("fences") List<Fence> fences,
+                                     @JsonProperty("inside") Policy inPolicy,
+                                     @JsonProperty("outside") Policy outPolicy) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;

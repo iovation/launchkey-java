@@ -1,5 +1,6 @@
 package com.iovation.launchkey.sdk.transport.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -23,7 +24,11 @@ public class GeoCircleFence implements Fence {
     @JsonProperty("type")
     private final String type = "GEO_CIRCLE";
 
-    public GeoCircleFence(String fenceName, double latitude, double longitude, double radius) {
+    @JsonCreator
+    public GeoCircleFence(@JsonProperty("name") String fenceName,
+                          @JsonProperty("latitude") double latitude,
+                          @JsonProperty("longitude") double longitude,
+                          @JsonProperty("radius") double radius) {
         this.fenceName = fenceName;
         this.latitude = latitude;
         this.longitude = longitude;

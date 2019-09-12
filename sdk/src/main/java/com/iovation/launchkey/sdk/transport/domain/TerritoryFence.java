@@ -1,5 +1,6 @@
 package com.iovation.launchkey.sdk.transport.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -21,7 +22,11 @@ public class TerritoryFence implements Fence {
     @JsonProperty("type")
     private final String type = "TERRITORY";
 
-    public TerritoryFence(String fenceName, String country, String administrativeArea, String postalCode) {
+    @JsonCreator
+    public TerritoryFence(@JsonProperty("name") String fenceName,
+                          @JsonProperty("country") String country,
+                          @JsonProperty("administrative_area") String administrativeArea,
+                          @JsonProperty("postal_code") String postalCode) {
         this.fenceName = fenceName;
         this.country = country;
         this.administrativeArea = administrativeArea;

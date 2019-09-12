@@ -735,10 +735,19 @@ public class ApacheHttpTransport implements Transport {
         HttpResponse response =
                 getHttpResponse("POST", "/directory/v3/service/policy/item", subject, request, true, null);
         PolicyAdapter policy;
+        // TODO: YUCK!!
         try {
             policy = decryptResponse(response, ServicePolicy.class);
         } catch(Exception e) {
-            policy = decryptResponse(response, Policy.class);
+            try {
+                policy = decryptResponse(response, ConditionalGeoFencePolicy.class);
+            } catch(Exception e2) {
+                try {
+                    policy = decryptResponse(response, FactorsPolicy.class);
+                } catch(Exception e3) {
+                    policy = decryptResponse(response, MethodAmountPolicy.class);
+                }
+            }
         }
         return policy;
     }
