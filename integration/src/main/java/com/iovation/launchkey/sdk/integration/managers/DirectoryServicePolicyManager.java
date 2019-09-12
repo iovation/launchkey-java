@@ -98,6 +98,4 @@ public class DirectoryServicePolicyManager {
         }
         return (Policy) adapter;
     }
-
-
 }

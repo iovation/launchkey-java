@@ -199,8 +199,6 @@ public class DirectoryServicePolicySteps {
         assertThat(directoryServicePolicyManager.getCurrentServicePolicyEntity().getLocations(), is(equalTo(LocationListConverter.fromDataTable(dataTable))));
     }
 
-    // TODO: Add new policy object tests
-
     @When("^I create a new MethodAmountPolicy$")
     public void iCreateNewMethodAmountPolicy() throws Throwable {
         directoryServicePolicyManager.currentPolicyContext = new MutablePolicy(new MethodAmountPolicy());
