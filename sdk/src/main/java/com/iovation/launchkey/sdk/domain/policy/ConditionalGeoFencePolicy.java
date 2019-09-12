@@ -32,7 +32,7 @@ public class ConditionalGeoFencePolicy implements Policy {
         } else {
             throw new InvalidPolicyAttributes("outPolicy must be of type FactorsPolicy or MethodAmountPolicy", null, null);
         }
-        // TODO: Do I check fences??? If not where are fences checked
+        // TODO: Check fences and sub policy booleans
     }
 
     @Override
