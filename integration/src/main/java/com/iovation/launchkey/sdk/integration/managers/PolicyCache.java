@@ -29,10 +29,6 @@ public class PolicyCache {
         cachedPolicy = new ConditionalGeoFencePolicy();
     }
 
-    public void setCachedPolicy(Policy cachedPolicy) {
-        this.cachedPolicy = cachedPolicy;
-    }
-
     public void setDenyRootedJailBroken(Boolean newValue) throws InvalidPolicyAttributes {
         if (cachedPolicy == null) {
             return;
@@ -67,7 +63,10 @@ public class PolicyCache {
         if (cachedPolicy == null) {
             return;
         }
-        ArrayList<Fence> fences = (ArrayList<Fence>) cachedPolicy.getFences();
+        ArrayList<Fence> fences = new ArrayList<>();
+        if (cachedPolicy.getFences() != null) {
+            fences.addAll(cachedPolicy.getFences());
+        }
         fences.addAll(newFences);
         if (cachedPolicy instanceof MethodAmountPolicy) {
             cachedPolicy = new MethodAmountPolicy(cachedPolicy.getDenyRootedJailbroken(),cachedPolicy.getDenyEmulatorSimulator(),fences,((MethodAmountPolicy) cachedPolicy).getAmount());

@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.domain.policy.Fence;
 import com.iovation.launchkey.sdk.domain.policy.GeoCircleFence;
+import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.policy.TerritoryFence;
 import com.iovation.launchkey.sdk.integration.Utils;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.GeoCircleFenceConverter;
@@ -200,16 +201,23 @@ public class DirectoryServicePolicySteps {
         assertThat(directoryServicePolicyManager.getCurrentServicePolicyEntity().getLocations(), is(equalTo(LocationListConverter.fromDataTable(dataTable))));
     }
 
-    // TODO: New policy object tests
-    @When("I create a new MethodAmountPolicy")
+    // TODO: Add new policy object tests
+
+    @When("^I create a new MethodAmountPolicy$")
     public void iCreateNewMethodAmountPolicy() throws Throwable {
         directoryServicePolicyManager.policyCache.createMethodAmountPolicy();
+    }
+
+    @When("^I create a new I create a new Factors Policy$")
+    public void iCreateNewFactorsPolicy() throws Throwable {
+        directoryServicePolicyManager.policyCache.createFactorsPolicy();
     }
 
     @And("^I add the following GeoCircleFence items$")
     public void iAddGeoCircleFenceToCurrentPolicy(DataTable dataTable) throws Throwable {
         List<GeoCircleFence> fencesFromFeatureFile = (GeoCircleFenceConverter.fromDataTable(dataTable));
         List<Fence> fences = new ArrayList<>(fencesFromFeatureFile);
+        System.out.println(fences);
         directoryServicePolicyManager.policyCache.addFences(fences);
     }
 
@@ -224,4 +232,77 @@ public class DirectoryServicePolicySteps {
     public void iSetPolicyForCurrentDirectory() throws Throwable {
         directoryServicePolicyManager.setPolicyForCurrentService();
     }
+
+    @Then("^the Directory Service Policy has \"([^\"]*)\" fences$")
+    public void directoryServicePolicyHasAmountFences(String stringAmount) throws Throwable {
+        int amount = Integer.getInteger(stringAmount);
+        Policy policy = directoryServicePolicyManager.getCurrentPolicy();
+        assertThat(policy.getFences().size(), is(equalTo(amount)));
+    }
+
+    @And("^the Directory Service Policy contains the GeoCircleFence \"([^\"]*)\"$")
+    public void directoryServicePolicyHasGeoCircleFenceNamed(String fenceName) throws Throwable {
+        Policy policy = directoryServicePolicyManager.getCurrentPolicy();
+        boolean fenceNameMatches = false;
+        for (Fence fence : policy.getFences()) {
+            if (fence.getFenceName().equals(fenceName)) {
+                fenceNameMatches = true;
+                directoryServicePolicyManager.fenceCache.cachedFence = fence;
+            }
+        }
+        assertThat(fenceNameMatches, is(equalTo(true)));
+    }
+
+    @And("^that fence has a latitude of \"([^\"]*)\"$")
+    public void directoryServicePolicyHasGeoFenceWithLatitude(String latValueAsString) {
+        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        Double latitude = Double.parseDouble(latValueAsString);
+        assertThat(thatFence.getLatitude(), is(equalTo(latitude)));
+    }
+
+    @And("^that fence has a longitude of \"([^\"]*)\"$")
+    public void directoryServicePolicyManagerHasGeoFenceWithLongitude(String longValueAsString) {
+        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        Double longitude = Double.parseDouble(longValueAsString);
+        assertThat(thatFence.getLongitude(), is(equalTo(longitude)));
+    }
+
+    @And("that fence has a radius of \"([^\"]*)\"$")
+    public void directoryServicePolicyManagerHasGeoFenceWithRadius(String radiusAsString) {
+        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        Double radius = Double.parseDouble(radiusAsString);
+        assertThat(thatFence.getRadius(), is(equalTo(radius)));
+    }
+
+    @And("^the Directory Service Policy contains the TerritoryFence \"([^\"]*)\"$")
+    public void directoryServicePolicyHasTerritoryFenceNamed(String fenceName) throws Throwable {
+        Policy policy = directoryServicePolicyManager.getCurrentPolicy();
+        boolean fenceNameMatches = false;
+        for (Fence fence : policy.getFences()) {
+            if (fence.getFenceName().equals(fenceName)) {
+                fenceNameMatches = true;
+                directoryServicePolicyManager.fenceCache.cachedFence = fence;
+            }
+        }
+        assertThat(fenceNameMatches, is(equalTo(true)));
+    }
+
+    @And("that fence has a country of \"([^\"]*)\"$")
+    public void directoryServicePolicyManagerHasTerritoryFenceWithCountryName(String countryName) {
+        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        assertThat(thatFence.getCountry(), is(equalTo(countryName)));
+    }
+
+    @And("that fence has an administrative_area of \"([^\"]*)\"$")
+    public void directoryServicePolicyManagerHasTerritoryFenceWithAdminArea(String adminArea) {
+        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        assertThat(thatFence.getAdministrativeArea(), is(equalTo(adminArea)));
+    }
+
+    @And("that fence has a postal_code of \"([^\"]*)\"$")
+    public void directoryServicePolicyManagerHasTerritoryFenceWithPostalCode(String postalCode) {
+        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        assertThat(thatFence.getPostalCode(), is(equalTo(postalCode)));
+    }
+
 }

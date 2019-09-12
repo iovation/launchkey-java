@@ -29,7 +29,7 @@ public class DirectoryServicePolicyManager {
     private final DirectoryServiceManager directoryServiceManager;
     private ServicePolicyEntity currentServicePolicyEntity;
     public PolicyCache policyCache;
-    private Boolean usingNewPolicyFormat;
+    public FenceCache fenceCache;
 
     @Inject
     public DirectoryServicePolicyManager(DirectoryManager directoryManager,
@@ -57,7 +57,7 @@ public class DirectoryServicePolicyManager {
             currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
         }
         else if (adapter instanceof Policy) {
-            policyCache.setCachedPolicy((Policy) adapter);
+            policyCache.cachedPolicy = (Policy) adapter;
         }
         else {
             throw new Throwable("Retrieved Policy of unknown type");
@@ -98,6 +98,10 @@ public class DirectoryServicePolicyManager {
 
     public void setPolicyForCurrentService() throws Throwable {
         setPolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
+    }
+
+    public Policy getCurrentPolicy() throws Throwable {
+        return policyCache.cachedPolicy;
     }
 
 
