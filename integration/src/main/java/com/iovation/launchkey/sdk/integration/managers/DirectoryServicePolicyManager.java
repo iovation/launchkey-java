@@ -28,16 +28,17 @@ public class DirectoryServicePolicyManager {
     private final DirectoryManager directoryManager;
     private final DirectoryServiceManager directoryServiceManager;
     private ServicePolicyEntity currentServicePolicyEntity;
-    public PolicyCache policyCache;
     public FenceCache fenceCache;
+    // It is too late to modify feature files but steps are not independent of each other and assume objects are mutable.
+    // We must store last policy that was operated on in currentPolicyContext so when a line like "factors should be
+    // set to "Knowledge"" is read, we know what policy the feature step is referencing (could be a sub or root policy).
+    public MutablePolicy currentPolicyContext;
 
     @Inject
     public DirectoryServicePolicyManager(DirectoryManager directoryManager,
-                                         DirectoryServiceManager directoryServiceManager,
-                                         PolicyCache policyCache) {
+                                         DirectoryServiceManager directoryServiceManager) {
         this.directoryManager = directoryManager;
         this.directoryServiceManager = directoryServiceManager;
-        this.policyCache = policyCache;
         cleanUp();
     }
 
@@ -49,18 +50,14 @@ public class DirectoryServicePolicyManager {
         return directoryManager.getDirectoryClient();
     }
 
-    // Any Policy
     public void retrievePolicyForService(UUID serviceId) throws Throwable {
         PolicyAdapter adapter = getDirectoryClient().getServicePolicy(serviceId);
         if (adapter instanceof ServicePolicy) {
             ServicePolicy policy = (ServicePolicy) adapter;
             currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
         }
-        else if (adapter instanceof Policy) {
-            policyCache.cachedPolicy = (Policy) adapter;
-        }
         else {
-            throw new Throwable("Retrieved Policy of unknown type");
+            throw new Throwable("Expecting legacy policy type received new policy type");
         }
     }
 
@@ -71,8 +68,6 @@ public class DirectoryServicePolicyManager {
     public void retrievePolicyForCurrentService() throws Throwable {
         retrievePolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
     }
-
-    // Legacy Policy
 
     public ServicePolicyEntity getCurrentServicePolicyEntity() {
         return currentServicePolicyEntity;
@@ -92,16 +87,16 @@ public class DirectoryServicePolicyManager {
 
     // New Policy Objects
 
-    private void setPolicyForService(UUID serviceId) throws Throwable {
-        getDirectoryClient().setServicePolicy(serviceId, policyCache.cachedPolicy);
+    public void setPolicyForCurrentServiceToCurrentPolicyContext() throws Throwable {
+        getDirectoryClient().setServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId(), currentPolicyContext.toImmutablePolicy());
     }
 
-    public void setPolicyForCurrentService() throws Throwable {
-        setPolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
-    }
-
-    public Policy getCurrentPolicy() throws Throwable {
-        return policyCache.cachedPolicy;
+    public Policy getCurrentlySetDirectoryServicePolicy() throws Throwable {
+        PolicyAdapter adapter = getDirectoryClient().getServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId());
+        if (adapter instanceof ServicePolicy) {
+            throw new Throwable("Something is wrong, returned legacy policy format expecting new format");
+        }
+        return (Policy) adapter;
     }
 
 

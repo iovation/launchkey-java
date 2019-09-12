@@ -14,17 +14,14 @@ package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.iovation.launchkey.sdk.domain.policy.Fence;
-import com.iovation.launchkey.sdk.domain.policy.GeoCircleFence;
-import com.iovation.launchkey.sdk.domain.policy.Policy;
-import com.iovation.launchkey.sdk.domain.policy.TerritoryFence;
+import com.iovation.launchkey.sdk.domain.policy.*;
 import com.iovation.launchkey.sdk.integration.Utils;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.GeoCircleFenceConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.LocationListConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TerritoryFenceConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TimeFenceListConverter;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServicePolicyManager;
-import com.iovation.launchkey.sdk.integration.managers.PolicyCache;
+import com.iovation.launchkey.sdk.integration.managers.MutablePolicy;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -32,13 +29,14 @@ import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 
 @Singleton
@@ -49,7 +47,7 @@ public class DirectoryServicePolicySteps {
     @Inject
     public DirectoryServicePolicySteps(
             DirectoryServicePolicyManager directoryServicePolicyManager,
-            GenericSteps genericSteps, PolicyCache policyCache) {
+            GenericSteps genericSteps) {
         this.directoryServicePolicyManager = directoryServicePolicyManager;
         this.genericSteps = genericSteps;
     }
@@ -205,44 +203,43 @@ public class DirectoryServicePolicySteps {
 
     @When("^I create a new MethodAmountPolicy$")
     public void iCreateNewMethodAmountPolicy() throws Throwable {
-        directoryServicePolicyManager.policyCache.createMethodAmountPolicy();
+        directoryServicePolicyManager.currentPolicyContext = new MutablePolicy(new MethodAmountPolicy());
     }
 
-    @When("^I create a new I create a new Factors Policy$")
+    @When("^I create a new Factors Policy$")
     public void iCreateNewFactorsPolicy() throws Throwable {
-        directoryServicePolicyManager.policyCache.createFactorsPolicy();
+        directoryServicePolicyManager.currentPolicyContext = new MutablePolicy(new FactorsPolicy());
     }
 
     @And("^I add the following GeoCircleFence items$")
     public void iAddGeoCircleFenceToCurrentPolicy(DataTable dataTable) throws Throwable {
         List<GeoCircleFence> fencesFromFeatureFile = (GeoCircleFenceConverter.fromDataTable(dataTable));
         List<Fence> fences = new ArrayList<>(fencesFromFeatureFile);
-        System.out.println(fences);
-        directoryServicePolicyManager.policyCache.addFences(fences);
+        directoryServicePolicyManager.currentPolicyContext.addFences(fences);
     }
 
     @And("^I add the following TerritoryFence items$")
     public void iAddTerritoryFenceToCurrentPolicy(DataTable dataTable) throws Throwable {
         List<TerritoryFence> fencesFromFeatureFile = (TerritoryFenceConverter.fromDataTable(dataTable));
         List<Fence> fences = new ArrayList<>(fencesFromFeatureFile);
-        directoryServicePolicyManager.policyCache.addFences(fences);
+        directoryServicePolicyManager.currentPolicyContext.addFences(fences);
     }
 
     @And("I set the Policy for the Current Directory Service to the new policy")
     public void iSetPolicyForCurrentDirectory() throws Throwable {
-        directoryServicePolicyManager.setPolicyForCurrentService();
+        directoryServicePolicyManager.setPolicyForCurrentServiceToCurrentPolicyContext();
     }
 
-    @Then("^the Directory Service Policy has \"([^\"]*)\" fences$")
+    @Then("^the Directory Service Policy has \"([^\"]*)\" fence(?:s)?$")
     public void directoryServicePolicyHasAmountFences(String stringAmount) throws Throwable {
         int amount = Integer.getInteger(stringAmount);
-        Policy policy = directoryServicePolicyManager.getCurrentPolicy();
+        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
         assertThat(policy.getFences().size(), is(equalTo(amount)));
     }
 
     @And("^the Directory Service Policy contains the GeoCircleFence \"([^\"]*)\"$")
     public void directoryServicePolicyHasGeoCircleFenceNamed(String fenceName) throws Throwable {
-        Policy policy = directoryServicePolicyManager.getCurrentPolicy();
+        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
         boolean fenceNameMatches = false;
         for (Fence fence : policy.getFences()) {
             if (fence.getFenceName().equals(fenceName)) {
@@ -267,7 +264,7 @@ public class DirectoryServicePolicySteps {
         assertThat(thatFence.getLongitude(), is(equalTo(longitude)));
     }
 
-    @And("that fence has a radius of \"([^\"]*)\"$")
+    @And("^that fence has a radius of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasGeoFenceWithRadius(String radiusAsString) {
         GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.cachedFence;
         Double radius = Double.parseDouble(radiusAsString);
@@ -276,7 +273,7 @@ public class DirectoryServicePolicySteps {
 
     @And("^the Directory Service Policy contains the TerritoryFence \"([^\"]*)\"$")
     public void directoryServicePolicyHasTerritoryFenceNamed(String fenceName) throws Throwable {
-        Policy policy = directoryServicePolicyManager.getCurrentPolicy();
+        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
         boolean fenceNameMatches = false;
         for (Fence fence : policy.getFences()) {
             if (fence.getFenceName().equals(fenceName)) {
@@ -287,22 +284,131 @@ public class DirectoryServicePolicySteps {
         assertThat(fenceNameMatches, is(equalTo(true)));
     }
 
-    @And("that fence has a country of \"([^\"]*)\"$")
+    @And("^that fence has a country of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasTerritoryFenceWithCountryName(String countryName) {
         TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
         assertThat(thatFence.getCountry(), is(equalTo(countryName)));
     }
 
-    @And("that fence has an administrative_area of \"([^\"]*)\"$")
+    @And("^that fence has an administrative_area of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasTerritoryFenceWithAdminArea(String adminArea) {
         TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
         assertThat(thatFence.getAdministrativeArea(), is(equalTo(adminArea)));
     }
 
-    @And("that fence has a postal_code of \"([^\"]*)\"$")
+    @And("^that fence has a postal_code of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasTerritoryFenceWithPostalCode(String postalCode) {
         TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
         assertThat(thatFence.getPostalCode(), is(equalTo(postalCode)));
     }
 
+    @Given("^the Directory Service is set to any Conditional Geofence Policy$")
+    public void directoryServiceIsSetToAnyConditionalGeofencePolicy() throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext = new MutablePolicy(new ConditionalGeoFencePolicy());
+        directoryServicePolicyManager.setPolicyForCurrentServiceToCurrentPolicyContext();
+    }
+
+    @When("^I set the inside Policy to a new Factors Policy$")
+    public void setGeoFencePolicyInsidePolicyToFactorsPolicy() throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext.addInsidePolicy(new FactorsPolicy());
+    }
+
+    @When("^I set the inside Policy to a new MethodAmountPolicy$")
+    public void setGeofencePolicyInsidePolicyToMethodAmountPolicy() throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext.addInsidePolicy(new MethodAmountPolicy());
+    }
+
+    @When("^I set the outside Policy to a new Factors Policy$")
+    public void setGeofencePolicyOutsidePolicyToFactorsPolicy() throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext.addOutsidePolicy(new FactorsPolicy());
+    }
+
+    @When("^I set the outside Policy to a new MethodAmount Policy$$")
+    public void setGeofencePolicyOutsidePolicyToMethodAmountPolicy$() throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext.addOutsidePolicy(new MethodAmountPolicy());
+    }
+
+    @And("^I set the outside Policy factors to \"([^\"]*)\"$")
+    public void setOutsidePolicyFactors(String policyFactor) throws Throwable {
+        Factor factor = Factor.valueOf(policyFactor.toUpperCase());
+        directoryServicePolicyManager.currentPolicyContext.addFactorToOutsidePolicy(factor);
+    }
+
+    @And("^I set the inside Policy amount to \"([^\"]*)\"$")
+    public void setInsidePolicyAmountTo(String stringAmount) throws Throwable {
+        int amount = Integer.getInteger(stringAmount);
+        directoryServicePolicyManager.currentPolicyContext.setInsidePolicyAmount(amount);
+    }
+
+    @And("^I set the inside Policy factors to \"([^\"]*)\"$")
+    public void setInsidePolicyFactors(String policyFactor) throws Throwable {
+        Factor factor = Factor.valueOf(policyFactor.toUpperCase());
+        directoryServicePolicyManager.currentPolicyContext.addFactorToInsidePolicy(factor);
+    }
+
+    @Then("^the inside Policy should be a MethodAmountPolicy")
+    public void theInsidePolicyIsMethodAmountPolicy() throws Throwable {
+        ConditionalGeoFencePolicy currentPolicy = (ConditionalGeoFencePolicy) directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
+        Policy insidePolicy = currentPolicy.getInPolicy();
+        assertTrue(insidePolicy instanceof MethodAmountPolicy);
+        directoryServicePolicyManager.currentPolicyContext = new MutablePolicy(insidePolicy);
+    }
+
+    @Then("^the inside Policy should be a FactorsPolicy$")
+    public void theInsidePolicyIsFactorsPolicy() throws Throwable {
+        ConditionalGeoFencePolicy currentPolicy = (ConditionalGeoFencePolicy) directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
+        Policy insidePolicy = currentPolicy.getInPolicy();
+        assertTrue(insidePolicy instanceof FactorsPolicy);
+        directoryServicePolicyManager.currentPolicyContext = new MutablePolicy(insidePolicy);
+    }
+
+    @Then("^the outside Policy should be a FactorsPolicy$")
+    public void theOutsidePolicyisFactorsPolicy() throws Throwable {
+        ConditionalGeoFencePolicy currentPolicy = (ConditionalGeoFencePolicy) directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
+        Policy outsidePolicy = currentPolicy.getOutPolicy();
+        assertTrue(outsidePolicy instanceof FactorsPolicy);
+        directoryServicePolicyManager.currentPolicyContext = new MutablePolicy(outsidePolicy);
+    }
+
+    @Then("^the outside Policy should be a MethodAmountPolicy$")
+    public void theOutsidePolicyIsMethodAmountPolicy() throws Throwable {
+        ConditionalGeoFencePolicy currentPolicy = (ConditionalGeoFencePolicy) directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
+        Policy outsidePolicy = currentPolicy.getOutPolicy();
+        assertTrue(outsidePolicy instanceof MethodAmountPolicy);
+        directoryServicePolicyManager.currentPolicyContext = new MutablePolicy(outsidePolicy);
+    }
+
+    @And("^I set the outside Policy amount to \"([^\"]*)\"$")
+    public void setOutsidePolicyAmountTo(String stringAmount) throws Throwable {
+        int amount = Integer.getInteger(stringAmount);
+        directoryServicePolicyManager.currentPolicyContext.setOutsidePolicyAmount(amount);
+    }
+
+    @And("^amount should be set to \"([^\"]*)\"$")
+    public void currentPolicyContextAmountSetTo(String stringAmount) {
+        int amount = Integer.getInteger(stringAmount);
+        MethodAmountPolicy methodAmountPolicy = (MethodAmountPolicy) directoryServicePolicyManager.currentPolicyContext.toImmutablePolicy();
+        assertEquals(methodAmountPolicy.getAmount(),amount);
+    }
+
+    @And("^factors should be set to \"([^\"]*)\"$")
+    public void theInsidePolicyFactorsAre(String factorString) throws Throwable {
+        Factor factor = Factor.valueOf(factorString.toUpperCase());
+        List<Factor> expectedFactors = new ArrayList<>();
+        expectedFactors.add(factor);
+        FactorsPolicy factorsPolicy = (FactorsPolicy) directoryServicePolicyManager.currentPolicyContext.toImmutablePolicy();
+        assertEquals(new HashSet<>(expectedFactors), new HashSet<>(factorsPolicy.getFactors()));
+    }
+
+    @And("^deny_rooted_jailbroken should be set to \"([^\"]*)\"$")
+    public void currentPolicyContextDenyRootedJailbrokenIsSetTo(String switchString) {
+        Policy currentPolicyContext = directoryServicePolicyManager.currentPolicyContext.toImmutablePolicy();
+        assertEquals((boolean)currentPolicyContext.getDenyRootedJailbroken(), Boolean.getBoolean(switchString));
+    }
+
+    @And("^deny_emulator_simulator should be set to \"([^\"]*)\"$")
+    public void currentPolicyContextDenyEmulatorSimulatorIsSetTo(String switchString) {
+        Policy currentPolicyContext = directoryServicePolicyManager.currentPolicyContext.toImmutablePolicy();
+        assertEquals((boolean)currentPolicyContext.getDenyEmulatorSimulator(), Boolean.getBoolean(switchString));
+    }
 }
