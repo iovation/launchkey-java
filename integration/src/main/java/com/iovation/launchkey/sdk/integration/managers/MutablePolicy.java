@@ -22,6 +22,20 @@ public class MutablePolicy {
         return sourceImmutablePolicy;
     }
 
+    public void setAmount(int amount) throws Throwable {
+        if ((sourceImmutablePolicy == null) || !(sourceImmutablePolicy instanceof MethodAmountPolicy)) {
+            throw new Throwable("Source Policy is not of type method amount policy cannot add amount");
+        }
+        sourceImmutablePolicy = new MethodAmountPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(),amount);
+    }
+
+    public void setFactors(List<Factor> factors) throws Throwable {
+        if ((sourceImmutablePolicy == null) || !(sourceImmutablePolicy instanceof FactorsPolicy)) {
+            throw new Throwable("Source Policy is not of type factors policy cannot add factors");
+        }
+        sourceImmutablePolicy = new FactorsPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(),factors);
+    }
+
     public void setDenyRootedJailBroken(Boolean newValue) throws Throwable {
         if (sourceImmutablePolicy == null) {
             throw new Throwable("Source Policy is null cannot set deny rooted jailbroken");
@@ -34,6 +48,9 @@ public class MutablePolicy {
         }
         else if (sourceImmutablePolicy instanceof ConditionalGeoFencePolicy) {
             sourceImmutablePolicy = new ConditionalGeoFencePolicy(newValue, sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getInPolicy(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getOutPolicy());
+        }
+        else {
+            throw new Throwable("Source Policy is of unknown type");
         }
     }
 
@@ -49,6 +66,9 @@ public class MutablePolicy {
         }
         else if (sourceImmutablePolicy instanceof ConditionalGeoFencePolicy) {
             sourceImmutablePolicy = new ConditionalGeoFencePolicy(sourceImmutablePolicy.getDenyRootedJailbroken(),newValue, sourceImmutablePolicy.getFences(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getInPolicy(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getOutPolicy());
+        }
+        else {
+            throw new Throwable("Source Policy is of unknown type");
         }
     }
 
@@ -69,6 +89,9 @@ public class MutablePolicy {
         }
         else if (sourceImmutablePolicy instanceof ConditionalGeoFencePolicy) {
             sourceImmutablePolicy = new ConditionalGeoFencePolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(),fences, ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getInPolicy(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getOutPolicy());
+        }
+        else {
+            throw new Throwable("Source Policy is of unknown type");
         }
     }
 

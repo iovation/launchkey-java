@@ -22,16 +22,14 @@ import com.iovation.launchkey.sdk.integration.cucumber.converters.TerritoryFence
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TimeFenceListConverter;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServicePolicyManager;
 import com.iovation.launchkey.sdk.integration.managers.MutablePolicy;
+import com.iovation.launchkey.sdk.integration.managers.PolicyContext;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -43,6 +41,7 @@ import static org.hamcrest.Matchers.hasSize;
 public class DirectoryServicePolicySteps {
     private DirectoryServicePolicyManager directoryServicePolicyManager;
     private GenericSteps genericSteps;
+
 
     @Inject
     public DirectoryServicePolicySteps(
@@ -242,7 +241,7 @@ public class DirectoryServicePolicySteps {
         for (Fence fence : policy.getFences()) {
             if (fence.getFenceName().equals(fenceName)) {
                 fenceNameMatches = true;
-                directoryServicePolicyManager.fenceCache.cachedFence = fence;
+                directoryServicePolicyManager.fenceCache.setCachedFence(fence);
             }
         }
         assertThat(fenceNameMatches, is(equalTo(true)));
@@ -250,21 +249,21 @@ public class DirectoryServicePolicySteps {
 
     @And("^that fence has a latitude of \"([^\"]*)\"$")
     public void directoryServicePolicyHasGeoFenceWithLatitude(String latValueAsString) {
-        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.getCachedFence();
         Double latitude = Double.parseDouble(latValueAsString);
         assertThat(thatFence.getLatitude(), is(equalTo(latitude)));
     }
 
     @And("^that fence has a longitude of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasGeoFenceWithLongitude(String longValueAsString) {
-        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.getCachedFence();
         Double longitude = Double.parseDouble(longValueAsString);
         assertThat(thatFence.getLongitude(), is(equalTo(longitude)));
     }
 
     @And("^that fence has a radius of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasGeoFenceWithRadius(String radiusAsString) {
-        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        GeoCircleFence thatFence = (GeoCircleFence) directoryServicePolicyManager.fenceCache.getCachedFence();
         Double radius = Double.parseDouble(radiusAsString);
         assertThat(thatFence.getRadius(), is(equalTo(radius)));
     }
@@ -276,7 +275,8 @@ public class DirectoryServicePolicySteps {
         for (Fence fence : policy.getFences()) {
             if (fence.getFenceName().equals(fenceName)) {
                 fenceNameMatches = true;
-                directoryServicePolicyManager.fenceCache.cachedFence = fence;
+                directoryServicePolicyManager.fenceCache.setCachedFence(fence);
+                break;
             }
         }
         assertThat(fenceNameMatches, is(equalTo(true)));
@@ -284,19 +284,19 @@ public class DirectoryServicePolicySteps {
 
     @And("^that fence has a country of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasTerritoryFenceWithCountryName(String countryName) {
-        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.getCachedFence();
         assertThat(thatFence.getCountry(), is(equalTo(countryName)));
     }
 
     @And("^that fence has an administrative_area of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasTerritoryFenceWithAdminArea(String adminArea) {
-        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.getCachedFence();
         assertThat(thatFence.getAdministrativeArea(), is(equalTo(adminArea)));
     }
 
     @And("^that fence has a postal_code of \"([^\"]*)\"$")
     public void directoryServicePolicyManagerHasTerritoryFenceWithPostalCode(String postalCode) {
-        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.cachedFence;
+        TerritoryFence thatFence = (TerritoryFence) directoryServicePolicyManager.fenceCache.getCachedFence();
         assertThat(thatFence.getPostalCode(), is(equalTo(postalCode)));
     }
 
@@ -408,5 +408,42 @@ public class DirectoryServicePolicySteps {
     public void currentPolicyContextDenyEmulatorSimulatorIsSetTo(String switchString) {
         Policy currentPolicyContext = directoryServicePolicyManager.currentPolicyContext.toImmutablePolicy();
         assertEquals((boolean)currentPolicyContext.getDenyEmulatorSimulator(), Boolean.getBoolean(switchString));
+    }
+
+    @And("I set the amount to {string}")
+    public void iSetTheAmountTo(String arg0) throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext.setAmount(Integer.parseInt(arg0));
+    }
+
+    @Then("the amount should be set to {string}")
+    public void theAmountShouldBeSetTo(String arg0) throws Throwable {
+        MethodAmountPolicy policy = (MethodAmountPolicy) directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
+        int amount = Integer.getInteger(arg0);
+        assertEquals(policy.getAmount(),amount);
+    }
+
+    @And("I set the factors to {string}")
+    public void iSetTheFactorsTo(String arg0) throws Throwable {
+        String[] factorsAsStrings = arg0.split("\\s*,\\s*");
+        List<Factor> factors = new ArrayList<>();
+        for (String stringFactor : factorsAsStrings) {
+            factors.add(Factor.valueOf(stringFactor));
+        }
+        directoryServicePolicyManager.currentPolicyContext.setFactors(factors);
+    }
+
+    @And("I set deny_rooted_jailbroken to {string}")
+    public void iSetDeny_rooted_jailbrokenTo(String arg0) throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext.setDenyRootedJailBroken(Boolean.valueOf(arg0));
+    }
+
+    @And("I set deny_emulator_simulator to {string}")
+    public void iSetDeny_emulator_simulatorTo(String arg0) throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext.setDenyEmulatorSimulator(Boolean.valueOf(arg0));
+    }
+
+    @When("I set the outside Policy to a new MethodAmountPolicy")
+    public void iSetTheOutsidePolicyToANewMethodAmountPolicy() throws Throwable {
+        directoryServicePolicyManager.currentPolicyContext.addOutsidePolicy(new MethodAmountPolicy());
     }
 }

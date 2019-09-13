@@ -28,10 +28,10 @@ public class DirectoryServicePolicyManager {
     private final DirectoryManager directoryManager;
     private final DirectoryServiceManager directoryServiceManager;
     private ServicePolicyEntity currentServicePolicyEntity;
+
+    // TODO: these in wrong place
+    // Singleton instance variables that are accessed in DirectoryServicePolicySteps
     public FenceCache fenceCache;
-    // It is too late to modify feature files but steps are not independent of each other and assume objects are mutable.
-    // We must store last policy that was operated on in currentPolicyContext so when a line like "factors should be
-    // set to "Knowledge"" is read, we know what policy the feature step is referencing (could be a sub or root policy).
     public MutablePolicy currentPolicyContext;
 
     @Inject
