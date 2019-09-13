@@ -14,11 +14,16 @@ package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.iovation.launchkey.sdk.domain.policy.ConditionalGeoFencePolicy;
+import com.iovation.launchkey.sdk.domain.policy.Fence;
+import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.integration.Utils;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.LocationListConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TimeFenceListConverter;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
+import com.iovation.launchkey.sdk.integration.managers.MutablePolicy;
 import com.iovation.launchkey.sdk.integration.managers.OrganizationServicePolicyManager;
+import com.iovation.launchkey.sdk.integration.managers.PolicyContext;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -35,13 +40,16 @@ import static org.hamcrest.Matchers.hasSize;
 public class OrganizationServicePolicySteps {
     private OrganizationServicePolicyManager organizationServicePolicyManager;
     private GenericSteps genericSteps;
+    private PolicyContext policyContext;
 
     @Inject
     public OrganizationServicePolicySteps(
             OrganizationServicePolicyManager organizationServicePolicyManager,
-            GenericSteps genericSteps) {
+            GenericSteps genericSteps,
+            PolicyContext policyContext) {
         this.organizationServicePolicyManager = organizationServicePolicyManager;
         this.genericSteps = genericSteps;
+        this.policyContext = policyContext;
     }
 
     @When("^I retrieve the Policy for the Current Organization Service$")
@@ -189,24 +197,49 @@ public class OrganizationServicePolicySteps {
     public void theOrganizationServicePolicyHasTheFollowingGeofenceLocations(DataTable dataTable) throws Throwable {
         assertThat(organizationServicePolicyManager.getCurrentServicePolicyEntity().getLocations(), is(equalTo(LocationListConverter.fromDataTable(dataTable))));
     }
-    // TODO: Fill in
+
     @And("I set the Policy for the Current Organization Service to the new policy")
-    public void iSetThePolicyForTheCurrentOrganizationServiceToTheNewPolicy() {
+    public void iSetThePolicyForTheCurrentOrganizationServiceToTheNewPolicy() throws Throwable {
+        organizationServicePolicyManager.setPolicyForCurrentService(policyContext.currentPolicy.toImmutablePolicy());
     }
 
     @Then("the Organization Service Policy has {string} fences")
-    public void theOrganizationServicePolicyHasFences(String arg0) {
+    public void theOrganizationServicePolicyHasFences(String arg0) throws Throwable {
+        int amount = Integer.getInteger(arg0);
+        Policy policy = organizationServicePolicyManager.getCurrentlySetOrganizationServicePolicy();
+        assertThat(policy.getFences().size(), is(equalTo(amount)));
     }
 
     @And("the Organization Service Policy contains the GeoCircleFence {string}")
-    public void theOrganizationServicePolicyContainsTheGeoCircleFence(String arg0) {
+    public void theOrganizationServicePolicyContainsTheGeoCircleFence(String arg0) throws Throwable {
+        Policy policy = organizationServicePolicyManager.getCurrentlySetOrganizationServicePolicy();
+        boolean fenceNameMatches = false;
+        for (Fence fence : policy.getFences()) {
+            if (fence.getFenceName().equals(arg0)) {
+                fenceNameMatches = true;
+                policyContext.fenceCache = fence;
+            }
+        }
+        assertThat(fenceNameMatches, is(equalTo(true)));
     }
 
     @And("the Organization Service Policy contains the TerritoryFence {string}")
-    public void theOrganizationServicePolicyContainsTheTerritoryFence(String arg0) {
+    public void theOrganizationServicePolicyContainsTheTerritoryFence(String arg0) throws Throwable {
+        Policy policy = organizationServicePolicyManager.getCurrentlySetOrganizationServicePolicy();
+        boolean fenceNameMatches = false;
+        for (Fence fence : policy.getFences()) {
+            if (fence.getFenceName().equals(arg0)) {
+                fenceNameMatches = true;
+                policyContext.fenceCache = fence;
+                break;
+            }
+        }
+        assertThat(fenceNameMatches, is(equalTo(true)));
     }
 
     @Given("the Organization Service is set to any Conditional Geofence Policy")
-    public void theOrganizationServiceIsSetToAnyConditionalGeofencePolicy() {
+    public void theOrganizationServiceIsSetToAnyConditionalGeofencePolicy() throws Throwable {
+        policyContext.currentPolicy = new MutablePolicy(new ConditionalGeoFencePolicy());
+        organizationServicePolicyManager.setPolicyForCurrentService(policyContext.currentPolicy.toImmutablePolicy());
     }
 }
