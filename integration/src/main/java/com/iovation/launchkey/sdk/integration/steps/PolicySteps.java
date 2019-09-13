@@ -1,11 +1,13 @@
 package com.iovation.launchkey.sdk.integration.steps;
 
 import com.iovation.launchkey.sdk.domain.policy.*;
+import com.iovation.launchkey.sdk.error.InvalidPolicyAttributes;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.GeoCircleFenceConverter;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TerritoryFenceConverter;
 import com.iovation.launchkey.sdk.integration.managers.MutablePolicy;
 import com.iovation.launchkey.sdk.integration.managers.PolicyContext;
 import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
@@ -91,7 +93,7 @@ public class PolicySteps {
         String[] factorsAsStrings = arg0.split("\\s*,\\s*");
         List<Factor> factors = new ArrayList<>();
         for (String stringFactor : factorsAsStrings) {
-            factors.add(Factor.valueOf(stringFactor));
+            factors.add(Factor.valueOf(stringFactor.toUpperCase()));
         }
         policyContext.currentPolicy.setFactors(factors);
     }
@@ -231,6 +233,50 @@ public class PolicySteps {
         MethodAmountPolicy policy = (MethodAmountPolicy) policyContext.currentPolicy.toImmutablePolicy();
         int amount = Integer.getInteger(arg0);
         assertEquals(policy.getAmount(),amount);
+    }
+
+    @And("I attempt to create a new Conditional Geofence Policy with the inside policy set to the new policy")
+    public void iAttemptToCreateANewConditionalGeofencePolicyWithTheInsidePolicySetToTheNewPolicy() throws InvalidPolicyAttributes {
+        Policy newPolicy = policyContext.currentPolicy.toImmutablePolicy();
+        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(null,null,null,newPolicy,null);
+    }
+
+    @And("I attempt to create a new Conditional Geofence Policy with the outside policy set to the new policy")
+    public void iAttemptToCreateANewConditionalGeofencePolicyWithTheOutsidePolicySetToTheNewPolicy() throws InvalidPolicyAttributes {
+        Policy newPolicy = policyContext.currentPolicy.toImmutablePolicy();
+        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(null,null,null,null,newPolicy);
+    }
+
+    @When("I attempt to set the inside policy to any Conditional Geofence Policy")
+    public void iAttemptToSetTheInsidePolicyToAnyConditionalGeofencePolicy() throws InvalidPolicyAttributes {
+        Policy currentPolicy = policyContext.currentPolicy.toImmutablePolicy();
+        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(null,null,null,new ConditionalGeoFencePolicy(),null);
+    }
+
+    @Given("I have any Conditional Geofence Policy")
+    public void iHaveAnyConditionalGeofencePolicy() {
+        policyContext.setCurrentPolicy(new ConditionalGeoFencePolicy());
+    }
+
+    @And("I set the factors to {factors}")
+    public void iSetTheFactorsToFactors(List<Factor> factors) throws Throwable {
+        policyContext.currentPolicy.setFactors(factors);
+    }
+
+    @Then("factors should be set to {factors}")
+    public void factorsShouldBeSetToFactors(List<Factor> factors) {
+        FactorsPolicy policy = (FactorsPolicy) policyContext.currentPolicy.toImmutablePolicy();
+        assertEquals(new HashSet<>(factors), new HashSet<>(policy.getFactors()));
+    }
+
+    @And("I set deny_rooted_jailbroken on the Policy to {value}")
+    public void iSetDenyRootedJailbrokenOnThePolicyToValue(Boolean value) throws Throwable {
+        policyContext.currentPolicy.setDenyRootedJailBroken(value);
+    }
+
+    @And("I set deny_emulator_simulator on the Policy to {value}")
+    public void iSetDenyEmulatorSimulatorOnThePolicyToValue(Boolean value) throws Throwable {
+        policyContext.currentPolicy.setDenyEmulatorSimulator(value);
     }
 
 }
