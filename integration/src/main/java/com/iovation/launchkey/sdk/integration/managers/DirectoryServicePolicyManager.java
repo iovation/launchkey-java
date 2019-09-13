@@ -29,11 +29,6 @@ public class DirectoryServicePolicyManager {
     private final DirectoryServiceManager directoryServiceManager;
     private ServicePolicyEntity currentServicePolicyEntity;
 
-    // TODO: these in wrong place
-    // Singleton instance variables that are accessed in DirectoryServicePolicySteps
-    public FenceCache fenceCache;
-    public MutablePolicy currentPolicyContext;
-
     @Inject
     public DirectoryServicePolicyManager(DirectoryManager directoryManager,
                                          DirectoryServiceManager directoryServiceManager) {
@@ -87,14 +82,14 @@ public class DirectoryServicePolicyManager {
 
     // New Policy Objects
 
-    public void setPolicyForCurrentServiceToCurrentPolicyContext() throws Throwable {
-        getDirectoryClient().setServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId(), currentPolicyContext.toImmutablePolicy());
+    public void setPolicyForCurrentService(Policy policy) throws Throwable {
+        getDirectoryClient().setServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId(), policy);
     }
 
     public Policy getCurrentlySetDirectoryServicePolicy() throws Throwable {
         PolicyAdapter adapter = getDirectoryClient().getServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId());
         if (adapter instanceof ServicePolicy) {
-            throw new Throwable("Something is wrong, returned legacy policy format expecting new format");
+            return null;
         }
         return (Policy) adapter;
     }
