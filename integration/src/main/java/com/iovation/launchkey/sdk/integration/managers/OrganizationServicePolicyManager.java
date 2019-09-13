@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.OrganizationClient;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
@@ -47,9 +48,15 @@ public class OrganizationServicePolicyManager {
     }
 
     public void retrievePolicyForService(UUID serviceId) throws Throwable {
+        // TODO: client needs better getter
         PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy policy = (ServicePolicy) adapter;
-        currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
+        if (adapter instanceof ServicePolicy) {
+            ServicePolicy policy = (ServicePolicy) adapter;
+            currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
+        }
+        else {
+            throw new Throwable("Expecting legacy policy type received new policy type");
+        }
     }
 
     public void retrievePolicyForCurrentService() throws Throwable {
@@ -70,5 +77,18 @@ public class OrganizationServicePolicyManager {
 
     public void setPolicyForCurrentService() throws Throwable {
         setPolicyForService(organizationServiceManager.getCurrentServiceEntity().getId());
+    }
+
+    // Support for Advanced Policy Types
+    public void setPolicyForCurrentService(Policy policy) throws Throwable {
+        client.setServicePolicy(organizationServiceManager.getCurrentServiceEntity().getId(), policy);
+    }
+
+    public Policy getCurrentlySetOrganizationServicePolicy() throws Throwable {
+        PolicyAdapter adapter = client.getServicePolicy(organizationServiceManager.getCurrentServiceEntity().getId());
+        if (adapter instanceof ServicePolicy) {
+            return null;
+        }
+        return (Policy) adapter;
     }
 }

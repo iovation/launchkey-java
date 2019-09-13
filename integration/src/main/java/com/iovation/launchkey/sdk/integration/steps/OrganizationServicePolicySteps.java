@@ -19,6 +19,7 @@ import com.iovation.launchkey.sdk.integration.cucumber.converters.LocationListCo
 import com.iovation.launchkey.sdk.integration.cucumber.converters.TimeFenceListConverter;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
 import com.iovation.launchkey.sdk.integration.managers.OrganizationServicePolicyManager;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -187,5 +188,25 @@ public class OrganizationServicePolicySteps {
     @Given("^the Organization Service Policy has the following Geofence locations:$")
     public void theOrganizationServicePolicyHasTheFollowingGeofenceLocations(DataTable dataTable) throws Throwable {
         assertThat(organizationServicePolicyManager.getCurrentServicePolicyEntity().getLocations(), is(equalTo(LocationListConverter.fromDataTable(dataTable))));
+    }
+    // TODO: Fill in
+    @And("I set the Policy for the Current Organization Service to the new policy")
+    public void iSetThePolicyForTheCurrentOrganizationServiceToTheNewPolicy() {
+    }
+
+    @Then("the Organization Service Policy has {string} fences")
+    public void theOrganizationServicePolicyHasFences(String arg0) {
+    }
+
+    @And("the Organization Service Policy contains the GeoCircleFence {string}")
+    public void theOrganizationServicePolicyContainsTheGeoCircleFence(String arg0) {
+    }
+
+    @And("the Organization Service Policy contains the TerritoryFence {string}")
+    public void theOrganizationServicePolicyContainsTheTerritoryFence(String arg0) {
+    }
+
+    @Given("the Organization Service is set to any Conditional Geofence Policy")
+    public void theOrganizationServiceIsSetToAnyConditionalGeofencePolicy() {
     }
 }

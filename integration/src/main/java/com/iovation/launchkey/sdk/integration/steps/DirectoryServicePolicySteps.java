@@ -54,7 +54,7 @@ public class DirectoryServicePolicySteps {
     @When("^I retrieve the Policy for the Current Directory Service$")
     public void iRetrieveTheDirectoryServicePolicy() throws Throwable {
         directoryServicePolicyManager.retrievePolicyForCurrentService();
-        policyContext.setCurrentPolicy(directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy());
+        policyContext.setCurrentPolicy(directoryServicePolicyManager.getCurrentlySetDirectoryServiceAdvancedPolicy());
     }
 
     @When("^I attempt to remove the Policy for the Directory Service with the ID \"([^\"]*)\"$")
@@ -69,7 +69,7 @@ public class DirectoryServicePolicySteps {
 
     @When("^I remove the Policy for the Directory Service$")
     public void iRemoveThePolicyForTheDirectoryService() throws Throwable {
-        directoryServicePolicyManager.removeServicePolicyForCurrentService();
+        directoryServicePolicyManager.removePolicyForCurrentService();
     }
 
     @When("^I attempt to retrieve the Policy for the Directory Service with the ID \"([^\"]*)\"$")
@@ -86,7 +86,7 @@ public class DirectoryServicePolicySteps {
     public void iAttemptToSetThePolicyForTheDirectoryServiceWithTheID(String uuid) throws Throwable {
         UUID serviceId = UUID.fromString(uuid);
         try {
-            directoryServicePolicyManager.setServicePolicyForService(serviceId);
+            directoryServicePolicyManager.setPolicyForService(serviceId);
         } catch (Exception e) {
             genericSteps.setCurrentException(e);
         }
@@ -94,7 +94,7 @@ public class DirectoryServicePolicySteps {
 
     @When("^I set the Policy for the Directory Service$")
     public void iSetThePolicyForTheDirectoryService() throws Throwable {
-        directoryServicePolicyManager.setServicePolicyForCurrentService();
+        directoryServicePolicyManager.setPolicyForCurrentService();
     }
 
     @When("^the Directory Service Policy is set to require (\\d+) factors?$")
@@ -104,7 +104,7 @@ public class DirectoryServicePolicySteps {
 
     @When("^I set the Policy for the Current Directory Service$")
     public void iSetThePolicyForTheCurrentDirectoryService() throws Throwable {
-        directoryServicePolicyManager.setServicePolicyForCurrentService();
+        directoryServicePolicyManager.setPolicyForCurrentService();
     }
 
     @When("^the Directory Service Policy is (not set|set) to require inherence$")
@@ -207,13 +207,13 @@ public class DirectoryServicePolicySteps {
     @Then("^the Directory Service Policy has \"([^\"]*)\" fence(?:s)?$")
     public void directoryServicePolicyHasAmountFences(String stringAmount) throws Throwable {
         int amount = Integer.getInteger(stringAmount);
-        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
+        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServiceAdvancedPolicy();
         assertThat(policy.getFences().size(), is(equalTo(amount)));
     }
 
     @And("^the Directory Service Policy contains the GeoCircleFence \"([^\"]*)\"$")
     public void directoryServicePolicyHasGeoCircleFenceNamed(String fenceName) throws Throwable {
-        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
+        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServiceAdvancedPolicy();
         boolean fenceNameMatches = false;
         for (Fence fence : policy.getFences()) {
             if (fence.getFenceName().equals(fenceName)) {
@@ -226,7 +226,7 @@ public class DirectoryServicePolicySteps {
 
     @And("^the Directory Service Policy contains the TerritoryFence \"([^\"]*)\"$")
     public void directoryServicePolicyHasTerritoryFenceNamed(String fenceName) throws Throwable {
-        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServicePolicy();
+        Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServiceAdvancedPolicy();
         boolean fenceNameMatches = false;
         for (Fence fence : policy.getFences()) {
             if (fence.getFenceName().equals(fenceName)) {
