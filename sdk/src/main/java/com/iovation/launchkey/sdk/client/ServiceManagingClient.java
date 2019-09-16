@@ -15,7 +15,7 @@ package com.iovation.launchkey.sdk.client;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
-import com.iovation.launchkey.sdk.transport.domain.ServicePolicy;
+import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.error.*;
 
 import java.net.URI;
