@@ -1,7 +1,9 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
 import com.iovation.launchkey.sdk.error.InvalidPolicyAttributes;
+import com.iovation.launchkey.sdk.error.UnknownPolicyException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConditionalGeoFencePolicy implements Policy {
@@ -22,17 +24,10 @@ public class ConditionalGeoFencePolicy implements Policy {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
-        if ((inPolicy instanceof FactorsPolicy) || (inPolicy instanceof MethodAmountPolicy) || (inPolicy == null)) {
-            this.inPolicy = inPolicy;
-        } else {
-            throw new InvalidPolicyAttributes("inPolicy must be of type FactorsPolicy or MethodAmountPolicy", null, null);
-        }
-        if ((outPolicy instanceof FactorsPolicy) || (outPolicy instanceof MethodAmountPolicy) || (outPolicy == null)) {
-            this.outPolicy = outPolicy;
-        } else {
-            throw new InvalidPolicyAttributes("outPolicy must be of type FactorsPolicy or MethodAmountPolicy", null, null);
-        }
-        // TODO: Check fences and sub policy booleans
+        verifySubPolicy(inPolicy);
+        verifySubPolicy(outPolicy);
+        this.inPolicy = inPolicy;
+        this.outPolicy = outPolicy;
     }
 
     @Override
@@ -58,4 +53,23 @@ public class ConditionalGeoFencePolicy implements Policy {
         return this.outPolicy;
     }
 
+    private void verifySubPolicy(Policy subPolicy) throws InvalidPolicyAttributes {
+        // Assert policy is either null or is of Type FactorsPolicy or MethodAmountPolicy
+        // Assert denyRootedJailbroken and denyEmulatorSimulator are false
+        // Assert no fences
+        if (subPolicy == null) {
+            return;
+        }
+        if ((subPolicy instanceof FactorsPolicy) || (subPolicy instanceof MethodAmountPolicy)) {
+            if (subPolicy.getDenyEmulatorSimulator() || subPolicy.getDenyRootedJailbroken()) {
+                throw new InvalidPolicyAttributes("Inside or Outside Policy objects cannot have denyEmulatorSimulator or denyRootedJailbroken set to true", null, null);
+            }
+            if (subPolicy.getFences() != null) {
+                throw new InvalidPolicyAttributes("Fences are not supported on Inside or Outside Policy objects",null,null);
+            }
+        }
+        else {
+            throw new InvalidPolicyAttributes("Inside or Outside Policy objects must be of type FactorsPolicy or MethodAmountPolicy, or null if no policy", null, null);
+        }
+    }
 }
