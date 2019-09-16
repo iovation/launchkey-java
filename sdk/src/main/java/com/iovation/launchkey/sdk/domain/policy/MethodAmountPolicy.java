@@ -1,11 +1,13 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MethodAmountPolicy implements Policy {
 
-    private Boolean denyRootedJailbroken = false;
-    private Boolean denyEmulatorSimulator = false;
+    private boolean denyRootedJailbroken = false;
+    private boolean denyEmulatorSimulator = false;
     private List<Fence> fences;
     private int amount;
 
@@ -22,18 +24,18 @@ public class MethodAmountPolicy implements Policy {
     }
 
     @Override
-    public Boolean getDenyRootedJailbroken() {
+    public boolean getDenyRootedJailbroken() {
         return this.denyRootedJailbroken;
     }
 
     @Override
-    public Boolean getDenyEmulatorSimulator() {
+    public boolean getDenyEmulatorSimulator() {
         return this.denyEmulatorSimulator;
     }
 
     @Override
     public List<Fence> getFences() {
-        return this.fences;
+        return Collections.unmodifiableList(new ArrayList<>(fences));
     }
 
     public int getAmount() { return amount; }

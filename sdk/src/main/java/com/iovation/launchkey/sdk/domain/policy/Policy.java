@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface Policy extends PolicyAdapter {
 
-    Boolean getDenyRootedJailbroken();
+    boolean getDenyRootedJailbroken();
 
-    Boolean getDenyEmulatorSimulator();
+    boolean getDenyEmulatorSimulator();
 
     List<Fence> getFences();
 

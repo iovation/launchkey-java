@@ -36,12 +36,12 @@ public class ConditionalGeoFencePolicy implements Policy {
     }
 
     @Override
-    public Boolean getDenyRootedJailbroken() {
+    public boolean getDenyRootedJailbroken() {
         return denyRootedJailbroken;
     }
 
     @Override
-    public Boolean getDenyEmulatorSimulator() {
+    public boolean getDenyEmulatorSimulator() {
         return this.denyEmulatorSimulator;
     }
 
