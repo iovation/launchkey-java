@@ -17,7 +17,7 @@ public class FactorsPolicy implements Policy {
         this.factors = null;
     }
 
-    public FactorsPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, List<Factor> factors) {
+    public FactorsPolicy(boolean denyRootedJailbroken, boolean denyEmulatorSimulator, List<Fence> fences, List<Factor> factors) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;

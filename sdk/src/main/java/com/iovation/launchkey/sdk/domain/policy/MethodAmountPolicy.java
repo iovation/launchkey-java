@@ -16,7 +16,7 @@ public class MethodAmountPolicy implements Policy {
         this.amount = 0;
     }
 
-    public MethodAmountPolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, int amountOfFactors) {
+    public MethodAmountPolicy(boolean denyRootedJailbroken, boolean denyEmulatorSimulator, List<Fence> fences, int amountOfFactors) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;

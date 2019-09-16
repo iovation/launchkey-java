@@ -8,8 +8,8 @@ import java.util.List;
 
 public class ConditionalGeoFencePolicy implements Policy {
 
-    private Boolean denyRootedJailbroken = false;
-    private Boolean denyEmulatorSimulator = false;
+    private boolean denyRootedJailbroken = false;
+    private boolean denyEmulatorSimulator = false;
     private List<Fence> fences;
     private Policy inPolicy;
     private Policy outPolicy;
@@ -20,7 +20,7 @@ public class ConditionalGeoFencePolicy implements Policy {
         this.outPolicy = null;
     }
 
-    public ConditionalGeoFencePolicy(Boolean denyRootedJailbroken, Boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy) throws InvalidPolicyAttributes {
+    public ConditionalGeoFencePolicy(boolean denyRootedJailbroken, boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy) throws InvalidPolicyAttributes {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
