@@ -15,6 +15,7 @@ package com.iovation.launchkey.sdk.client;
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.organization.Directory;
+import com.iovation.launchkey.sdk.domain.policy.LegacyPolicy;
 import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
@@ -26,6 +27,7 @@ import com.iovation.launchkey.sdk.transport.domain.*;
 import java.net.URI;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class BasicOrganizationClient extends ServiceManagingBaseClient implements OrganizationClient {
     private final Transport transport;
@@ -306,11 +308,32 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
     }
 
     @Override
+    @Deprecated
     public ServicePolicy getServicePolicy(UUID serviceId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
-        // TODO: Call getAdvancedServicePolicy. Convert result to ServicePolicy. See specs.
+        Policy policy = getAdvancedServicePolicy(serviceId);
+        if (!(policy instanceof LegacyPolicy)) {
+            Logger.getLogger("com.iovation.launchkey.sdk").warning("Received new policy type using deprecated method. Please update to use getAdvancedServicePolicy instead");
+            return null;
+        }
+        return getServicePolicyFromLegacyPolicy((LegacyPolicy)(policy));
+    }
+
+    @Override
+    @Deprecated
+    public void setServicePolicy(UUID serviceId, ServicePolicy policy) throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
+            InvalidCredentialsException, CommunicationErrorException, MarshallingError,
+            CryptographyError {
+        setAdvancedServicePolicy(serviceId,getLegacyPolicyFromServicePolicy(policy));
+    }
+
+    @Override
+    public Policy getAdvancedServicePolicy(UUID serviceId) throws PlatformErrorException, UnknownEntityException,
+            InvalidResponseException, InvalidStateException, InvalidCredentialsException, CommunicationErrorException,
+            MarshallingError, CryptographyError {
+
 //        com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy =
 //                transport
 //                        .organizationV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), organization);
@@ -330,10 +353,9 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
     }
 
     @Override
-    public void setServicePolicy(UUID serviceId, ServicePolicy policy) throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
-            InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError {
-        // TODO: Convert ServicePolicy to Legacy Policy then call setAdvancedServicePolicy
+    public void setAdvancedServicePolicy(UUID serviceId, Policy policy) throws PlatformErrorException,
+            UnknownEntityException, InvalidResponseException, InvalidStateException, InvalidCredentialsException,
+            CommunicationErrorException, MarshallingError, CryptographyError {
 //        if (policy instanceof ServicePolicy) {
 //            ServicePolicy legacyPolicy = (ServicePolicy) policy;
 //            com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportPolicy =
@@ -346,22 +368,6 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
 //            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = getTransportPolicyFromDomainPolicy(newPolicyType);
 //             transport.organizationV3PolicyPut(new PolicyPutRequest(serviceId, transportPolicy), organization);
 //        }
-    }
-
-    @Override
-    public com.iovation.launchkey.sdk.domain.policy.Policy getAdvancedServicePolicy(UUID serviceId) throws PlatformErrorException, UnknownEntityException,
-            InvalidResponseException, InvalidStateException, InvalidCredentialsException, CommunicationErrorException,
-            MarshallingError, CryptographyError {
-
-
-        return null;
-    }
-
-    @Override
-    public void setAdvancedServicePolicy(UUID serviceId, Policy policy) throws PlatformErrorException,
-            UnknownEntityException, InvalidResponseException, InvalidStateException, InvalidCredentialsException,
-            CommunicationErrorException, MarshallingError, CryptographyError {
-
     }
 
     @Override

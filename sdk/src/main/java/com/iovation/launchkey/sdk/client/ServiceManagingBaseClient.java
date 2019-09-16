@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 class ServiceManagingBaseClient {
-    ServicePolicy getDomainServicePolicyFromTransportServicePolicy(
+    protected ServicePolicy getDomainServicePolicyFromTransportServicePolicy(
             com.iovation.launchkey.sdk.transport.domain.ServicePolicy policy) {
 
         List<ServicePolicy.Location> geoFences = new ArrayList<>();
@@ -79,7 +79,7 @@ class ServiceManagingBaseClient {
         return transportPolicy;
     }
 
-    Policy getDomainPolicyFromTransportPolicy(
+    protected Policy getDomainPolicyFromTransportPolicy(
             com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy) throws UnknownPolicyException, UnknownFenceTypeException, InvalidPolicyAttributes {
 
         Policy domainPolicy = null;
@@ -122,7 +122,7 @@ class ServiceManagingBaseClient {
         return domainPolicy;
     }
 
-    com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
+    protected com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
         Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
         List<Fence> domainPolicyFences = domainPolicy.getFences();
@@ -171,6 +171,15 @@ class ServiceManagingBaseClient {
 
         return transportPolicy;
     }
+
+    protected LegacyPolicy getLegacyPolicyFromServicePolicy(ServicePolicy servicePolicy) {
+        return null;
+    }
+
+    protected ServicePolicy getServicePolicyFromLegacyPolicy(LegacyPolicy legacyPolicy) {
+        return null;
+    }
+
 
     private Fence getDomainFenceFromTransportFence(com.iovation.launchkey.sdk.transport.domain.Fence transportFence) throws UnknownFenceTypeException {
         Fence domainFence = null;
