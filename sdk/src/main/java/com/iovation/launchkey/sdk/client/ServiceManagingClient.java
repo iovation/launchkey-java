@@ -13,7 +13,6 @@
 package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.domain.PublicKey;
-import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.domain.ServicePolicy;
@@ -323,13 +322,12 @@ public interface ServiceManagingClient {
      * often due to invalid dependencies being provided or algorithms not being supported by the JCE provider.
      * @throws MarshallingError When the response cannot be marshaled
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
-     * @throws UnknownPolicyException When an unknown policy type is passed in.
      * the signature of the response
      */
     void setServicePolicy(UUID serviceId, ServicePolicy policy)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError, UnknownPolicyException, UnknownFenceTypeException;
+            CryptographyError;
 
     /**
      * Remove the dDefault authorization policy for a Service
