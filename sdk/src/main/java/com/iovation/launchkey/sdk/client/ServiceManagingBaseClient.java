@@ -222,6 +222,7 @@ class ServiceManagingBaseClient {
     }
 
     private void checkForUnknownPolicyFormat(Policy condInPolicy, Policy condOutPolicy) throws UnknownPolicyException {
+        // TODO: Verify this is correct and maybe use similar validation as in ConditionalGeofencePolicy.java
         // Prevent unknown policy types from being converted
         ArrayList<Boolean> everythingShouldEvalFalse = new ArrayList<>();
         everythingShouldEvalFalse.add(condInPolicy.getDenyEmulatorSimulator());
