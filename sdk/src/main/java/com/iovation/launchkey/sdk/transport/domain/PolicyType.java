@@ -15,6 +15,11 @@ public class PolicyType {
     }
 
     public PolicyTypeEnum getPolicyTypeEnum() {
-        return PolicyTypeEnum.valueOf(policyType);
+        if (policyType == null || policyType.equals("")) {
+            return PolicyTypeEnum.LEGACY;
+        }
+        else {
+            return PolicyTypeEnum.valueOf(policyType);
+        }
     }
 }
