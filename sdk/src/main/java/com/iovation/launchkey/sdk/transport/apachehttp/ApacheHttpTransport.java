@@ -734,20 +734,23 @@ public class ApacheHttpTransport implements Transport {
             InvalidCredentialsException {
         HttpResponse response =
                 getHttpResponse("POST", "/directory/v3/service/policy/item", subject, request, true, null);
-        PolicyAdapter policy;
-        // TODO: YUCK!!
-        try {
-            policy = decryptResponse(response, ServicePolicy.class);
-        } catch(Exception e) {
-            try {
+        PolicyAdapter policy = null;
+        PolicyType policyType = decryptResponse(response, PolicyType.class);
+        switch (policyType.getPolicyTypeEnum()) {
+            case LEGACY:
+                policy = decryptResponse(response, ServicePolicy.class);
+                break;
+            case COND_GEO:
                 policy = decryptResponse(response, ConditionalGeoFencePolicy.class);
-            } catch(Exception e2) {
-                try {
-                    policy = decryptResponse(response, FactorsPolicy.class);
-                } catch(Exception e3) {
-                    policy = decryptResponse(response, MethodAmountPolicy.class);
-                }
-            }
+                break;
+            case METHOD_AMOUNT:
+                policy = decryptResponse(response, MethodAmountPolicy.class);
+                break;
+            case FACTORS:
+                policy = decryptResponse(response, FactorsPolicy.class);
+                break;
+            default:
+                throw new InvalidResponseException("Response is unexpected JSON format in ApacheHttpTransport.java",null,null);
         }
         return policy;
     }
