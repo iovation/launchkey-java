@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// TODO: Remove list of factors and add boolean values with getters
 public class FactorsPolicy implements Policy {
 
     private boolean denyRootedJailbroken = false;
@@ -43,36 +44,4 @@ public class FactorsPolicy implements Policy {
         return  Collections.unmodifiableList(new ArrayList<>(factors));
     }
 
-    public boolean isInherence() {
-        if (!factors.isEmpty()) {
-            for (Factor factor : factors) {
-                if (factor == Factor.INHERENCE) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean isKnowledge() {
-        if (!factors.isEmpty()) {
-            for (Factor factor : factors) {
-                if (factor == Factor.KNOWLEDGE) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean isPossession() {
-        if (!factors.isEmpty()) {
-            for (Factor factor : factors) {
-                if (factor == Factor.POSSESSION) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }

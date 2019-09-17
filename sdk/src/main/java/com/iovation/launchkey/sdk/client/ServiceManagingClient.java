@@ -358,7 +358,7 @@ public interface ServiceManagingClient {
     Policy getAdvancedServicePolicy(UUID serviceId)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError;
+            CryptographyError, InvalidPolicyAttributes, UnknownFenceTypeException, UnknownPolicyException;
 
     /**
      * Update the default authorization policy for a Service
@@ -384,7 +384,7 @@ public interface ServiceManagingClient {
     void setAdvancedServicePolicy(UUID serviceId, Policy policy)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
-            CryptographyError;
+            CryptographyError, UnknownFenceTypeException, UnknownPolicyException;
 
     /**
      * Remove the dDefault authorization policy for a Service

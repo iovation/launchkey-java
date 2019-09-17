@@ -313,9 +313,15 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
-        Policy policy = getAdvancedServicePolicy(serviceId);
+        Policy policy = null;
+        try {
+            policy = getAdvancedServicePolicy(serviceId);
+        } catch (Exception e) {
+            Logger.getLogger("com.iovation.launchkey.sdk").throwing("BasicDirectoryClient.java","getServicePolicy(UUID serviceId)",e);
+            return null;
+        }
         if (!(policy instanceof LegacyPolicy)) {
-            Logger.getLogger("com.iovation.launchkey.sdk").warning("Received new policy type using deprecated method. Please update to use getAdvancedServicePolicy instead");
+            Logger.getLogger("com.iovation.launchkey.sdk").severe("Received new policy type using deprecated method. Please update to use getAdvancedServicePolicy instead");
             return null;
         }
         return getServicePolicyFromLegacyPolicy((LegacyPolicy)(policy));
@@ -326,48 +332,45 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
     public void setServicePolicy(UUID serviceId, ServicePolicy policy) throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
-        setAdvancedServicePolicy(serviceId,getLegacyPolicyFromServicePolicy(policy));
+        try {
+            setAdvancedServicePolicy(serviceId, getLegacyPolicyFromServicePolicy(policy));
+        } catch (Exception e) {
+            Logger.getLogger("com.iovation.launchkey.sdk").throwing("BasicDirectoryClient.java","setServicePolicy(UUID serviceId, ServicePolicy policy)",e);
+            return;
+        }
     }
 
     @Override
     public Policy getAdvancedServicePolicy(UUID serviceId) throws PlatformErrorException, UnknownEntityException,
             InvalidResponseException, InvalidStateException, InvalidCredentialsException, CommunicationErrorException,
-            MarshallingError, CryptographyError {
+            MarshallingError, CryptographyError, InvalidPolicyAttributes, UnknownFenceTypeException, UnknownPolicyException {
 
-//        com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy =
-//                transport
-//                        .organizationV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), organization);
-//        PolicyAdapter returnValue = null;
-//        if (transportPolicy instanceof com.iovation.launchkey.sdk.transport.domain.Policy) {
-//            com.iovation.launchkey.sdk.transport.domain.Policy newPolicyType =
-//                    (com.iovation.launchkey.sdk.transport.domain.Policy) transportPolicy;
-//            returnValue = getDomainPolicyFromTransportPolicy(newPolicyType);
-//        }
-//        else if (transportPolicy instanceof com.iovation.launchkey.sdk.transport.domain.ServicePolicy) {
-//            com.iovation.launchkey.sdk.transport.domain.ServicePolicy legacyPolicyType =
-//                    (com.iovation.launchkey.sdk.transport.domain.ServicePolicy) transportPolicy;
-//            returnValue = getDomainServicePolicyFromTransportServicePolicy(legacyPolicyType);
-//        }
-//        return returnValue;
-        return null;
+        com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy =
+                transport.directoryV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), organization);
+        Policy returnValue = null;
+        if (transportPolicy instanceof com.iovation.launchkey.sdk.transport.domain.Policy) {
+            com.iovation.launchkey.sdk.transport.domain.Policy newPolicyType =
+                    (com.iovation.launchkey.sdk.transport.domain.Policy) transportPolicy;
+            returnValue = getDomainPolicyFromTransportPolicy(newPolicyType);
+        }
+        else if (transportPolicy instanceof com.iovation.launchkey.sdk.transport.domain.ServicePolicy) {
+            com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportServicePolicy =
+                    (com.iovation.launchkey.sdk.transport.domain.ServicePolicy) transportPolicy;
+            ServicePolicy servicePolicy = getDomainServicePolicyFromTransportServicePolicy(transportServicePolicy);
+            returnValue = getLegacyPolicyFromServicePolicy(servicePolicy);
+        }
+        else {
+            throw new UnknownPolicyException("Received unknown policy format",null,null);
+        }
+        return returnValue;
     }
 
     @Override
     public void setAdvancedServicePolicy(UUID serviceId, Policy policy) throws PlatformErrorException,
             UnknownEntityException, InvalidResponseException, InvalidStateException, InvalidCredentialsException,
-            CommunicationErrorException, MarshallingError, CryptographyError {
-//        if (policy instanceof ServicePolicy) {
-//            ServicePolicy legacyPolicy = (ServicePolicy) policy;
-//            com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportPolicy =
-//                    getTransportServicePolicyFromDomainServicePolicy(legacyPolicy);
-//            transport.organizationV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, transportPolicy), organization);
-//        }
-//        else if (policy instanceof com.iovation.launchkey.sdk.domain.policy.Policy) {
-//            com.iovation.launchkey.sdk.domain.policy.Policy newPolicyType =
-//                    (com.iovation.launchkey.sdk.domain.policy.Policy) policy;
-//            com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = getTransportPolicyFromDomainPolicy(newPolicyType);
-//             transport.organizationV3PolicyPut(new PolicyPutRequest(serviceId, transportPolicy), organization);
-//        }
+            CommunicationErrorException, MarshallingError, CryptographyError, UnknownFenceTypeException, UnknownPolicyException {
+        com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = getTransportPolicyFromDomainPolicy(policy);
+        transport.directoryV3PolicyPut(new PolicyPutRequest(serviceId, transportPolicy), organization);
     }
 
     @Override
