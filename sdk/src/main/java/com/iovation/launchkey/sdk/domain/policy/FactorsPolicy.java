@@ -4,25 +4,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-// TODO: Remove list of factors and add boolean values with getters
 public class FactorsPolicy implements Policy {
 
     private boolean denyRootedJailbroken = false;
     private boolean denyEmulatorSimulator = false;
+    private boolean inherenceRequired = false;
+    private boolean knowledgeRequired = false;
+    private boolean possessionRequired = false;
     private List<Fence> fences;
-    private List<Factor> factors;
-
 
     public FactorsPolicy() {
         this.fences = null;
-        this.factors = null;
     }
 
-    public FactorsPolicy(boolean denyRootedJailbroken, boolean denyEmulatorSimulator, List<Fence> fences, List<Factor> factors) {
+    public FactorsPolicy(boolean denyRootedJailbroken, boolean denyEmulatorSimulator, List<Fence> fences, boolean inherenceRequired, boolean knowledgeRequired, boolean possessionRequired) {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
-        this.factors = factors;
+        this.inherenceRequired = inherenceRequired;
+        this.knowledgeRequired = knowledgeRequired;
+        this.possessionRequired = possessionRequired;
     }
 
     @Override
@@ -40,8 +41,15 @@ public class FactorsPolicy implements Policy {
         return Collections.unmodifiableList(new ArrayList<>(fences));
     }
 
-    public List<Factor> getFactors() {
-        return  Collections.unmodifiableList(new ArrayList<>(factors));
+    public boolean isInherenceRequired() {
+        return inherenceRequired;
     }
 
+    public boolean isKnowledgeRequired() {
+        return knowledgeRequired;
+    }
+
+    public boolean isPossessionRequired() {
+        return possessionRequired;
+    }
 }

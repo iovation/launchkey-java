@@ -17,7 +17,6 @@ import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.organization.Directory;
 import com.iovation.launchkey.sdk.domain.policy.LegacyPolicy;
 import com.iovation.launchkey.sdk.domain.policy.Policy;
-import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.error.*;

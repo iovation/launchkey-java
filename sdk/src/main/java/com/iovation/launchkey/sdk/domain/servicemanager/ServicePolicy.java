@@ -12,7 +12,6 @@
 
 package com.iovation.launchkey.sdk.domain.servicemanager;
 
-import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
@@ -21,7 +20,7 @@ import java.util.TimeZone;
  * Class to represent an authentication policy which will be utilized for providing dynamic policies per request.
  */
 @Deprecated
-public class ServicePolicy implements PolicyAdapter {
+public class ServicePolicy {
     private final Integer requiredFactors;
     private final Boolean requireKnowledgeFactor;
     private final Boolean requireInherenceFactor;

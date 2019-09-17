@@ -11,7 +11,6 @@ package com.iovation.launchkey.sdk.client; /**
  */
 
 
-import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 
 import com.iovation.launchkey.sdk.transport.Transport;
@@ -87,8 +86,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
         List<AuthPolicy.MinimumRequirement> minimum = Collections.singletonList(new AuthPolicy.MinimumRequirement(
                 AuthPolicy.MinimumRequirement.Type.AUTHENTICATED, 9, 0, 0, 0));
         when(response.getMinimumRequirements()).thenReturn(minimum);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertEquals(Integer.valueOf(9), servicePolicy.getRequiredFactors());
     }
 
@@ -97,8 +95,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
         List<AuthPolicy.MinimumRequirement> minimum = Collections.singletonList(new AuthPolicy.MinimumRequirement(
                 AuthPolicy.MinimumRequirement.Type.AUTHENTICATED, 0, 1, 0, 0));
         when(response.getMinimumRequirements()).thenReturn(minimum);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertEquals(true, servicePolicy.isKnowledgeFactorRequired());
     }
 
@@ -107,8 +104,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
         List<AuthPolicy.MinimumRequirement> minimum = Collections.singletonList(new AuthPolicy.MinimumRequirement(
                 AuthPolicy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 1, 0));
         when(response.getMinimumRequirements()).thenReturn(minimum);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertEquals(true, servicePolicy.isInherenceFactorRequired());
     }
 
@@ -117,8 +113,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
         List<AuthPolicy.MinimumRequirement> minimum = Collections.singletonList(new AuthPolicy.MinimumRequirement(
                 AuthPolicy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 0, 1));
         when(response.getMinimumRequirements()).thenReturn(minimum);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertEquals(true, servicePolicy.isPossessionFactorRequired());
     }
 
@@ -137,8 +132,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
                         TimeZone.getTimeZone("America/New_York"))
         );
         when(response.getTimeFences()).thenReturn(fences);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         List<com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.TimeFence> actual = servicePolicy.getTimeFences();
         assertEquals(expected, actual);
     }
@@ -154,16 +148,14 @@ public class BasicOrganizationClientGetServicePolicyTest {
                 new com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.Location("Location 2", 2.1, 2.2, 2.3)
         );
         when(response.getGeoFences()).thenReturn(fences);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertEquals(expected, servicePolicy.getLocations());
     }
 
     @Test
     public void getsDeviceIntegrityAsJailBreakProtection() throws Exception {
         when(response.getDeviceIntegrity()).thenReturn(true);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertEquals(true, servicePolicy.isJailBreakProtectionEnabled());
     }
 
@@ -174,8 +166,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
         when(response.getTimeFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.TimeFence>());
         when(response.getGeoFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.Location>());
         when(response.getDeviceIntegrity()).thenReturn(null);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertNull(servicePolicy.getRequiredFactors());
     }
 
@@ -186,8 +177,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
         when(response.getTimeFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.TimeFence>());
         when(response.getGeoFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.Location>());
         when(response.getDeviceIntegrity()).thenReturn(null);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertNull(servicePolicy.isInherenceFactorRequired());
     }
 
@@ -198,8 +188,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
         when(response.getTimeFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.TimeFence>());
         when(response.getGeoFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.Location>());
         when(response.getDeviceIntegrity()).thenReturn(null);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertNull(servicePolicy.isKnowledgeFactorRequired());
     }
 
@@ -210,8 +199,7 @@ public class BasicOrganizationClientGetServicePolicyTest {
         when(response.getTimeFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.TimeFence>());
         when(response.getGeoFences()).thenReturn(new ArrayList<com.iovation.launchkey.sdk.transport.domain.ServicePolicy.Location>());
         when(response.getDeviceIntegrity()).thenReturn(null);
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        ServicePolicy servicePolicy = (ServicePolicy) adapter;
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
         assertNull(servicePolicy.isPossessionFactorRequired());
     }
 }

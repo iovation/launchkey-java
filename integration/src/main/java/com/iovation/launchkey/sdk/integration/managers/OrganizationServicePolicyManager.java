@@ -17,7 +17,6 @@ import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.OrganizationClient;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
 import com.iovation.launchkey.sdk.domain.policy.Policy;
-import com.iovation.launchkey.sdk.domain.policy.PolicyAdapter;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
 import cucumber.api.java.After;

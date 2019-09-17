@@ -1,6 +1,5 @@
 package com.iovation.launchkey.sdk.integration.cucumber;
 
-import com.iovation.launchkey.sdk.domain.policy.Factor;
 import cucumber.api.TypeRegistry;
 import cucumber.api.TypeRegistryConfigurer;
 import io.cucumber.cucumberexpressions.ParameterType;

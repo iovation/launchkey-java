@@ -108,13 +108,14 @@ class ServiceManagingBaseClient {
             domainPolicy = new MethodAmountPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,methodAmountPolicy.getAmount());
         }
         else if (policyType.equals("FACTORS")) {
-            com.iovation.launchkey.sdk.transport.domain.FactorsPolicy factorsPolicy = (com.iovation.launchkey.sdk.transport.domain.FactorsPolicy) transportPolicy;
-            List<String> transportFactors = factorsPolicy.getFactors();
-            List<Factor> factors = new ArrayList<>();
-            for (String factor : transportFactors) {
-                factors.add(Factor.valueOf(factor));
-            }
-            domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
+            // TODO: Fix once new factors Policy transport object is created
+//            com.iovation.launchkey.sdk.transport.domain.FactorsPolicy factorsPolicy = (com.iovation.launchkey.sdk.transport.domain.FactorsPolicy) transportPolicy;
+//            List<String> transportFactors = factorsPolicy.getFactors();
+//            List<Factor> factors = new ArrayList<>();
+//            for (String factor : transportFactors) {
+//                factors.add(Factor.valueOf(factor));
+//            }
+//            domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
         }
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
@@ -155,15 +156,16 @@ class ServiceManagingBaseClient {
 
         }
         else if (domainPolicy instanceof FactorsPolicy) {
-            List<Factor> domainFactors = ((FactorsPolicy) domainPolicy).getFactors();
-            List<String> factors = null;
-            if (domainFactors != null) {
-                factors = new ArrayList<>();
-                for (Factor factor : domainFactors) {
-                    factors.add(factor.toString());
-                }
-            }
-            transportPolicy = new com.iovation.launchkey.sdk.transport.domain.FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
+            // TODO: Fix once new factors Policy transport object is created
+//            List<Factor> domainFactors = ((FactorsPolicy) domainPolicy).getFactors();
+//            List<String> factors = null;
+//            if (domainFactors != null) {
+//                factors = new ArrayList<>();
+//                for (Factor factor : domainFactors) {
+//                    factors.add(factor.toString());
+//                }
+//            }
+//            transportPolicy = new com.iovation.launchkey.sdk.transport.domain.FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
         }
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
