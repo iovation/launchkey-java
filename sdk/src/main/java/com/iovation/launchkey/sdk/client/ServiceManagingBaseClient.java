@@ -184,20 +184,52 @@ class ServiceManagingBaseClient {
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
         }
-
         return transportPolicy;
     }
 
     protected LegacyPolicy getLegacyPolicyFromServicePolicy(ServicePolicy servicePolicy) {
-        // TODO: Fill in
-        return null;
+        List<GeoCircleFence> geoFences = null;
+        if (!servicePolicy.getLocations().isEmpty()) {
+            geoFences = new ArrayList<>();
+            for (ServicePolicy.Location location : servicePolicy.getLocations()) {
+                geoFences.add(getGeoCircleFenceFromLocation(location));
+            }
+        }
+        return new LegacyPolicy(servicePolicy.getRequiredFactors(),
+                servicePolicy.isInherenceFactorRequired(),
+                servicePolicy.isKnowledgeFactorRequired(),
+                servicePolicy.isPossessionFactorRequired(),
+                servicePolicy.isInherenceFactorRequired(),
+                geoFences,
+                servicePolicy.getTimeFences());
     }
 
     protected ServicePolicy getServicePolicyFromLegacyPolicy(LegacyPolicy legacyPolicy) {
-        // TODO: Fill in
-        return null;
+        List<ServicePolicy.Location> locations = null;
+        if (!legacyPolicy.getFences().isEmpty()) {
+            locations = new ArrayList<>();
+            for (Fence fence : legacyPolicy.getFences()) {
+                if (fence instanceof GeoCircleFence) {
+                    locations.add(getLocationFromGeoCircleFence((GeoCircleFence) fence));
+                }
+            }
+        }
+        return new ServicePolicy(legacyPolicy.getAmount(),
+                legacyPolicy.isKnowledge(),
+                legacyPolicy.isInherence(),
+                legacyPolicy.isPossession(),
+                legacyPolicy.getDenyRootedJailbroken(),
+                locations,
+                legacyPolicy.getTimeFences());
     }
 
+    private GeoCircleFence getGeoCircleFenceFromLocation(ServicePolicy.Location location) {
+        return new GeoCircleFence(location.getName(),location.getLatitude(),location.getLongitude(),location.getRadius());
+    }
+
+    private ServicePolicy.Location getLocationFromGeoCircleFence(GeoCircleFence geoCircleFence) {
+        return new ServicePolicy.Location(geoCircleFence.getFenceName(),geoCircleFence.getRadius(),geoCircleFence.getLatitude(),geoCircleFence.getLongitude());
+    }
 
     private Fence getDomainFenceFromTransportFence(com.iovation.launchkey.sdk.transport.domain.Fence transportFence) throws UnknownFenceTypeException {
         Fence domainFence = null;
