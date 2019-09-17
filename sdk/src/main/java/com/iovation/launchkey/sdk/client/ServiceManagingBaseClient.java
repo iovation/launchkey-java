@@ -108,14 +108,23 @@ class ServiceManagingBaseClient {
             domainPolicy = new MethodAmountPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,methodAmountPolicy.getAmount());
         }
         else if (policyType.equals("FACTORS")) {
-            // TODO: Fix once new factors Policy transport object is created
-//            com.iovation.launchkey.sdk.transport.domain.FactorsPolicy factorsPolicy = (com.iovation.launchkey.sdk.transport.domain.FactorsPolicy) transportPolicy;
-//            List<String> transportFactors = factorsPolicy.getFactors();
-//            List<Factor> factors = new ArrayList<>();
-//            for (String factor : transportFactors) {
-//                factors.add(Factor.valueOf(factor));
-//            }
-//            domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
+            com.iovation.launchkey.sdk.transport.domain.FactorsPolicy factorsPolicy = (com.iovation.launchkey.sdk.transport.domain.FactorsPolicy) transportPolicy;
+            List<String> transportFactors = factorsPolicy.getFactors();
+            boolean inherence = false;
+            boolean possession = false;
+            boolean knowledge = false;
+            for (String factor : transportFactors) {
+                if (factor.equals("KNOWLEDGE")) {
+                    knowledge = true;
+                }
+                if (factor.equals("INHERENCE")) {
+                    inherence = true;
+                }
+                if (factor.equals("POSSESSION")) {
+                    possession = true;
+                }
+            }
+            domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inherence,knowledge,possession);
         }
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
@@ -156,16 +165,21 @@ class ServiceManagingBaseClient {
 
         }
         else if (domainPolicy instanceof FactorsPolicy) {
-            // TODO: Fix once new factors Policy transport object is created
-//            List<Factor> domainFactors = ((FactorsPolicy) domainPolicy).getFactors();
-//            List<String> factors = null;
-//            if (domainFactors != null) {
-//                factors = new ArrayList<>();
-//                for (Factor factor : domainFactors) {
-//                    factors.add(factor.toString());
-//                }
-//            }
-//            transportPolicy = new com.iovation.launchkey.sdk.transport.domain.FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
+            FactorsPolicy factorsPolicy = (FactorsPolicy) domainPolicy;
+            List<String> factors = new ArrayList<>();
+            if (factorsPolicy.isInherenceRequired()) {
+                factors.add("INHERENCE");
+            }
+            if (factorsPolicy.isKnowledgeRequired()) {
+                factors.add("KNOWLEDGE");
+            }
+            if (factorsPolicy.isPossessionRequired()) {
+                factors.add("POSSESSION");
+            }
+            if (factors.isEmpty()) {
+                factors = null;
+            }
+            transportPolicy = new com.iovation.launchkey.sdk.transport.domain.FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
         }
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
