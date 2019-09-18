@@ -57,7 +57,7 @@ class ServiceManagingBaseClient {
                 policy.getDeviceIntegrity(), geoFences, timeFences);
     }
 
-    com.iovation.launchkey.sdk.transport.domain.ServicePolicy getTransportServicePolicyFromDomainServicePolicy(
+    protected com.iovation.launchkey.sdk.transport.domain.ServicePolicy getTransportServicePolicyFromDomainServicePolicy(
             ServicePolicy policy) {
         com.iovation.launchkey.sdk.transport.domain.ServicePolicy transportPolicy =
                 new com.iovation.launchkey.sdk.transport.domain.ServicePolicy(policy.getRequiredFactors(),
@@ -99,7 +99,6 @@ class ServiceManagingBaseClient {
                     (com.iovation.launchkey.sdk.transport.domain.ConditionalGeoFencePolicy) transportPolicy;
             Policy inPolicy = getDomainPolicyFromTransportPolicy(conGeoPolicy.getInPolicy());
             Policy outPolicy = getDomainPolicyFromTransportPolicy(conGeoPolicy.getOutPolicy());
-            checkForUnknownPolicyFormat(inPolicy,outPolicy);
             domainPolicy = new ConditionalGeoFencePolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy);
         }
         else if (policyType.equals("METHOD_AMOUNT")) {
@@ -125,6 +124,9 @@ class ServiceManagingBaseClient {
                 }
             }
             domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inherence,knowledge,possession);
+        }
+        else if (policyType.equals("LEGACY")) {
+            // TODO: Parse Legacy Policy
         }
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
@@ -152,8 +154,8 @@ class ServiceManagingBaseClient {
             ConditionalGeoFencePolicy condGeoPolicy = (ConditionalGeoFencePolicy) domainPolicy;
             Policy condInPolicy = condGeoPolicy.getInPolicy();
             Policy condOutPolicy = condGeoPolicy.getOutPolicy();
-            // TODO: Is this check necessary??
-            checkForUnknownPolicyFormat(condInPolicy, condOutPolicy);
+            verifySubPolicy(condInPolicy);
+            verifySubPolicy(condOutPolicy);
             inPolicy = getTransportPolicyFromDomainPolicy(condInPolicy);
             outPolicy = getTransportPolicyFromDomainPolicy(condOutPolicy);
             transportPolicy = new com.iovation.launchkey.sdk.transport.domain.ConditionalGeoFencePolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy);
@@ -181,6 +183,9 @@ class ServiceManagingBaseClient {
             }
             transportPolicy = new com.iovation.launchkey.sdk.transport.domain.FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
         }
+        else if (domainPolicy instanceof LegacyPolicy) {
+            // TODO: Parse Legacy Policy Type
+        }
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
         }
@@ -199,7 +204,7 @@ class ServiceManagingBaseClient {
                 servicePolicy.isInherenceFactorRequired(),
                 servicePolicy.isKnowledgeFactorRequired(),
                 servicePolicy.isPossessionFactorRequired(),
-                servicePolicy.isInherenceFactorRequired(),
+                servicePolicy.isJailBreakProtectionEnabled(),
                 geoFences,
                 servicePolicy.getTimeFences());
     }
@@ -280,21 +285,23 @@ class ServiceManagingBaseClient {
         return transportFence;
     }
 
-    private void checkForUnknownPolicyFormat(Policy condInPolicy, Policy condOutPolicy) throws UnknownPolicyException {
-        // TODO: Verify this is correct and maybe use similar validation as in ConditionalGeofencePolicy.java
-        // Prevent unknown policy types from being converted
-        ArrayList<Boolean> everythingShouldEvalFalse = new ArrayList<>();
-        everythingShouldEvalFalse.add(condInPolicy.getDenyEmulatorSimulator());
-        everythingShouldEvalFalse.add(condInPolicy.getDenyRootedJailbroken());
-        everythingShouldEvalFalse.add(condOutPolicy.getDenyEmulatorSimulator());
-        everythingShouldEvalFalse.add(condOutPolicy.getDenyRootedJailbroken());
-        for (Boolean o : everythingShouldEvalFalse) {
-            if (o) {
-                throw new UnknownPolicyException("Unknown policy type",null,null);
+    private void verifySubPolicy(Policy subPolicy) throws UnknownPolicyException {
+        // Assert policy is either null or is of Type FactorsPolicy or MethodAmountPolicy
+        // Assert denyRootedJailbroken and denyEmulatorSimulator are false
+        // Assert no fences
+        if (subPolicy == null) {
+            return;
+        }
+        if ((subPolicy instanceof FactorsPolicy) || (subPolicy instanceof MethodAmountPolicy)) {
+            if (subPolicy.getDenyEmulatorSimulator() || subPolicy.getDenyRootedJailbroken()) {
+                throw new UnknownPolicyException("Inside or Outside Policy objects cannot have denyEmulatorSimulator or denyRootedJailbroken set to true", null, null);
+            }
+            if (subPolicy.getFences() != null) {
+                throw new UnknownPolicyException("Fences are not supported on Inside or Outside Policy objects",null,null);
             }
         }
-        if ((condInPolicy.getFences() != null) || (condOutPolicy.getFences() != null)) {
-            throw new UnknownPolicyException("Fences are not supported on Inside or Outside Policy objects",null,null);
+        else {
+            throw new UnknownPolicyException("Inside or Outside Policy objects must be of type FactorsPolicy or MethodAmountPolicy, or null if no policy", null, null);
         }
     }
 }

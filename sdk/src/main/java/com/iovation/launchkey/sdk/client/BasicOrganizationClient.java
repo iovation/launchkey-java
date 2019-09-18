@@ -315,9 +315,9 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
         Policy policy = null;
         try {
             policy = getAdvancedServicePolicy(serviceId);
-        } catch (Exception e) {
-            Logger.getLogger("com.iovation.launchkey.sdk").throwing("BasicDirectoryClient.java","getServicePolicy(UUID serviceId)",e);
-            return null;
+        } catch (InvalidPolicyAttributes | UnknownFenceTypeException | UnknownPolicyException e) {
+            Logger.getLogger("com.iovation.launchkey.sdk").throwing("BasicOrganizationClient.java","getServicePolicy(UUID serviceId)",e);
+            throw new InvalidResponseException("Error thrown from internal getAdvancedServicePolicy",e.getCause(),e.getErrorCode());
         }
         if (!(policy instanceof LegacyPolicy)) {
             Logger.getLogger("com.iovation.launchkey.sdk").severe("Received new policy type using deprecated method. Please update to use getAdvancedServicePolicy instead");
@@ -333,9 +333,9 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             CryptographyError {
         try {
             setAdvancedServicePolicy(serviceId, getLegacyPolicyFromServicePolicy(policy));
-        } catch (Exception e) {
-            Logger.getLogger("com.iovation.launchkey.sdk").throwing("BasicDirectoryClient.java","setServicePolicy(UUID serviceId, ServicePolicy policy)",e);
-            return;
+        } catch (UnknownFenceTypeException | UnknownPolicyException e) {
+            Logger.getLogger("com.iovation.launchkey.sdk").throwing("BasicOrganizationClient.java","setServicePolicy(UUID serviceId, ServicePolicy policy)",e);
+            throw new UnknownEntityException("Error thrown from internal sgetAdvancedServicePolicy",e.getCause(),e.getErrorCode());
         }
     }
 

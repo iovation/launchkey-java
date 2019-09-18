@@ -226,8 +226,9 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
         Policy policy = null;
         try {
             policy = getAdvancedServicePolicy(serviceId);
-        } catch (Exception e) {
+        } catch (InvalidPolicyAttributes | UnknownFenceTypeException | UnknownPolicyException e) {
             Logger.getLogger("com.iovation.launchkey.sdk").throwing("BasicDirectoryClient.java","getServicePolicy(UUID serviceId)",e);
+            throw new InvalidResponseException("Error thrown from internal getAdvancedServicePolicy",e.getCause(),e.getErrorCode());
         }
         if (!(policy instanceof LegacyPolicy)) {
             Logger.getLogger("com.iovation.launchkey.sdk").severe("Received new policy type using deprecated method. Please update to use getAdvancedServicePolicy instead");
@@ -243,8 +244,9 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
             CryptographyError {
         try {
             setAdvancedServicePolicy(serviceId, getLegacyPolicyFromServicePolicy(policy));
-        } catch (Exception e) {
+        } catch (UnknownFenceTypeException | UnknownPolicyException e) {
             Logger.getLogger("com.iovation.launchkey.sdk").throwing("BasicDirectoryClient.java","setServicePolicy(UUID serviceId, ServicePolicy policy)",e);
+            throw new UnknownEntityException("Error thrown from internal setAdvancedServicePolicy",e.getCause(),e.getErrorCode());
         }
     }
 

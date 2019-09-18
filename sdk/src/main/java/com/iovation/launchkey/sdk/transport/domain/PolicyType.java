@@ -15,7 +15,7 @@ public class PolicyType {
     }
 
     public PolicyTypeEnum getPolicyTypeEnum() {
-        if (policyType == null || policyType.equals("")) {
+        if (policyType == null) {
             return PolicyTypeEnum.LEGACY;
         }
         else {
