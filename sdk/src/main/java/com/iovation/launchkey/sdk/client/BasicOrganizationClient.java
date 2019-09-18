@@ -366,8 +366,13 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
     public void setAdvancedServicePolicy(UUID serviceId, Policy policy) throws PlatformErrorException,
             UnknownEntityException, InvalidResponseException, InvalidStateException, InvalidCredentialsException,
             CommunicationErrorException, MarshallingError, CryptographyError, UnknownFenceTypeException, UnknownPolicyException {
-        com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = getTransportPolicyFromDomainPolicy(policy);
-        transport.directoryV3PolicyPut(new PolicyPutRequest(serviceId, transportPolicy), organization);
+        com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy = getTransportPolicyFromDomainPolicy(policy);
+        if (transportPolicy instanceof com.iovation.launchkey.sdk.transport.domain.ServicePolicy) {
+            transport.directoryV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, (com.iovation.launchkey.sdk.transport.domain.ServicePolicy) transportPolicy), organization);
+        }
+        else {
+            transport.directoryV3PolicyPut(new PolicyPutRequest(serviceId, (com.iovation.launchkey.sdk.transport.domain.Policy) transportPolicy), organization);
+        }
     }
 
     @Override

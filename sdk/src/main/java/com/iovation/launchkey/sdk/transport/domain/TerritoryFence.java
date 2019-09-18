@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({"type", "name", "country", "administrative_area", "postal_code"})
-public class TerritoryFence implements Fence {
-
-    @JsonProperty("name")
-    private final String fenceName;
+public class TerritoryFence extends Fence {
 
     @JsonProperty("country")
     private final String country;
@@ -19,23 +16,17 @@ public class TerritoryFence implements Fence {
     @JsonProperty("postal_code")
     private final String postalCode;
 
-    @JsonProperty("type")
-    private final String type = "TERRITORY";
-
     @JsonCreator
     public TerritoryFence(@JsonProperty("name") String fenceName,
                           @JsonProperty("country") String country,
                           @JsonProperty("administrative_area") String administrativeArea,
                           @JsonProperty("postal_code") String postalCode) {
-        this.fenceName = fenceName;
+        super(fenceName,"TERRITORY");
         this.country = country;
         this.administrativeArea = administrativeArea;
         this.postalCode = postalCode;
     }
 
-    public String getFenceName() {
-        return fenceName;
-    }
 
     public String getCountry() {
         return country;
@@ -49,7 +40,4 @@ public class TerritoryFence implements Fence {
         return postalCode;
     }
 
-    public String getType() {
-        return type;
-    }
 }

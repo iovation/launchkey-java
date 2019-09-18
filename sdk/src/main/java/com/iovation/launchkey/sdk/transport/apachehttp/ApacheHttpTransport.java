@@ -735,7 +735,7 @@ public class ApacheHttpTransport implements Transport {
         HttpResponse response =
                 getHttpResponse("POST", "/directory/v3/service/policy/item", subject, request, true, null);
         PolicyAdapter policy = null;
-        PolicyType policyType = decryptResponse(response, PolicyType.class);
+        Policy policyType = decryptResponse(response, Policy.class);
         switch (policyType.getPolicyTypeEnum()) {
             case LEGACY:
                 policy = decryptResponse(response, ServicePolicy.class);

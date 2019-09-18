@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonIgnoreProperties(value = {"geoFenceLocations", "geoFences", "deviceIntegrity"}, ignoreUnknown = true)
-@JsonPropertyOrder({"minimum_requirements", "factors"})
+@JsonPropertyOrder({"type","minimum_requirements", "factors"})
 public class AuthPolicy {
     private final static Logger logger = Logger.getLogger("com.iovation.launchkey.sdk");
     private final static int ZERO = 0;
@@ -31,6 +31,8 @@ public class AuthPolicy {
     private final List<Location> geoFenceLocations;
     private final Boolean deviceIntegrity;
 
+    @JsonProperty("type")
+    private static final String policyType = "LEGACY";
 
     @Deprecated
     public AuthPolicy(Integer any, Boolean knowledge, Boolean inherence, Boolean possession) {

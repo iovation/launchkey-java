@@ -94,6 +94,7 @@ class ServiceManagingBaseClient {
                 fences.add(getDomainFenceFromTransportFence(transportFence));
             }
         }
+        // No concept of LEGACY policy in transport objects
         if (policyType.equals("COND_GEO")) {
             com.iovation.launchkey.sdk.transport.domain.ConditionalGeoFencePolicy conGeoPolicy =
                     (com.iovation.launchkey.sdk.transport.domain.ConditionalGeoFencePolicy) transportPolicy;
@@ -125,16 +126,13 @@ class ServiceManagingBaseClient {
             }
             domainPolicy = new FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inherence,knowledge,possession);
         }
-        else if (policyType.equals("LEGACY")) {
-            // TODO: Parse Legacy Policy
-        }
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
         }
         return domainPolicy;
     }
 
-    protected com.iovation.launchkey.sdk.transport.domain.Policy getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
+    protected com.iovation.launchkey.sdk.transport.domain.PolicyAdapter getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
         Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
         List<Fence> domainPolicyFences = domainPolicy.getFences();
@@ -148,7 +146,7 @@ class ServiceManagingBaseClient {
         com.iovation.launchkey.sdk.transport.domain.Policy inPolicy = null;
         com.iovation.launchkey.sdk.transport.domain.Policy outPolicy = null;
 
-        com.iovation.launchkey.sdk.transport.domain.Policy transportPolicy = null;
+        com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy = null;
 
         if (domainPolicy instanceof ConditionalGeoFencePolicy) {
             ConditionalGeoFencePolicy condGeoPolicy = (ConditionalGeoFencePolicy) domainPolicy;
@@ -156,8 +154,8 @@ class ServiceManagingBaseClient {
             Policy condOutPolicy = condGeoPolicy.getOutPolicy();
             verifySubPolicy(condInPolicy);
             verifySubPolicy(condOutPolicy);
-            inPolicy = getTransportPolicyFromDomainPolicy(condInPolicy);
-            outPolicy = getTransportPolicyFromDomainPolicy(condOutPolicy);
+            inPolicy = (com.iovation.launchkey.sdk.transport.domain.Policy) getTransportPolicyFromDomainPolicy(condInPolicy);
+            outPolicy = (com.iovation.launchkey.sdk.transport.domain.Policy) getTransportPolicyFromDomainPolicy(condOutPolicy);
             transportPolicy = new com.iovation.launchkey.sdk.transport.domain.ConditionalGeoFencePolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy);
         }
         else if (domainPolicy instanceof MethodAmountPolicy) {
@@ -184,7 +182,9 @@ class ServiceManagingBaseClient {
             transportPolicy = new com.iovation.launchkey.sdk.transport.domain.FactorsPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,factors);
         }
         else if (domainPolicy instanceof LegacyPolicy) {
-            // TODO: Parse Legacy Policy Type
+            LegacyPolicy legacyPolicy = (LegacyPolicy) domainPolicy;
+            ServicePolicy servicePolicy = getServicePolicyFromLegacyPolicy(legacyPolicy);
+            transportPolicy = getTransportServicePolicyFromDomainServicePolicy(servicePolicy);
         }
         else {
             throw new UnknownPolicyException("Unknown policy type",null,null);
