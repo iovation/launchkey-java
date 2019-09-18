@@ -20,6 +20,7 @@ public class ConditionalGeoFencePolicy implements Policy {
     @JsonProperty("deny_emulator_simulator")
     private final Boolean denyEmulatorSimulator;
 
+    // TODO: Fence needs Jackson annotation
     @JsonProperty("fences")
     private final List<Fence> fences;
 
