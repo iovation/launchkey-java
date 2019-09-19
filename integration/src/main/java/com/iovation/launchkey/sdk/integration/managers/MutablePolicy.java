@@ -29,11 +29,25 @@ public class MutablePolicy {
         sourceImmutablePolicy = new MethodAmountPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(),amount);
     }
 
-    public void setFactors(List<Factor> factors) throws Throwable {
+    public void setFactors(List<String> factors) throws Throwable {
         if ((sourceImmutablePolicy == null) || !(sourceImmutablePolicy instanceof FactorsPolicy)) {
             throw new Throwable("Source Policy is not of type factors policy cannot add factors");
         }
-        sourceImmutablePolicy = new FactorsPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(),factors);
+        boolean inherence = false;
+        boolean possession = false;
+        boolean knowledge = false;
+        for (String factor : factors) {
+            if (factor.equals("KNOWLEDGE")) {
+                knowledge = true;
+            }
+            if (factor.equals("INHERENCE")) {
+                inherence = true;
+            }
+            if (factor.equals("POSSESSION")) {
+                possession = true;
+            }
+        }
+        sourceImmutablePolicy = new FactorsPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(),inherence,knowledge,possession);
     }
 
     public void setDenyRootedJailBroken(Boolean newValue) throws Throwable {
@@ -44,7 +58,8 @@ public class MutablePolicy {
             sourceImmutablePolicy = new MethodAmountPolicy(newValue, sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(),((MethodAmountPolicy) sourceImmutablePolicy).getAmount());
         }
         else if (sourceImmutablePolicy instanceof FactorsPolicy) {
-            sourceImmutablePolicy = new FactorsPolicy(newValue, sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(),((FactorsPolicy) sourceImmutablePolicy).getFactors());
+            FactorsPolicy factorsPolicy = (FactorsPolicy) sourceImmutablePolicy;
+            sourceImmutablePolicy = new FactorsPolicy(newValue, sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(),factorsPolicy.isInherenceRequired(),factorsPolicy.isKnowledgeRequired(),factorsPolicy.isPossessionRequired());
         }
         else if (sourceImmutablePolicy instanceof ConditionalGeoFencePolicy) {
             sourceImmutablePolicy = new ConditionalGeoFencePolicy(newValue, sourceImmutablePolicy.getDenyEmulatorSimulator(), sourceImmutablePolicy.getFences(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getInPolicy(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getOutPolicy());
@@ -62,7 +77,8 @@ public class MutablePolicy {
             sourceImmutablePolicy = new MethodAmountPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(),newValue, sourceImmutablePolicy.getFences(),((MethodAmountPolicy) sourceImmutablePolicy).getAmount());
         }
         else if (sourceImmutablePolicy instanceof FactorsPolicy) {
-            sourceImmutablePolicy = new FactorsPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(),newValue, sourceImmutablePolicy.getFences(),((FactorsPolicy) sourceImmutablePolicy).getFactors());
+            FactorsPolicy factorsPolicy = (FactorsPolicy) sourceImmutablePolicy;
+            sourceImmutablePolicy = new FactorsPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(),newValue, sourceImmutablePolicy.getFences(),factorsPolicy.isInherenceRequired(),factorsPolicy.isKnowledgeRequired(),factorsPolicy.isPossessionRequired());
         }
         else if (sourceImmutablePolicy instanceof ConditionalGeoFencePolicy) {
             sourceImmutablePolicy = new ConditionalGeoFencePolicy(sourceImmutablePolicy.getDenyRootedJailbroken(),newValue, sourceImmutablePolicy.getFences(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getInPolicy(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getOutPolicy());
@@ -85,7 +101,8 @@ public class MutablePolicy {
             sourceImmutablePolicy = new MethodAmountPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(),fences,((MethodAmountPolicy) sourceImmutablePolicy).getAmount());
         }
         else if (sourceImmutablePolicy instanceof FactorsPolicy) {
-            sourceImmutablePolicy = new FactorsPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(),fences,((FactorsPolicy) sourceImmutablePolicy).getFactors());
+            FactorsPolicy factorsPolicy = (FactorsPolicy) sourceImmutablePolicy;
+            sourceImmutablePolicy = new FactorsPolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(),fences,factorsPolicy.isInherenceRequired(),factorsPolicy.isKnowledgeRequired(),factorsPolicy.isPossessionRequired());
         }
         else if (sourceImmutablePolicy instanceof ConditionalGeoFencePolicy) {
             sourceImmutablePolicy = new ConditionalGeoFencePolicy(sourceImmutablePolicy.getDenyRootedJailbroken(), sourceImmutablePolicy.getDenyEmulatorSimulator(),fences, ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getInPolicy(), ((ConditionalGeoFencePolicy) sourceImmutablePolicy).getOutPolicy());
@@ -111,7 +128,7 @@ public class MutablePolicy {
         sourceImmutablePolicy = new ConditionalGeoFencePolicy(castedCachedPolicy.getDenyRootedJailbroken(),castedCachedPolicy.getDenyEmulatorSimulator(),castedCachedPolicy.getFences(),castedCachedPolicy.getInPolicy(),outsidePolicy);
     }
 
-    public void addFactorToInsidePolicy(Factor factor) throws Throwable {
+    public void addFactorToInsidePolicy(String factor) throws Throwable {
         if ((sourceImmutablePolicy == null) || !(sourceImmutablePolicy instanceof ConditionalGeoFencePolicy)) {
             throw new Throwable("Source Policy is not ConditionalGeoFence type cannot hold inside policies");
         }
@@ -123,9 +140,19 @@ public class MutablePolicy {
         }
         ConditionalGeoFencePolicy castedCachedPolicy = (ConditionalGeoFencePolicy) sourceImmutablePolicy;
         FactorsPolicy existingFactorsPolicy = (FactorsPolicy) castedCachedPolicy.getInPolicy();
-        List<Factor> factors = new ArrayList<>();
-        factors.add(factor);
-        FactorsPolicy newFactorsPolicy = new FactorsPolicy(existingFactorsPolicy.getDenyRootedJailbroken(),existingFactorsPolicy.getDenyRootedJailbroken(),existingFactorsPolicy.getFences(),factors);
+        boolean inherence = false;
+        boolean possession = false;
+        boolean knowledge = false;
+        if (factor.equals("KNOWLEDGE")) {
+            knowledge = true;
+        }
+        if (factor.equals("INHERENCE")) {
+            inherence = true;
+        }
+        if (factor.equals("POSSESSION")) {
+            possession = true;
+        }
+        FactorsPolicy newFactorsPolicy = new FactorsPolicy(existingFactorsPolicy.getDenyRootedJailbroken(),existingFactorsPolicy.getDenyRootedJailbroken(),existingFactorsPolicy.getFences(),inherence,knowledge,possession);
         sourceImmutablePolicy = new ConditionalGeoFencePolicy(castedCachedPolicy.getDenyRootedJailbroken(),castedCachedPolicy.getDenyEmulatorSimulator(),castedCachedPolicy.getFences(),newFactorsPolicy,castedCachedPolicy.getOutPolicy());
     }
 
@@ -145,7 +172,7 @@ public class MutablePolicy {
         sourceImmutablePolicy = new ConditionalGeoFencePolicy(castedCachedPolicy.getDenyRootedJailbroken(),castedCachedPolicy.getDenyEmulatorSimulator(),castedCachedPolicy.getFences(),newInsidePolicy,castedCachedPolicy.getOutPolicy());
     }
 
-    public void addFactorToOutsidePolicy(Factor factor) throws Throwable {
+    public void addFactorToOutsidePolicy(String factor) throws Throwable {
         if ((sourceImmutablePolicy == null) || !(sourceImmutablePolicy instanceof ConditionalGeoFencePolicy)) {
             throw new Throwable("Source Policy is not ConditionalGeoFence type cannot hold outside policies");
         }
@@ -157,9 +184,19 @@ public class MutablePolicy {
         }
         ConditionalGeoFencePolicy castedCachedPolicy = (ConditionalGeoFencePolicy) sourceImmutablePolicy;
         FactorsPolicy existingFactorsPolicy = (FactorsPolicy) castedCachedPolicy.getOutPolicy();
-        List<Factor> factors = new ArrayList<>();
-        factors.add(factor);
-        FactorsPolicy newFactorsPolicy = new FactorsPolicy(existingFactorsPolicy.getDenyRootedJailbroken(),existingFactorsPolicy.getDenyRootedJailbroken(),existingFactorsPolicy.getFences(),factors);
+        boolean inherence = false;
+        boolean possession = false;
+        boolean knowledge = false;
+        if (factor.equals("KNOWLEDGE")) {
+            knowledge = true;
+        }
+        if (factor.equals("INHERENCE")) {
+            inherence = true;
+        }
+        if (factor.equals("POSSESSION")) {
+            possession = true;
+        }
+        FactorsPolicy newFactorsPolicy = new FactorsPolicy(existingFactorsPolicy.getDenyRootedJailbroken(),existingFactorsPolicy.getDenyRootedJailbroken(),existingFactorsPolicy.getFences(),inherence,knowledge,possession);
         sourceImmutablePolicy = new ConditionalGeoFencePolicy(castedCachedPolicy.getDenyRootedJailbroken(),castedCachedPolicy.getDenyEmulatorSimulator(),castedCachedPolicy.getFences(),castedCachedPolicy.getInPolicy(),newFactorsPolicy);
     }
 
