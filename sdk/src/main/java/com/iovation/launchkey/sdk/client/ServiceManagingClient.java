@@ -364,7 +364,7 @@ public interface ServiceManagingClient {
      * Update the default authorization policy for a Service
      *
      * @param serviceId ID of the Service for which the Public Key belongs
-     * @param policy Default authorization policy for the Service
+     * @param servicePolicy Default authorization policy for the Service
      * @throws InvalidResponseException When the response JWT is missing or does not pass validation, when the response
      * content hash does not match the value in the JWT, or when the JWE in the body fails validation, or the decrypted
      * JWE in the body cannot be parsed or mapped to the expected data.
@@ -381,7 +381,7 @@ public interface ServiceManagingClient {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      * the signature of the response
      */
-    void setAdvancedServicePolicy(UUID serviceId, Policy policy)
+    void setAdvancedServicePolicy(UUID serviceId, Policy servicePolicy)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError, UnknownFenceTypeException, UnknownPolicyException;
