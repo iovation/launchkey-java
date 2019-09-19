@@ -91,9 +91,9 @@ public class PolicySteps {
     @And("I set the factors to {string}")
     public void iSetTheFactorsTo(String arg0) throws Throwable {
         String[] factorsAsStrings = arg0.split("\\s*,\\s*");
-        List<Factor> factors = new ArrayList<>();
+        List<String> factors = new ArrayList<>();
         for (String stringFactor : factorsAsStrings) {
-            factors.add(Factor.valueOf(stringFactor.toUpperCase()));
+            factors.add(stringFactor.toUpperCase());
         }
         policyContext.currentPolicy.setFactors(factors);
     }
@@ -131,8 +131,7 @@ public class PolicySteps {
 
     @And("^I set the outside Policy factors to \"([^\"]*)\"$")
     public void setOutsidePolicyFactors(String policyFactor) throws Throwable {
-        Factor factor = Factor.valueOf(policyFactor.toUpperCase());
-        policyContext.currentPolicy.addFactorToOutsidePolicy(factor);
+        policyContext.currentPolicy.addFactorToOutsidePolicy(policyFactor.toUpperCase());
     }
 
     @And("^I set the inside Policy amount to \"([^\"]*)\"$")
@@ -143,8 +142,7 @@ public class PolicySteps {
 
     @And("^I set the inside Policy factors to \"([^\"]*)\"$")
     public void setInsidePolicyFactors(String policyFactor) throws Throwable {
-        Factor factor = Factor.valueOf(policyFactor.toUpperCase());
-        policyContext.currentPolicy.addFactorToInsidePolicy(factor);
+        policyContext.currentPolicy.addFactorToInsidePolicy(policyFactor.toUpperCase());
     }
 
     @And("^that fence has a latitude of \"([^\"]*)\"$")
@@ -209,11 +207,29 @@ public class PolicySteps {
 
     @And("^factors should be set to \"([^\"]*)\"$")
     public void theInsidePolicyFactorsAre(String factorString) throws Throwable {
-        Factor factor = Factor.valueOf(factorString.toUpperCase());
-        List<Factor> expectedFactors = new ArrayList<>();
-        expectedFactors.add(factor);
+        String[] factorsAsStrings = factorString.split("\\s*,\\s*");
+        List<String> expectedFactors = new ArrayList<>();
+        for (String stringFactor : factorsAsStrings) {
+            expectedFactors.add(stringFactor.toUpperCase());
+        }
+        boolean inherence = false;
+        boolean possession = false;
+        boolean knowledge = false;
+        for (String factor : expectedFactors) {
+            if (factor.equals("KNOWLEDGE")) {
+                knowledge = true;
+            }
+            if (factor.equals("INHERENCE")) {
+                inherence = true;
+            }
+            if (factor.equals("POSSESSION")) {
+                possession = true;
+            }
+        }
         FactorsPolicy factorsPolicy = (FactorsPolicy) policyContext.currentPolicy.toImmutablePolicy();
-        assertEquals(new HashSet<>(expectedFactors), new HashSet<>(factorsPolicy.getFactors()));
+        assertEquals(inherence,factorsPolicy.isInherenceRequired());
+        assertEquals(possession,factorsPolicy.isPossessionRequired());
+        assertEquals(knowledge,factorsPolicy.isKnowledgeRequired());
     }
 
     @And("^deny_rooted_jailbroken should be set to \"([^\"]*)\"$")
@@ -238,19 +254,19 @@ public class PolicySteps {
     @And("I attempt to create a new Conditional Geofence Policy with the inside policy set to the new policy")
     public void iAttemptToCreateANewConditionalGeofencePolicyWithTheInsidePolicySetToTheNewPolicy() throws InvalidPolicyAttributes {
         Policy newPolicy = policyContext.currentPolicy.toImmutablePolicy();
-        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(null,null,null,newPolicy,null);
+        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(true,true,null,newPolicy,null);
     }
 
     @And("I attempt to create a new Conditional Geofence Policy with the outside policy set to the new policy")
     public void iAttemptToCreateANewConditionalGeofencePolicyWithTheOutsidePolicySetToTheNewPolicy() throws InvalidPolicyAttributes {
         Policy newPolicy = policyContext.currentPolicy.toImmutablePolicy();
-        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(null,null,null,null,newPolicy);
+        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(true,true,null,null,newPolicy);
     }
 
     @When("I attempt to set the inside policy to any Conditional Geofence Policy")
     public void iAttemptToSetTheInsidePolicyToAnyConditionalGeofencePolicy() throws InvalidPolicyAttributes {
         Policy currentPolicy = policyContext.currentPolicy.toImmutablePolicy();
-        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(null,null,null,new ConditionalGeoFencePolicy(),null);
+        ConditionalGeoFencePolicy condGeoPolicy = new ConditionalGeoFencePolicy(true,true,null,new ConditionalGeoFencePolicy(),null);
     }
 
     @Given("I have any Conditional Geofence Policy")
@@ -259,14 +275,30 @@ public class PolicySteps {
     }
 
     @And("I set the factors to {factors}")
-    public void iSetTheFactorsToFactors(List<Factor> factors) throws Throwable {
+    public void iSetTheFactorsToFactors(List<String> factors) throws Throwable {
         policyContext.currentPolicy.setFactors(factors);
     }
 
     @Then("factors should be set to {factors}")
-    public void factorsShouldBeSetToFactors(List<Factor> factors) {
+    public void factorsShouldBeSetToFactors(List<String> factors) {
         FactorsPolicy policy = (FactorsPolicy) policyContext.currentPolicy.toImmutablePolicy();
-        assertEquals(new HashSet<>(factors), new HashSet<>(policy.getFactors()));
+        boolean inherence = false;
+        boolean possession = false;
+        boolean knowledge = false;
+        for (String factor : factors) {
+            if (factor.equals("KNOWLEDGE")) {
+                knowledge = true;
+            }
+            if (factor.equals("INHERENCE")) {
+                inherence = true;
+            }
+            if (factor.equals("POSSESSION")) {
+                possession = true;
+            }
+        }
+        assertEquals(policy.isInherenceRequired(),inherence);
+        assertEquals(policy.isKnowledgeRequired(), knowledge);
+        assertEquals(policy.isPossessionRequired(), possession);
     }
 
     @And("I set deny_rooted_jailbroken on the Policy to {value}")

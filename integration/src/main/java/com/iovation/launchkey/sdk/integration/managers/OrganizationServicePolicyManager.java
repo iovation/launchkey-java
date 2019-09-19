@@ -46,16 +46,10 @@ public class OrganizationServicePolicyManager {
         return currentServicePolicyEntity;
     }
 
+    @Deprecated
     public void retrievePolicyForService(UUID serviceId) throws Throwable {
-        // TODO: client needs better getter
-        PolicyAdapter adapter = client.getServicePolicy(serviceId);
-        if (adapter instanceof ServicePolicy) {
-            ServicePolicy policy = (ServicePolicy) adapter;
-            currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
-        }
-        else {
-            throw new Throwable("Expecting legacy policy type received new policy type");
-        }
+        ServicePolicy policy = client.getServicePolicy(serviceId);
+        currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
     }
 
     public void retrievePolicyForCurrentService() throws Throwable {
@@ -80,14 +74,10 @@ public class OrganizationServicePolicyManager {
 
     // Support for Advanced Policy Types
     public void setPolicyForCurrentService(Policy policy) throws Throwable {
-        client.setServicePolicy(organizationServiceManager.getCurrentServiceEntity().getId(), policy);
+        client.setAdvancedServicePolicy(organizationServiceManager.getCurrentServiceEntity().getId(), policy);
     }
 
     public Policy getCurrentlySetOrganizationServicePolicy() throws Throwable {
-        PolicyAdapter adapter = client.getServicePolicy(organizationServiceManager.getCurrentServiceEntity().getId());
-        if (adapter instanceof ServicePolicy) {
-            return null;
-        }
-        return (Policy) adapter;
+        return client.getAdvancedServicePolicy(organizationServiceManager.getCurrentServiceEntity().getId());
     }
 }

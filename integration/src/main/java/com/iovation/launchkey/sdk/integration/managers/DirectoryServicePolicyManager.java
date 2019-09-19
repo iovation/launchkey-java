@@ -45,16 +45,10 @@ public class DirectoryServicePolicyManager {
         return currentServicePolicyEntity;
     }
 
+    @Deprecated
     public void retrievePolicyForService(UUID serviceId) throws Throwable {
-        // TODO: client needs better getter
-        PolicyAdapter adapter = getDirectoryClient().getServicePolicy(serviceId);
-        if (adapter instanceof ServicePolicy) {
-            ServicePolicy policy = (ServicePolicy) adapter;
-            currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
-        }
-        else {
-            throw new Throwable("Expecting legacy policy type received new policy type");
-        }
+        ServicePolicy policy = getDirectoryClient().getServicePolicy(serviceId);
+        currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
     }
 
     public void retrievePolicyForCurrentService() throws Throwable {
@@ -83,14 +77,10 @@ public class DirectoryServicePolicyManager {
 
     // Support for Advanced Policy Types
     public void setPolicyForCurrentService(Policy policy) throws Throwable {
-        getDirectoryClient().setServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId(), policy);
+        getDirectoryClient().setAdvancedServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId(), policy);
     }
 
     public Policy getCurrentlySetDirectoryServiceAdvancedPolicy() throws Throwable {
-        PolicyAdapter adapter = getDirectoryClient().getServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId());
-        if (adapter instanceof ServicePolicy) {
-            return null;
-        }
-        return (Policy) adapter;
+        return getDirectoryClient().getAdvancedServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId());
     }
 }

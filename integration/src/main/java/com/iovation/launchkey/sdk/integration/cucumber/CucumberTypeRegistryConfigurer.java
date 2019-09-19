@@ -23,11 +23,11 @@ public class CucumberTypeRegistryConfigurer implements TypeRegistryConfigurer {
                 List.class,
                 new Transformer<List>() {
                     @Override
-                    public List<Factor> transform(String s) throws Throwable {
+                    public List<String> transform(String s) throws Throwable {
                         String[] factorsAsStrings = s.split("\\s*,\\s*");
-                        List<Factor> factors = new ArrayList<>();
+                        List<String> factors = new ArrayList<>();
                         for (String stringFactor : factorsAsStrings) {
-                            factors.add(Factor.valueOf(stringFactor));
+                            factors.add(stringFactor.toUpperCase());
                         }
                         return factors;
                     }
