@@ -31,9 +31,6 @@ public class AuthPolicy {
     private final List<Location> geoFenceLocations;
     private final Boolean deviceIntegrity;
 
-    @JsonProperty("type")
-    private static final String policyType = "LEGACY";
-
     @Deprecated
     public AuthPolicy(Integer any, Boolean knowledge, Boolean inherence, Boolean possession) {
         this(any, knowledge, inherence, possession, null);

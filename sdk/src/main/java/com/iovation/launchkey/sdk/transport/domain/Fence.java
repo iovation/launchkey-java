@@ -2,7 +2,7 @@ package com.iovation.launchkey.sdk.transport.domain;
 
 import com.fasterxml.jackson.annotation.*;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = TerritoryFence.class, name = "TERRITORY"),
         @JsonSubTypes.Type(value = GeoCircleFence.class, name = "GEO_CIRCLE")

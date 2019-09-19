@@ -35,7 +35,11 @@ public class MethodAmountPolicy implements Policy {
 
     @Override
     public List<Fence> getFences() {
-        return Collections.unmodifiableList(new ArrayList<>(fences));
+        if (fences != null) {
+            return Collections.unmodifiableList(new ArrayList<>(fences));
+        } else {
+            return null;
+        }
     }
 
     public int getAmount() { return amount; }

@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.*;
 
 import java.util.List;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = MethodAmountPolicy.class, name = "METHOD_AMOUNT"),
         @JsonSubTypes.Type(value = FactorsPolicy.class, name = "FACTORS"),
@@ -25,29 +28,18 @@ public class Policy implements PolicyAdapter {
     private final Boolean denyEmulatorSimulator;
 
     @JsonCreator
-    public Policy(@JsonProperty("type") String policyTypeString,
-                  @JsonProperty("deny_rooted_jailbroken") Boolean denyRootedJailbroken,
-                  @JsonProperty("deny_emulator_simulator") Boolean denyEmulatorSimulator,
-                  @JsonProperty("fences") List<Fence> fences
-                  ) {
+    public Policy(
+            @JsonProperty("type") String policyTypeString,
+            @JsonProperty("deny_rooted_jailbroken") Boolean denyRootedJailbroken,
+            @JsonProperty("deny_emulator_simulator") Boolean denyEmulatorSimulator,
+            @JsonProperty("fences") List<Fence> fences) {
         this.policyType = policyTypeString;
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
     }
 
-    public PolicyTypeEnum getPolicyTypeEnum() {
-        if (policyType == null) {
-            return PolicyTypeEnum.LEGACY;
-        }
-        else {
-            return PolicyTypeEnum.valueOf(policyType);
-        }
-    }
-
-    public String getPolicyType() {
-        return policyType;
-    }
+    public String getPolicyType() { return policyType; }
 
     public List<Fence> getFences() {
         return fences;

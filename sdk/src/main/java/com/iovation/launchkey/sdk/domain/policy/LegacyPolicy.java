@@ -9,14 +9,14 @@ import java.util.List;
 public class LegacyPolicy implements Policy {
 
     private final int amount;
-    private final boolean inherence;
-    private final boolean knowledge;
-    private final boolean possession;
+    private final Boolean inherence;
+    private final Boolean knowledge;
+    private final Boolean possession;
     private final boolean denyRootedJailbroken;
     private final List<GeoCircleFence> fences;
     private final List<ServicePolicy.TimeFence> timeFences;
 
-    public LegacyPolicy(int amount, boolean inherence, boolean knowledge, boolean possession, boolean denyRootedJailbroken, List<GeoCircleFence> fences, List<ServicePolicy.TimeFence> timeFences) {
+    public LegacyPolicy(int amount, Boolean inherence, Boolean knowledge, Boolean possession, boolean denyRootedJailbroken, List<GeoCircleFence> fences, List<ServicePolicy.TimeFence> timeFences) {
         this.amount = amount;
         this.inherence = inherence;
         this.knowledge = knowledge;
@@ -30,15 +30,15 @@ public class LegacyPolicy implements Policy {
         return amount;
     }
 
-    public boolean isInherence() {
+    public Boolean isInherence() {
         return inherence;
     }
 
-    public boolean isKnowledge() {
+    public Boolean isKnowledge() {
         return knowledge;
     }
 
-    public boolean isPossession() {
+    public Boolean isPossession() {
         return possession;
     }
 
@@ -53,7 +53,12 @@ public class LegacyPolicy implements Policy {
     }
 
     public List<Fence> getFences() {
-        return Collections.unmodifiableList(new ArrayList<Fence>(fences));
+        if (fences != null) {
+            return Collections.unmodifiableList(new ArrayList<Fence>(fences));
+        }
+        else {
+            return null;
+        }
     }
 
     public List<ServicePolicy.TimeFence> getTimeFences() {

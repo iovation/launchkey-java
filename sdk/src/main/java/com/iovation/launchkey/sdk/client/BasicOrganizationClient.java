@@ -343,7 +343,7 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             MarshallingError, CryptographyError, InvalidPolicyAttributes, UnknownFenceTypeException, UnknownPolicyException {
 
         com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy =
-                transport.directoryV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), organization);
+                transport.organizationV3PolicyItemPost(new ServicePolicyItemPostRequest(serviceId), organization);
         Policy returnValue = null;
         if (transportPolicy instanceof com.iovation.launchkey.sdk.transport.domain.Policy) {
             com.iovation.launchkey.sdk.transport.domain.Policy newPolicyType =
@@ -368,10 +368,10 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
             CommunicationErrorException, MarshallingError, CryptographyError, UnknownFenceTypeException, UnknownPolicyException {
         com.iovation.launchkey.sdk.transport.domain.PolicyAdapter transportPolicy = getTransportPolicyFromDomainPolicy(policy);
         if (transportPolicy instanceof com.iovation.launchkey.sdk.transport.domain.ServicePolicy) {
-            transport.directoryV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, (com.iovation.launchkey.sdk.transport.domain.ServicePolicy) transportPolicy), organization);
+            transport.organizationV3ServicePolicyPut(new ServicePolicyPutRequest(serviceId, (com.iovation.launchkey.sdk.transport.domain.ServicePolicy) transportPolicy), organization);
         }
         else {
-            transport.directoryV3PolicyPut(new PolicyPutRequest(serviceId, (com.iovation.launchkey.sdk.transport.domain.Policy) transportPolicy), organization);
+            transport.organizationV3PolicyPut(new PolicyPutRequest(serviceId, (com.iovation.launchkey.sdk.transport.domain.Policy) transportPolicy), organization);
         }
     }
 

@@ -38,7 +38,11 @@ public class FactorsPolicy implements Policy {
 
     @Override
     public List<Fence> getFences() {
-        return Collections.unmodifiableList(new ArrayList<>(fences));
+        if (fences != null) {
+            return Collections.unmodifiableList(new ArrayList<>(fences));
+        } else {
+            return null;
+        }
     }
 
     public boolean isInherenceRequired() {

@@ -135,6 +135,7 @@ class ServiceManagingBaseClient {
     protected com.iovation.launchkey.sdk.transport.domain.PolicyAdapter getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
         Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
+
         List<Fence> domainPolicyFences = domainPolicy.getFences();
         List<com.iovation.launchkey.sdk.transport.domain.Fence> fences = null;
         if (domainPolicyFences != null) {
@@ -194,38 +195,51 @@ class ServiceManagingBaseClient {
 
     protected LegacyPolicy getLegacyPolicyFromServicePolicy(ServicePolicy servicePolicy) {
         List<GeoCircleFence> geoFences = null;
-        if (!servicePolicy.getLocations().isEmpty()) {
-            geoFences = new ArrayList<>();
-            for (ServicePolicy.Location location : servicePolicy.getLocations()) {
-                geoFences.add(getGeoCircleFenceFromLocation(location));
+        if (servicePolicy.getLocations() != null) {
+            if (!servicePolicy.getLocations().isEmpty()) {
+                geoFences = new ArrayList<>();
+                for (ServicePolicy.Location location : servicePolicy.getLocations()) {
+                    geoFences.add(getGeoCircleFenceFromLocation(location));
+                }
             }
         }
-        return new LegacyPolicy(servicePolicy.getRequiredFactors(),
-                servicePolicy.isInherenceFactorRequired(),
-                servicePolicy.isKnowledgeFactorRequired(),
-                servicePolicy.isPossessionFactorRequired(),
-                servicePolicy.isJailBreakProtectionEnabled(),
-                geoFences,
-                servicePolicy.getTimeFences());
+        Integer requiredFactors = servicePolicy.getRequiredFactors();
+        int amount = (requiredFactors != null)  ? requiredFactors : 0;
+        Boolean inherence = servicePolicy.isInherenceFactorRequired();
+        Boolean knownledge = servicePolicy.isKnowledgeFactorRequired();
+        Boolean possession = servicePolicy.isPossessionFactorRequired();
+        boolean denyRootedJailbroken = (servicePolicy.isJailBreakProtectionEnabled() != null) ? servicePolicy.isJailBreakProtectionEnabled() : false;
+        List<ServicePolicy.TimeFence> timeFences = servicePolicy.getTimeFences();
+
+        return new LegacyPolicy(amount,inherence,knownledge,possession,denyRootedJailbroken,geoFences,timeFences);
     }
 
     protected ServicePolicy getServicePolicyFromLegacyPolicy(LegacyPolicy legacyPolicy) {
         List<ServicePolicy.Location> locations = null;
-        if (!legacyPolicy.getFences().isEmpty()) {
-            locations = new ArrayList<>();
-            for (Fence fence : legacyPolicy.getFences()) {
-                if (fence instanceof GeoCircleFence) {
-                    locations.add(getLocationFromGeoCircleFence((GeoCircleFence) fence));
+        if (legacyPolicy.getFences() != null) {
+            if (!legacyPolicy.getFences().isEmpty()) {
+                locations = new ArrayList<>();
+                for (Fence fence : legacyPolicy.getFences()) {
+                    if (fence instanceof GeoCircleFence) {
+                        locations.add(getLocationFromGeoCircleFence((GeoCircleFence) fence));
+                    }
                 }
             }
         }
-        return new ServicePolicy(legacyPolicy.getAmount(),
-                legacyPolicy.isKnowledge(),
-                legacyPolicy.isInherence(),
-                legacyPolicy.isPossession(),
-                legacyPolicy.getDenyRootedJailbroken(),
+        Integer requiredFactors = (legacyPolicy.getAmount() != 0) ? legacyPolicy.getAmount() : null;
+        Boolean knowledgeFactorRequired = legacyPolicy.isKnowledge();
+        Boolean inherenceFactorRequired = legacyPolicy.isInherence();
+        Boolean possessionFactorRequired = legacyPolicy.isPossession();
+        Boolean jailBreakProtectionEnabled = legacyPolicy.getDenyRootedJailbroken();
+        List<ServicePolicy.TimeFence> timeFences = legacyPolicy.getTimeFences();
+
+        return new ServicePolicy(requiredFactors,
+                knowledgeFactorRequired,
+                inherenceFactorRequired,
+                possessionFactorRequired,
+                jailBreakProtectionEnabled,
                 locations,
-                legacyPolicy.getTimeFences());
+                timeFences);
     }
 
     private GeoCircleFence getGeoCircleFenceFromLocation(ServicePolicy.Location location) {
