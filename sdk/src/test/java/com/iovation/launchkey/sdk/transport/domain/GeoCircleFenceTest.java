@@ -17,6 +17,15 @@ public class GeoCircleFenceTest {
     }
 
     @Test
+    public void objectParsesAsExpected() throws Exception {
+        String json = "{\"type\":\"GEO_CIRCLE\",\"name\":\"a GeoCircle Fence\",\"latitude\":1.0," +
+                "\"longitude\":1.0,\"radius\":1.0}";
+        GeoCircleFence expected = new GeoCircleFence("a GeoCircle Fence", 1,1,1);
+        GeoCircleFence actual = new ObjectMapper().readValue(json, GeoCircleFence.class);
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void getFenceName() throws Exception {
         GeoCircleFence geoCircleFence = new GeoCircleFence("a GeoCircle Fence", 1,1,1);
         assertEquals(geoCircleFence.getFenceName(), "a GeoCircle Fence");

@@ -32,6 +32,24 @@ public class MethodAmountPolicyTest {
     }
 
     @Test
+    public void objectParsesAsExpected() throws Exception {
+        String json = "{\"type\":\"METHOD_AMOUNT\",\"deny_rooted_jailbroken\":true," +
+                "\"deny_emulator_simulator\":true,\"fences\":[{\"type\":\"GEO_CIRCLE\"," +
+                "\"name\":\"a GeoCircle Fence\",\"latitude\":1.0,\"longitude\":1.0,\"radius\":1.0}," +
+                "{\"type\":\"TERRITORY\",\"name\":\"a Territory Fence\",\"country\":\"country\"," +
+                "\"administrative_area\":\"Admin Area\",\"postal_code\":\"ABCDE6\"}],\"amount\":5}";
+
+        List<Fence> fences = new ArrayList<>();
+        Fence geoCircleFence = new GeoCircleFence("a GeoCircle Fence", 1,1,1);
+        Fence territorialFence = new TerritoryFence("a Territory Fence", "country", "Admin Area", "ABCDE6");
+        fences.add(geoCircleFence);
+        fences.add(territorialFence);
+        Policy expected = new MethodAmountPolicy(true,true,fences,5);
+        MethodAmountPolicy actual = new ObjectMapper().readValue(json, MethodAmountPolicy.class);
+        assertEquals(expected,actual);
+    }
+
+    @Test
     public void getPolicyType() {
         MethodAmountPolicy policy = new MethodAmountPolicy(null,null,null,0);
         assertEquals(policy.getPolicyType(),"METHOD_AMOUNT");

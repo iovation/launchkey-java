@@ -16,6 +16,15 @@ public class TerritoryFenceTest {
     }
 
     @Test
+    public void objectParsesAsExpected() throws Exception {
+        String json = "{\"type\":\"TERRITORY\",\"name\":\"a Territory Fence\",\"country\":\"country\"," +
+                "\"administrative_area\":\"Admin Area\",\"postal_code\":\"ABCDE6\"}";
+        TerritoryFence expected = new TerritoryFence("a Territory Fence", "country", "Admin Area", "ABCDE6");
+        TerritoryFence actual = new ObjectMapper().readValue(json, TerritoryFence.class);
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void getFenceName() throws Exception {
         TerritoryFence territorialFence = new TerritoryFence("a Territory Fence", "country", "Admin Area", "ABCDE6");
         assertEquals(territorialFence.getFenceName(), "a Territory Fence");
