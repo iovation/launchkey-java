@@ -19,7 +19,7 @@ public class CucumberTypeRegistryConfigurer implements TypeRegistryConfigurer {
     public void configureTypeRegistry(TypeRegistry typeRegistry) {
         typeRegistry.defineParameterType(new ParameterType<>(
                 "factors",
-                "(Knowledge|Inherence|Possession)(,\\s*\\d+)*",
+                "(Knowledge|Inherence|Possession|Knowledge, Inherence|Knowledge, Possession|Inherence, Possession|Knowledge, Inherence, Possession)",
                 List.class,
                 new Transformer<List>() {
                     @Override
