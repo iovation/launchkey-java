@@ -381,7 +381,7 @@ public class ServiceManagingBaseClientPolicyConversionTest {
 
         com.iovation.launchkey.sdk.domain.policy.MethodAmountPolicy domainMethodAmountPolicy = new com.iovation.launchkey.sdk.domain.policy.MethodAmountPolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,amount);
         ServiceManagingBaseClient client = new ServiceManagingBaseClient();
-        MethodAmountPolicy transportMethodAmountPolicy = (MethodAmountPolicy) client.getTransportPolicyFromDomainPolicy(domainMethodAmountPolicy);
+        MethodAmountPolicy transportMethodAmountPolicy = (MethodAmountPolicy) client.getTransportPolicyFromDomainPolicy(domainMethodAmountPolicy, false);
 
         assertEquals(transportMethodAmountPolicy.getDenyRootedJailbroken(),denyRootedJailbroken);
         assertEquals(transportMethodAmountPolicy.getDenyEmulatorSimulator(), denyEmulatorSimulator);

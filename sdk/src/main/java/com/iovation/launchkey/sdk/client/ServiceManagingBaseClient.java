@@ -132,10 +132,13 @@ class ServiceManagingBaseClient {
         return domainPolicy;
     }
 
-    protected com.iovation.launchkey.sdk.transport.domain.PolicyAdapter getTransportPolicyFromDomainPolicy(Policy domainPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
+    protected com.iovation.launchkey.sdk.transport.domain.PolicyAdapter getTransportPolicyFromDomainPolicy(Policy domainPolicy, boolean isNestedPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
         Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
         Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
-
+        if (isNestedPolicy) {
+            denyRootedJailbroken = null;
+            denyEmulatorSimulator = null;
+        }
         List<Fence> domainPolicyFences = domainPolicy.getFences();
         List<com.iovation.launchkey.sdk.transport.domain.Fence> fences = null;
         if (domainPolicyFences != null) {
@@ -155,8 +158,8 @@ class ServiceManagingBaseClient {
             Policy condOutPolicy = condGeoPolicy.getOutPolicy();
             verifySubPolicy(condInPolicy);
             verifySubPolicy(condOutPolicy);
-            inPolicy = (com.iovation.launchkey.sdk.transport.domain.Policy) getTransportPolicyFromDomainPolicy(condInPolicy);
-            outPolicy = (com.iovation.launchkey.sdk.transport.domain.Policy) getTransportPolicyFromDomainPolicy(condOutPolicy);
+            inPolicy = (com.iovation.launchkey.sdk.transport.domain.Policy) getTransportPolicyFromDomainPolicy(condInPolicy, true);
+            outPolicy = (com.iovation.launchkey.sdk.transport.domain.Policy) getTransportPolicyFromDomainPolicy(condOutPolicy, true);
             transportPolicy = new com.iovation.launchkey.sdk.transport.domain.ConditionalGeoFencePolicy(denyRootedJailbroken,denyEmulatorSimulator,fences,inPolicy,outPolicy);
         }
         else if (domainPolicy instanceof MethodAmountPolicy) {
