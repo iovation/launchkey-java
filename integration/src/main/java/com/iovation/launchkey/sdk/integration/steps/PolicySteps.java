@@ -13,6 +13,7 @@ import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+@Singleton
 public class PolicySteps {
     private PolicyContext policyContext;
 
@@ -247,7 +249,7 @@ public class PolicySteps {
     @Then("the amount should be set to {string}")
     public void theAmountShouldBeSetTo(String arg0) throws Throwable {
         MethodAmountPolicy policy = (MethodAmountPolicy) policyContext.currentPolicy.toImmutablePolicy();
-        int amount = Integer.getInteger(arg0);
+        int amount = Integer.parseInt(arg0);
         assertEquals(policy.getAmount(),amount);
     }
 
