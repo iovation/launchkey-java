@@ -734,17 +734,15 @@ public class ApacheHttpTransport implements Transport {
             InvalidCredentialsException {
         HttpResponse response =
                 getHttpResponse("POST", "/directory/v3/service/policy/item", subject, request, true, null);
-        PolicyAdapter returnValue = null;
-        Policy policy = decryptResponse(response, Policy.class);
-        returnValue = policy;
-        // No type attribute provided cannot parse into new Policy format
-        if (policy == null) {
-            returnValue = decryptResponse(response, ServicePolicy.class);
+        PolicyResponseType policyType;
+        policyType = decryptResponse(response, PolicyResponseType.class);
+        if (policyType == null) {
+            return decryptResponse(response, ServicePolicy.class);
         }
-        else if (policy.getPolicyType().equals("LEGACY")) {
-            returnValue = decryptResponse(response, ServicePolicy.class);
+        if (policyType.getPolicyType().equals("LEGACY")) {
+            return decryptResponse(response, ServicePolicy.class);
         }
-        return returnValue;
+        return decryptResponse(response, Policy.class);
     }
 
     @Override

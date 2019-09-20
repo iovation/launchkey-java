@@ -53,8 +53,13 @@ public class DirectoryServicePolicySteps {
 
     @When("^I retrieve the Policy for the Current Directory Service$")
     public void iRetrieveTheDirectoryServicePolicy() throws Throwable {
-        directoryServicePolicyManager.retrievePolicyForCurrentService();
-        policyContext.setCurrentPolicy(directoryServicePolicyManager.getCurrentlySetDirectoryServiceAdvancedPolicy());
+        // Adapting old steps to new Feature scenarios
+        if (policyContext.currentPolicy == null) {
+            directoryServicePolicyManager.retrievePolicyForCurrentService();
+        }
+        else {
+            policyContext.setCurrentPolicy(directoryServicePolicyManager.getCurrentlySetDirectoryServiceAdvancedPolicy());
+        }
     }
 
     @When("^I attempt to remove the Policy for the Directory Service with the ID \"([^\"]*)\"$")
@@ -204,9 +209,8 @@ public class DirectoryServicePolicySteps {
         directoryServicePolicyManager.setPolicyForCurrentService(policyContext.currentPolicy.toImmutablePolicy());
     }
 
-    @Then("^the Directory Service Policy has \"([^\"]*)\" fence(?:s)?$")
-    public void directoryServicePolicyHasAmountFences(String stringAmount) throws Throwable {
-        int amount = Integer.getInteger(stringAmount);
+    @Then("^the Directory Service Policy has \"(\\d+)\" fence(?:s)?$")
+    public void directoryServicePolicyHasAmountFences(int amount) throws Throwable {
         Policy policy = directoryServicePolicyManager.getCurrentlySetDirectoryServiceAdvancedPolicy();
         assertThat(policy.getFences().size(), is(equalTo(amount)));
     }
