@@ -1,5 +1,7 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
+import java.util.Objects;
+
 public class GeoCircleFence implements Fence {
 
     private final String fenceName;
@@ -39,5 +41,16 @@ public class GeoCircleFence implements Fence {
 
     public double getRadius() {
         return radius;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GeoCircleFence)) return false;
+        GeoCircleFence that = (GeoCircleFence) o;
+        return Objects.equals(getFenceName(), that.getFenceName()) &&
+                Objects.equals(getLatitude(), that.getLatitude()) &&
+                Objects.equals(getLongitude(), that.getLongitude()) &&
+                Objects.equals(getRadius(), that.getRadius());
     }
 }

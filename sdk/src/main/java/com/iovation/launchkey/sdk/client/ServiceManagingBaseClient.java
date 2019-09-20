@@ -227,9 +227,9 @@ class ServiceManagingBaseClient {
             }
         }
         Integer requiredFactors = (legacyPolicy.getAmount() != 0) ? legacyPolicy.getAmount() : null;
-        Boolean knowledgeFactorRequired = legacyPolicy.isKnowledge();
-        Boolean inherenceFactorRequired = legacyPolicy.isInherence();
-        Boolean possessionFactorRequired = legacyPolicy.isPossession();
+        Boolean knowledgeFactorRequired = legacyPolicy.isKnowledgeRequired();
+        Boolean inherenceFactorRequired = legacyPolicy.isInherenceRequired();
+        Boolean possessionFactorRequired = legacyPolicy.isPossessionRequired();
         Boolean jailBreakProtectionEnabled = legacyPolicy.getDenyRootedJailbroken();
         List<ServicePolicy.TimeFence> timeFences = legacyPolicy.getTimeFences();
 

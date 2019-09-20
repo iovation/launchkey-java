@@ -3,6 +3,7 @@ package com.iovation.launchkey.sdk.transport.domain;
 import com.fasterxml.jackson.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -51,5 +52,16 @@ public class Policy implements PolicyAdapter {
 
     public Boolean getDenyEmulatorSimulator() {
         return denyEmulatorSimulator;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Policy)) return false;
+        Policy that = (Policy) o;
+        return Objects.equals(getFences(), that.getFences()) &&
+                Objects.equals(getDenyEmulatorSimulator(), that.getDenyEmulatorSimulator()) &&
+                Objects.equals(getDenyRootedJailbroken(), that.getDenyRootedJailbroken()) &&
+                Objects.equals(getPolicyType(), that.getPolicyType());
     }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.Objects;
+
 @JsonPropertyOrder({"type", "name", "country", "administrative_area", "postal_code"})
 public class TerritoryFence extends Fence {
 
@@ -38,6 +40,17 @@ public class TerritoryFence extends Fence {
 
     public String getPostalCode() {
         return postalCode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TerritoryFence)) return false;
+        TerritoryFence that = (TerritoryFence) o;
+        return Objects.equals(getFenceName(), that.getFenceName()) &&
+                Objects.equals(getCountry(), that.getCountry()) &&
+                Objects.equals(getAdministrativeArea(), that.getAdministrativeArea()) &&
+                Objects.equals(getPostalCode(), that.getPostalCode());
     }
 
 }

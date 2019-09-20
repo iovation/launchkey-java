@@ -5,6 +5,7 @@ import com.iovation.launchkey.sdk.error.UnknownPolicyException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ConditionalGeoFencePolicy implements Policy {
 
@@ -71,5 +72,17 @@ public class ConditionalGeoFencePolicy implements Policy {
         else {
             throw new InvalidPolicyAttributes("Inside or Outside Policy objects must be of type FactorsPolicy or MethodAmountPolicy, or null if no policy", null, null);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConditionalGeoFencePolicy)) return false;
+        ConditionalGeoFencePolicy that = (ConditionalGeoFencePolicy) o;
+        return Objects.equals(getFences(), that.getFences()) &&
+                Objects.equals(getDenyEmulatorSimulator(), that.getDenyEmulatorSimulator()) &&
+                Objects.equals(getDenyRootedJailbroken(), that.getDenyRootedJailbroken()) &&
+                Objects.equals(getInPolicy(), that.getInPolicy()) &&
+                Objects.equals(getOutPolicy(), that.getOutPolicy());
     }
 }

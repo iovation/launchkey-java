@@ -5,6 +5,7 @@ import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class LegacyPolicy implements Policy {
 
@@ -30,15 +31,15 @@ public class LegacyPolicy implements Policy {
         return amount;
     }
 
-    public Boolean isInherence() {
+    public Boolean isInherenceRequired() {
         return inherence;
     }
 
-    public Boolean isKnowledge() {
+    public Boolean isKnowledgeRequired() {
         return knowledge;
     }
 
-    public Boolean isPossession() {
+    public Boolean isPossessionRequired() {
         return possession;
     }
 
@@ -62,6 +63,25 @@ public class LegacyPolicy implements Policy {
     }
 
     public List<ServicePolicy.TimeFence> getTimeFences() {
-        return Collections.unmodifiableList(timeFences);
+        if (timeFences != null) {
+            return Collections.unmodifiableList(timeFences);
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LegacyPolicy)) return false;
+        LegacyPolicy that = (LegacyPolicy) o;
+        return Objects.equals(getFences(), that.getFences()) &&
+                Objects.equals(getDenyEmulatorSimulator(), that.getDenyEmulatorSimulator()) &&
+                Objects.equals(getDenyRootedJailbroken(), that.getDenyRootedJailbroken()) &&
+                Objects.equals(isInherenceRequired(), that.isInherenceRequired()) &&
+                Objects.equals(isKnowledgeRequired(), that.isKnowledgeRequired()) &&
+                Objects.equals(isPossessionRequired(), that.isPossessionRequired()) &&
+                Objects.equals(getTimeFences(), that.getTimeFences());
     }
 }

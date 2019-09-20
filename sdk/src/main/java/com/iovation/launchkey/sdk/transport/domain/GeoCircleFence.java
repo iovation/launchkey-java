@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.Objects;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"type", "name", "latitude", "longitude", "radius"})
 public class GeoCircleFence extends Fence {
@@ -39,6 +41,17 @@ public class GeoCircleFence extends Fence {
 
     public double getRadius() {
         return radius;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GeoCircleFence)) return false;
+        GeoCircleFence that = (GeoCircleFence) o;
+        return Objects.equals(getFenceName(), that.getFenceName()) &&
+                Objects.equals(getLatitude(), that.getLatitude()) &&
+                Objects.equals(getLongitude(), that.getLongitude()) &&
+                Objects.equals(getRadius(), that.getRadius());
     }
 
 }

@@ -1,5 +1,7 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
+import java.util.Objects;
+
 public class TerritoryFence implements Fence {
 
     private final String fenceName;
@@ -41,4 +43,14 @@ public class TerritoryFence implements Fence {
         return postalCode;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TerritoryFence)) return false;
+        TerritoryFence that = (TerritoryFence) o;
+        return Objects.equals(getFenceName(), that.getFenceName()) &&
+                Objects.equals(getCountry(), that.getCountry()) &&
+                Objects.equals(getAdministrativeArea(), that.getAdministrativeArea()) &&
+                Objects.equals(getPostalCode(), that.getPostalCode());
+    }
 }

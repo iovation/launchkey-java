@@ -1,8 +1,11 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
+import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class MethodAmountPolicy implements Policy {
 
@@ -43,5 +46,16 @@ public class MethodAmountPolicy implements Policy {
     }
 
     public int getAmount() { return amount; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MethodAmountPolicy)) return false;
+        MethodAmountPolicy that = (MethodAmountPolicy) o;
+        return Objects.equals(getFences(), that.getFences()) &&
+                Objects.equals(getDenyEmulatorSimulator(), that.getDenyEmulatorSimulator()) &&
+                Objects.equals(getDenyRootedJailbroken(), that.getDenyRootedJailbroken()) &&
+                Objects.equals(getAmount(), that.getAmount());
+    }
 
 }

@@ -2,6 +2,8 @@ package com.iovation.launchkey.sdk.transport.domain;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.util.Objects;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = TerritoryFence.class, name = "TERRITORY"),
@@ -28,5 +30,14 @@ public class Fence {
 
     public String getType() {
         return fenceType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Fence)) return false;
+        Fence that = (Fence) o;
+        return Objects.equals(getFenceName(), that.getFenceName()) &&
+                Objects.equals(getType(), that.getType());
     }
 }

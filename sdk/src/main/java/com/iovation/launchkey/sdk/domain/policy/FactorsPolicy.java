@@ -3,6 +3,7 @@ package com.iovation.launchkey.sdk.domain.policy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class FactorsPolicy implements Policy {
 
@@ -55,5 +56,18 @@ public class FactorsPolicy implements Policy {
 
     public boolean isPossessionRequired() {
         return possessionRequired;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FactorsPolicy)) return false;
+        FactorsPolicy that = (FactorsPolicy) o;
+        return Objects.equals(getFences(), that.getFences()) &&
+                Objects.equals(getDenyEmulatorSimulator(), that.getDenyEmulatorSimulator()) &&
+                Objects.equals(getDenyRootedJailbroken(), that.getDenyRootedJailbroken()) &&
+                Objects.equals(isInherenceRequired(), that.isInherenceRequired()) &&
+                Objects.equals(isKnowledgeRequired(), that.isKnowledgeRequired()) &&
+                Objects.equals(isPossessionRequired(), that.isPossessionRequired());
     }
 }
