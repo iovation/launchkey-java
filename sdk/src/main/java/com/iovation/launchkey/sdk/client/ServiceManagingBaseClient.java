@@ -133,11 +133,18 @@ class ServiceManagingBaseClient {
     }
 
     protected com.iovation.launchkey.sdk.transport.domain.PolicyAdapter getTransportPolicyFromDomainPolicy(Policy domainPolicy, boolean isNestedPolicy) throws UnknownPolicyException, UnknownFenceTypeException {
-        Boolean denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
-        Boolean denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
+        if (domainPolicy == null) {
+            return null;
+        }
+        Boolean denyRootedJailbroken;
+        Boolean denyEmulatorSimulator;
         if (isNestedPolicy) {
+            // if recursive call (sub policies have already been properly verified to not have these attributes set to true)
             denyRootedJailbroken = null;
             denyEmulatorSimulator = null;
+        } else {
+            denyRootedJailbroken = domainPolicy.getDenyRootedJailbroken();
+            denyEmulatorSimulator = domainPolicy.getDenyEmulatorSimulator();
         }
         List<Fence> domainPolicyFences = domainPolicy.getFences();
         List<com.iovation.launchkey.sdk.transport.domain.Fence> fences = null;

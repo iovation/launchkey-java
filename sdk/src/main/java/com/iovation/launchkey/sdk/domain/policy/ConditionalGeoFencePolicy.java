@@ -4,6 +4,7 @@ import com.iovation.launchkey.sdk.error.InvalidPolicyAttributes;
 import com.iovation.launchkey.sdk.error.UnknownPolicyException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,7 +44,12 @@ public class ConditionalGeoFencePolicy implements Policy {
 
     @Override
     public List<Fence> getFences() {
-        return this.fences;
+        if (fences != null) {
+            return Collections.unmodifiableList(new ArrayList<Fence>(fences));
+        }
+        else {
+            return null;
+        }
     }
 
     public Policy getInPolicy() {
