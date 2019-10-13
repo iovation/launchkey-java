@@ -13,6 +13,7 @@
 package com.iovation.launchkey.sdk.integration;
 
 import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.iovation.launchkey.sdk.FactoryFactoryBuilder;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
