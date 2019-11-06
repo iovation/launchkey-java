@@ -135,7 +135,7 @@ public class AdvancedAuthorizationResponse {
     }
 
     /**
-     * Hashed identifier of the User that responded to the authentication request. This value will be used by the
+     * Get the hashed identifier of the User that responded to the authentication request. This value will be used by the
      * De-Orbit Callback to identify the de-orbiting User.
      *
      * @return User hash
@@ -178,13 +178,13 @@ public class AdvancedAuthorizationResponse {
     }
 
     /**
-     * A list of up to 5 random value strings that are unique for a Device and Service combination. The list is
+     * Get a list of up to 5 random value strings that are unique for a Device and Service combination. The list is
      * intended for Device validation at the Service. Devices will rotate out Service pins as a queue, first in -
-     * first out (FIFO). As such, they are rotating shared secrets known only to the device and the Service. Service
-     * pins can be used to protect against a myriad of potential attacks. However, they do run the risk of devices
-     * getting "out of sync" and resulting in devices not being able to authenticate. If you implement service pins
-     * in your solutions, you will need to build in a recovery mechanism to reset the known service pins and re-sync
-     * the device.
+     * first out (FIFO). As such, the Service PINs are rotating shared secrets known only to the device and the Service.
+     * Service pins can be used to protect against a myriad of potential attacks. However, they do run the risk of
+     * devices getting "out of sync" and resulting in devices not being able to authenticate. If you implement service
+     * pins in your solutions, you will need to incorporate a recovery mechanism to reset the known service pins and
+     * re-sync the device.
      *
      * @return List of Device Pins
      */
@@ -219,7 +219,7 @@ public class AdvancedAuthorizationResponse {
     }
 
     /**
-     * Was the authorization request determined to be fraudulent?
+     * This flag answers: Was the authorization request determined to be fraudulent?
      * @return Fraud flag
      */
     public Boolean isFraud() {

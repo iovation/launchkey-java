@@ -162,7 +162,7 @@ public class BasicOrganizationClientGetAdvancedServicePolicyTest {
         when(response.getOutPolicy()).thenReturn(policy);
         ConditionalGeoFencePolicy actual =
                 (ConditionalGeoFencePolicy) client.getAdvancedServicePolicy(serviceId);
-        assertNull(actual.getInPolicy().getFences());
+        assertNull(actual.getInside().getFences());
     }
 
     @Test
@@ -176,7 +176,7 @@ public class BasicOrganizationClientGetAdvancedServicePolicyTest {
         when(response.getOutPolicy()).thenReturn(policy);
         ConditionalGeoFencePolicy actual =
                 (ConditionalGeoFencePolicy) client.getAdvancedServicePolicy(serviceId);
-        assertFalse(actual.getInPolicy().getDenyRootedJailbroken());
+        assertFalse(actual.getInside().getDenyRootedJailbroken());
     }
 
     @Test
@@ -190,7 +190,7 @@ public class BasicOrganizationClientGetAdvancedServicePolicyTest {
         when(response.getOutPolicy()).thenReturn(policy);
         ConditionalGeoFencePolicy actual =
                 (ConditionalGeoFencePolicy) client.getAdvancedServicePolicy(serviceId);
-        assertFalse(actual.getInPolicy().getDenyEmulatorSimulator());
+        assertFalse(actual.getInside().getDenyEmulatorSimulator());
     }
 
     @Test
@@ -205,7 +205,7 @@ public class BasicOrganizationClientGetAdvancedServicePolicyTest {
         when(response.getOutPolicy()).thenReturn(policy);
         ConditionalGeoFencePolicy actual =
                 (ConditionalGeoFencePolicy) client.getAdvancedServicePolicy(serviceId);
-        assertNull(actual.getOutPolicy().getFences());
+        assertNull(actual.getOutside().getFences());
     }
 
     @Test
@@ -219,7 +219,7 @@ public class BasicOrganizationClientGetAdvancedServicePolicyTest {
         when(response.getOutPolicy()).thenReturn(policy);
         ConditionalGeoFencePolicy actual =
                 (ConditionalGeoFencePolicy) client.getAdvancedServicePolicy(serviceId);
-        assertFalse(actual.getOutPolicy().getDenyRootedJailbroken());
+        assertFalse(actual.getOutside().getDenyRootedJailbroken());
     }
 
     @Test
@@ -233,6 +233,6 @@ public class BasicOrganizationClientGetAdvancedServicePolicyTest {
         when(response.getOutPolicy()).thenReturn(policy);
         ConditionalGeoFencePolicy actual =
                 (ConditionalGeoFencePolicy) client.getAdvancedServicePolicy(serviceId);
-        assertFalse(actual.getOutPolicy().getDenyEmulatorSimulator());
+        assertFalse(actual.getOutside().getDenyEmulatorSimulator());
     }
 }

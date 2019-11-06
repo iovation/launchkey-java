@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class GeoCircleFence implements Fence {
 
-    private final String fenceName;
+    private final String name;
 
     private final double latitude;
 
@@ -12,15 +12,15 @@ public class GeoCircleFence implements Fence {
 
     private final double radius;
 
-    public GeoCircleFence(String fenceName, double latitude, double longitude, double radius) {
-        this.fenceName = fenceName;
+    public GeoCircleFence(String name, double latitude, double longitude, double radius) {
+        this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
     }
 
     public GeoCircleFence(double latitude, double longitude, double radius) {
-        this.fenceName = null;
+        this.name = null;
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
@@ -28,7 +28,7 @@ public class GeoCircleFence implements Fence {
 
     @Override
     public String getName() {
-        return fenceName;
+        return name;
     }
 
     public double getLatitude() {
@@ -51,18 +51,18 @@ public class GeoCircleFence implements Fence {
         return Double.compare(that.latitude, latitude) == 0 &&
                 Double.compare(that.longitude, longitude) == 0 &&
                 Double.compare(that.radius, radius) == 0 &&
-                Objects.equals(fenceName, that.fenceName);
+                Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fenceName, latitude, longitude, radius);
+        return Objects.hash(name, latitude, longitude, radius);
     }
 
     @Override
     public String toString() {
         return "GeoCircleFence{" +
-                "fenceName='" + fenceName + '\'' +
+                "name='" + name + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", radius=" + radius +

@@ -167,7 +167,7 @@ public class PolicySteps {
     @Then("^the inside Policy should be a MethodAmountPolicy")
     public void theInsidePolicyIsMethodAmountPolicy() throws Throwable {
         ConditionalGeoFencePolicy currentPolicy = (ConditionalGeoFencePolicy) policyContext.currentPolicy.toImmutablePolicy();
-        Policy insidePolicy = currentPolicy.getInPolicy();
+        Policy insidePolicy = currentPolicy.getInside();
         assertTrue(insidePolicy instanceof MethodAmountPolicy);
         policyContext.currentPolicy = new MutablePolicy(insidePolicy);
     }
@@ -175,7 +175,7 @@ public class PolicySteps {
     @Then("^the inside Policy should be a FactorsPolicy$")
     public void theInsidePolicyIsFactorsPolicy() throws Throwable {
         ConditionalGeoFencePolicy currentPolicy = (ConditionalGeoFencePolicy) policyContext.currentPolicy.toImmutablePolicy();
-        Policy insidePolicy = currentPolicy.getInPolicy();
+        Policy insidePolicy = currentPolicy.getInside();
         assertTrue(insidePolicy instanceof FactorsPolicy);
         policyContext.currentPolicy = new MutablePolicy(insidePolicy);
     }
@@ -183,7 +183,7 @@ public class PolicySteps {
     @Then("^the outside Policy should be a FactorsPolicy$")
     public void theOutsidePolicyIsFactorsPolicy() throws Throwable {
         ConditionalGeoFencePolicy currentPolicy = (ConditionalGeoFencePolicy) policyContext.currentPolicy.toImmutablePolicy();
-        Policy outsidePolicy = currentPolicy.getOutPolicy();
+        Policy outsidePolicy = currentPolicy.getOutside();
         assertTrue(outsidePolicy instanceof FactorsPolicy);
         policyContext.currentPolicy = new MutablePolicy(outsidePolicy);
     }
@@ -191,7 +191,7 @@ public class PolicySteps {
     @Then("^the outside Policy should be a MethodAmountPolicy$")
     public void theOutsidePolicyIsMethodAmountPolicy() throws Throwable {
         ConditionalGeoFencePolicy currentPolicy = (ConditionalGeoFencePolicy) policyContext.currentPolicy.toImmutablePolicy();
-        Policy outsidePolicy = currentPolicy.getOutPolicy();
+        Policy outsidePolicy = currentPolicy.getOutside();
         assertTrue(outsidePolicy instanceof MethodAmountPolicy);
         policyContext.currentPolicy = new MutablePolicy(outsidePolicy);
     }

@@ -45,6 +45,8 @@ abstract class ServiceManagingBaseClient {
                     fences.add(new TerritoryFence(transportFence.getName(), transportFence.getCountry(), transportFence.getAdministrativeArea(), transportFence.getPostalCode()));
                 } else if (com.iovation.launchkey.sdk.transport.domain.Fence.TYPE_GEO_CIRCLE.equals(transportFence.getType())) {
                     fences.add(new GeoCircleFence(transportFence.getName(), transportFence.getLatitude(), transportFence.getLongitude(), transportFence.getRadius()));
+                } else {
+                    throw new UnknownFenceTypeException("Unable to process fence of type " + transportFence.getType(), null, null);
                 }
             }
         }
@@ -184,12 +186,10 @@ abstract class ServiceManagingBaseClient {
 
         if (domainPolicy instanceof ConditionalGeoFencePolicy) {
             ConditionalGeoFencePolicy condGeoPolicy = (ConditionalGeoFencePolicy) domainPolicy;
-            Policy condInPolicy = condGeoPolicy.getInPolicy();
-            Policy condOutPolicy = condGeoPolicy.getOutPolicy();
-            verifySubPolicy(condInPolicy);
-            verifySubPolicy(condOutPolicy);
-            com.iovation.launchkey.sdk.transport.domain.Policy inPolicy = (com.iovation.launchkey.sdk.transport.domain.Policy) getTransportPolicyFromDomainPolicy(condInPolicy, true);
-            com.iovation.launchkey.sdk.transport.domain.Policy outPolicy = (com.iovation.launchkey.sdk.transport.domain.Policy) getTransportPolicyFromDomainPolicy(condOutPolicy, true);
+            Policy condInPolicy = condGeoPolicy.getInside();
+            Policy condOutPolicy = condGeoPolicy.getOutside();
+            com.iovation.launchkey.sdk.transport.domain.Policy inPolicy = getTransportPolicyFromDomainPolicy(condInPolicy, true);
+            com.iovation.launchkey.sdk.transport.domain.Policy outPolicy = getTransportPolicyFromDomainPolicy(condOutPolicy, true);
             transportPolicy = new com.iovation.launchkey.sdk.transport.domain.Policy(com.iovation.launchkey.sdk.transport.domain.Policy.TYPE_COND_GEO, denyRootedJailbroken, denyEmulatorSimulator, fences, null, null, inPolicy, outPolicy, null);
         } else if (domainPolicy instanceof MethodAmountPolicy) {
             MethodAmountPolicy methodAmountPolicy = (MethodAmountPolicy) domainPolicy;
@@ -238,7 +238,7 @@ abstract class ServiceManagingBaseClient {
                 }});
                 factors.add(geoFenceFactor);
             }
-            if (!legacyPolicy.getTimeFences().isEmpty()) {
+            if (!legacyPolicy.getTimeRestrictions().isEmpty()) {
                 ObjectNode timeFenceFactor = new ObjectNode(jnf);
                 factors.add(timeFenceFactor);
                 timeFenceFactor.set("factor", new TextNode("timefence"));
@@ -247,7 +247,7 @@ abstract class ServiceManagingBaseClient {
                 ObjectNode geoFenceAttributes = new ObjectNode(jnf);
                 timeFenceFactor.set("attributes", geoFenceAttributes);
                 geoFenceAttributes.set("time fences", new ArrayNode(jnf) {{
-                    for (final LegacyPolicy.TimeFence timeFence : legacyPolicy.getTimeFences()) {
+                    for (final LegacyPolicy.TimeFence timeFence : legacyPolicy.getTimeRestrictions()) {
                         ObjectNode timeFenceNode = new ObjectNode(jnf);
                         timeFenceNode.set("name", new TextNode(timeFence.getName()));
                         timeFenceNode.set("days", new ArrayNode(jnf) {{
@@ -310,7 +310,7 @@ abstract class ServiceManagingBaseClient {
         Integer requiredFactors = servicePolicy.getRequiredFactors();
         int amount = (requiredFactors != null) ? requiredFactors : 0;
         Boolean inherence = servicePolicy.isInherenceFactorRequired();
-        Boolean knownledge = servicePolicy.isKnowledgeFactorRequired();
+        Boolean knowledge = servicePolicy.isKnowledgeFactorRequired();
         Boolean possession = servicePolicy.isPossessionFactorRequired();
         boolean denyRootedJailbroken = (servicePolicy.isJailBreakProtectionEnabled() != null) ? servicePolicy.isJailBreakProtectionEnabled() : false;
         List<LegacyPolicy.TimeFence> timeFences = new ArrayList<>();
@@ -330,7 +330,7 @@ abstract class ServiceManagingBaseClient {
             );
         }
 
-        return new LegacyPolicy(amount, inherence, knownledge, possession, denyRootedJailbroken, geoFences, timeFences);
+        return new LegacyPolicy(amount, inherence, knowledge, possession, denyRootedJailbroken, geoFences, timeFences);
     }
 
     ServicePolicy getServicePolicyFromLegacyPolicy(LegacyPolicy legacyPolicy) {
@@ -356,7 +356,7 @@ abstract class ServiceManagingBaseClient {
         }
         Boolean jailBreakProtectionEnabled = legacyPolicy.getDenyRootedJailbroken() ? true : null;
         List<ServicePolicy.TimeFence> timeFences = new ArrayList<>();
-        for (LegacyPolicy.TimeFence legacyPolicyTimefence : legacyPolicy.getTimeFences()) {
+        for (LegacyPolicy.TimeFence legacyPolicyTimefence : legacyPolicy.getTimeRestrictions()) {
             List<ServicePolicy.Day> days = new ArrayList<>();
             for (LegacyPolicy.Day day : legacyPolicyTimefence.getDays()) {
                 days.add(ServicePolicy.Day.fromString(day.toString()));
@@ -388,26 +388,6 @@ abstract class ServiceManagingBaseClient {
         return new ServicePolicy.Location(geoCircleFence.getName(), geoCircleFence.getRadius(), geoCircleFence.getLatitude(), geoCircleFence.getLongitude());
     }
 
-    private Fence getDomainFenceFromTransportFence(com.iovation.launchkey.sdk.transport.domain.Fence transportFence) throws UnknownFenceTypeException {
-        Fence domainFence = null;
-        if (transportFence.getType().equals(com.iovation.launchkey.sdk.transport.domain.Fence.TYPE_GEO_CIRCLE)) {
-            String name = transportFence.getName();
-            double latitude = transportFence.getLatitude();
-            double longitude = transportFence.getLongitude();
-            double radius = transportFence.getRadius();
-            domainFence = new GeoCircleFence(name, latitude, longitude, radius);
-        } else if (transportFence.getType().equals(com.iovation.launchkey.sdk.transport.domain.Fence.TYPE_TERRITORY)) {
-            String name = transportFence.getName();
-            String adminArea = transportFence.getAdministrativeArea();
-            String postalCode = transportFence.getPostalCode();
-            String country = transportFence.getCountry();
-            domainFence = new TerritoryFence(country, adminArea, postalCode, name);
-        } else {
-            throw new UnknownFenceTypeException("Unknown fence type", null, null);
-        }
-        return domainFence;
-    }
-
     private com.iovation.launchkey.sdk.transport.domain.Fence getTransportFenceFromDomainFence(Fence domainFence) throws UnknownFenceTypeException {
         com.iovation.launchkey.sdk.transport.domain.Fence transportFence = null;
         if (domainFence instanceof GeoCircleFence) {
@@ -430,24 +410,5 @@ abstract class ServiceManagingBaseClient {
             throw new UnknownFenceTypeException("Unknown fence type", null, null);
         }
         return transportFence;
-    }
-
-    private void verifySubPolicy(Policy subPolicy) throws UnknownPolicyException {
-        // Assert policy is either null or is of Type FactorsPolicy or MethodAmountPolicy
-        // Assert denyRootedJailbroken and denyEmulatorSimulator are false
-        // Assert no fences
-        if (subPolicy == null) {
-            return;
-        }
-        if ((subPolicy instanceof FactorsPolicy) || (subPolicy instanceof MethodAmountPolicy)) {
-            if (subPolicy.getDenyEmulatorSimulator() || subPolicy.getDenyRootedJailbroken()) {
-                throw new UnknownPolicyException("Inside or Outside Policy objects must have denyEmulatorSimulator or denyRootedJailbroken set to false", null, null);
-            }
-            if (subPolicy.getFences() != null) {
-                throw new UnknownPolicyException("Fences are not supported on Inside or Outside Policy objects", null, null);
-            }
-        } else {
-            throw new UnknownPolicyException("Inside or Outside Policy objects must be of type FactorsPolicy or MethodAmountPolicy, or null if no policy", null, null);
-        }
     }
 }

@@ -24,15 +24,15 @@ public class AdvancedAuthorizationResponseWebhookPackage implements WebhookPacka
     private final AdvancedAuthorizationResponse authorizationResponse;
 
     /**
-     * @param authorizationResponse The response sent in hte callback
+     * @param authorizationResponse The response sent in the callback
      */
     public AdvancedAuthorizationResponseWebhookPackage(AdvancedAuthorizationResponse authorizationResponse) {
         this.authorizationResponse = authorizationResponse;
     }
 
     /**
-     * Get the response sent in hte callback
-     * @return The response sent in hte callback
+     * Get the response sent in the callback
+     * @return The response sent in the callback
      */
     public AdvancedAuthorizationResponse getAuthorizationResponse() {
         return authorizationResponse;

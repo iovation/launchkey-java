@@ -7,13 +7,13 @@
 
 # <a name="overview"></a>Overview
 
-This example project utilizes Spring MVC and Spring Boot to provide a fully self-contained browser based tool to assist
-with building a Mobile Authenticator utilizing a LaunchKey Mobil Authenticator SDK. It is also an example of best
+This example project utilizes Spring MVC and Spring Boot to provide a fully self-contained, browser based tool to assist
+with building a Mobile Authenticator utilizing a LaunchKey Mobile Authenticator SDK. It is also an example of best
 practices for building a proper backend implementation utilizing the LaunchKey Service SDK for Java via webhooks.
 
 The application removes some of the configuration headache regarding webhooks in Directories for successful linking
-webhooks and Services for auth response and session end webhooks. Make sure this will not interfere with any other
-implementations as it would alter the configuration in an undesirable way. 
+webhooks and Services for auth response and session end webhooks. This example will interfere with any other
+implementations that utilize webhooks as it will alter the webhook configuration for the Directory and Service. 
 
 # <a name="prerequisites"></a>Pre-Requisites
 

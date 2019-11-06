@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class TerritoryFence implements Fence {
 
-    private final String fenceName;
+    private final String name;
 
     private final String country;
 
@@ -12,8 +12,8 @@ public class TerritoryFence implements Fence {
 
     private final String postalCode;
 
-    public TerritoryFence(String fenceName, String country, String administrativeArea, String postalCode) {
-        this.fenceName = fenceName;
+    public TerritoryFence(String name, String country, String administrativeArea, String postalCode) {
+        this.name = name;
         this.country = country;
         this.administrativeArea = administrativeArea;
         this.postalCode = postalCode;
@@ -21,7 +21,7 @@ public class TerritoryFence implements Fence {
 
     @Override
     public String getName() {
-        return fenceName;
+        return name;
     }
 
     public String getCountry() {
@@ -41,7 +41,7 @@ public class TerritoryFence implements Fence {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TerritoryFence that = (TerritoryFence) o;
-        return Objects.equals(fenceName, that.fenceName) &&
+        return Objects.equals(name, that.name) &&
                 Objects.equals(country, that.country) &&
                 Objects.equals(administrativeArea, that.administrativeArea) &&
                 Objects.equals(postalCode, that.postalCode);
@@ -49,13 +49,13 @@ public class TerritoryFence implements Fence {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fenceName, country, administrativeArea, postalCode);
+        return Objects.hash(name, country, administrativeArea, postalCode);
     }
 
     @Override
     public String toString() {
         return "TerritoryFence{" +
-                "fenceName='" + fenceName + '\'' +
+                "name='" + name + '\'' +
                 ", country='" + country + '\'' +
                 ", administrativeArea='" + administrativeArea + '\'' +
                 ", postalCode='" + postalCode + '\'' +

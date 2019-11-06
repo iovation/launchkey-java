@@ -1,6 +1,9 @@
 package com.iovation.launchkey.sdk.example.cli;
 
 import com.iovation.launchkey.sdk.client.ServiceClient;
+import com.iovation.launchkey.sdk.domain.policy.Fence;
+import com.iovation.launchkey.sdk.domain.policy.GeoCircleFence;
+import com.iovation.launchkey.sdk.domain.policy.TerritoryFence;
 import com.iovation.launchkey.sdk.domain.service.*;
 import com.iovation.launchkey.sdk.error.AuthorizationInProgress;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestCanceled;
@@ -71,12 +74,12 @@ class ServiceCommand {
             System.out.println("    Auth Request: " + authRequest);
             System.out.print("Checking for response from the End User");
             System.out.println();
-            AuthorizationResponse authorizationResponse;
+            AdvancedAuthorizationResponse authorizationResponse;
             long started = new Date().getTime();
             while (new Date().getTime() - started <= 600000) {
                     Thread.sleep(1000L);
                     System.out.print(".");
-                    authorizationResponse = serviceClient.getAuthorizationResponse(authRequest.getId());
+                    authorizationResponse = serviceClient.getAdvancedAuthorizationResponse(authRequest.getId());
                     if (authorizationResponse != null) {
                         System.out.println("Authorization request response received:");
                         System.out.println("    Request ID:    " + authorizationResponse.getAuthorizationRequestId());
@@ -91,27 +94,38 @@ class ServiceCommand {
                         System.out.println("    Org User Hash: " + safeNull(authorizationResponse.getOrganizationUserHash()));
 
                         System.out.print("    Auth Policy: ");
-                        AuthPolicy policy = authorizationResponse.getPolicy();
+                        AuthorizationResponsePolicy policy = authorizationResponse.getPolicy();
                         if (policy == null) {
                             System.out.println("None");
                         } else {
                             System.out.println();
-                            System.out.println("        Factors:    " + safeNull(policy.getRequiredFactors()));
-                            System.out.println("        Inherence:  " + safeNull(policy.isInherenceFactorRequired()));
-                            System.out.println("        Knowledge:  " + safeNull(policy.isKnowledgeFactorRequired()));
-                            System.out.println("        Possession: " + safeNull(policy.isPossessionFactorRequired()));
+                            System.out.println("        Factors:    " + safeNull(policy.getAmount()));
+                            System.out.println("        Inherence:  " + safeNull(policy.wasInherenceRequired()));
+                            System.out.println("        Knowledge:  " + safeNull(policy.wasKnowledgeRequired()));
+                            System.out.println("        Possession: " + safeNull(policy.wasPossessionRequired()));
 
                             System.out.print("        Geofences: ");
-                            List<AuthPolicy.Location> locations = authorizationResponse.getPolicy().getLocations();
-                            if (locations == null || locations.size() < 1) {
+                            List<Fence> fences = authorizationResponse.getPolicy().getFences();
+                            if (fences == null || fences.size() < 1) {
                                 System.out.println("None");
                             } else {
                                 System.out.println();
-                                for (AuthPolicy.Location location : locations) {
-                                    System.out.println("            Name: " + safeNull(location.getName()));
-                                    System.out.println("                Radius:    " + safeNull(location.getRadius()));
-                                    System.out.println("                Latitude:  " + safeNull(location.getLatitude()));
-                                    System.out.println("                Longitude: " + safeNull(location.getLongitude()));
+                                for (Fence fence : fences) {
+                                    System.out.println("            Name: " + safeNull(fence.getName()));
+                                    if (fence instanceof GeoCircleFence) {
+                                        GeoCircleFence circleFence = (GeoCircleFence) fence;
+                                        System.out.println("                Radius:    " + safeNull(circleFence.getRadius()));
+                                        System.out.println("                Latitude:  " + safeNull(circleFence.getLatitude()));
+                                        System.out.println("                Longitude: " + safeNull(circleFence.getLongitude()));
+                                    } else if (fence instanceof TerritoryFence) {
+                                        TerritoryFence territoryFence = (TerritoryFence) fence;
+                                        System.out.println("                Radius:    " + safeNull(territoryFence.getCountry()));
+                                        System.out.println("                Latitude:  " + safeNull(territoryFence.getAdministrativeArea()));
+                                        System.out.println("                Longitude: " + safeNull(territoryFence.getPostalCode()));
+
+                                    } else {
+                                        System.out.println("                Unhandled Type:    " + fence.getClass().getSimpleName());
+                                    }
                                 }
                             }
                         }

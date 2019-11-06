@@ -1,27 +1,25 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
-import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
-
 import java.util.*;
 
 public class LegacyPolicy implements Policy {
 
     private final int amount;
-    private final Boolean inherence;
-    private final Boolean knowledge;
-    private final Boolean possession;
+    private final Boolean inherenceRequired;
+    private final Boolean knowledgeRequired;
+    private final Boolean possessionRequired;
     private final boolean denyRootedJailbroken;
     private final List<GeoCircleFence> fences;
-    private final List<TimeFence> timeFences;
+    private final List<TimeFence> timeRestrictions;
 
-    public LegacyPolicy(int amount, Boolean inherence, Boolean knowledge, Boolean possession, boolean denyRootedJailbroken, List<GeoCircleFence> fences, List<TimeFence> timeFences) {
+    public LegacyPolicy(int amount, Boolean inherenceRequired, Boolean knowledgeRequired, Boolean possessionRequired, boolean denyRootedJailbroken, List<GeoCircleFence> fences, List<TimeFence> timeRestrictions) {
         this.amount = amount;
-        this.inherence = inherence;
-        this.knowledge = knowledge;
-        this.possession = possession;
+        this.inherenceRequired = inherenceRequired;
+        this.knowledgeRequired = knowledgeRequired;
+        this.possessionRequired = possessionRequired;
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.fences = fences;
-        this.timeFences = timeFences;
+        this.timeRestrictions = timeRestrictions;
     }
 
     public int getAmount() {
@@ -29,15 +27,15 @@ public class LegacyPolicy implements Policy {
     }
 
     public Boolean isInherenceRequired() {
-        return inherence;
+        return inherenceRequired;
     }
 
     public Boolean isKnowledgeRequired() {
-        return knowledge;
+        return knowledgeRequired;
     }
 
     public Boolean isPossessionRequired() {
-        return possession;
+        return possessionRequired;
     }
 
     @Override
@@ -50,6 +48,7 @@ public class LegacyPolicy implements Policy {
         return false;
     }
 
+    @Override
     public List<Fence> getFences() {
         if (fences != null) {
             return Collections.unmodifiableList(new ArrayList<Fence>(fences));
@@ -58,9 +57,9 @@ public class LegacyPolicy implements Policy {
         }
     }
 
-    public List<TimeFence> getTimeFences() {
-        if (timeFences != null) {
-            return Collections.unmodifiableList(timeFences);
+    public List<TimeFence> getTimeRestrictions() {
+        if (timeRestrictions != null) {
+            return Collections.unmodifiableList(timeRestrictions);
         } else {
             return null;
         }
@@ -77,7 +76,7 @@ public class LegacyPolicy implements Policy {
                 Objects.equals(isInherenceRequired(), that.isInherenceRequired()) &&
                 Objects.equals(isKnowledgeRequired(), that.isKnowledgeRequired()) &&
                 Objects.equals(isPossessionRequired(), that.isPossessionRequired()) &&
-                Objects.equals(getTimeFences(), that.getTimeFences());
+                Objects.equals(getTimeRestrictions(), that.getTimeRestrictions());
     }
 
     public static class TimeFence {

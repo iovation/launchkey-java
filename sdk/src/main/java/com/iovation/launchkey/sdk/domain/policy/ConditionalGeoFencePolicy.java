@@ -1,7 +1,6 @@
 package com.iovation.launchkey.sdk.domain.policy;
 
 import com.iovation.launchkey.sdk.error.InvalidPolicyAttributes;
-import com.iovation.launchkey.sdk.error.UnknownPolicyException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,17 +12,17 @@ public class ConditionalGeoFencePolicy implements Policy {
     private final boolean denyRootedJailbroken;
     private final boolean denyEmulatorSimulator;
     private final List<Fence> fences;
-    private final Policy inPolicy;
-    private final Policy outPolicy;
+    private final Policy inside;
+    private final Policy outside;
 
-    public ConditionalGeoFencePolicy(boolean denyRootedJailbroken, boolean denyEmulatorSimulator, List<Fence> fences, Policy inPolicy, Policy outPolicy) throws InvalidPolicyAttributes {
+    public ConditionalGeoFencePolicy(boolean denyRootedJailbroken, boolean denyEmulatorSimulator, List<Fence> fences, Policy inside, Policy outside) throws InvalidPolicyAttributes {
         this.denyRootedJailbroken = denyRootedJailbroken;
         this.denyEmulatorSimulator = denyEmulatorSimulator;
         this.fences = fences;
-        verifySubPolicy(inPolicy);
-        verifySubPolicy(outPolicy);
-        this.inPolicy = inPolicy;
-        this.outPolicy = outPolicy;
+        verifySubPolicy(inside);
+        verifySubPolicy(outside);
+        this.inside = inside;
+        this.outside = outside;
     }
 
     @Override
@@ -46,23 +45,30 @@ public class ConditionalGeoFencePolicy implements Policy {
         }
     }
 
-    public Policy getInPolicy() {
-        return this.inPolicy;
+    /**
+     * Get the policy to execute when the device in inside one of the fences
+     * @return Inside policy
+     */
+    public Policy getInside() {
+        return this.inside;
     }
 
-    public Policy getOutPolicy() {
-        return this.outPolicy;
+    /**
+     *
+     * @return Outside policy
+     */
+    public Policy getOutside() {
+        return this.outside;
     }
 
     private void verifySubPolicy(Policy subPolicy) throws InvalidPolicyAttributes {
-        // Assert policy is either null or is of Type FactorsPolicy or MethodAmountPolicy
+        // Assert policy is either FactorsPolicy or MethodAmountPolicy
         // Assert denyRootedJailbroken and denyEmulatorSimulator are false
         // Assert no fences
         if (subPolicy == null) {
-            return;
-        }
-        if (!(subPolicy instanceof FactorsPolicy) && !(subPolicy instanceof MethodAmountPolicy)) {
-            throw new InvalidPolicyAttributes("Inside or Outside Policy objects must be of type FactorsPolicy or MethodAmountPolicy, or null if no policy", null, null);
+            throw new InvalidPolicyAttributes("Inside or Outside Policy objects must not be null", null, null);
+        } else if (!(subPolicy instanceof FactorsPolicy) && !(subPolicy instanceof MethodAmountPolicy)) {
+            throw new InvalidPolicyAttributes("Inside or Outside Policy objects must be of type FactorsPolicy or MethodAmountPolicy", null, null);
         }
         if (subPolicy.getDenyEmulatorSimulator() || subPolicy.getDenyRootedJailbroken()) {
             throw new InvalidPolicyAttributes("Inside or Outside Policy objects must have denyEmulatorSimulator or denyRootedJailbroken set to false", null, null);
@@ -80,7 +86,7 @@ public class ConditionalGeoFencePolicy implements Policy {
         return Objects.equals(getFences(), that.getFences()) &&
                 Objects.equals(getDenyEmulatorSimulator(), that.getDenyEmulatorSimulator()) &&
                 Objects.equals(getDenyRootedJailbroken(), that.getDenyRootedJailbroken()) &&
-                Objects.equals(getInPolicy(), that.getInPolicy()) &&
-                Objects.equals(getOutPolicy(), that.getOutPolicy());
+                Objects.equals(getInside(), that.getInside()) &&
+                Objects.equals(getOutside(), that.getOutside());
     }
 }

@@ -17,11 +17,11 @@ public interface WebhookHandlingClient {
      * @param headers A generic map of request headers. These will be used to access and validate the JWT.
      * @param body The body of the webhook request. This will be used to determine the data for the webhook and have be
      * validated against the JWT.
-     * @return Returns a {@link ServiceUserSessionEndWebhookPackage} when the webhook was initialed from the
+     * @return Returns a {@link ServiceUserSessionEndWebhookPackage} when the webhook was initiated from the
      * user logging out from a linked Device, a {@link DirectoryClient#endAllServiceSessions(String)} request, a
      * {@link AuthorizationResponseWebhookPackage} when the webhook was initiated by a Device responding to a
      * {@link ServiceClient#createAuthorizationRequest(String)} request, or a
-     * {@link DirectoryUserDeviceLinkCompletionWebhookPackage} when the webhook was initiated by de Device completing
+     * {@link DirectoryUserDeviceLinkCompletionWebhookPackage} when the webhook was initiated by a Device completing
      * a {@link DirectoryClient#linkDevice(String)} request.
      * @throws NoKeyFoundException When the Entity and Key ID identifying the public key used to encrypt authorization
      * response is not found in the known keys mapping.
@@ -46,11 +46,11 @@ public interface WebhookHandlingClient {
      * validated against the JWT.
      * @param method The method of the webhook request. This will be validated against the JWT.
      * @param path The body of the webhook request. This will be validated against the JWT.
-     * @return Returns a {@link ServiceUserSessionEndWebhookPackage} when the webhook was initialed from the
+     * @return Returns a {@link ServiceUserSessionEndWebhookPackage} when the webhook was initiated from the
      * user logging out from a linked Device, a {@link DirectoryClient#endAllServiceSessions(String)} request, a
      * {@link AuthorizationResponseWebhookPackage} when the webhook was initiated by a Device responding to a
      * {@link ServiceClient#createAuthorizationRequest(String)} request, or a
-     * {@link DirectoryUserDeviceLinkCompletionWebhookPackage} when the webhook was initiated by de Device completing
+     * {@link DirectoryUserDeviceLinkCompletionWebhookPackage} when the webhook was initiated by a Device completing
      * a {@link DirectoryClient#linkDevice(String)} request.
      * @throws NoKeyFoundException When the Entity and Key ID identifying the public key used to encrypt authorization
      * response is not found in the known keys mapping.
@@ -75,11 +75,11 @@ public interface WebhookHandlingClient {
      * validated against the JWT.
      * @param method The method of the webhook request. This will be validated against the JWT.
      * @param path The body of the webhook request. This will be validated against the JWT.
-     * @return Returns a {@link ServiceUserSessionEndWebhookPackage} when the webhook was initialed from the
+     * @return Returns a {@link ServiceUserSessionEndWebhookPackage} when the webhook was initiated from the
      * user logging out from a linked Device, a {@link DirectoryClient#endAllServiceSessions(String)} request, a
      * {@link AdvancedAuthorizationResponseWebhookPackage} when the webhook was initiated by a Device responding to a
      * {@link ServiceClient#createAuthorizationRequest(String)} request, or a
-     * {@link DirectoryUserDeviceLinkCompletionWebhookPackage} when the webhook was initiated by de Device completing
+     * {@link DirectoryUserDeviceLinkCompletionWebhookPackage} when the webhook was initiated by a Device completing
      * a {@link DirectoryClient#linkDevice(String)} request.
      * @throws NoKeyFoundException When the Entity and Key ID identifying the public key used to encrypt authorization
      * response is not found in the known keys mapping.
