@@ -12,7 +12,7 @@ with building a Mobile Authenticator utilizing a LaunchKey Mobile Authenticator 
 practices for building a proper backend implementation utilizing the LaunchKey Service SDK for Java via webhooks.
 
 The application removes some of the configuration headache regarding webhooks in Directories for successful linking
-webhooks and Services for auth response and session end webhooks. This example will interfere with any other
+webhooks and Services for auth response and session end webhooks. As such, it will interfere with any other
 implementations that utilize webhooks as it will alter the webhook configuration for the Directory and Service. 
 
 # <a name="prerequisites"></a>Pre-Requisites
