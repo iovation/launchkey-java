@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BasicServiceClientTest extends TestCase {
+public class BasicServiceClientHandleWebhookTest extends TestCase {
 
     @Mock
     public Transport transport;

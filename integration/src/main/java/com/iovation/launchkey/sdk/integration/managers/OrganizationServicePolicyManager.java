@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.OrganizationClient;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
 import cucumber.api.java.After;
@@ -45,6 +46,7 @@ public class OrganizationServicePolicyManager {
         return currentServicePolicyEntity;
     }
 
+    @Deprecated
     public void retrievePolicyForService(UUID serviceId) throws Throwable {
         ServicePolicy policy = client.getServicePolicy(serviceId);
         currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
@@ -56,6 +58,7 @@ public class OrganizationServicePolicyManager {
 
     public void removePolicyForService(UUID serviceId) throws Throwable {
         client.removeServicePolicy(serviceId);
+        currentServicePolicyEntity = new ServicePolicyEntity();
     }
 
     public void removePolicyForCurrentService() throws Throwable {
@@ -66,7 +69,15 @@ public class OrganizationServicePolicyManager {
         client.setServicePolicy(serviceId, currentServicePolicyEntity.toServicePolicy());
     }
 
-    public void setPolicyForCurrentService() throws Throwable {
+    public void setAdvancedPolicyForCurrentService() throws Throwable {
         setPolicyForService(organizationServiceManager.getCurrentServiceEntity().getId());
+    }
+
+    public void setAdvancedPolicyForCurrentService(Policy policy) throws Throwable {
+        client.setAdvancedServicePolicy(organizationServiceManager.getCurrentServiceEntity().getId(), policy);
+    }
+
+    public Policy getCurrentlySetOrganizationServiceAdvancedPolicy() throws Throwable {
+        return client.getAdvancedServicePolicy(organizationServiceManager.getCurrentServiceEntity().getId());
     }
 }

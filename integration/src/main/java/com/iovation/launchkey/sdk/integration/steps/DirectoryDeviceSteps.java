@@ -7,10 +7,9 @@ import com.iovation.launchkey.sdk.integration.entities.LinkingResponseEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryDeviceManager;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryManager;
 import com.iovation.launchkey.sdk.integration.mobile.driver.SampleAppMobileDriver;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 import java.net.URI;
 import java.util.List;
@@ -51,8 +50,8 @@ public class DirectoryDeviceSteps {
         this.driver = driver;
     }
 
-    @When("^I ma[k|d]e a Device linking request$")
-    public void iMakeADeviceLinkingRequest() throws Throwable {
+    @When("^I( have)? ma[k|d]e a Device linking request$")
+    public void iMakeADeviceLinkingRequest(@SuppressWarnings("unused") String ignored) throws Throwable {
         directoryDeviceManager.createLinkingRequest(Utils.createRandomDirectoryUserName(), null);
     }
 
@@ -61,12 +60,12 @@ public class DirectoryDeviceSteps {
         directoryDeviceManager.createLinkingRequest(Utils.createRandomDirectoryUserName(), seconds);
     }
 
-    @And("^I retrieve the Devices list for the current User$")
+    @When("^I retrieve the Devices list for the current User$")
     public void iRetrieveTheDevicesListForTheCurrentUser() throws Throwable {
         directoryDeviceManager.retrieveUserDevices();
     }
 
-    @And("^I retrieve the Devices list for the user \"([^\"]*)\"$")
+    @When("^I retrieve the Devices list for the user \"([^\"]*)\"$")
     public void iRetrieveTheDevicesListForTheCurrentUser(String userIdentifier) throws Throwable {
         directoryDeviceManager.retrieveUserDevices(userIdentifier);
     }
@@ -84,19 +83,19 @@ public class DirectoryDeviceSteps {
         assertThat("QR Code URL does not contain linking code", url, containsString(response.getLinkingCode()));
     }
 
-    @And("^the Device linking response contains a valid Linking Code$")
+    @Then("^the Device linking response contains a valid Linking Code$")
     public void theDeviceLinkingResponseContainsAValidLinkingCode() throws Throwable {
         String linkingCode = directoryDeviceManager.getCurrentLinkingResponse().getLinkingCode();
         assertThat(linkingCode, not(isEmptyOrNullString()));
     }
 
-    @And("^the Device linking response contains a valid Device ID$")
+    @Then("^the Device linking response contains a valid Device ID$")
     public void theDeviceLinkingResponseContainsAValidDeviceID() {
         UUID deviceId = directoryDeviceManager.getCurrentLinkingResponse().getDeviceId();
         assertThat(deviceId, not(nullValue(UUID.class)));
     }
 
-    @And("^the Device List has (\\d+) Devices?$")
+    @Then("^the Device List has (\\d+) Devices?$")
     public void theDeviceListHasNumberOfDevices(int expectedDeviceCount) throws Throwable {
         assertThat(directoryDeviceManager.getCurrentDevicesList().size(), is(equalTo(expectedDeviceCount)));
     }
@@ -138,9 +137,9 @@ public class DirectoryDeviceSteps {
     }
 
 
-    @And("^I have a linked Device$")
+    @Given("^I have a linked Device$")
     public void linkDevice() throws Throwable {
-        iMakeADeviceLinkingRequest();
+        iMakeADeviceLinkingRequest((String) null);
         iLinkMyDevice();
     }
 
@@ -174,7 +173,7 @@ public class DirectoryDeviceSteps {
         driver.receiveAndAcknowledgeAuthFailure();
     }
 
-    @And("^there should be (\\d+) Devices? in the Devices list$")
+    @Then("^there should be (\\d+) Devices? in the Devices list$")
     public void thereShouldBeDeviceInTheDevicesList(int devices) throws Throwable {
         assertThat(directoryDeviceManager.getCurrentDevicesList().size(), equalTo(devices));
     }

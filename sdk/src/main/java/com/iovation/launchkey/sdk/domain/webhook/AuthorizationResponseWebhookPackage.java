@@ -16,7 +16,9 @@ import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 
 /**
  * Object created by parsing an service response from a Server Sent Event
+ * @deprecated Use {@link AdvancedAuthorizationResponseWebhookPackage}
  */
+@Deprecated
 public class AuthorizationResponseWebhookPackage implements WebhookPackage {
 
     private final AuthorizationResponse authorizationResponse;

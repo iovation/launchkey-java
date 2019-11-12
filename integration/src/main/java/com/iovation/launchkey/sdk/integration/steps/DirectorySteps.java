@@ -1,14 +1,15 @@
 package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
+import com.iovation.launchkey.sdk.domain.organization.Directory;
+import com.iovation.launchkey.sdk.integration.entities.DirectoryEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryManager;
-import com.iovation.launchkey.sdk.integration.managers.DirectoryServiceManager;
 import com.iovation.launchkey.sdk.integration.managers.KeysManager;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.hamcrest.Matcher;
 
 import java.net.URI;
@@ -18,7 +19,7 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.equalTo;
 
 /**
  * Copyright 2017 iovation, Inc.
@@ -71,13 +72,13 @@ public class DirectorySteps {
     }
 
     @Then("^the Directory name is the same as was sent$")
-    public void theDirectoryNameIsTheSameAsWasSent() throws Throwable {
+    public void theDirectoryNameIsTheSameAsWasSent() {
         theDirectoryNameIs(directoryManager.getPreviousDirectoryEntity().getName());
     }
 
     @Then("^the Directory name is \"([^\"]*)\"$")
-    public void theDirectoryNameIs(String name) throws Throwable {
-        Matcher matcher;
+    public void theDirectoryNameIs(String name) {
+        Matcher<Object> matcher;
         if (name.equalsIgnoreCase("null")) {
             matcher = nullValue();
         } else {
@@ -87,8 +88,8 @@ public class DirectorySteps {
     }
 
     @Then("^the Android Key is \"([^\"]*)\"$")
-    public void theAndroidKeyIs(String key) throws Throwable {
-        Matcher matcher;
+    public void theAndroidKeyIs(String key) {
+        Matcher<Object> matcher;
         if (key.equalsIgnoreCase("null")) {
             matcher = nullValue();
         } else {
@@ -118,22 +119,22 @@ public class DirectorySteps {
     }
 
     @Then("^the Directory is active$")
-    public void theDirectoryIsActive() throws Throwable {
+    public void theDirectoryIsActive() {
         assertThat(directoryManager.getCurrentDirectoryEntity().getActive(), is(true));
     }
 
     @Then("^the Directory is not active$")
-    public void theDirectoryIsNotActive() throws Throwable {
+    public void theDirectoryIsNotActive() {
         assertThat(directoryManager.getCurrentDirectoryEntity().getActive(), is(false));
     }
 
     @Then("^the Directory has no Service IDs$")
-    public void theDirectoryHasNoServiceIDs() throws Throwable {
+    public void theDirectoryHasNoServiceIDs() {
         assertThat(directoryManager.getCurrentDirectoryEntity().getServiceIds(), is(empty()));
     }
 
     @Then("^the Directory has no SDK Keys$")
-    public void theDirectoryHasNoSDKKeys() throws Throwable {
+    public void theDirectoryHasNoSDKKeys() {
         assertThat(directoryManager.getCurrentDirectoryEntity().getSdkKeys(), is(empty()));
     }
 
@@ -152,12 +153,12 @@ public class DirectorySteps {
     }
 
     @Then("^the Directory Android Key is \"([^\"]*)\"$")
-    public void thenTheDirectoryAndroidKeyIs(String androidKey) throws Throwable {
+    public void thenTheDirectoryAndroidKeyIs(String androidKey) {
         assertThat(directoryManager.getCurrentDirectoryEntity().getAndroidKey(), is(equalTo(androidKey)));
     }
 
     @Then("^the Directory has no Android Key$")
-    public void theDirectoryHasNoAndroidKey() throws Throwable {
+    public void theDirectoryHasNoAndroidKey() {
         assertThat(directoryManager.getCurrentDirectoryEntity().getAndroidKey(), is(nullValue()));
     }
 
@@ -181,14 +182,14 @@ public class DirectorySteps {
     }
 
     @Then("^Directory the iOS Certificate Fingerprint matches the provided certificate$")
-    public void directoryTheIOSCertificateFingerprintMatchesTheProvidedCertificate() throws Throwable {
+    public void directoryTheIOSCertificateFingerprintMatchesTheProvidedCertificate() {
         // Write code here that turns the phrase above into concrete actions
         assertThat(directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(),
                 is(equalTo(directoryManager.getPreviousDirectoryEntity().getIosCertificateFingerprint())));
     }
 
     @Then("^the Directory has no IOS Certificate Fingerprint$")
-    public void theDirectoryHasNoIOSCertificateFingerprint() throws Throwable {
+    public void theDirectoryHasNoIOSCertificateFingerprint() {
         assertThat(directoryManager.getCurrentDirectoryEntity().getIosCertificateFingerprint(), is(nullValue()));
     }
 
@@ -203,7 +204,7 @@ public class DirectorySteps {
     }
 
     @Then("^Directory denial context inquiry enabled flag is false")
-    public void directoryTheDirectoryDenialContextInquiryEnabledFlagIsValue() throws Throwable {
+    public void directoryTheDirectoryDenialContextInquiryEnabledFlagIsValue() {
         assertThat(Boolean.FALSE,
                 is(equalTo(directoryManager.getCurrentDirectoryEntity().isDenialContextInquiryEnabled())));
     }
@@ -231,18 +232,18 @@ public class DirectorySteps {
     }
 
     @And("^the Directory webhook url is \"([^\"]*)\"$")
-    public void theDirectoryWebhookUrlIs(String webhookUrl) throws Throwable {
+    public void theDirectoryWebhookUrlIs(String webhookUrl) {
         assertThat(URI.create(webhookUrl),
                 is(equalTo(directoryManager.getCurrentDirectoryEntity().getWebhookUrl())));
     }
 
     @And("^the Directory webhook url is empty$")
-    public void theDirectoryWebhookUrlIsEmpty() throws Throwable {
+    public void theDirectoryWebhookUrlIsEmpty() {
         assertThat(null, is(equalTo(directoryManager.getCurrentDirectoryEntity().getWebhookUrl())));
     }
 
     @And("^the Directory has the added SDK Keys?$")
-    public void theDirectoryHasTheAddedSDKKeys() throws Throwable {
+    public void theDirectoryHasTheAddedSDKKeys() {
         Collections.sort(directoryManager.getCurrentDirectoryEntity().getSdkKeys());
         Collections.sort(directoryManager.getPreviousDirectoryEntity().getSdkKeys());
 
@@ -251,13 +252,13 @@ public class DirectorySteps {
     }
 
     @Then("^the ID matches the value returned when the Directory was created$")
-    public void theIDMatchesTheValueReturnedWhenTheDirectoryWasCreated() throws Throwable {
+    public void theIDMatchesTheValueReturnedWhenTheDirectoryWasCreated() {
         assertThat(directoryManager.getCurrentDirectoryEntity().getId(),
                 is(equalTo(directoryManager.getPreviousDirectoryEntity().getId())));
     }
 
     @And("^the Directory has the added Service IDs?$")
-    public void theDirectoryHasTheAddedServiceIDs() throws Throwable {
+    public void theDirectoryHasTheAddedServiceIDs() {
         Collections.sort(directoryManager.getPreviousDirectoryEntity().getServiceIds());
         Collections.sort(directoryManager.getCurrentDirectoryEntity().getServiceIds());
         assertThat(directoryManager.getCurrentDirectoryEntity().getServiceIds(),
@@ -280,13 +281,13 @@ public class DirectorySteps {
     }
 
     @Then("^the current Directory list is a list with only the current Directory$")
-    public void theCurrentDirectoryIsAListWithOnlyTheCurrentDirectory() throws Throwable {
+    public void theCurrentDirectoryIsAListWithOnlyTheCurrentDirectory() {
         assertThat(directoryManager.getCurrentDirectoryEntityList(),
                 is(equalTo(Collections.singletonList(directoryManager.getCurrentDirectoryEntity()))));
     }
 
     @Then("^the current Directory is in the Directory list$")
-    public void theCurrentDirectoryIsInTheDirectoryList() throws Throwable {
+    public void theCurrentDirectoryIsInTheDirectoryList() {
         assertThat(directoryManager.getCurrentDirectoryEntityList(),
                 hasItem(directoryManager.getCurrentDirectoryEntity()));
     }
@@ -315,5 +316,16 @@ public class DirectorySteps {
         } catch (Exception e) {
             genericSteps.setCurrentException(e);
         }
+    }
+
+    @Then("^DenialContextInquiryEnabled (is|should be) set to \"([^\"]+)\"$")
+    public void denialContextInquiryEnabledIsSetTo(@SuppressWarnings("unused") String ignore, boolean value) {
+        assertThat(value, is(equalTo(value)));
+    }
+
+    @When("^I update the DenialContextInquiryEnabled to \"([^\"]+)\"$")
+    public void iUpdateTheDenialContextInquiryEnabledTo(boolean value) throws Throwable {
+        DirectoryEntity directory = directoryManager.getCurrentDirectoryEntity();
+        directoryManager.updateDirectory(directory.getId(), directory.getActive(), null, null, null, value, null);
     }
 }

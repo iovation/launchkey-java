@@ -15,9 +15,7 @@ package com.iovation.launchkey.sdk.integration.managers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.ServiceClient;
-import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
-import com.iovation.launchkey.sdk.domain.service.DenialReason;
+import com.iovation.launchkey.sdk.domain.service.*;
 import cucumber.api.java.After;
 
 import java.util.ArrayList;
@@ -37,6 +35,7 @@ public class DirectoryServiceAuthsManager {
     private String currentAuthRequestId;
     private AuthorizationResponse currentAuthResponse;
     private AuthPolicy currentAuthPolicy;
+    private AdvancedAuthorizationResponse currentAdvancedAuthResponse;
 
     @Inject
     public DirectoryServiceAuthsManager(DirectoryServiceManager directoryServiceManager) {
@@ -47,6 +46,7 @@ public class DirectoryServiceAuthsManager {
     public void cleanUp() {
         currentAuthRequestId = null;
         currentAuthResponse = null;
+        currentAdvancedAuthResponse = null;
         currentAuthPolicy = null;
         factors = null;
         inherence = false;
@@ -123,9 +123,23 @@ public class DirectoryServiceAuthsManager {
         return currentAuthPolicy;
     }
 
-    public AuthorizationResponse getAuthorizationResponse() throws Throwable {
-        currentAuthResponse = getServiceClient().getAuthorizationResponse(currentAuthRequestId);
+    public AuthorizationResponse getAuthorizationResponse(String authRequestId) throws Throwable {
+        currentAuthResponse = getServiceClient().getAuthorizationResponse(authRequestId);
         return currentAuthResponse;
+    }
+
+    public AdvancedAuthorizationResponse getAdvancedAuthorizationResponse() throws Throwable {
+        currentAdvancedAuthResponse = getServiceClient().getAdvancedAuthorizationResponse(currentAuthRequestId);
+        return currentAdvancedAuthResponse;
+    }
+
+    public AdvancedAuthorizationResponse getAdvancedAuthorizationResponse(String authRequestId) throws Throwable {
+        currentAdvancedAuthResponse = getServiceClient().getAdvancedAuthorizationResponse(authRequestId);
+        return currentAdvancedAuthResponse;
+    }
+
+    public AuthorizationResponse getAuthorizationResponse() throws Throwable {
+       return getAuthorizationResponse(currentAuthRequestId);
     }
 
     public AuthorizationResponse getCurrentAuthResponse() {
@@ -134,5 +148,9 @@ public class DirectoryServiceAuthsManager {
 
     private ServiceClient getServiceClient() throws Throwable {
         return directoryServiceManager.getServiceClient();
+    }
+
+    public AdvancedAuthorizationResponse getCurrentAdvancedAuthorizationResponse() {
+        return currentAdvancedAuthResponse;
     }
 }

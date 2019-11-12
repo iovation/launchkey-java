@@ -9,14 +9,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.domain.policy.Fence;
+import com.iovation.launchkey.sdk.domain.policy.GeoCircleFence;
+import com.iovation.launchkey.sdk.domain.policy.TerritoryFence;
 import com.iovation.launchkey.sdk.domain.service.AuthMethod;
 import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.service.DenialReason;
+import com.iovation.launchkey.sdk.domain.service.*;
+import com.iovation.launchkey.sdk.domain.webhook.AdvancedAuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.ServiceUserSessionEndWebhookPackage;
 import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
@@ -136,185 +138,22 @@ public class BasicServiceClient implements ServiceClient {
     public AuthorizationResponse getAuthorizationResponse(String authorizationRequestId)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError, AuthorizationRequestTimedOutError, NoKeyFoundException {
-        UUID authorizationRequestUUID;
-        authorizationRequestUUID = getAuthRequestIdFromString(authorizationRequestId);
-        AuthorizationResponse response;
-        ServiceV3AuthsGetResponse transportResponse = transport.serviceV3AuthsGet(
-                authorizationRequestUUID, serviceEntity
-        );
+        AdvancedAuthorizationResponse advancedResponse = getAdvancedAuthorizationResponse(authorizationRequestId);
+
+        return getAuthorizationResponse(advancedResponse);
+    }
+
+    @Override
+    public AdvancedAuthorizationResponse getAdvancedAuthorizationResponse(String authorizationRequestId) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError, AuthorizationRequestTimedOutError, NoKeyFoundException, AuthorizationRequestCanceled {
+        UUID authorizationRequestUUID = getAuthRequestIdFromString(authorizationRequestId);
+        AuthsResponse transportResponse = transport.serviceV3AuthsGet(authorizationRequestUUID, serviceEntity);
+        AdvancedAuthorizationResponse response;
         if (transportResponse == null) {
             response = null;
         } else {
-            response = getAuthorizationResponse(transportResponse);
+            response = getAdvancedAuthorizationResponse(transportResponse);
         }
         return response;
-    }
-
-    private AuthorizationResponse getAuthorizationResponse(AuthsResponse authsResponse) {
-        AuthorizationResponse.Type type = getType(authsResponse);
-        AuthorizationResponse.Reason reason = getReason(authsResponse);
-        AuthPolicy policy = getAuthPolicy(authsResponse);
-        List<AuthMethod> authMethods = getMethods(authsResponse);
-
-        AuthorizationResponse response = new AuthorizationResponse(
-                authsResponse.getAuthorizationRequestId().toString(),
-                authsResponse.getResponse(),
-                authsResponse.getServiceUserHash(),
-                authsResponse.getOrganizationUserHash(),
-                authsResponse.getUserPushId(),
-                authsResponse.getDeviceId(),
-                Arrays.asList(authsResponse.getServicePins()),
-                type,
-                reason,
-                authsResponse.getDenialReason(),
-                reason == AuthorizationResponse.Reason.FRAUDULENT,
-                policy,
-                authMethods);
-        return response;
-    }
-
-    private AuthPolicy getAuthPolicy(AuthsResponse authsResponse) {
-        AuthPolicy policy;
-
-        if (authsResponse.getAuthPolicy() == null) {
-            policy = null;
-        } else {
-            List<AuthPolicy.Location> locations = getLocations(authsResponse);
-
-            Boolean inherence = null;
-            Boolean knowledge = null;
-            Boolean possession = null;
-            Integer any = null;
-            for (com.iovation.launchkey.sdk.transport.domain.AuthPolicy.MinimumRequirement minumumRequrement : authsResponse.getAuthPolicy().getMinimumRequirements()) {
-                if (minumumRequrement.getInherence() != null) {
-                    inherence = minumumRequrement.getInherence().equals(1);
-                }
-                if (minumumRequrement.getKnowledge() != null) {
-                    knowledge = minumumRequrement.getKnowledge().equals(1);
-                }
-                if (minumumRequrement.getPossession() != null) {
-                    possession = minumumRequrement.getPossession().equals(1);
-                }
-                if (minumumRequrement.getAny() != null) {
-                    any = minumumRequrement.getAny();
-                }
-            }
-
-            if (any != null) {
-                policy = new AuthPolicy(any, authsResponse.getAuthPolicy().getDeviceIntegrity(), locations);
-            } else if (inherence != null || knowledge != null || possession != null) {
-                policy = new AuthPolicy(
-                        knowledge != null && knowledge,
-                        inherence != null && inherence,
-                        possession != null && possession,
-                        authsResponse.getAuthPolicy().getDeviceIntegrity(),
-                        locations);
-            } else {
-                policy = new AuthPolicy(locations);
-            }
-        }
-        return policy;
-    }
-
-    private List<AuthMethod> getMethods(AuthsResponse authsResponse) {
-        List<AuthMethod> authMethods;
-        if (authsResponse.getAuthMethods() == null) {
-            authMethods = null;
-        } else {
-            authMethods = new ArrayList<>();
-            for (com.iovation.launchkey.sdk.transport.domain.AuthMethod authMethod : authsResponse.getAuthMethods()) {
-                AuthMethod.Type authMethodType;
-                if ("PIN_CODE".equalsIgnoreCase(authMethod.getMethod())) {
-                    authMethodType = AuthMethod.Type.PIN_CODE;
-                } else if ("CIRCLE_CODE".equalsIgnoreCase(authMethod.getMethod())) {
-                    authMethodType = AuthMethod.Type.CIRCLE_CODE;
-                } else if ("GEOFENCING".equalsIgnoreCase(authMethod.getMethod())) {
-                    authMethodType = AuthMethod.Type.GEOFENCING;
-                } else if ("LOCATIONS".equalsIgnoreCase(authMethod.getMethod())) {
-                    authMethodType = AuthMethod.Type.LOCATIONS;
-                } else if ("WEARABLES".equalsIgnoreCase(authMethod.getMethod())) {
-                    authMethodType = AuthMethod.Type.WEARABLES;
-                } else if ("FINGERPRINT".equalsIgnoreCase(authMethod.getMethod())) {
-                    authMethodType = AuthMethod.Type.FINGERPRINT;
-                } else if ("FACE".equalsIgnoreCase(authMethod.getMethod())) {
-                    authMethodType = AuthMethod.Type.FACE;
-                } else {
-                    authMethodType = AuthMethod.Type.OTHER;
-                }
-                authMethods.add(new AuthMethod(authMethodType, authMethod.getSet(), authMethod.getActive(),
-                        authMethod.getAllowed(), authMethod.getSupported(), authMethod.getUserRequired(),
-                        authMethod.getPassed(), authMethod.getError()));
-            }
-        }
-        return authMethods;
-    }
-
-    private List<AuthPolicy.Location> getLocations(AuthsResponse authsResponse) {
-        List<AuthPolicy.Location> locations;
-        if (authsResponse.getAuthPolicy().getGeoFences() == null) {
-            locations = null;
-        } else {
-            locations = new ArrayList<>();
-            for (com.iovation.launchkey.sdk.transport.domain.AuthPolicy.Location location : authsResponse.getAuthPolicy().getGeoFences()) {
-                locations.add(new AuthPolicy.Location(location.getName(), location.getRadius(), location.getLatitude(),
-                        location.getLongitude()));
-            }
-        }
-        return locations;
-    }
-
-    private AuthorizationResponse.Reason getReason(AuthsResponse authsResponse) {
-        AuthorizationResponse.Reason reason;
-        if (authsResponse.getReason() == null) {
-            reason = null;
-        } else if (authsResponse.getReason().equals("APPROVED")) {
-            reason = AuthorizationResponse.Reason.APPROVED;
-        } else if (authsResponse.getReason().equals("DISAPPROVED")) {
-            reason = AuthorizationResponse.Reason.DISAPPROVED;
-        } else if (authsResponse.getReason().equals("FRAUDULENT")) {
-            reason = AuthorizationResponse.Reason.FRAUDULENT;
-        } else if (authsResponse.getReason().equals("POLICY")) {
-            reason = AuthorizationResponse.Reason.POLICY;
-        } else if (authsResponse.getReason().equals("PERMISSION")) {
-            reason = AuthorizationResponse.Reason.PERMISSION;
-        } else if (authsResponse.getReason().equals("AUTHENTICATION")) {
-            reason = AuthorizationResponse.Reason.AUTHENTICATION;
-        } else if (authsResponse.getReason().equals("CONFIGURATION")) {
-            reason = AuthorizationResponse.Reason.CONFIGURATION;
-        } else if (authsResponse.getReason().equals("BUSY_LOCAL")) {
-            reason = AuthorizationResponse.Reason.BUSY_LOCAL;
-        } else if (authsResponse.getReason().equals("SENSOR")) {
-            reason = AuthorizationResponse.Reason.SENSOR;
-        } else {
-            reason = AuthorizationResponse.Reason.OTHER;
-        }
-        return reason;
-    }
-
-    private AuthorizationResponse.Type getType(AuthsResponse authsResponse) {
-        AuthorizationResponse.Type type;
-        if (authsResponse.getType() == null) {
-            type = null;
-        } else if (authsResponse.getType().equals("AUTHORIZED")) {
-            type = AuthorizationResponse.Type.AUTHORIZED;
-        } else if (authsResponse.getType().equals("DENIED")) {
-            type = AuthorizationResponse.Type.DENIED;
-        } else if (authsResponse.getType().equals("FAILED")) {
-            type = AuthorizationResponse.Type.FAILED;
-        } else {
-            type = AuthorizationResponse.Type.OTHER;
-        }
-        return type;
-    }
-
-    private UUID getAuthRequestIdFromString(String uuid) {
-        UUID authorizationRequestUUID;
-        try {
-            authorizationRequestUUID = UUID.fromString(uuid);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("authorizationRequestId must be a valid UUID!", e);
-        }
-        return authorizationRequestUUID;
     }
 
     @Override
@@ -352,13 +191,27 @@ public class BasicServiceClient implements ServiceClient {
     public WebhookPackage handleWebhook(Map<String, List<String>> headers, String body, String method, String path)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError, NoKeyFoundException {
+        WebhookPackage response = handleAdvancedWebhook(headers, body, method, path);
+        if (response instanceof AdvancedAuthorizationResponseWebhookPackage) {
+            //noinspection deprecation
+            response = new AuthorizationResponseWebhookPackage(getAuthorizationResponse(
+                    ((AdvancedAuthorizationResponseWebhookPackage) response).getAuthorizationResponse()));
+        }
+        return response;
+    }
+
+    @Override
+    public WebhookPackage handleAdvancedWebhook(
+            Map<String, List<String>> headers, String body, String method, String path
+    ) throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError, NoKeyFoundException {
         ServerSentEvent transportResponse = transport.handleServerSentEvent(headers, method, path, body);
         WebhookPackage response;
         if (transportResponse == null) {
             response = null;
         } else if (transportResponse instanceof ServerSentEventAuthorizationResponse) {
-            response = new AuthorizationResponseWebhookPackage(
-                    getAuthorizationResponse((ServerSentEventAuthorizationResponse) transportResponse)
+            response = new AdvancedAuthorizationResponseWebhookPackage(
+                    getAdvancedAuthorizationResponse((ServerSentEventAuthorizationResponse) transportResponse)
             );
         } else if (transportResponse instanceof ServerSentEventUserServiceSessionEnd) {
             response = new ServiceUserSessionEndWebhookPackage(
@@ -369,5 +222,296 @@ public class BasicServiceClient implements ServiceClient {
             throw new InvalidRequestException("Unknown response type was returned by the transport", null, null);
         }
         return response;
+    }
+
+    private AuthorizationResponse getAuthorizationResponse(AdvancedAuthorizationResponse advancedResponse) {
+        AuthorizationResponse response;
+        if (advancedResponse == null) {
+            response = null;
+        } else {
+            response = new AuthorizationResponse(
+                    advancedResponse.getAuthorizationRequestId(),
+                    advancedResponse.isAuthorized(),
+                    advancedResponse.getServiceUserHash(),
+                    advancedResponse.getOrganizationUserHash(),
+                    advancedResponse.getUserPushId(),
+                    advancedResponse.getDeviceId(),
+                    advancedResponse.getServicePins(),
+                    getLegacyTypeFromAdvancedType(advancedResponse.getType()),
+                    getLegacyReasonFromAdvancedReason(advancedResponse.getReason()),
+                    advancedResponse.getDenialReason(),
+                    advancedResponse.isFraud(),
+                    getLegacyPolicyFromAdvancedPolicy(advancedResponse.getPolicy()),
+                    advancedResponse.getAuthMethods()
+            );
+        }
+        return response;
+    }
+
+    private AuthPolicy getLegacyPolicyFromAdvancedPolicy(AuthorizationResponsePolicy advancedPolicy) {
+        if (advancedPolicy == null) {
+            return null;
+        }
+        List<AuthPolicy.Location> locations = new ArrayList<>();
+        if (advancedPolicy.getFences() != null) {
+            for (Fence fence : advancedPolicy.getFences()) {
+                if (fence instanceof GeoCircleFence) {
+                    GeoCircleFence circleFence = (GeoCircleFence) fence;
+                    locations.add(new AuthPolicy.Location(circleFence.getName(), circleFence.getRadius(),
+                            circleFence.getLatitude(), circleFence.getLongitude()));
+                }
+            }
+        }
+        AuthPolicy authPolicy;
+        if (Requirement.TYPES.equals(advancedPolicy.getRequirement())) {
+            authPolicy = new AuthPolicy(advancedPolicy.wasKnowledgeRequired(), advancedPolicy.wasInherenceRequired(), advancedPolicy.wasPossessionRequired(), null, locations);
+        } else if (Requirement.AMOUNT.equals(advancedPolicy.getRequirement())) {
+            authPolicy = new AuthPolicy(advancedPolicy.getAmount(), null, locations);
+        } else if (null == advancedPolicy.getRequirement()) {
+            authPolicy = new AuthPolicy(locations);
+        } else {
+            authPolicy = null;
+        }
+        return authPolicy;
+    }
+
+    private AuthorizationResponse.Reason getLegacyReasonFromAdvancedReason(AdvancedAuthorizationResponse.Reason advancedreason) {
+        AuthorizationResponse.Reason reason;
+        if (advancedreason == null) {
+            reason = null;
+        } else {
+            switch (advancedreason) {
+                case APPROVED:
+                    reason = AuthorizationResponse.Reason.APPROVED;
+                    break;
+                case DISAPPROVED:
+                    reason = AuthorizationResponse.Reason.DISAPPROVED;
+                    break;
+                case FRAUDULENT:
+                    reason = AuthorizationResponse.Reason.FRAUDULENT;
+                    break;
+                case POLICY:
+                    reason = AuthorizationResponse.Reason.POLICY;
+                    break;
+                case PERMISSION:
+                    reason = AuthorizationResponse.Reason.PERMISSION;
+                    break;
+                case AUTHENTICATION:
+                    reason = AuthorizationResponse.Reason.AUTHENTICATION;
+                    break;
+                case CONFIGURATION:
+                    reason = AuthorizationResponse.Reason.CONFIGURATION;
+                    break;
+                case BUSY_LOCAL:
+                    reason = AuthorizationResponse.Reason.BUSY_LOCAL;
+                    break;
+                case SENSOR:
+                    reason = AuthorizationResponse.Reason.SENSOR;
+                    break;
+                case OTHER:
+                    reason = AuthorizationResponse.Reason.OTHER;
+                    break;
+                default:
+                    reason = null;
+            }
+        }
+        return reason;
+    }
+
+    private AuthorizationResponse.Type getLegacyTypeFromAdvancedType(AdvancedAuthorizationResponse.Type advancedType) {
+        AuthorizationResponse.Type type;
+        if (advancedType == null) {
+            type = null;
+        } else {
+            switch (advancedType) {
+                case AUTHORIZED:
+                    type = AuthorizationResponse.Type.AUTHORIZED;
+                    break;
+                case DENIED:
+                    type = AuthorizationResponse.Type.DENIED;
+                    break;
+                case FAILED:
+                    type = AuthorizationResponse.Type.FAILED;
+                    break;
+                case OTHER:
+                    type = AuthorizationResponse.Type.OTHER;
+                    break;
+                default:
+                    type = null;
+            }
+        }
+        return type;
+    }
+
+    private AdvancedAuthorizationResponse getAdvancedAuthorizationResponse(AuthsResponse authsResponse) throws InvalidResponseException {
+        AdvancedAuthorizationResponse.Type type = getAdvancedType(authsResponse);
+        AdvancedAuthorizationResponse.Reason reason = getAdvancedReason(authsResponse);
+        AuthorizationResponsePolicy policy;
+        try {
+            policy = getAuthorizationResponsePolicy(authsResponse);
+        } catch (UnknownPolicyException e) {
+            throw new InvalidResponseException("Error parsing policy", e, null);
+        }
+        List<AuthMethod> authMethods = getMethods(authsResponse);
+
+        return new AdvancedAuthorizationResponse(
+                authsResponse.getAuthorizationRequestId().toString(),
+                authsResponse.getResponse(),
+                authsResponse.getServiceUserHash(),
+                authsResponse.getOrganizationUserHash(),
+                authsResponse.getUserPushId(),
+                authsResponse.getDeviceId(),
+                Arrays.asList(authsResponse.getServicePins()),
+                type,
+                reason,
+                authsResponse.getDenialReason(),
+                reason == AdvancedAuthorizationResponse.Reason.FRAUDULENT,
+                policy,
+                authMethods);
+    }
+
+    private AuthorizationResponsePolicy getAuthorizationResponsePolicy(AuthsResponse authsResponse) throws UnknownPolicyException {
+        AuthorizationResponsePolicy policy;
+
+        if (authsResponse.getAuthPolicy() == null) {
+            policy = null;
+        } else {
+            policy = new AuthorizationResponsePolicy(
+                    getRequirement(authsResponse.getAuthPolicy()),
+                    authsResponse.getAuthPolicy().getAmount(),
+                    getFences(authsResponse.getAuthPolicy()),
+                    authsResponse.getAuthPolicy().getTypes() != null && authsResponse.getAuthPolicy().getTypes().contains("inherence"),
+                    authsResponse.getAuthPolicy().getTypes() != null && authsResponse.getAuthPolicy().getTypes().contains("knowledge"),
+                    authsResponse.getAuthPolicy().getTypes() != null && authsResponse.getAuthPolicy().getTypes().contains("possession")
+            );
+        }
+        return policy;
+    }
+
+    private Requirement getRequirement(AuthResponsePolicy authPolicy) {
+        Requirement requirement;
+        if (null == authPolicy.getRequirement()) {
+            requirement = null;
+        } else if ("types".equals(authPolicy.getRequirement())) {
+            requirement = Requirement.TYPES;
+        } else if ("amount".equals(authPolicy.getRequirement())) {
+            requirement = Requirement.AMOUNT;
+        } else if ("cond_geo".equals(authPolicy.getRequirement())) {
+            requirement = Requirement.COND_GEO;
+        } else {
+            requirement = Requirement.OTHER;
+        }
+        return requirement;
+    }
+
+    private AdvancedAuthorizationResponse.Reason getAdvancedReason(AuthsResponse authsResponse) {
+        AdvancedAuthorizationResponse.Reason reason;
+        if (authsResponse.getReason() == null) {
+            reason = null;
+        } else if (authsResponse.getReason().equals("APPROVED")) {
+            reason = AdvancedAuthorizationResponse.Reason.APPROVED;
+        } else if (authsResponse.getReason().equals("DISAPPROVED")) {
+            reason = AdvancedAuthorizationResponse.Reason.DISAPPROVED;
+        } else if (authsResponse.getReason().equals("FRAUDULENT")) {
+            reason = AdvancedAuthorizationResponse.Reason.FRAUDULENT;
+        } else if (authsResponse.getReason().equals("POLICY")) {
+            reason = AdvancedAuthorizationResponse.Reason.POLICY;
+        } else if (authsResponse.getReason().equals("PERMISSION")) {
+            reason = AdvancedAuthorizationResponse.Reason.PERMISSION;
+        } else if (authsResponse.getReason().equals("AUTHENTICATION")) {
+            reason = AdvancedAuthorizationResponse.Reason.AUTHENTICATION;
+        } else if (authsResponse.getReason().equals("CONFIGURATION")) {
+            reason = AdvancedAuthorizationResponse.Reason.CONFIGURATION;
+        } else if (authsResponse.getReason().equals("BUSY_LOCAL")) {
+            reason = AdvancedAuthorizationResponse.Reason.BUSY_LOCAL;
+        } else if (authsResponse.getReason().equals("SENSOR")) {
+            reason = AdvancedAuthorizationResponse.Reason.SENSOR;
+        } else {
+            reason = AdvancedAuthorizationResponse.Reason.OTHER;
+        }
+        return reason;
+    }
+
+    private AdvancedAuthorizationResponse.Type getAdvancedType(AuthsResponse authsResponse) {
+        AdvancedAuthorizationResponse.Type type;
+        if (authsResponse.getType() == null) {
+            type = null;
+        } else if (authsResponse.getType().equals("AUTHORIZED")) {
+            type = AdvancedAuthorizationResponse.Type.AUTHORIZED;
+        } else if (authsResponse.getType().equals("DENIED")) {
+            type = AdvancedAuthorizationResponse.Type.DENIED;
+        } else if (authsResponse.getType().equals("FAILED")) {
+            type = AdvancedAuthorizationResponse.Type.FAILED;
+        } else {
+            type = AdvancedAuthorizationResponse.Type.OTHER;
+        }
+        return type;
+    }
+
+    private List<Fence> getFences(AuthResponsePolicy transportPolicy) throws UnknownPolicyException {
+        List<Fence> fences;
+        if (transportPolicy.getFences() == null) {
+            fences = null;
+        } else {
+            fences = new ArrayList<>();
+            for (com.iovation.launchkey.sdk.transport.domain.Fence policyFence : transportPolicy.getFences()) {
+                Fence fence;
+                if (policyFence.getType() == null || "GEO_CIRCLE".equals(policyFence.getType())) {
+                    fence = new GeoCircleFence(policyFence.getName(), policyFence.getLatitude(),
+                            policyFence.getLongitude(), policyFence.getRadius());
+                } else if ("TERRITORY".equals(policyFence.getType())) {
+                    fence = new TerritoryFence(policyFence.getName(), policyFence.getCountry(),
+                            policyFence.getAdministrativeArea(), policyFence.getPostalCode());
+                } else {
+                    throw new UnknownPolicyException("Policy has unknown fence type: " + policyFence.getType(),
+                            null, null);
+                }
+                fences.add(fence);
+            }
+        }
+        return fences;
+    }
+
+    private List<AuthMethod> getMethods(AuthsResponse authsResponse) {
+        List<AuthMethod> authMethods;
+        if (authsResponse.getAuthMethods() == null) {
+            authMethods = null;
+        } else {
+            authMethods = new ArrayList<>();
+            for (com.iovation.launchkey.sdk.transport.domain.AuthMethod authMethod : authsResponse.getAuthMethods()) {
+                AuthMethod.Type authMethodType;
+                if ("PIN_CODE".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.PIN_CODE;
+                } else if ("CIRCLE_CODE".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.CIRCLE_CODE;
+                } else if ("GEOFENCING".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.GEOFENCING;
+                } else if ("LOCATIONS".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.LOCATIONS;
+                } else if ("WEARABLES".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.WEARABLES;
+                } else if ("FINGERPRINT".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.FINGERPRINT;
+                } else if ("FACE".equalsIgnoreCase(authMethod.getMethod())) {
+                    authMethodType = AuthMethod.Type.FACE;
+                } else {
+                    authMethodType = AuthMethod.Type.OTHER;
+                }
+                authMethods.add(new AuthMethod(authMethodType, authMethod.getSet(), authMethod.getActive(),
+                        authMethod.getAllowed(), authMethod.getSupported(), authMethod.getUserRequired(),
+                        authMethod.getPassed(), authMethod.getError()));
+            }
+        }
+        return authMethods;
+    }
+
+    private UUID getAuthRequestIdFromString(String uuid) {
+        UUID authorizationRequestUUID;
+        try {
+            authorizationRequestUUID = UUID.fromString(uuid);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("authorizationRequestId must be a valid UUID!", e);
+        }
+        return authorizationRequestUUID;
     }
 }

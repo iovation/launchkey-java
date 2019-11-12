@@ -2,6 +2,12 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.6.0
+  
+    * Added new policy types for method amount, factor, and geo-conditional policies
+    * Add territorial fences
+    * Deprecated existing policy objects as well as methods and objects that used them
+
   * 4.5.0
   
     * Added Auth Response Insights

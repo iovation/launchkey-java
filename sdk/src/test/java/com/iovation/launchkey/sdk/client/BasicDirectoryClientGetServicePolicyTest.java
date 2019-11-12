@@ -10,34 +10,34 @@ package com.iovation.launchkey.sdk.client; /**
  * limitations under the License.
  */
 
+import com.fasterxml.jackson.databind.node.*;
+import com.iovation.launchkey.sdk.domain.policy.ConditionalGeoFencePolicy;
+import com.iovation.launchkey.sdk.domain.policy.MethodAmountPolicy;
+import com.iovation.launchkey.sdk.domain.policy.TerritoryFence;
+import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
+
 import com.iovation.launchkey.sdk.transport.Transport;
-import com.iovation.launchkey.sdk.transport.domain.AuthPolicy;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
-import com.iovation.launchkey.sdk.transport.domain.ServicePolicy;
+import com.iovation.launchkey.sdk.transport.domain.Fence;
+import com.iovation.launchkey.sdk.transport.domain.Policy;
 import com.iovation.launchkey.sdk.transport.domain.ServicePolicyItemPostRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BasicDirectoryClientGetServicePolicyTest {
-    @Mock
     private Transport transport;
-
-    @Mock
-    private ServicePolicy response;
+    private com.iovation.launchkey.sdk.transport.domain.Policy response;
 
     @Captor
     private ArgumentCaptor<EntityIdentifier> entityCaptor;
@@ -51,9 +51,13 @@ public class BasicDirectoryClientGetServicePolicyTest {
 
     @Before
     public void setUp() throws Exception {
+        response = mock(Policy.class);
+        transport = mock(Transport.class);
+        when(transport.directoryV3ServicePolicyItemPost(
+                any(ServicePolicyItemPostRequest.class),
+                any(EntityIdentifier.class))
+        ).thenReturn(response);
         client = new BasicDirectoryClient(directoryId, transport);
-        when(transport.directoryV3ServicePolicyItemPost(any(ServicePolicyItemPostRequest.class),
-                any(EntityIdentifier.class))).thenReturn(response);
     }
 
     @Test
@@ -81,118 +85,193 @@ public class BasicDirectoryClientGetServicePolicyTest {
 
     @Test
     public void getsRequiredFactorsFromMinimumRequirements() throws Exception {
-        List<AuthPolicy.MinimumRequirement> minimum = Collections.singletonList(new AuthPolicy.MinimumRequirement(
-                AuthPolicy.MinimumRequirement.Type.AUTHENTICATED, 9, 0, 0, 0));
+        List<Policy.MinimumRequirement> minimum = Collections.singletonList(new Policy.MinimumRequirement(
+                Policy.MinimumRequirement.Type.AUTHENTICATED, 9, 0, 0, 0));
         when(response.getMinimumRequirements()).thenReturn(minimum);
-        assertEquals(Integer.valueOf(9), client.getServicePolicy(serviceId).getRequiredFactors());
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertEquals(Integer.valueOf(9), servicePolicy.getRequiredFactors());
     }
 
     @Test
     public void getsKnowledgeRequiredFromMinimumRequirements() throws Exception {
-        List<AuthPolicy.MinimumRequirement> minimum = Collections.singletonList(new AuthPolicy.MinimumRequirement(
-                AuthPolicy.MinimumRequirement.Type.AUTHENTICATED, 0, 1, 0, 0));
+        List<Policy.MinimumRequirement> minimum = Collections.singletonList(new Policy.MinimumRequirement(
+                Policy.MinimumRequirement.Type.AUTHENTICATED, 0, 1, 0, 0));
         when(response.getMinimumRequirements()).thenReturn(minimum);
-        assertEquals(true, client.getServicePolicy(serviceId).isKnowledgeFactorRequired());
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertEquals(true, servicePolicy.isKnowledgeFactorRequired());
     }
 
     @Test
     public void getsInherenceRequiredFromMinimumRequirements() throws Exception {
-        List<AuthPolicy.MinimumRequirement> minimum = Collections.singletonList(new AuthPolicy.MinimumRequirement(
-                AuthPolicy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 1, 0));
+        List<Policy.MinimumRequirement> minimum = Collections.singletonList(new Policy.MinimumRequirement(
+                Policy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 1, 0));
         when(response.getMinimumRequirements()).thenReturn(minimum);
-        assertEquals(true, client.getServicePolicy(serviceId).isInherenceFactorRequired());
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertEquals(true, servicePolicy.isInherenceFactorRequired());
     }
 
     @Test
     public void getsPossessionRequiredFromMinimumRequirements() throws Exception {
-        List<AuthPolicy.MinimumRequirement> minimum = Collections.singletonList(new AuthPolicy.MinimumRequirement(
-                AuthPolicy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 0, 1));
+        List<Policy.MinimumRequirement> minimum = Collections.singletonList(new Policy.MinimumRequirement(
+                Policy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 0, 1));
         when(response.getMinimumRequirements()).thenReturn(minimum);
-        assertEquals(true, client.getServicePolicy(serviceId).isPossessionFactorRequired());
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertEquals(true, servicePolicy.isPossessionFactorRequired());
     }
 
     @Test
     public void getsTimeFences() throws Exception {
-        List<ServicePolicy.TimeFence> fences = Arrays.asList(
-                new ServicePolicy.TimeFence("Name 1", Arrays.asList("Monday", "Tuesday"), 1, 2, 3, 4,
-                        "America/Los_Angeles"),
-                new ServicePolicy.TimeFence("Name 2", Arrays.asList("Wednesday", "Sunday"), 4, 3, 2, 1,
-                        "America/New_York")
-        );
-        List<com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.TimeFence> expected = Arrays.asList(
-                new com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.TimeFence("Name 1", Arrays.asList(
+        final JsonNodeFactory jnf = new JsonNodeFactory(true);
+        when(response.getFactors()).thenReturn(new ArrayNode(jnf) {{
+            ObjectNode timeFence = jnf.objectNode();
+            timeFence.set("factor", new TextNode("timefence"));
+            timeFence.set("requirement", new TextNode("forced requirement"));
+            timeFence.set("priority", new IntNode(1));
+            ObjectNode timeFenceAttributes = jnf.objectNode();
+            timeFenceAttributes.set("time fences", new ArrayNode(jnf) {{
+                ObjectNode fence1 = jnf.objectNode();
+                fence1.set("name", new TextNode("Name 1"));
+                fence1.set("days", new ArrayNode(jnf) {{
+                    add(new TextNode("Monday"));
+                    add(new TextNode("Tuesday"));
+                }});
+                fence1.set("start hour", new IntNode(1));
+                fence1.set("end hour", new IntNode(2));
+                fence1.set("start minute", new IntNode(3));
+                fence1.set("end minute", new IntNode(4));
+                fence1.set("timezone", new TextNode("America/Los_Angeles"));
+                add(fence1);
+                ObjectNode fence2 = jnf.objectNode();
+                fence2.set("name", new TextNode("Name 2"));
+                fence2.set("days", new ArrayNode(jnf) {{
+                    add(new TextNode("Wednesday"));
+                    add(new TextNode("Sunday"));
+                }});
+                fence2.set("start hour", new IntNode(4));
+                fence2.set("end hour", new IntNode(3));
+                fence2.set("start minute", new IntNode(2));
+                fence2.set("end minute", new IntNode(1));
+                fence2.set("timezone", new TextNode("America/New_York"));
+                add(fence2);
+            }});
+            timeFence.set("attributes", timeFenceAttributes);
+            add(timeFence);
+        }});
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        List<com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.TimeFence> actual =
+                servicePolicy.getTimeFences();
+        List<ServicePolicy.TimeFence> expected = Arrays.asList(
+                new ServicePolicy.TimeFence("Name 1", Arrays.asList(
                         com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.Day.MONDAY,
                         com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.Day.TUESDAY), 1, 3, 2, 4,
                         TimeZone.getTimeZone("America/Los_Angeles")),
-                new com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.TimeFence("Name 2", Arrays.asList(
-                        com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.Day.WEDNESDAY,
-                        com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.Day.SUNDAY), 4, 2, 3, 1,
+                new ServicePolicy.TimeFence("Name 2", Arrays.asList(
+                        ServicePolicy.Day.WEDNESDAY,
+                        ServicePolicy.Day.SUNDAY), 4, 2, 3, 1,
                         TimeZone.getTimeZone("America/New_York"))
         );
-        when(response.getTimeFences()).thenReturn(fences);
-        List<com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.TimeFence> actual =
-                client.getServicePolicy(serviceId).getTimeFences();
         assertEquals(expected, actual);
     }
 
     @Test
     public void getsGeoFences() throws Exception {
-        List<ServicePolicy.Location> fences = Arrays.asList(
+        final JsonNodeFactory jnf = new JsonNodeFactory(true);
+        when(response.getFactors()).thenReturn(new ArrayNode(jnf) {{
+            ObjectNode geofence = jnf.objectNode();
+            geofence.set("factor", new TextNode("geofence"));
+            geofence.set("requirement", new TextNode("forced requirement"));
+            geofence.set("priority", new IntNode(1));
+            ObjectNode geoFenceAttributes = jnf.objectNode();
+            ArrayNode locations = new ArrayNode(jnf) {{
+                ObjectNode location1 = jnf.objectNode();
+                location1.set("name", new TextNode("Location 1"));
+                location1.set("radius", new DoubleNode(1.1));
+                location1.set("latitude", new DoubleNode(1.2));
+                location1.set("longitude", new DoubleNode(1.3));
+                add(location1);
+                ObjectNode location2 = jnf.objectNode();
+                location2.set("name", new TextNode("Location 2"));
+                location2.set("radius", new DoubleNode(2.1));
+                location2.set("latitude", new DoubleNode(2.2));
+                location2.set("longitude", new DoubleNode(2.3));
+                add(location2);
+            }};
+            geoFenceAttributes.set("locations", locations);
+            geofence.set("attributes", geoFenceAttributes);
+            add(geofence);
+        }});
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        List<ServicePolicy.Location> expected = Arrays.asList(
                 new ServicePolicy.Location("Location 1", 1.1, 1.2, 1.3),
                 new ServicePolicy.Location("Location 2", 2.1, 2.2, 2.3)
         );
-        List<com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.Location> expected = Arrays.asList(
-                new com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.Location("Location 1", 1.1, 1.2,
-                        1.3),
-                new com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy.Location("Location 2", 2.1, 2.2, 2.3)
-        );
-        when(response.getGeoFences()).thenReturn(fences);
-        assertEquals(expected, client.getServicePolicy(serviceId).getLocations());
+        assertEquals(expected, servicePolicy.getLocations());
     }
 
     @Test
     public void getsDeviceIntegrityAsJailBreakProtection() throws Exception {
-        when(response.getDeviceIntegrity()).thenReturn(true);
-        assertEquals(true, client.getServicePolicy(serviceId).isJailBreakProtectionEnabled());
+        final JsonNodeFactory jnf = new JsonNodeFactory(true);
+        ArrayNode factors = new ArrayNode(jnf) {{
+            ObjectNode deviceIntegrity = jnf.objectNode();
+            deviceIntegrity.set("factor", new TextNode("device integrity"));
+            ObjectNode deviceIntegrityAttributes = jnf.objectNode();
+            deviceIntegrityAttributes.set("factor enabled", new TextNode("1"));
+            deviceIntegrity.set("attributes", deviceIntegrityAttributes);
+            add(deviceIntegrity);
+        }};
+        when(response.getFactors()).thenReturn(factors);
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertEquals(true, servicePolicy.isJailBreakProtectionEnabled());
+    }
+
+    @Test
+    public void getsDeviceIntegrityAsNullWhenJailBreakProtectionIsFalse() throws Exception {
+        when(response.getFactors()).thenReturn(new ArrayNode(JsonNodeFactory.instance));
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertNull(servicePolicy.isJailBreakProtectionEnabled());
     }
 
     @SuppressWarnings("Duplicates")
     @Test
     public void getRequiredFactorsNullWhenNoMinimumRequirements() throws Exception {
-        when(response.getMinimumRequirements()).thenReturn(new ArrayList<AuthPolicy.MinimumRequirement>());
-        when(response.getTimeFences()).thenReturn(new ArrayList<ServicePolicy.TimeFence>());
-        when(response.getGeoFences()).thenReturn(new ArrayList<ServicePolicy.Location>());
-        when(response.getDeviceIntegrity()).thenReturn(null);
-        assertNull(client.getServicePolicy(serviceId).getRequiredFactors());
+        List<Policy.MinimumRequirement> minimumRequirements = new ArrayList<Policy.MinimumRequirement>() {{
+            add(new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 0, 0));
+        }};
+        when(response.getMinimumRequirements()).thenReturn(minimumRequirements);
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertNull(servicePolicy.getRequiredFactors());
     }
 
     @SuppressWarnings("Duplicates")
     @Test
     public void isInherenceFactorRequiredNullWhenNoMinimumRequirements() throws Exception {
-        when(response.getMinimumRequirements()).thenReturn(new ArrayList<AuthPolicy.MinimumRequirement>());
-        when(response.getTimeFences()).thenReturn(new ArrayList<ServicePolicy.TimeFence>());
-        when(response.getGeoFences()).thenReturn(new ArrayList<ServicePolicy.Location>());
-        when(response.getDeviceIntegrity()).thenReturn(null);
-        assertNull(client.getServicePolicy(serviceId).isInherenceFactorRequired());
+        List<Policy.MinimumRequirement> minimumRequirements = new ArrayList<Policy.MinimumRequirement>() {{
+            add(new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 0, 0));
+        }};
+        when(response.getMinimumRequirements()).thenReturn(minimumRequirements);
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertNull(servicePolicy.isInherenceFactorRequired());
     }
 
     @SuppressWarnings("Duplicates")
     @Test
     public void isKnowledgeFactorRequiredNullWhenNoMinimumRequirements() throws Exception {
-        when(response.getMinimumRequirements()).thenReturn(new ArrayList<AuthPolicy.MinimumRequirement>());
-        when(response.getTimeFences()).thenReturn(new ArrayList<ServicePolicy.TimeFence>());
-        when(response.getGeoFences()).thenReturn(new ArrayList<ServicePolicy.Location>());
-        when(response.getDeviceIntegrity()).thenReturn(null);
-        assertNull(client.getServicePolicy(serviceId).isKnowledgeFactorRequired());
+        List<Policy.MinimumRequirement> minimumRequirements = new ArrayList<Policy.MinimumRequirement>() {{
+            add(new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 0, 0));
+        }};
+        when(response.getMinimumRequirements()).thenReturn(minimumRequirements);
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertNull(servicePolicy.isKnowledgeFactorRequired());
     }
 
     @SuppressWarnings("Duplicates")
     @Test
     public void isPossessionFactorRequiredNullWhenNoMinimumRequirements() throws Exception {
-        when(response.getMinimumRequirements()).thenReturn(new ArrayList<AuthPolicy.MinimumRequirement>());
-        when(response.getTimeFences()).thenReturn(new ArrayList<ServicePolicy.TimeFence>());
-        when(response.getGeoFences()).thenReturn(new ArrayList<ServicePolicy.Location>());
-        when(response.getDeviceIntegrity()).thenReturn(null);
-        assertNull(client.getServicePolicy(serviceId).isPossessionFactorRequired());
+        List<Policy.MinimumRequirement> minimumRequirements = new ArrayList<Policy.MinimumRequirement>() {{
+            add(new Policy.MinimumRequirement(Policy.MinimumRequirement.Type.AUTHENTICATED, 0, 0, 0, 0));
+        }};
+        when(response.getMinimumRequirements()).thenReturn(minimumRequirements);
+        ServicePolicy servicePolicy = client.getServicePolicy(serviceId);
+        assertNull(servicePolicy.isPossessionFactorRequired());
     }
 }

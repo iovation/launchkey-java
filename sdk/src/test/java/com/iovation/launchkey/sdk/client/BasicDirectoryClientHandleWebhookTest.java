@@ -44,13 +44,13 @@ public class BasicDirectoryClientHandleWebhookTest {
     @Test
     public void handleWebhookWithoutMethodAndPathPassesNullForMethodAndPathToTransport() throws Exception {
         client.handleWebhook(emptyHeaders, "body");
-        verify(transport).handleServerSentEvent(any(Map.class), (String) eq(null), (String) eq(null), anyString());
+        verify(transport).handleServerSentEvent(eq(emptyHeaders), (String) eq(null), (String) eq(null), eq("body"));
     }
 
     @Test
     public void handleWebhookSendsExpectedHeadersToTransport() throws Exception {
-        Map<String, List<String>> headers = Collections.unmodifiableMap(new HashMap() {{
-            put("One", Collections.unmodifiableList(new ArrayList() {{
+        Map<String, List<String>> headers = Collections.unmodifiableMap(new HashMap<String, List<String>>() {{
+            put("One", Collections.unmodifiableList(new ArrayList<String>() {{
                 add("A");
                 add("B");
             }}));
