@@ -22,7 +22,7 @@ Feature: Directory Client can link Devices
     And I retrieve the Devices list for the current User
     Then there should be 1 Device in the Devices list
     And all of the devices should be inactive
-    
+
   @device_testing
   Scenario: Linking a physical device
     Given I have added an SDK Key to the Directory

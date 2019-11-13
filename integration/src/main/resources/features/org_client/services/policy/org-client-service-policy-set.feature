@@ -174,7 +174,7 @@ Feature: Organization Client can set Organization Service Policy
     When I create a new Factors Policy
     And I set the factors to "<factors>"
     And I set the Advanced Policy for the Current Organization Service to the new policy
-    When I retrieve the Advanced Policy for the Current Organization Service
+    And I retrieve the Advanced Policy for the Current Organization Service
     Then factors should be set to "<factors>"
   Examples:
   | factors                          |

@@ -3,15 +3,15 @@ Feature: Service Client Authorization Request: Get Device Response Methods
   In order to understand an auth response
   As a Directory Service
   I can retrieve an Authorization Requests that been responded to and determine
-  the policy that was used
+  the methods that were used
 
-   Background:
+  Background:
     Given I created a Directory
     And I have added an SDK Key to the Directory
     And I created a Directory Service
     And I have a linked Device
 
-   Scenario: Verify that an auth request with no policy contains the expected methods
+  Scenario: Verify that an auth request with no policy contains the expected methods
     When I make an Authorization request
     And I approve the auth request
     And I get the response for the Authorization request
