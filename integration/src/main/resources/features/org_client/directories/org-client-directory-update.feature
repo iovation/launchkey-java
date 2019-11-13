@@ -30,18 +30,18 @@ Feature: Organization clients can update Directories
     When I update the Directory iOS P12 with null
     And I retrieve the updated Directory
     Then the Directory has no IOS Certificate Fingerprint
-    
+
   Scenario: I can set the webhook url
     When I update the Directory webhook url to "https://a.webhook.url/path"
     And I retrieve the updated Directory
     Then the Directory webhook url is "https://a.webhook.url/path"
-    
+
   Scenario: I can unset the webhook url
     When I update the Directory webhook url to "https://a.webhook.url/path"
     And I update the Directory webhook url to null
     And I retrieve the updated Directory
     Then the Directory webhook url is empty
-    
+
   Scenario: I can set Denial Context Inquiry Enabled to False
     When I update the DenialContextInquiryEnabled to "false"
     And I retrieve the updated Directory

@@ -279,4 +279,4 @@ Feature: Directory Client can set Directory Service Policy
     | US      | US-CA      | 90001       | US-CA |
     And I set the Advanced Policy for the Current Directory Service to the new policy
     And I retrieve the Advanced Policy for the Current Directory Service
-    Then the Directory Service Policy has "5" fences 
+    Then the Directory Service Policy has "5" fences

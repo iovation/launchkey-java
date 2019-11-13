@@ -15,7 +15,7 @@ Feature: Directory Client can unlink devices
 
   Scenario: Unlinking invalid Device throws NotFoundException
     Given I have made a Device linking request
-    When I attempt to unlink the device with the ID "67c87654-aed9-11e7-98e9-0469f8dc10a5" 
+    When I attempt to unlink the device with the ID "67c87654-aed9-11e7-98e9-0469f8dc10a5"
     Then a EntityNotFound error occurs
 
   Scenario: Unlinking Device from invalid User throws NotFoundException

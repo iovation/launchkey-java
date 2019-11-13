@@ -30,7 +30,6 @@ Feature: Service Client Authorization Request: Get Device Response Policy - New 
     Then the Advanced Authorization response should have amount set to 2
     And the Advanced Authorization response should have the requirement "AMOUNT"
 
-
   Scenario: Verify that a Conditional Geofence Policy can be parsed
     Given the Directory Service is set to any Conditional Geofence Policy
     When I add the following GeoCircleFence items
@@ -107,4 +106,4 @@ Feature: Service Client Authorization Request: Get Device Response Policy - New 
     And I deny the auth request
     And I get the response for the Advanced Authorization request
     Then the Advanced Authorization response should contain a TerritoryFence with a country of "US", a administrative area of "US-NV", a postal code of "89120", and a name of "US-NV"
-    And the Advanced Authorization response should have the requirement "COND_GEO"    
+    And the Advanced Authorization response should have the requirement "COND_GEO"
