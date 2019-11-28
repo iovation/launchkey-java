@@ -99,10 +99,17 @@ public class BasicServiceClient implements ServiceClient {
 
         ServiceV3AuthsPostRequest request = new ServiceV3AuthsPostRequest(
                 userIdentifier, requestPolicy, context, title, ttl, pushTitle, pushBody, requestDenialReasons);
-        ServiceV3AuthsPostResponse response = transport.serviceV3AuthsPost(request, serviceEntity);
+        final ServiceV3AuthsPostResponse response = transport.serviceV3AuthsPost(request, serviceEntity);
+        List<String> deviceIds = null;
+        if (response.getDeviceIds() != null) {
+            deviceIds = new ArrayList<String>() {{
+                addAll(response.getDeviceIds());
+            }};
+        }
         return new AuthorizationRequest(
                 response.getAuthRequest().toString(),
-                response.getPushPackage());
+                response.getPushPackage(),
+                deviceIds);
 
     }
 
