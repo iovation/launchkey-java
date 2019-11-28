@@ -2,6 +2,11 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.7.0
+  
+    * Added support for Device IDs returned by API in creating Authorization Requests. This will assist
+        3rd party push implementations.
+ 
   * 4.6.0
   
     * Added new policy types for method amount, factor, and geo-conditional policies

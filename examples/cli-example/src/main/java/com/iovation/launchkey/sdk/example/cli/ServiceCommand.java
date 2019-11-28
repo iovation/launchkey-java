@@ -72,6 +72,18 @@ class ServiceCommand {
             System.out.println();
             System.out.println("Authorization request successful");
             System.out.println("    Auth Request: " + authRequest);
+            String deviceList;
+            if (authRequest.getDeviceIds() == null) {
+                deviceList = "N/A";
+            } else {
+                StringBuilder deviceListBuilder = new StringBuilder();
+                for (String deviceId : authRequest.getDeviceIds()) {
+                    deviceListBuilder.append(deviceId).append(", ");
+                }
+                deviceList = deviceListBuilder.toString();
+                deviceList = deviceList.substring(0, deviceList.length() - 2);
+            }
+            System.out.println("    Valid Devices: " + deviceList);
             System.out.print("Checking for response from the End User");
             System.out.println();
             AdvancedAuthorizationResponse authorizationResponse;
