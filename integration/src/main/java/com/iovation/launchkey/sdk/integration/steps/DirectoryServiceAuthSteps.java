@@ -15,17 +15,18 @@ package com.iovation.launchkey.sdk.integration.steps;
 import com.google.inject.Inject;
 import com.iovation.launchkey.sdk.domain.policy.GeoCircleFence;
 import com.iovation.launchkey.sdk.domain.policy.TerritoryFence;
-import com.iovation.launchkey.sdk.domain.service.AuthPolicy;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
-import com.iovation.launchkey.sdk.domain.service.AuthorizationResponsePolicy;
-import com.iovation.launchkey.sdk.domain.service.Requirement;
+import com.iovation.launchkey.sdk.domain.service.*;
 import com.iovation.launchkey.sdk.integration.cucumber.converters.MethodsListConverter;
+import com.iovation.launchkey.sdk.integration.entities.DeviceEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryDeviceManager;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServiceAuthsManager;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -226,5 +227,18 @@ public class DirectoryServiceAuthSteps {
         TerritoryFence expected = new TerritoryFence(name, country, admin, postal_code);
         AuthorizationResponsePolicy policy = directoryServiceAuthsManager.getCurrentAdvancedAuthorizationResponse().getPolicy();
         assertThat(policy.getFences(), hasItem(expected));
+    }
+
+    @Then("the Authorization Request response Device IDs matches the current Devices list")
+    public void theAuthorizationRequestResponseDevicesListIsComprisedOfTheIDOfCurrentDevice() throws Throwable {
+        AuthorizationRequest response = directoryServiceAuthsManager.getAuthorizationRequest();
+        List<String> authRequestDeviceIds = response.getDeviceIds();
+        assertThat("Authorization request response device IDs should not be null", authRequestDeviceIds, notNullValue());
+        directoryDeviceManager.retrieveUserDevices();
+        List<String> currentDeviceIds = new ArrayList<>();
+        for (DeviceEntity device :  directoryDeviceManager.getCurrentDevicesList()) {
+            currentDeviceIds.add(device.getId());
+        }
+        assertThat(authRequestDeviceIds, is(equalTo(currentDeviceIds)));
     }
 }

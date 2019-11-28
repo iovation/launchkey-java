@@ -32,10 +32,11 @@ public class DirectoryServiceAuthsManager {
     private boolean knowledge;
     private boolean possession;
 
-    private String currentAuthRequestId;
+    @SuppressWarnings("deprecation")
     private AuthorizationResponse currentAuthResponse;
     private AuthPolicy currentAuthPolicy;
     private AdvancedAuthorizationResponse currentAdvancedAuthResponse;
+    private AuthorizationRequest currentAuthRequest;
 
     @Inject
     public DirectoryServiceAuthsManager(DirectoryServiceManager directoryServiceManager) {
@@ -44,7 +45,6 @@ public class DirectoryServiceAuthsManager {
 
     @After
     public void cleanUp() {
-        currentAuthRequestId = null;
         currentAuthResponse = null;
         currentAdvancedAuthResponse = null;
         currentAuthPolicy = null;
@@ -75,41 +75,24 @@ public class DirectoryServiceAuthsManager {
         locations.add(location);
     }
 
-    public String createAuthorizationRequest(String userIdentifier) throws Throwable {
-        currentAuthResponse = null;
-        currentAuthPolicy = null;
-        currentAuthRequestId = getServiceClient().createAuthorizationRequest(userIdentifier).getId();
-        return currentAuthRequestId;
+    public void createAuthorizationRequest(String userIdentifier) throws Throwable {
+        createAuthorizationRequest(userIdentifier, null, null, null, null, null, null, null);
     }
 
-    public String createAuthorizationRequest(String userIdentifier, String context) throws Throwable {
-        currentAuthResponse = null;
-        currentAuthPolicy = null;
-        currentAuthRequestId = getServiceClient().createAuthorizationRequest(userIdentifier, context).getId();
-        return currentAuthRequestId;
+    public void createAuthorizationRequest(String userIdentifier, String context) throws Throwable {
+        createAuthorizationRequest(userIdentifier, context, null, null, null, null, null, null);
     }
 
-    public String createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy) throws Throwable {
-        currentAuthResponse = null;
-        currentAuthPolicy = policy;
-        currentAuthRequestId = getServiceClient().createAuthorizationRequest(userIdentifier, context, policy).getId();
-        return currentAuthRequestId;
+    public void createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy) throws Throwable {
+        createAuthorizationRequest(userIdentifier, context, policy, null, null, null, null, null);
     }
 
-    public String createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy, String title, Integer ttl) throws Throwable {
-        currentAuthResponse = null;
-        currentAuthPolicy = policy;
-        currentAuthRequestId = getServiceClient().createAuthorizationRequest(userIdentifier, context, policy, title, ttl).getId();
-        return currentAuthRequestId;
-    }
-
-    public String createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy,
+    public void createAuthorizationRequest(String userIdentifier, String context, AuthPolicy policy,
                                                     String title, Integer ttl, String pushTitle, String pushBody,
                                                     List<DenialReason> denialReasons) throws Throwable {
         currentAuthResponse = null;
         currentAuthPolicy = policy;
-        currentAuthRequestId = getServiceClient().createAuthorizationRequest(userIdentifier, context, policy, title, ttl, pushTitle, pushBody, denialReasons).getId();
-        return currentAuthRequestId;
+        currentAuthRequest = getServiceClient().createAuthorizationRequest(userIdentifier, context, policy, title, ttl, pushTitle, pushBody, denialReasons);
     }
 
     public AuthPolicy getCurrentAuthPolicy() {
@@ -123,13 +106,14 @@ public class DirectoryServiceAuthsManager {
         return currentAuthPolicy;
     }
 
+    @SuppressWarnings("deprecation")
     public AuthorizationResponse getAuthorizationResponse(String authRequestId) throws Throwable {
         currentAuthResponse = getServiceClient().getAuthorizationResponse(authRequestId);
         return currentAuthResponse;
     }
 
     public AdvancedAuthorizationResponse getAdvancedAuthorizationResponse() throws Throwable {
-        currentAdvancedAuthResponse = getServiceClient().getAdvancedAuthorizationResponse(currentAuthRequestId);
+        currentAdvancedAuthResponse = getServiceClient().getAdvancedAuthorizationResponse(currentAuthRequest.getId());
         return currentAdvancedAuthResponse;
     }
 
@@ -138,10 +122,12 @@ public class DirectoryServiceAuthsManager {
         return currentAdvancedAuthResponse;
     }
 
+    @SuppressWarnings("deprecation")
     public AuthorizationResponse getAuthorizationResponse() throws Throwable {
-       return getAuthorizationResponse(currentAuthRequestId);
+       return getAuthorizationResponse(currentAuthRequest.getId());
     }
 
+    @SuppressWarnings("deprecation")
     public AuthorizationResponse getCurrentAuthResponse() {
         return currentAuthResponse;
     }
@@ -152,5 +138,9 @@ public class DirectoryServiceAuthsManager {
 
     public AdvancedAuthorizationResponse getCurrentAdvancedAuthorizationResponse() {
         return currentAdvancedAuthResponse;
+    }
+
+    public AuthorizationRequest getAuthorizationRequest() {
+        return currentAuthRequest;
     }
 }
