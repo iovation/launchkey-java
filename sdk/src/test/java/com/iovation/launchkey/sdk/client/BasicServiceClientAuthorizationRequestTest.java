@@ -376,4 +376,15 @@ public class BasicServiceClientAuthorizationRequestTest {
         AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null, null);
         assertEquals(pushPackage, actual.getPushPackage());
     }
+
+    @Test
+    public void returnsDeviceIds() throws Exception {
+        List<String> expected = new ArrayList<String>() {{
+            add("Device A");
+            add("Device B");
+        }};
+        when(response.getDeviceIds()).thenReturn(expected);
+        AuthorizationRequest actual = client.createAuthorizationRequest(user, null, null, null, null, null, null, null);
+        assertEquals(expected, actual.getDeviceIds());
+    }
 }

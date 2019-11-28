@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -23,11 +24,17 @@ import java.util.UUID;
 public class ServiceV3AuthsPostResponse {
     private final UUID authRequest;
     private final String pushPackage;
+    private List<String> deviceIds;
 
     @JsonCreator
-    public ServiceV3AuthsPostResponse(@JsonProperty(value = "auth_request") UUID authRequest, @JsonProperty(value = "push_package") String pushPackage) {
+    public ServiceV3AuthsPostResponse(
+            @JsonProperty(value = "auth_request") UUID authRequest,
+            @JsonProperty(value = "push_package") String pushPackage,
+            @JsonProperty(value = "device_ids") List<String> deviceIds
+    ) {
         this.authRequest = authRequest;
         this.pushPackage = pushPackage;
+        this.deviceIds = deviceIds;
     }
 
     public UUID getAuthRequest() {
@@ -38,18 +45,23 @@ public class ServiceV3AuthsPostResponse {
         return pushPackage;
     }
 
+    public List<String> getDeviceIds() {
+        return deviceIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ServiceV3AuthsPostResponse that = (ServiceV3AuthsPostResponse) o;
         return Objects.equals(authRequest, that.authRequest) &&
-                Objects.equals(pushPackage, that.pushPackage);
+                Objects.equals(pushPackage, that.pushPackage) &&
+                Objects.equals(deviceIds, that.deviceIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authRequest, pushPackage);
+        return Objects.hash(authRequest, pushPackage, deviceIds);
     }
 
     @Override
@@ -57,6 +69,7 @@ public class ServiceV3AuthsPostResponse {
         return "ServiceV3AuthsPostResponse{" +
                 "authRequest=" + authRequest +
                 ", pushPackage='" + pushPackage + '\'' +
+                ", deviceIds=" + deviceIds +
                 '}';
     }
 }
