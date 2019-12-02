@@ -15,7 +15,7 @@ public class ServiceV3AuthsGetResponseDeviceJWE {
     private final UUID authorizationRequestId;
     private final String deviceId;
     private final String[] servicePins;
-    private final AuthPolicy authPolicy;
+    private final AuthResponsePolicy authPolicy;
     private final AuthMethod[] authMethods;
 
     public ServiceV3AuthsGetResponseDeviceJWE(
@@ -25,7 +25,7 @@ public class ServiceV3AuthsGetResponseDeviceJWE {
             @JsonProperty(value = "auth_request") UUID authorizationRequestId,
             @JsonProperty(value = "device_id") String deviceId,
             @JsonProperty(value = "service_pins") String[] servicePins,
-            @JsonProperty(value = "auth_policy") AuthPolicy authPolicy,
+            @JsonProperty(value = "auth_policy") AuthResponsePolicy authPolicy,
             @JsonProperty(value = "auth_methods") AuthMethod[] authMethods) {
             this.type = type;
             this.reason = reason;
@@ -61,7 +61,7 @@ public class ServiceV3AuthsGetResponseDeviceJWE {
         return servicePins;
     }
 
-    public AuthPolicy getAuthPolicy() {
+    public AuthResponsePolicy getAuthPolicy() {
         return authPolicy;
     }
 

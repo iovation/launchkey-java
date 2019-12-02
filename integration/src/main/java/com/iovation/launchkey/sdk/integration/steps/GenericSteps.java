@@ -16,7 +16,7 @@ package com.iovation.launchkey.sdk.integration.steps;
 import com.google.inject.Singleton;
 import cucumber.api.PendingException;
 import cucumber.api.java.After;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.Then;
 import cucumber.runtime.java.guice.ScenarioScoped;
 
 import static org.hamcrest.MatcherAssert.assertThat;

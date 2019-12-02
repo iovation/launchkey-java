@@ -98,7 +98,7 @@ public class ServerSentEventAuthorizationResponse implements ServerSentEvent, Au
     }
 
     @Override
-    public AuthPolicy getAuthPolicy() {
+    public AuthResponsePolicy getAuthPolicy() {
         return null;
     }
 

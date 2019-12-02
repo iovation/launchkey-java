@@ -17,8 +17,8 @@ import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryDeviceManager;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServiceManager;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServiceSessionManager;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
 
 @Singleton
 public class ServiceSessionSteps {

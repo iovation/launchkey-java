@@ -27,14 +27,14 @@ public class ServicePolicyPutRequestTest {
 
     @Test
     public void getPolicy() throws Exception {
-        ServicePolicy expected = mock(ServicePolicy.class);
+        Policy expected = mock(Policy.class);
         assertEquals(expected, new ServicePolicyPutRequest(null, expected).getPolicy());
     }
 
     @Test
     public void toJSON() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-        ServicePolicy policy = new ServicePolicy(3, false, false, false, false);
+        Policy policy = new Policy(Policy.TYPE_METHOD_AMOUNT, false, false, null, null, 5, null, null, null);
         assertEquals("{\"service_id\":\"891918a6-b5e6-11e7-942f-0469f8dc10a5\",\"policy\":" +
                 mapper.writeValueAsString(policy) + "}", new ObjectMapper().writeValueAsString(
                 new ServicePolicyPutRequest(UUID.fromString("891918a6-b5e6-11e7-942f-0469f8dc10a5"), policy)));

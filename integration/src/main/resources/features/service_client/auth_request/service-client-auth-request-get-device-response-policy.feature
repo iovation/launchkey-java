@@ -1,3 +1,4 @@
+@device_testing
 Feature: Service Client Authorization Request: Get Device Response Policy
   In order to understand an auth response
   As a Directory Service
@@ -20,8 +21,8 @@ Feature: Service Client Authorization Request: Get Device Response Policy
     And the Authorization response should contain a geofence with a radius of 100.0, a latitude of -23.4, and a longitude of 56.7
 
   Scenario: Verify that geofences containing names received from a device can be parsed
-    Given the current Authorization Policy requires a geofence with a radius of 150.0, a latitude of 23.4, a longitude of -56.7, and named "geo 1"
-    And the current Authorization Policy requires a geofence with a radius of 100.0, a latitude of -23.4, a longitude of 56.7, and named "geo 2"
+    Given the current Authorization Policy requires a geofence with a radius of 150.0, a latitude of 23.4, a longitude of -56.7, and a name of "geo 1"
+    And the current Authorization Policy requires a geofence with a radius of 100.0, a latitude of -23.4, a longitude of 56.7, and a name of "geo 2"
     When I make a Policy based Authorization request for the User
     And I deny the auth request
     And I get the response for the Authorization request
@@ -31,7 +32,7 @@ Feature: Service Client Authorization Request: Get Device Response Policy
   Scenario: Verify that required factor counts received from a device can be parsed
     Given the current Authorization Policy requires 3 factors
     When I make a Policy based Authorization request for the User
-    And I receive the auth request and acknowledge the failure message
+    And I deny the auth request
     And I get the response for the Authorization request
     Then the Authorization response should require 3 factors
 
@@ -39,7 +40,7 @@ Feature: Service Client Authorization Request: Get Device Response Policy
     Given the current Authorization Policy requires inherence
     And the current Authorization Policy requires possession
     When I make a Policy based Authorization request for the User
-    And I receive the auth request and acknowledge the failure message
+    And I deny the auth request
     And I get the response for the Authorization request
     Then the Authorization response should require inherence
     And the Authorization response should require possession

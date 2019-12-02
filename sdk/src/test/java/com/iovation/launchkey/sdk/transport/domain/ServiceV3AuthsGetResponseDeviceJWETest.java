@@ -55,7 +55,7 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
 
     @Test
     public void getAuthPolicy() {
-        AuthPolicy expected = new AuthPolicy(2, true, false, true, null);
+        AuthResponsePolicy expected = new AuthResponsePolicy("AMOUNT", 2, null, null);
         ServiceV3AuthsGetResponseDeviceJWE actual = new ServiceV3AuthsGetResponseDeviceJWE("Type", "Reason",
                 "Denial Reason", UUID.randomUUID(), "Device ID", new String[]{"1", "2", "3"}, expected, null);
         assertEquals(expected, actual.getAuthPolicy());
@@ -94,6 +94,7 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
                 "               }," +
                 "               {" +
                 "                   \"name\": \"HQ North\"," +
+                "                   \"type\": \"GEO_CIRCLE\","  +
                 "                   \"latitude\": 36.121020," +
                 "                   \"longitude\": -115.156460," +
                 "                   \"radius\": 550" +
@@ -177,10 +178,10 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
         ServiceV3AuthsGetResponseDeviceJWE expected = new ServiceV3AuthsGetResponseDeviceJWE("DENIED", "FRAUDULENT",
                 "DEN2", UUID.fromString("5d1acf5c-dc5d-11e7-9ea1-0469f8dc10a5"), "c07c4907-dc67-11e7-bb14-0469f8dc10a5",
                 new String[]{"2648", "2046", "0583", "2963", "2046"},
-                new AuthPolicy(null, null, "types", Arrays.asList("knowledge", "inherence", "possession"), null,
+                new AuthResponsePolicy("types", 0, Arrays.asList("knowledge", "inherence", "possession"),
                         Arrays.asList(
-                                new AuthPolicy.Location(null, 200, 36.120825, -115.157216),
-                                new AuthPolicy.Location("HQ North", 550, 36.121020, -115.156460)
+                                new Fence(null, null, 36.120825, -115.157216, 200.0, null, null, null),
+                                new Fence("HQ North", "GEO_CIRCLE", 36.121020, -115.156460, 550.0, null, null, null)
                         )
                 ),
                 new AuthMethod[]{
@@ -300,10 +301,10 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
         ServiceV3AuthsGetResponseDeviceJWE expected = new ServiceV3AuthsGetResponseDeviceJWE("DENIED", "FRAUDULENT",
                 "DEN2", UUID.fromString("5d1acf5c-dc5d-11e7-9ea1-0469f8dc10a5"), "c07c4907-dc67-11e7-bb14-0469f8dc10a5",
                 new String[]{"2648", "2046", "0583", "2963", "2046"},
-                new AuthPolicy(null, null, "amount", null, 2,
+                new AuthResponsePolicy("amount", 2, null,
                         Arrays.asList(
-                                new AuthPolicy.Location(null, 200, 36.120825, -115.157216),
-                                new AuthPolicy.Location("HQ North", 550, 36.121020, -115.156460)
+                                new Fence(null, null, 36.120825, -115.157216, 200.0, null, null, null),
+                                new Fence("HQ North", null, 36.121020, -115.156460, 550.0, null, null, null)
                         )
                 ),
                 new AuthMethod[]{
@@ -330,7 +331,7 @@ public class ServiceV3AuthsGetResponseDeviceJWETest {
                 "    \"auth_policy\": {}" +
                 "}";
         ServiceV3AuthsGetResponseDeviceJWE actual = new ObjectMapper().readValue(json, ServiceV3AuthsGetResponseDeviceJWE.class);
-        assertEquals(new AuthPolicy(null, null, null, null, null), actual.getAuthPolicy());
+        assertEquals(new AuthResponsePolicy(null, 0, null, null), actual.getAuthPolicy());
     }
 
     @Test

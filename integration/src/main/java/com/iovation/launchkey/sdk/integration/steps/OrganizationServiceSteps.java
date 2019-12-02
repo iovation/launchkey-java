@@ -15,9 +15,8 @@ package com.iovation.launchkey.sdk.integration.steps;
 import com.iovation.launchkey.sdk.client.OrganizationClient;
 import com.iovation.launchkey.sdk.integration.entities.ServiceEntity;
 import com.iovation.launchkey.sdk.integration.managers.OrganizationServiceManager;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.Is;
@@ -58,7 +57,7 @@ public class OrganizationServiceSteps {
         organizationServiceManager.createService();
     }
 
-    @And("^I attempt to create a Organization Service with the same name$")
+    @When("^I attempt to create a Organization Service with the same name$")
     public void iAttemptToCreateAOrganizationServiceWithTheSameName() throws Throwable {
         ServiceEntity service = organizationServiceManager.getCurrentServiceEntity();
         if (service == null) throw new Exception("Organization Service must be created before executing this step.");
@@ -70,7 +69,7 @@ public class OrganizationServiceSteps {
         }
     }
 
-    @And("^I retrieve the created Organization Service$")
+    @When("^I retrieve the created Organization Service$")
     public void iRetrieveTheCreatedOrganizationService() throws Throwable {
         organizationServiceManager.retrieveCurrentService();
     }
@@ -82,7 +81,7 @@ public class OrganizationServiceSteps {
                 is(equalTo(organizationServiceManager.getPreviousServiceEntity().getName())));
     }
 
-    @And("^the Organization Service is (active|not active)")
+    @Then("^the Organization Service is (active|not active)")
     public void theOrganizationServiceIsActive(String active) throws Throwable {
         assertThat(organizationServiceManager.getCurrentServiceEntity().getActive(),
                 is("active".equalsIgnoreCase(active)));
@@ -109,20 +108,20 @@ public class OrganizationServiceSteps {
                 description, icon, callbackUrl, active);
     }
 
-    @And("^the Organization Service description is \"([^\"]*)\"$")
+    @Then("^the Organization Service description is \"([^\"]*)\"$")
     public void theOrganizationServiceDescriptionIs(String description) throws Throwable {
         assertThat(organizationServiceManager.getCurrentServiceEntity().getDescription(),
                 Is.is(CoreMatchers.equalTo(description)));
 
     }
 
-    @And("^the Organization Service icon is \"([^\"]*)\"$")
+    @Then("^the Organization Service icon is \"([^\"]*)\"$")
     public void theOrganizationServiceIconIs(String icon) throws Throwable {
         assertThat(organizationServiceManager.getCurrentServiceEntity().getIcon(),
                 Is.is(CoreMatchers.equalTo(URI.create(icon))));
     }
 
-    @And("^the Organization Service callback_url is \"([^\"]*)\"$")
+    @Then("^the Organization Service callback_url is \"([^\"]*)\"$")
     public void theOrganizationServiceCallback_urlIs(String callback_url) throws Throwable {
         assertThat(organizationServiceManager.getCurrentServiceEntity().getCallbackURL(),
                 Is.is(CoreMatchers.equalTo(URI.create(callback_url))));

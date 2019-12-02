@@ -12,10 +12,8 @@
 
 package com.iovation.launchkey.sdk.integration;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Stage;
+import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.iovation.launchkey.sdk.FactoryFactoryBuilder;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
@@ -27,11 +25,14 @@ import com.iovation.launchkey.sdk.integration.constants.Launchkey;
 import com.iovation.launchkey.sdk.integration.managers.kobiton.KobitonDevice;
 import com.iovation.launchkey.sdk.integration.managers.kobiton.KobitonManager;
 import com.iovation.launchkey.sdk.integration.managers.kobiton.transport.RequestFactory;
+import com.iovation.launchkey.sdk.integration.mobile.driver.NullMobileDriver;
 import com.iovation.launchkey.sdk.integration.mobile.driver.SampleAppMobileDriver;
 import com.iovation.launchkey.sdk.integration.mobile.driver.android.SampleAppAndroidDriver;
 import cucumber.api.guice.CucumberModules;
 import cucumber.runtime.java.guice.InjectorSource;
+import io.cucumber.java.Before;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.AssumptionViolatedException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.BufferedReader;
@@ -46,15 +47,25 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class CucumberGuiceInjectorSource implements InjectorSource {
 
     @Override
     public Injector getInjector() {
-        return Guice.createInjector(Stage.PRODUCTION, CucumberModules.SCENARIO, new CucumberJuiceModule());
+        Module scenarioModule = CucumberModules.createScenarioModule();
+        return Guice.createInjector(Stage.PRODUCTION, scenarioModule, new CucumberJuiceModule());
     }
 
-    protected class CucumberJuiceModule extends AbstractModule {
+    public static class CucumberJuiceModule extends AbstractModule {
+        private boolean skipDeviceScenarios = true;
+
+        @Before("@device_testing")
+        public void skipDeviceScenarios() throws Exception {
+            if (!System.getProperty(Capability.run_device_tests).equals("true")) {
+                throw new AssumptionViolatedException("Skipping device tests");
+            }
+        }
 
         @Override
         protected void configure() {
@@ -93,7 +104,12 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
                 organizationFactory = null;
             }
             bind(OrganizationFactory.class).toInstance(organizationFactory);
-            bind(SampleAppMobileDriver.class).toInstance(getMobileDriver());
+            if (getBooleanPropertyElseAddError(Capability.run_device_tests)) {
+                bind(SampleAppMobileDriver.class).toInstance(getMobileDriver());
+            } else {
+                Logger.getGlobal().warning("Not running device based tests");
+                bind(SampleAppMobileDriver.class).toInstance(new NullMobileDriver());
+            }
         }
 
         private String getApiBaseUrl() {
@@ -151,8 +167,8 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
         }
 
         private SampleAppMobileDriver getMobileDriver() {
-            SampleAppMobileDriver mobileDriver = null;
-            boolean useKobiton = getPositiveBooleanPropertyElseAddError(Appium.Kobiton.use_kobiton);
+           SampleAppMobileDriver mobileDriver = null;
+            boolean useKobiton = getBooleanPropertyElseAddError(Appium.Kobiton.use_kobiton);
             if (useKobiton) {
 
                 String kobitonUploadUrl = getPropertyElseAddError(Appium.Kobiton.upload_url);
@@ -220,32 +236,43 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
             if (getPropertyElseAddError(Capability.platform_name).equals("Android")) {
                 capabilities.setCapability("gpsEnabled", true);
                 capabilities.setCapability("disableWindowAnimation", true);
-                capabilities.setCapability("appPackage", getPropertyElseAddError(Capability.Android.app_package));
-                capabilities.setCapability("appWaitActivity", getPropertyElseAddError(Capability.Android.appWaitActivity));
-                capabilities.setCapability("appActivity", getPropertyElseAddError(Capability.Android.appActivity));
             }
 
             // General
-            capabilities.setCapability("app", getPropertyElseAddError(Capability.app));
-            capabilities.setCapability("automationName", getPropertyElseAddError(Capability.automation_name));
-            capabilities.setCapability("fullReset", getPositiveBooleanPropertyElseAddError(Capability.full_reset));
-            capabilities.setCapability("noReset", getPositiveBooleanPropertyElseAddError(Capability.no_reset));
-            capabilities.setCapability("applicationCacheEnabled",  getPositiveBooleanPropertyElseAddError(Capability.application_cache_enabled));
-            capabilities.setCapability("locationContextEnabled", getPropertyElseAddError(Capability.location_context_enabled));
+            capabilities.setCapability("app",
+                    getPropertyElseAddError(Capability.app));
+            capabilities.setCapability("automationName",
+                    getPropertyElseAddError(Capability.automation_name));
+            capabilities.setCapability("fullReset",
+                    getBooleanPropertyElseAddError(Capability.full_reset));
+            capabilities.setCapability("noReset",
+                    getBooleanPropertyElseAddError(Capability.no_reset));
+            capabilities.setCapability("applicationCacheEnabled",
+                    getBooleanPropertyElseAddError(Capability.application_cache_enabled));
+            capabilities.setCapability("locationContextEnabled",
+                    getPropertyElseAddError(Capability.location_context_enabled));
 
             // Device specific
-            capabilities.setCapability("sessionName", getPropertyElseAddError(Capability.session_name));
-            capabilities.setCapability("deviceOrientation", getPropertyElseAddError(Capability.device_orientation));
-            capabilities.setCapability("captureScreenshots",  getPositiveBooleanPropertyElseAddError(Capability.capture_screenshots));
-            capabilities.setCapability("deviceGroup", getPropertyElseAddError(Capability.device_group));
-            capabilities.setCapability("deviceName", getPropertyElseAddError(Capability.device_name));
-            capabilities.setCapability("platformVersion", getPropertyElseAddError(Capability.platform_version));
-            capabilities.setCapability("platformName", getPropertyElseAddError(Capability.platform_name));
+            capabilities.setCapability("sessionName",
+                    getPropertyElseAddError(Capability.session_name));
+            capabilities.setCapability("deviceOrientation",
+                    getPropertyElseAddError(Capability.device_orientation));
+            capabilities.setCapability("captureScreenshots",
+                    getBooleanPropertyElseAddError(Capability.capture_screenshots));
+            capabilities.setCapability("deviceGroup",
+                    getPropertyElseAddError(Capability.device_group));
+            capabilities.setCapability("deviceName",
+                    getPropertyElseAddError(Capability.device_name));
+            capabilities.setCapability("platformVersion",
+                    getPropertyElseAddError(Capability.platform_version));
+            capabilities.setCapability("platformName",
+                    getPropertyElseAddError(Capability.platform_name));
             return capabilities;
         }
 
         private void addInvalidPropertyError(String prop) {
-            addError(new Message("Property \""+ prop + "\"\" not provided or invalid. Cannot run tests without this property"));
+            addError(new Message("Property \""+ prop +
+                    "\" not provided or invalid. Cannot run tests without this property"));
         }
 
         private String getPropertyElseAddError(String prop) {
@@ -256,10 +283,11 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
             return propString;
         }
 
-        private boolean getPositiveBooleanPropertyElseAddError(String positiveProp) {
+        private boolean getBooleanPropertyElseAddError(String positiveProp) {
             String propString = getPropertyElseAddError(positiveProp);
             if (!propString.equals("true") && !propString.equals("false")) {
-                addError(new Message("Boolean property \"" + positiveProp + "\" has invalid string, true or false are the only accepted values."));
+                addError(new Message("Boolean property \"" + positiveProp +
+                        "\" has invalid string, true or false are the only accepted values."));
             }
             return propString.equals("true");
         }

@@ -15,7 +15,7 @@ package com.iovation.launchkey.sdk.integration.managers;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.DirectoryClient;
-import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
 import cucumber.api.java.After;
@@ -45,6 +45,7 @@ public class DirectoryServicePolicyManager {
         return currentServicePolicyEntity;
     }
 
+    @Deprecated
     public void retrievePolicyForService(UUID serviceId) throws Throwable {
         ServicePolicy policy = getDirectoryClient().getServicePolicy(serviceId);
         currentServicePolicyEntity = ServicePolicyEntity.fromServicePolicy(policy);
@@ -56,6 +57,7 @@ public class DirectoryServicePolicyManager {
 
     public void removePolicyForService(UUID serviceId) throws Throwable {
         getDirectoryClient().removeServicePolicy(serviceId);
+        currentServicePolicyEntity = new ServicePolicyEntity();
     }
 
     public void removePolicyForCurrentService() throws Throwable {
@@ -66,7 +68,7 @@ public class DirectoryServicePolicyManager {
         getDirectoryClient().setServicePolicy(serviceId, currentServicePolicyEntity.toServicePolicy());
     }
 
-    public void setPolicyForCurrentService() throws Throwable {
+    public void setAdvancedPolicyForCurrentService() throws Throwable {
         setPolicyForService(directoryServiceManager.getCurrentServiceEntity().getId());
     }
 
@@ -74,4 +76,12 @@ public class DirectoryServicePolicyManager {
         return directoryManager.getDirectoryClient();
     }
 
+    // Support for Advanced Policy Types
+    public void setAdvancedPolicyForCurrentService(Policy policy) throws Throwable {
+        getDirectoryClient().setAdvancedServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId(), policy);
+    }
+
+    public Policy getCurrentlySetDirectoryServiceAdvancedPolicy() throws Throwable {
+        return getDirectoryClient().getAdvancedServicePolicy(directoryServiceManager.getCurrentServiceEntity().getId());
+    }
 }

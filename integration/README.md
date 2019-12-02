@@ -6,6 +6,7 @@ tests to validate it is in good working order. The integration tests are BDD tes
 
   * [Installation](#installation)
   * [Usage](#usage)
+  * [Help](#help)
 
 
 ## <a name="installation"></a>Installation
@@ -27,24 +28,49 @@ directory directly under the directory where this file is located.
 
 In order to run the integration tests, a valid Organization with an active Public/Private Key Pair must exist. It is 
 suggested that you use a test organization that is separate from any Organizations you use in production. Creation of
-Organizations is managed by [Admin Center](https://admin.launchkey.com).  
+Organizations is managed by [Admin Center](https://admin.launchkey.com).
 
-### <a name="help"></a>Help
+### <a name="run"></a>Run
   
 Running the full suite of integration tests can be run by executing the JAR and including the following environment
 values:
 
-* `Launchkey.Organization.id` - Organization ID from Admin Center.
-* `Launchkey.Organization.private_key` - File name of the PEM formatted RSA private key of the Public/Private Key Pair
+* Required
+    * `Launchkey.Organization.id` - Organization ID from Admin Center.
+    * `Launchkey.Organization.private_key` - File name of the PEM formatted RSA private key of the Public/Private Key Pair
     of the Organization with the ID in the `Launchkey.Organization.id` property.
-* `Appium.url` - The url of the Appium server being connected to, in the case of Kobiton this would contain credentials
-	that should not be placed in a file
-* `Appium.Kobiton.use_kobiton` - Whether or not to connect to Kobiton's Appium server
-* _(CONDITIONAL)_ `Appium.Kobiton.auth` - The authorization credentials needed for Kobiton in the format '{USERNAME}:{SDK_KEY}'
-* _(OPTIONAL)_ `Launchkey.API.base_url` - Base URL for the LaunchKey API. This will only be applicable for LaunchKey 
-    developers.
- 
+* Optional
+    * `Launchkey.API.base_url` - Base URL for the LaunchKey API. This will only be required if you are making changes
+        to the SDK for pre-release functionality 
+
 Example:
+```
+java \
+-DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \
+-DLaunchkey.Organization.private_key=/tmp/private-key.pem \
+-jar target/sdk-integration-tests-4.6.0-SNAPSHOT-jar-with-dependencies.jar
+classpath:features \
+--glue classpath:com.iovation.launchkey.sdk.integration \
+--plugin pretty
+```
+
+Example (With Emulator Based Device Tests):
+ 
+ ```
+ java \
+ -DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \
+ -DLaunchkey.Organization.private_key=/tmp/private-key.pem \
+ -DAppium.url=https://localhost:4723/wd/hub \
+ -jar sdk-integration-tests-4.5.0-SNAPSHOT-jar-with-dependencies.jar \
+ classpath:features \
+ --glue classpath:com.iovation.launchkey.mobile.integration \
+ --plugin pretty \
+ --plugin html:target/cucumber-htmlreport \
+ --plugin json:target/cucumber-report.json
+ ```
+
+Example (With Kobiton Based Device Tests):
+
 ```
 java \
 -DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \

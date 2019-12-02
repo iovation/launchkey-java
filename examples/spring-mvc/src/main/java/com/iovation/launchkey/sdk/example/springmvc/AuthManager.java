@@ -8,13 +8,11 @@ import com.iovation.launchkey.sdk.client.ServiceClient;
 import com.iovation.launchkey.sdk.domain.directory.DeviceLinkCompletionResponse;
 import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
 import com.iovation.launchkey.sdk.domain.organization.Directory;
+import com.iovation.launchkey.sdk.domain.service.AdvancedAuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationRequest;
 import com.iovation.launchkey.sdk.domain.service.AuthorizationResponse;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
-import com.iovation.launchkey.sdk.domain.webhook.AuthorizationResponseWebhookPackage;
-import com.iovation.launchkey.sdk.domain.webhook.DirectoryUserDeviceLinkCompletionWebhookPackage;
-import com.iovation.launchkey.sdk.domain.webhook.ServiceUserSessionEndWebhookPackage;
-import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
+import com.iovation.launchkey.sdk.domain.webhook.*;
 import com.iovation.launchkey.sdk.error.BaseException;
 import com.iovation.launchkey.sdk.example.springmvc.model.LinkingData;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -49,8 +47,8 @@ public class AuthManager {
     private final Map<String, List<String>> userHashSessionMap;
     private final Map<String, String> sessionUsernameMap;
     private final Map<String, DeviceLinkCompletionResponse> deviceLinkCompletionMap;
+    private final boolean useAdvancedWebhook;
 
-    @SuppressWarnings("ThrowFromFinallyBlock")
     @Autowired
     public AuthManager(LaunchkeySdkConfig appConfig) throws ConfigurationException, IOException {
         final String organizationId = appConfig.getOrganizationId();
@@ -59,6 +57,7 @@ public class AuthManager {
         final String privateKeyLocation = appConfig.getPrivateKeyLocation();
         externalURL = appConfig.getExternalUrl();
         final String baseURL = appConfig.getBaseUrl();
+        useAdvancedWebhook = appConfig.useAdvancedWebhook();
 
         boolean halt = false;
         Logger log = LoggerFactory.getLogger(getClass());
@@ -158,7 +157,7 @@ public class AuthManager {
         }
     }
 
-    public LinkingData link(String username) throws Exception {
+    LinkingData link(String username) throws Exception {
         Directory directory = organizationClient.getDirectory(directoryId);
         URI webhookURI = URI.create(externalURL + DIRECTORY_WEBHOOK);
         organizationClient.updateDirectory(directoryId, true, directory.getAndroidKey(), null, true, webhookURI);
@@ -166,9 +165,16 @@ public class AuthManager {
         return new LinkingData(linkData.getDeviceId().toString(), linkData.getCode(), linkData.getQrCodeUrl());
     }
 
+    @SuppressWarnings("SameParameterValue")
     void handleDirectoryWebhook(Map<String, List<String>> headers, String body, String method, String path) throws AuthException {
         try {
-            WebhookPackage webhookPackage = directoryClient.handleWebhook(headers, body, method, path);
+            WebhookPackage webhookPackage;
+            if (useAdvancedWebhook) {
+                webhookPackage = directoryClient.handleAdvancedWebhook(headers, body, method, path);
+            } else {
+                //noinspection deprecation
+                webhookPackage = directoryClient.handleWebhook(headers, body, method, path);
+            }
             if (webhookPackage instanceof DirectoryUserDeviceLinkCompletionWebhookPackage) {
                 DeviceLinkCompletionResponse response = ((DirectoryUserDeviceLinkCompletionWebhookPackage) webhookPackage).getDeviceLinkCompletionResponse();
                 LOG.info("Directory User Device link completion:");
@@ -182,9 +188,15 @@ public class AuthManager {
         }
     }
 
+    @SuppressWarnings({"DuplicatedCode", "deprecation", "SameParameterValue"})
     void handleServiceWebhook(Map<String, List<String>> headers, String body, String method, String path) throws AuthException {
         try {
-            WebhookPackage webhookPackage = serviceClient.handleWebhook(headers, body, method, path);
+            WebhookPackage webhookPackage;
+            if (useAdvancedWebhook) {
+                webhookPackage = serviceClient.handleAdvancedWebhook(headers, body, method, path);
+            } else {
+                webhookPackage = serviceClient.handleWebhook(headers, body, method, path);
+            }
             if (webhookPackage instanceof AuthorizationResponseWebhookPackage) {
                 AuthorizationResponse authorizationResponse = ((AuthorizationResponseWebhookPackage) webhookPackage).getAuthorizationResponse();
                 String authRequestId = authorizationResponse.getAuthorizationRequestId();
@@ -220,6 +232,42 @@ public class AuthManager {
                     sessionList.add(sessionId);
                 }
                 serviceClient.sessionStart(sessionUsernameMap.get(sessionId));
+            } else if (webhookPackage instanceof AdvancedAuthorizationResponseWebhookPackage) {
+                AdvancedAuthorizationResponse authorizationResponse = ((AdvancedAuthorizationResponseWebhookPackage) webhookPackage).getAuthorizationResponse();
+                String authRequestId = authorizationResponse.getAuthorizationRequestId();
+                String sessionId = null;
+                for (Map.Entry<String, String> entry : sessionAuthRequestMap.entrySet()) {
+                    if (entry.getValue().equals(authRequestId)) {
+                        sessionId = entry.getKey();
+                        break;
+                    }
+                }
+                LOG.debug("Authorization request " + (authorizationResponse.isAuthorized() ? "accepted" : "denied") + " by user");
+                LOG.debug("    Type:          " + safeNull(authorizationResponse.getType()));
+                LOG.debug("    Reason:        " + safeNull(authorizationResponse.getReason()));
+                LOG.debug("    Denial Reason: " + safeNull(authorizationResponse.getDenialReason()));
+                LOG.debug("    Fraud:         " + safeNull(authorizationResponse.isFraud()));
+                LOG.debug("    Device ID:     " + authorizationResponse.getDeviceId());
+                LOG.debug("    Svc User Hash: " + authorizationResponse.getServiceUserHash());
+                LOG.debug("    User Push ID:  " + authorizationResponse.getUserPushId());
+                LOG.debug("    Org User Hash: " + safeNull(authorizationResponse.getOrganizationUserHash()));
+                if (null == sessionId) {
+                    throw new AuthException("No session found for getServiceService request: " + authRequestId);
+                }
+                sessionAuthenticationMap.put(sessionId, authorizationResponse.isAuthorized());
+                List<String> sessionList = userHashSessionMap.get(authorizationResponse.getServiceUserHash());
+
+                if (null == sessionList) { // If no session list exists for the user hash, create one in the map
+                    sessionList = Collections.synchronizedList(new ArrayList<String>());
+                    userHashSessionMap.put(authorizationResponse.getServiceUserHash(), sessionList);
+                }
+
+                // If the session does not already exist in the session list add it
+                if (!sessionList.contains(sessionId)) {
+                    sessionList.add(sessionId);
+                }
+                serviceClient.sessionStart(sessionUsernameMap.get(sessionId));
+
             } else if (webhookPackage instanceof ServiceUserSessionEndWebhookPackage) {
                 String userHash = ((ServiceUserSessionEndWebhookPackage) webhookPackage).getServiceUserHash();
                 for (String sessionId : userHashSessionMap.get(userHash)) {
@@ -248,16 +296,16 @@ public class AuthManager {
         }
     }
 
-    public boolean isLinked(String deviceId) {
+    boolean isLinked(String deviceId) {
         return deviceLinkCompletionMap.containsKey(deviceId);
     }
 
-    public class AuthException extends Throwable {
-        public AuthException(String message) {
+    public static class AuthException extends Throwable {
+        AuthException(String message) {
             super(message);
         }
 
-        public AuthException(String message, Throwable cause) {
+        AuthException(String message, Throwable cause) {
             super(message, cause);
         }
     }

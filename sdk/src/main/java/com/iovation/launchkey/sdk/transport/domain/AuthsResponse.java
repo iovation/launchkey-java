@@ -30,7 +30,7 @@ public interface AuthsResponse {
 
     String getDenialReason();
 
-    AuthPolicy getAuthPolicy();
+    AuthResponsePolicy getAuthPolicy();
 
     AuthMethod[] getAuthMethods();
 }

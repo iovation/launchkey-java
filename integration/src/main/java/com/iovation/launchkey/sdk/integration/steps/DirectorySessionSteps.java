@@ -15,8 +15,8 @@ package com.iovation.launchkey.sdk.integration.steps;
 import com.google.inject.Inject;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryDeviceManager;
 import com.iovation.launchkey.sdk.integration.managers.DirectorySessionManager;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

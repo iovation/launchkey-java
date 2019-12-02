@@ -20,9 +20,9 @@ import java.util.UUID;
 @JsonPropertyOrder({"service_id", "policy"})
 public class ServicePolicyPutRequest {
     private final UUID serviceId;
-    private final ServicePolicy policy;
+    private final Policy policy;
 
-    public ServicePolicyPutRequest(UUID serviceId, ServicePolicy policy) {
+    public ServicePolicyPutRequest(UUID serviceId, Policy policy) {
         this.serviceId = serviceId;
         this.policy = policy;
     }
@@ -33,7 +33,7 @@ public class ServicePolicyPutRequest {
     }
 
     @JsonProperty("policy")
-    public ServicePolicy getPolicy() {
+    public Policy getPolicy() {
         return policy;
     }
 }

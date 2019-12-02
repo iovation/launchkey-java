@@ -12,6 +12,7 @@ public class LaunchkeySdkConfig {
     private String serviceId;
     private String privateKeyLocation;
     private String externalUrl;
+    private boolean useAdvancedWebhook = true;
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -53,11 +54,19 @@ public class LaunchkeySdkConfig {
         return privateKeyLocation;
     }
 
+    public void setExternalUrl(String externalUrl) {
+        this.externalUrl = externalUrl;
+    }
+
     public String getExternalUrl() {
         return externalUrl;
     }
 
-    public void setExternalUrl(String externalUrl) {
-        this.externalUrl = externalUrl;
+    public boolean useAdvancedWebhook() {
+        return useAdvancedWebhook;
+    }
+
+    public void setUseAdvancedWebhook(boolean useAdvancedWebhook) {
+        this.useAdvancedWebhook = useAdvancedWebhook;
     }
 }

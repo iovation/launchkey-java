@@ -8,10 +8,10 @@ import com.iovation.launchkey.sdk.integration.entities.ServiceEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryManager;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryServiceManager;
 import com.iovation.launchkey.sdk.integration.managers.KeysManager;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import cucumber.runtime.java.guice.ScenarioScoped;
 
 import java.security.interfaces.RSAPublicKey;
