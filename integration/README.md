@@ -48,7 +48,7 @@ Example:
 java \
 -DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \
 -DLaunchkey.Organization.private_key=/tmp/private-key.pem \
--jar target/sdk-integration-tests-4.6.0-SNAPSHOT-jar-with-dependencies.jar
+-jar target/sdk-integration-tests-4.6.1-SNAPSHOT-jar-with-dependencies.jar
 classpath:features \
 --glue classpath:com.iovation.launchkey.sdk.integration \
 --plugin pretty
