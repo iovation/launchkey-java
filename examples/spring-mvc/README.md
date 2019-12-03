@@ -70,10 +70,10 @@ mvn clean package
     
     There are numerous ways to set those properties but the simplest way is usually to pass arguments to the JAR
     execution.  This is an example of how to run the example app from the main project root with the project version
-    of `4.6.0-SNAPSHOT`:
+    of `4.6.1-SNAPSHOT`:
     
     ```
-    java -jar examples/spring-mvc/target/examples-spring-mvc-4.6.0-SNAPSHOT.jar -Dlk.organization-id=5e460a6a-974d-11e7-b0c6-6a535e6278de -Dlk.directory-id=7ac4e652-974d-11e7-b0c6-6a535e6278de -Dlk.service-id=69cc4e34-fd9b-11e8-897e-d60562cc216d -Dlk.private-key-location=/tmp/keys/private-key.pem -Dlk.external-url=https://d5caea01.ngrok.io
+    java -jar examples/spring-mvc/target/examples-spring-mvc-4.6.1-SNAPSHOT.jar -Dlk.organization-id=5e460a6a-974d-11e7-b0c6-6a535e6278de -Dlk.directory-id=7ac4e652-974d-11e7-b0c6-6a535e6278de -Dlk.service-id=69cc4e34-fd9b-11e8-897e-d60562cc216d -Dlk.private-key-location=/tmp/keys/private-key.pem -Dlk.external-url=https://d5caea01.ngrok.io
     ```
     
     The name and location of the JAR file are subject to change. If you downloaded the JAR, substitute that name. If you 
