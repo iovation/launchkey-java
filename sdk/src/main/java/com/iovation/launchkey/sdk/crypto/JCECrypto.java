@@ -164,6 +164,24 @@ public class JCECrypto implements Crypto {
         StringBuilder builder = new StringBuilder();
         builder.append("-----BEGIN PUBLIC KEY-----\n");
 
+        getPEMFromRSAKey(publicKey, builder);
+
+        builder.append("-----END PUBLIC KEY-----\n");
+        return builder.toString();
+    }
+
+
+    public static String getPEMFromRSAPrivateKey(RSAPrivateKey privateKey) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("-----BEGIN RSA PRIVATE KEY-----\n");
+
+        getPEMFromRSAKey(privateKey, builder);
+
+        builder.append("-----END RSA PRIVATE KEY-----\n");
+        return builder.toString();
+    }
+
+    private static void getPEMFromRSAKey(Key publicKey, StringBuilder builder) {
         String encoded  = new String(BASE_64.encode(publicKey.getEncoded()));
 
         int start = 0;
@@ -182,11 +200,7 @@ public class JCECrypto implements Crypto {
                 builder.append("\n");
             }
         }
-
-        builder.append("-----END PUBLIC KEY-----\n");
-        return builder.toString();
     }
-
 
     private static byte[] getKeyBytesFromPEM(String pem) {
         StringBuilder strippedKey = new StringBuilder(pem.length());

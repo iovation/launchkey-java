@@ -90,8 +90,8 @@
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>[1.46,1.999]</version>
+            <artifactId>bc-fips</artifactId>
+            <version>[1.0.2,1.999]</version>
             <scope>test</scope>
         </dependency>
 
