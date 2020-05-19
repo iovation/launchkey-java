@@ -41,6 +41,7 @@ java -jar examples-cli-4.0.0-jar-with-dependencies.jar -h application
 
 There are two commands which have a number of actions they can perform.
 
+  * genrsa
   * [service](#service)
     * authorize
     * session-start

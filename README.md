@@ -28,7 +28,7 @@ Examples for using the iovation LaunchKey SDK for Java
 1. Fork it ([GitHub forking guide](https://guides.github.com/activities/forking/))
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Unit test your changes (`mvn clean test`)
-4. Integration tests your changes ([See Instructions](integration/README.md))
+4. Integration test your changes ([See Instructions](integration/README.md))
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request

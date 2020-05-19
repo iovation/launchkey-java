@@ -1,7 +1,7 @@
 package com.iovation.launchkey.sdk.crypto;
 
 import org.apache.commons.codec.binary.Base64;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -22,33 +22,58 @@ import static org.junit.Assert.assertNotNull;
 public class JCECryptoTest {
     @SuppressWarnings("SpellCheckingInspection")
     private static final String PRIVATE_KEY =
-            ("-----BEGIN RSA PRIVATE KEY-----\n" +
-                    "MIIEogIBAAKCAQEAq2izh7NEarDdrdZLrplizezZG/JzW14XQ74IXkjEqkvxhZ1s\n" +
-                    "6joGtvoxX+P0QRyWrhgtiUnN3DSRAa0QLsZ0ZKk5a2AMGqu0/6eoJGwXSHcLreLE\n" +
-                    "fqdd8+zlvDrbWISekTLoecLttwKSIcP2bcq1nAKz+ZNKMPvB/lm/dHXOqlnybo0J\n" +
-                    "7efUkbd81fHrMOZNLKRYXx3Zx8zsQFf2ee/ypnnw5lKwX+9IBAT/679eGUlh8HfT\n" +
-                    "SG6JQaNezyRG1cOd+pO6hKxff6Q2GVXqHsrIac4AlR80AEaBeiuFYxjHpruS6BRc\n" +
-                    "yW8UvqX0l9rKMDAWNAtMWt2egYAe6XOEXIWOiQIDAQABAoIBADUmDOzZ0DAI0WPS\n" +
-                    "m7rywqk5dIRu5AgDn9EYfn3FsH1heO1GR/xEq8pWv7KM+zKpS6uFwbDdGqDaB9Bu\n" +
-                    "OiNW08ZWloBN0tL+ROw0rzVD8uA8UXnEY8sl2EMHRKDd2x+SV5yMHXuLzqu9d1RS\n" +
-                    "7/lRLojGacnMOuf/WEKmz2+sC73UDfYm7Kq39LStE0Hi9iAq8eF+9U8b3l7Pikx/\n" +
-                    "t70wOfCQJCrlfAFn0MdoxXoybr4HCy7tA2pqWPG2yhGnROaJSA430UNJQ9sU9p5M\n" +
-                    "qyU8VWz8I2lFZkpflgf34D9sxt2BaRQvR0T0GBILHf0BfwDjlF+fdgZjQb0uTdez\n" +
-                    "mcIhiNECgYEAxju+IzfDHis3GSu/6GALoDnxLpOi3y8QjBBa8nEd4XpRGAyaHgbt\n" +
-                    "/Q03Sd9jfST0jP7hKyJPWiPR5l4M9BpCEuQlhxdpSdy0acvXhuwdAWawaOHkMcUV\n" +
-                    "iBZfzOB0VY2L55RVpaAqO1rq0EOydsD3n9uX/eEjWiaEEZNhdzrcgkUCgYEA3Vva\n" +
-                    "cW4wguSB7VWJDJCd+o69AS29tBQBqYtCXRokmzWU6hitNa36wJMI2/fTW2lxegAi\n" +
-                    "8RJ8HRAj8D3GpwbdIm5tgH+2EBoGqraxwXfyt4NKiVvRFEyg0zLq31U9VDm11BlG\n" +
-                    "KU6XdxzD5aC+/txML+ib85WQsVInKVdP5pXowXUCgYB2scT6f2QER2n5V1nUQNYV\n" +
-                    "PTxtYBcQvbSRuSVLr3Ft1fiChuEtA4cyktw9DlYa06reVarrUeLjnTkMT9o/uw0/\n" +
-                    "FH5n8huoD0+zXUuSzQPdF+ifFEq3hkOLNaJtISRnKZbQtd/GiS1gVuLsiuxr8MUU\n" +
-                    "Yb8TU+AAFbnUcEPWyVbJZQKBgBPtjQDhNqTSBZBkPu5OpqpD52gPwiBQHMYyr0rK\n" +
-                    "a7k9XaalihJnE0f69LU43mJAX+Ln2D1zuJC1P0cFiLjIuWe8IUeMN8vDTA5aXC5a\n" +
-                    "qhMzUqaDCZOWQnRBBTwN5HOMrn3luJdHaANlJ42opwkys/ksK74GHPyZtMTYA21y\n" +
-                    "2X1xAoGAW3Yu0n/VcvDcQZmE++iPDKLD/Mpc18G1sRLNwrdhVEgRVk8sfYiQxmOb\n" +
-                    "NNHiXe4njK7waEKHPo86poV22FAum0zBMFSf9igfCk5kuL/pk4EVa58NftF69S8V\n" +
-                    "Ud+Zy3E0RJXToW0t3Eo5UexVieglvpgxG7x1SCdvxYtTl6CZ520=\n" +
-                    "-----END RSA PRIVATE KEY-----\n");
+            "-----BEGIN RSA PRIVATE KEY-----\n" +
+                    "MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQCZ4sq1uy7AGXkB\n" +
+                    "0tD4DGk8c+oJBml1TkToxf2S+lHH0kUTIOThSKxEehGBPb+tTytwkGU7kW/mta8c\n" +
+                    "2XzMAzx8Zc10Jjc5LWpj4boQLORZjSz5tpshfHTffM6lsMKq/T4KWk6QNAg1AQWN\n" +
+                    "npY3oz72kSxcp8+qSyy6QnBLjv+8I8eMCft4Ozu6ZgjkaKToRk7yuifyzKehzMaT\n" +
+                    "s5gn5cGqA0vQ95Ple/1hwzfyXSXy1dhRTxNuFDOYhbdOxfxE2v3dB6hXq+aP2icS\n" +
+                    "9WAkUAKojvLwlIb0RFgdtdl3l/mdygQy7NnIVCFK01khfuEj+zKYkMjQrzFQpV3K\n" +
+                    "R4EuN/hyvtLkY+cJytiY1woileAKNtxHfQDavnt6cJbJLHf7XgJ5gR3GbR13bctk\n" +
+                    "sBwUktO+TH572bpZrg9rtOM6Rsdx7Thpk0hjBgc6WE5MFhwCuu5TPQhYEIIhoSqL\n" +
+                    "NYaCxwf/75ip7ytRXx8unDQWcoBlCRkJUgC9ks65iv0GgpyKwbJkx/9x9/MIWELU\n" +
+                    "wy5YTO28l6pg88PbR0pdzfwk7rJz6PIBf+SIkEJJKhSyMBQDzc62wCkxe9qjX/C7\n" +
+                    "2+m/uoHYgaSUqfVEVPXRCqsRjGJ8sAsj1y/jvTeNlOnbPajUbOg5sXBxy6QXxR+l\n" +
+                    "6dshEpOn6tQpTW5Je3aOzGO8OIKjcwIDAQABAoICAQCDgtZKSRXDBgHsFQaRdcnZ\n" +
+                    "6BXycJBft+wcIlh664JIiuKNXmc8QKc4PjoHgYX1ztsI794T8k73k/17YkLM91cR\n" +
+                    "2M6knKRFMRLjGV2xxSvBfG0bW3toOryG4lqYL1+uUY5buqG5iz4YTi84wHcQRWrh\n" +
+                    "vV90L9XBa01mQLFHYYYce1dlzoIiVjzNJ7YhvWxxNOTzezP4w/3ewOpT///g2PGR\n" +
+                    "IhABHhQ+4p/AlN2TOxfbV/XuRu4L/Se7CUuG/pyBG8YoxwqPIlGATqdmBF2NqvMa\n" +
+                    "qk/kWoqa5m2HtomLM04YEzVTcCcOlRd+ovBhN9WgsmSjDdkQvygeC7UD0egMX7jq\n" +
+                    "vtj2cSxX8jUADy8PKjRPs8KlhflJmb1G1Tkanoi+PkAmPlZupscF34AzepHrdwNc\n" +
+                    "wbeJ1W4QXcQ3V/RqwaM+St4JkXmmYjbW5gh0RiE3BcMNTewIeIE/nd8Vx3jTzbE6\n" +
+                    "wz+WesdNdnkEeFIOGGVwKlVbWfMI5R2Ou3I+vOd79yiu3aMiygJYZ26C040CUYUB\n" +
+                    "VpDPWufDb4KHedxhq1snJMhBMDaeCsUrr9qsqs9ZZh3+9oEVwQesKptR4NSWEuY3\n" +
+                    "3EZVxXsG5xzY+S4+jqvdzNr1RD47Nch/xhf9tbz7r8DH9cUokX7o8Oa89syXG/Wi\n" +
+                    "0SrrHGkSvg7aM0M4fSD8gQKCAQEA7CA4avCLuOvxYyEN7bSNszTUABa3lxHEAF8f\n" +
+                    "AxqKil585ug1SJj6V94fVviJUIs70DMFBIEfWnMh7xvKwFIqC/LiSqlroUjiXHoT\n" +
+                    "PY7nblyi+u17z16EgZJ4ziUSDIvAg5pul4bDg5FoAoUppXV0DR3peHBDv+3aMu7S\n" +
+                    "pSsLUQEYsPkP8qIocGLvCEe3J/pXvWcHJLjvwzQoWp2aZnoezPyf4YxFcjhQv03b\n" +
+                    "dPP3oDxflJIFhUfAlp4ZQnH5wtS+qD2FZfUSL0jwK++20Z4DeXq6hJQmjS+l0bsH\n" +
+                    "71DHUeo6VP/pIABo0sOVvnTN304ukqZux5UY8bjrotsh6imYuwKCAQEAptaOPAM2\n" +
+                    "Xszw28yRDKNOHIbUBRezZNAPEDs/uBFJvfbTQL83RpJAuLp3gR4axuoKvpsy6CD1\n" +
+                    "PEwAgus4uKw0GzWQuFDl7wyzMbGoDNozgrbTZNYyRiQNUAN8mUNnjp6U0e3OQSoq\n" +
+                    "exlfQhPRgugqELBSDvVZWi4xP2fHoggJcn/nwow/9ECqLo/hVSyp2pQEJ7yv3l4w\n" +
+                    "Vj31/PyjJHIFwsa7bElZ5ElGBjDJeAteUTn5LK/xtBuxYAO0bMEhT+1ohz8etzec\n" +
+                    "N0h3mt5Zdr5F+wfma1kCGLikFbbC3JL9SYVB2FbMgcYCBqfD1J75wb+JnzNXGjcF\n" +
+                    "uRYzE8B+zoFwqQKCAQEAodvEUKnrXSt/IDB8V8E4kOtZl2X7Gzc2X/rUS1BaP1dd\n" +
+                    "zvrF66nRkYHVgcyEdA29Ro5ylg/c6ieZz0oBxauM3vvzWrKf8MMBR9r2bXAT/HbL\n" +
+                    "0a4Q/KkRs7Av1z9aC/eQU6X8wSnDw+Bcp72YOq80iflDHSf3iQ0GUXucMVQ8QZ66\n" +
+                    "yjUwVWYKyl9G8yoVxvW4R0DkiKuszuZl8xetyylTC7jv77AzuoQX9crs8FJ8H/7C\n" +
+                    "lhkyZ5Yz0gs1zXJLft5Ogw0I8Eb53CfnWnbLnwzt3MvgJxlXA9jxlb7bRZTdzKz+\n" +
+                    "p1109FbThAZGE3QF21jAXA5ySaVOoAPeopgLu3QgGQKCAQBNTZCt4dcpadAYJ9r1\n" +
+                    "fh1NPnOywF6Q0Y6JOMq3YNtIN7t+fpsACfgPH+cLXoWNsRe1ZXfa8ppui9CY2KB5\n" +
+                    "gODL0q/xlxpS/xFwbx6shdXkNQ4R5OV6dm3sqxDqer7a6EOQWZ19uCniy8jFdyVW\n" +
+                    "gHgtL2V2JNx32ntbI5zuSMcH1JfwHsfrRqMT2/rOWlmBO6AJQXZDlGTVMPRveiel\n" +
+                    "VWex7h8dd4c9LW5So/xVsP7MqA36VLOrfkFbeZv54CqtPBV4xRhYUF4Dh4JTsb7G\n" +
+                    "NDd8rxZmmuFLzxHINdxoE3tku2fc86riXnrF1qn4NIkI6tS7fTBYpzHxpoWYG1Mm\n" +
+                    "H/exAoIBADVG6h2dEmhdimFL7ghw+Tx9j2yDOFkH1phq4LU3AV+E9HqYUXcqYWTB\n" +
+                    "IZt+xZHk8AoYg2SBjiMke6lIsEk+uADW1qUU1TMYl7ajKpLCtNfNykSP8bt1wT8c\n" +
+                    "MXTW635SDs6Ts1iPrjxijn/XjL7HYF9YKwpdyRtC3n4n69hdF/j9S2XFNAdH4ENa\n" +
+                    "Cs1unFgMgp+k5CVwVsEAdfEt/o1XECNepC/mOqjPIl6U5c+1SCdmy1iHy9trZJ1c\n" +
+                    "fH0GRVJfFNdq+1LpeeMTTNeXS3WSBG/ErgWSKfvQ0mXfZ7sQHvvJSWXpv8m1xtI0\n" +
+                    "z7EJEc1gLGLLZnL3KAGc+re1tjx5wCM=\n" +
+                    "-----END RSA PRIVATE KEY-----\n";
 
 
     private static final String PRIVATE_KEY_CARRIAGE_RETURN = PRIVATE_KEY.replace('\n', '\r');
@@ -57,22 +82,27 @@ public class JCECryptoTest {
     @SuppressWarnings("SpellCheckingInspection")
     private static final String PUBLIC_KEY =
             "-----BEGIN PUBLIC KEY-----\n" +
-                    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq2izh7NEarDdrdZLrpli\n" +
-                    "zezZG/JzW14XQ74IXkjEqkvxhZ1s6joGtvoxX+P0QRyWrhgtiUnN3DSRAa0QLsZ0\n" +
-                    "ZKk5a2AMGqu0/6eoJGwXSHcLreLEfqdd8+zlvDrbWISekTLoecLttwKSIcP2bcq1\n" +
-                    "nAKz+ZNKMPvB/lm/dHXOqlnybo0J7efUkbd81fHrMOZNLKRYXx3Zx8zsQFf2ee/y\n" +
-                    "pnnw5lKwX+9IBAT/679eGUlh8HfTSG6JQaNezyRG1cOd+pO6hKxff6Q2GVXqHsrI\n" +
-                    "ac4AlR80AEaBeiuFYxjHpruS6BRcyW8UvqX0l9rKMDAWNAtMWt2egYAe6XOEXIWO\n" +
-                    "iQIDAQAB\n" +
+                    "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAmeLKtbsuwBl5AdLQ+Axp\n" +
+                    "PHPqCQZpdU5E6MX9kvpRx9JFEyDk4UisRHoRgT2/rU8rcJBlO5Fv5rWvHNl8zAM8\n" +
+                    "fGXNdCY3OS1qY+G6ECzkWY0s+babIXx033zOpbDCqv0+ClpOkDQINQEFjZ6WN6M+\n" +
+                    "9pEsXKfPqkssukJwS47/vCPHjAn7eDs7umYI5Gik6EZO8ron8synoczGk7OYJ+XB\n" +
+                    "qgNL0PeT5Xv9YcM38l0l8tXYUU8TbhQzmIW3TsX8RNr93QeoV6vmj9onEvVgJFAC\n" +
+                    "qI7y8JSG9ERYHbXZd5f5ncoEMuzZyFQhStNZIX7hI/symJDI0K8xUKVdykeBLjf4\n" +
+                    "cr7S5GPnCcrYmNcKIpXgCjbcR30A2r57enCWySx3+14CeYEdxm0dd23LZLAcFJLT\n" +
+                    "vkx+e9m6Wa4Pa7TjOkbHce04aZNIYwYHOlhOTBYcArruUz0IWBCCIaEqizWGgscH\n" +
+                    "/++Yqe8rUV8fLpw0FnKAZQkZCVIAvZLOuYr9BoKcisGyZMf/cffzCFhC1MMuWEzt\n" +
+                    "vJeqYPPD20dKXc38JO6yc+jyAX/kiJBCSSoUsjAUA83OtsApMXvao1/wu9vpv7qB\n" +
+                    "2IGklKn1RFT10QqrEYxifLALI9cv4703jZTp2z2o1GzoObFwccukF8UfpenbIRKT\n" +
+                    "p+rUKU1uSXt2jsxjvDiCo3MCAwEAAQ==\n" +
                     "-----END PUBLIC KEY-----\n";
 
-    private static final String PUBLIC_KEY_FINGERPRINT = "39:bc:93:66:34:af:e5:15:b4:a1:33:58:81:dc:68:2c";
+    private static final String PUBLIC_KEY_FINGERPRINT = "5f:04:de:33:d6:bf:cc:6c:57:da:0a:7d:80:7d:a4:ce";
 
     private static final String PUBLIC_KEY_CARRIAGE_RETURN = PUBLIC_KEY.replace('\n', '\r');
     private static final String PUBLIC_KEY_CARRIAGE_RETURN_NEWLINE = PUBLIC_KEY.replace("\n", "\r\n");
 
     private Base64 base64;
-    private BouncyCastleProvider provider;
+    private BouncyCastleFipsProvider provider;
     private JCECrypto crypto;
     private RSAPublicKey rsaPublicKey;
     private RSAPrivateKey rsaPrivateKey;
@@ -80,7 +110,7 @@ public class JCECryptoTest {
     @Before
     public void setUp() throws Exception {
         base64 = new Base64(0);
-        provider = new BouncyCastleProvider();
+        provider = new BouncyCastleFipsProvider();
         KeyFactory keyFactory = KeyFactory.getInstance("RSA", provider);
         PemObject pem = new PemReader(new StringReader(PRIVATE_KEY)).readPemObject();
         rsaPrivateKey = (RSAPrivateKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(pem.getContent()));
@@ -105,11 +135,15 @@ public class JCECryptoTest {
         String expected = "This is the expected unencrypted value";
         @SuppressWarnings("SpellCheckingInspection")
         String base64encodedEncrypted =
-                "Jny/38IhsWDpeFigUC0f+H4sYwlwY/8iGvrvfUNGh7rZCiiSf8oIC7Kx6WUCl/jY9S+OXmYmGKls\n" +
-                        "YUn2yBYYp+5cYyO6CyKNJkhNFkWjWcbb9Q0u9pxOz8Q/2YhRvHCNZWaXtLxtmQQljoiF4m0sHGSf\n" +
-                        "CUf45pCCQAU6QInN1w9S51SMRP1weTyC8WROeg8vObeMXc+DzZ4c6WCTILmjgVjB4rnQb/43EUxe\n" +
-                        "RXvaj9crUPrgaXiu+yvRnhEM40Fw4B26p8t6k6Sb27SIuAOWhmusZkf+JZoWF2yU6JeMfgXbhbjk\n" +
-                        "9Q6a1Yhav4vBvYouoXRfRwEsiwyZflXfXzgHqA==\n";
+                "cADKKaB+W63omDsisrdZFuC/mkZZSyYRQfAUiS6jXS1O2pXqVxhVnZdYIgry7RcSEAGJOGSAOn2ws\n" +
+                        "8NERQLER3TTAjlCIH9qDas2bMGrftqeI/WHTvvaH/Gb9gILSfpQ/MVpdPdzzCZtBWnT3/jlA/ZVyTgA\n" +
+                        "vin1s/CSgQfbuKljIeD2MWZdU9Nyp8o+PJUTf8gs2NMAV+Ps4pffxsJRvmJ4IQWEfRpBO3RSvNaDGsn\n" +
+                        "meMXOj2TSMa5/3IezUAjuXOCMx6tu3uPfsdOkITMidxfdOAfO5uip2A1P7Uns2ljTFKtrhgbXzmAT/9\n" +
+                        "OiI7gSYCNLAG7awSUACQozVC6mc99/Pr9i3V3pe5kc58irU3jIczhJplAsLaoypsfsltVC+RJURtKoh\n" +
+                        "Avc2E1pmjPr2+idcysYO5HjO2XSWPxdCbgQQw2uwEBvRrEnN751wXa367BnKFmUXCRo5MF8BPKKGm+a\n" +
+                        "ebccFMllrpAYvibdgVxtFMNOjau9SxvC0uM1n4QS9AyW1vmtzwpgFcVRg79SnLU4++pBMqJ6g5vXHFi\n" +
+                        "vUuLcCKY66rG3cNFzjfzgw7VCakHTBr0wjniIjVemSo7MIhjir5az+zemN68pynuDpEf/vDEbjhXOu1\n" +
+                        "RHqh80cnExVivaRXeR7MjxEQ3Kca1C38FSmTB48M2H/zIQPcsZVhw=\n";
         String actual = new String(crypto.decryptRSA(base64.decode(base64encodedEncrypted), rsaPrivateKey));
         assertEquals(expected, actual);
     }
@@ -128,11 +162,14 @@ public class JCECryptoTest {
                 " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
         @SuppressWarnings("SpellCheckingInspection")
         String base64encodedEncrypted =
-                "MW7DckKE5IXFWkUN5liJeVo27Jhaq+XSeJSHci1/Qa0dvbhr4YRybxg2DiGlWLVZdZzPr5JaOzO8\n" +
-                        "gBEOLJMMVtojFzttShacd6u6llw+trHaaYqL1so9QpyZ7OQJke4MP8lFx/83vi/jL4bOiMGBKaQB\n" +
-                        "lgl4Z/z9/z6hiEbutDdmh8lcAaCQnGbPYoH174oXvIXHdVhMD9ajNVb4gWqWlGzz/xih2hQS9DoR\n" +
-                        "87tsVDUtqZjnN1qgiO3nzxZw2RrBSBPnZWtpcHs24a7R/AHnL+tKrFcIDbADiMIM3+Mao73ZWSf7\n" +
-                        "kTXLdICAqZOuCqYZcU4xdr9Wy/R2tWKOlPm9rw==\n";
+                "R4tPK4PnHE6gVZk3T3EvtuXZhJUZ6QkRwJNki/5cbfSGXHCIJPdFm/erQLb81LX/NP4fakqZGhjOXNc\n" +
+                        "IBrqkCf7JnVEA/cnVfg2zlL9LEMK/IqPvYf+GJSkT3KL0YT15FEDJiCZxXsI1slyZoPkNc+K/a3lONnguQ071+SO\n" +
+                        "K22BdMy1jYqXL8CS6HHE1+AO7w8hV++5fO4wF6N0ymM16NgdM9SWFPLZBKDtwHV5yWhdAs2xsH9G1w4y4MuX951O\n" +
+                        "3V8VUU5sWsei/o0ikakSHgXWbzew5VKfrogbJNFkC4xkae2y7O3yZ7Ltzv9knjaJ2gJakuUe84uhNxU0qq+oBY7m\n" +
+                        "cnP8dDGp78ICoR1Io09wJidpdX2RRcKYKw5BNUK2guKEGWq3O8Kpz/XPFdca5CD7At0uDNaOdBIWnO0Ilfil6pKQ\n" +
+                        "bAppAhmePxVsGAJc+W2tNbCrKeZxQXSVbLFVhJ+DVhFrbta0UF059fNj8KMyT7fkWLjooJru2zqhfk0dBkINJVbI\n" +
+                        "tfu0hvjsGKNtBr+SjujpofhYNPhQd8BvUcwbfO7G8MP8voNP7YoP6y8dLePGRwqmoG9aQuahh+UfhtsurHbBXqSo\n" +
+                        "+hXcZUw0E0mReFyqjU6PTUDX4GJETS2gm/OS91Sqvd9Mccd0zqBRW9z20j1sUmHBtBsDF/ljBEvY=";
         String actual = new String(crypto.decryptRSA(base64.decode(base64encodedEncrypted), rsaPrivateKey));
         assertEquals(expected, actual);
     }
@@ -224,5 +261,11 @@ public class JCECryptoTest {
                 "-----END PUBLIC KEY-----\n";
         assertEquals(pem,
                 JCECrypto.getPEMFromRSAPublicKey(JCECrypto.getRSAPublicKeyFromPEM(provider, pem)));
+    }
+
+    @Test
+    public void testGetPEMFromPrivateKey() throws Exception {
+        assertEquals(PRIVATE_KEY,
+                JCECrypto.getPEMFromRSAPrivateKey(JCECrypto.getRSAPrivateKeyFromPEM(provider, PRIVATE_KEY)));
     }
 }
