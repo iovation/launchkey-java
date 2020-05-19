@@ -2,6 +2,15 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.8.0
+  
+    * FIPS 140-2 support validation
+        * Use BouncyCastleFipsProvider for tests to ensure compatibility going forward
+        * Updated tests with keys that are supported by the BouncyCastleFipsProvider
+        * Added `genrsa` command to CLI example to generate RSA private keys acceptable to BouncyCastleFipsProvider
+        * Added ability to get PEM from Private Key to JCECrypto in support of the `genrsa` command 
+    * Fixed the Organization commands in the CLI example
+
   * 4.7.0
   
     * Added support for Device IDs returned by API in creating Authorization Requests. This will assist

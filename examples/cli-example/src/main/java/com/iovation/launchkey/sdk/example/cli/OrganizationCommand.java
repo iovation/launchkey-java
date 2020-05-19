@@ -25,9 +25,9 @@ class OrganizationCommand {
 
     @CommandLine.Command(name = "update-directory")
     void updateDirectory(
-            @CommandLine.Parameters(index = "2", paramLabel = "<DIRECTORY_ID>",
+            @CommandLine.Parameters(paramLabel = "<DIRECTORY_ID>",
                     description = "URL for webhooks to contact for Directory level events") String directoryId,
-            @CommandLine.Parameters(index = "3", paramLabel = "<WEBHOOK_URL>",
+            @CommandLine.Parameters(paramLabel = "<WEBHOOK_URL>",
                     description = "URL for webhooks to contact for Directory level events") String callback_url
     ) throws Exception {
         getOrganizationClient().updateDirectory(UUID.fromString(directoryId), null, null, null, null, URI.create(callback_url));

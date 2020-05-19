@@ -30,8 +30,10 @@ import java.util.concurrent.TimeUnit;
  * its sub-commands. If there is not sub-command specified, it will print out the help."
  */
 @CommandLine.Command(subcommands = {
+        OrganizationCommand.class,
         DirectoryCommand.class,
         ServiceCommand.class,
+        GenRsaCommand.class
 })
 public class RootCommand implements Callable<Void> {
 

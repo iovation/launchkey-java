@@ -32,7 +32,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicStatusLine;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.junit.Before;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -89,7 +89,7 @@ public class ApacheHttpTransportTestBase {
         when(jweService.decrypt(anyString())).thenReturn("Decrypted");
         when(jwtService.getJWTData(anyString())).thenReturn(jwtData);
         when(jwtService.decode(any(PublicKey.class), anyString(), anyString(), any(Date.class), anyString())).thenReturn(jwtClaims);
-        byte[] contentHash = MessageDigest.getInstance("SHA-256", new BouncyCastleProvider()).digest("Hello World!".getBytes());
+        byte[] contentHash = MessageDigest.getInstance("SHA-256", new BouncyCastleFipsProvider()).digest("Hello World!".getBytes());
         when(crypto.sha256(any(byte[].class))).thenReturn(contentHash);
         when(crypto.sha384(any(byte[].class))).thenReturn(contentHash);
         when(crypto.sha512(any(byte[].class))).thenReturn(contentHash);

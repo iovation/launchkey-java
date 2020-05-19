@@ -15,7 +15,7 @@ import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.KeysPostResponse;
 import com.iovation.launchkey.sdk.transport.domain.OrganizationV3DirectoryKeysPostRequest;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +56,7 @@ public class BasicOrganizationClientAddDirectoryPublicKeyTest {
             "sN9nM11H1ajurrZz4ZKCKPG1jdmqvo/tGXvt5mQyvR9WJCg6+uokSfMCAwEAAQ==\n" +
             "-----END PUBLIC KEY-----\n";
 
-    private static final RSAPublicKey publicKey = JCECrypto.getRSAPublicKeyFromPEM(new BouncyCastleProvider(), pem);
+    private static final RSAPublicKey publicKey = JCECrypto.getRSAPublicKeyFromPEM(new BouncyCastleFipsProvider(), pem);
 
 
     public BasicOrganizationClient client;

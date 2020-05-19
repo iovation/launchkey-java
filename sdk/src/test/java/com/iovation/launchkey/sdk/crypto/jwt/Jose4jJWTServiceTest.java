@@ -2,7 +2,7 @@ package com.iovation.launchkey.sdk.crypto.jwt;
 
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import org.apache.commons.codec.binary.Hex;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
@@ -45,7 +45,7 @@ public class Jose4jJWTServiceTest {
     private static final String PLATFORM_IDENTIFIER = "Platform Identifier";
     private static final String ENTITY_IDENTIFIER = "Entity Identifier";
 
-    private final Provider provider = new BouncyCastleProvider();
+    private final Provider provider = new BouncyCastleFipsProvider();
 
     private Jose4jJWTService jwtService;
     private Date platformDate;
