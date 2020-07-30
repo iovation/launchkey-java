@@ -1,6 +1,7 @@
 package com.iovation.launchkey.sdk.example.cli;
 
 import com.iovation.launchkey.sdk.client.DirectoryClient;
+import com.iovation.launchkey.sdk.domain.DirectoryUserTotp;
 import com.iovation.launchkey.sdk.domain.directory.Device;
 import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
 import picocli.CommandLine;
@@ -79,4 +80,27 @@ class DirectoryCommand {
         return rootCommand.getFactoryFactory()
                 .makeDirectoryFactory(directoryId, key).makeDirectoryClient();
     }
+
+    @CommandLine.Command(name = "generate-totp")
+    void generateTotp(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
+            description = "Unique identifier of the user for your application") String identifier) throws Exception {
+        DirectoryUserTotp dut = getDirectoryClient().generateUserTotp(identifier);
+        System.out.println();
+        System.out.println("TOTP:");
+        System.out.println("  Secret (Base32): " + dut.getSecret());
+        System.out.println("  Algorithm:       " + dut.getAlgorithm());
+        System.out.println("  Period:          " + dut.getPeriod());
+        System.out.println("  Digits:          " + dut.getDigits());
+        System.out.println();
+    }
+
+    @CommandLine.Command(name = "remove-totp")
+    void removeTotp(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
+            description = "Unique identifier of the user for your application") String identifier) throws Exception {
+        getDirectoryClient().removeUserTotp(identifier);
+        System.out.println();
+        System.out.println("Removed");
+        System.out.println();
+    }
+
 }

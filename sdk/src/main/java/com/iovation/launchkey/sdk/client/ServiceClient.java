@@ -332,4 +332,22 @@ public interface ServiceClient extends WebhookHandlingClient {
     void sessionEnd(String user)
             throws CommunicationErrorException, MarshallingError, InvalidResponseException,
             InvalidCredentialsException, CryptographyError;
+
+    /**
+     * Verifies a given TOTP is valid for a given user.
+     *
+     * @param user LaunchKey Username, User Push ID, or Directory User ID for the End User
+     * @param otp 6-8 digit OTP code for to verify.
+     * @throws EntityNotFound If you request a totp for a user that is not configured with totp. See
+     * {@link DirectoryClient#generateUserTotp(String)} for more information to configure totp for a user.
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    boolean verifyTotp(String user, String otp)
+            throws CommunicationErrorException, MarshallingError, InvalidResponseException,
+            InvalidCredentialsException, CryptographyError;
 }

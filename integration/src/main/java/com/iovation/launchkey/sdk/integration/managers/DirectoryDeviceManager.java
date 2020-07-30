@@ -20,7 +20,7 @@ import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
 import com.iovation.launchkey.sdk.error.EntityNotFound;
 import com.iovation.launchkey.sdk.integration.entities.DeviceEntity;
 import com.iovation.launchkey.sdk.integration.entities.LinkingResponseEntity;
-import cucumber.api.java.After;
+import io.cucumber.java.After;
 
 import java.util.*;
 

@@ -30,6 +30,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.HeaderGroup;
 import org.apache.http.util.EntityUtils;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -238,6 +239,13 @@ public class ApacheHttpTransport implements Transport {
             throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
             InvalidCredentialsException {
         getHttpResponse("DELETE", "/service/v3/sessions", subject, request, true, null);
+    }
+
+    @Override
+    public ServiceV3TotpPostResponse serviceV3TotpPost(ServiceV3TotpPostRequest request, EntityIdentifier subject)
+            throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError, InvalidCredentialsException {
+        HttpResponse response = getHttpResponse("POST", "/service/v3/totp", subject, request, true, null);
+        return decryptResponse(response, ServiceV3TotpPostResponse.class);
     }
 
     @Override
@@ -700,6 +708,21 @@ public class ApacheHttpTransport implements Transport {
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException {
         getHttpResponse("DELETE", "/directory/v3/service/policy", subject, request, true, null);
+    }
+
+    @Override
+    public DirectoryV3TotpPostResponse directoryV3TotpPost(DirectoryV3TotpPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        HttpResponse response = getHttpResponse("POST" , "/directory/v3/totp", subject, request, true, null);
+        return decryptResponse(response, DirectoryV3TotpPostResponse.class);
+    }
+
+    @Override
+    public void directoryV3TotpDelete(DirectoryV3TotpDeleteRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException {
+        getHttpResponse("DELETE" , "/directory/v3/totp", subject, request, true, null);
     }
 
     protected HttpResponse getHttpResponse(

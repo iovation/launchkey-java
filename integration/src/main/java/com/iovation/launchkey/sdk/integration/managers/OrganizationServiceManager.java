@@ -21,7 +21,7 @@ import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.integration.Utils;
 import com.iovation.launchkey.sdk.integration.entities.PublicKeyEntity;
 import com.iovation.launchkey.sdk.integration.entities.ServiceEntity;
-import cucumber.api.java.After;
+import io.cucumber.java.After;
 
 import java.net.URI;
 import java.security.interfaces.RSAPublicKey;

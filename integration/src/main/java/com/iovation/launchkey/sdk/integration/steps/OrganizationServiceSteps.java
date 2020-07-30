@@ -17,7 +17,7 @@ import com.iovation.launchkey.sdk.integration.entities.ServiceEntity;
 import com.iovation.launchkey.sdk.integration.managers.OrganizationServiceManager;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import cucumber.runtime.java.guice.ScenarioScoped;
+import io.cucumber.guice.ScenarioScoped;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.Is;
 

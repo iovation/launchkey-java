@@ -8,6 +8,7 @@ import com.iovation.launchkey.sdk.domain.service.*;
 import com.iovation.launchkey.sdk.error.AuthorizationInProgress;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestCanceled;
 import com.iovation.launchkey.sdk.error.AuthorizationRequestTimedOutError;
+import com.iovation.launchkey.sdk.error.EntityNotFound;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -184,6 +185,21 @@ class ServiceCommand {
         getServiceClient().cancelAuthorizationRequest(authRequestId);
         System.out.println();
         System.out.println("Auth Cancelled.");
+        System.out.println();
+    }
+
+    @CommandLine.Command(name = "verify-totp")
+    void verifyTotp(
+            @CommandLine.Parameters(paramLabel = "<USER_NAME>", description = "The username to verify otp") String username,
+            @CommandLine.Parameters(paramLabel = "<OTP>", description = "The otp code to verify") String otp
+    ) throws Exception {
+        System.out.println();
+        try{
+            boolean response = getServiceClient().verifyTotp(username, otp);
+            System.out.println(response?"Valid":"Invalid");
+        }catch (EntityNotFound e){
+            System.out.println("TOTP not configured for user");
+        }
         System.out.println();
     }
 

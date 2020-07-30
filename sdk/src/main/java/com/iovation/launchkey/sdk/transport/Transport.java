@@ -141,6 +141,22 @@ public interface Transport {
             InvalidCredentialsException;
 
     /**
+     * Verifies a given TOTP is valid for a given user.
+     *
+     * @param request Transport object with information that will be marshaled for the request.
+     * @param subject Service entity for the subject
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    ServiceV3TotpPostResponse serviceV3TotpPost(ServiceV3TotpPostRequest request, EntityIdentifier subject)
+            throws CommunicationErrorException, InvalidResponseException, MarshallingError, CryptographyError,
+            InvalidCredentialsException;
+
+    /**
      * Begin the device linking process for a specific Directory.
      *
      * @param request Transport object with information that will be marshaled for the request.
@@ -410,6 +426,38 @@ public interface Transport {
      * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
      */
     void directoryV3ServicePolicyDelete(ServicePolicyDeleteRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException;
+
+    /**
+     * Generate a TOTP secret for a Directory User
+     *
+     * @param request Transport object with information that will be marshaled for the request.
+     * @param subject Organization entity for the subject
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    DirectoryV3TotpPostResponse directoryV3TotpPost(DirectoryV3TotpPostRequest request, EntityIdentifier subject)
+            throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
+            InvalidCredentialsException;
+
+    /**
+     * Remove a TOTP secret for a Directory User
+     *
+     * @param request Transport object with information that will be marshaled for the request.
+     * @param subject Organization entity for the subject
+     * @throws CommunicationErrorException If there was an error communicating with the endpoint
+     * @throws MarshallingError If there was an error marshalling the request or un-marshalling the response
+     * @throws InvalidRequestException When the LaunchKey API responds with an error in the request data
+     * @throws InvalidResponseException When the response received cannot be processed
+     * @throws InvalidCredentialsException When the credentials supplied are not valid
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    void directoryV3TotpDelete(DirectoryV3TotpDeleteRequest request, EntityIdentifier subject)
             throws CryptographyError, InvalidResponseException, CommunicationErrorException, MarshallingError,
             InvalidCredentialsException;
 

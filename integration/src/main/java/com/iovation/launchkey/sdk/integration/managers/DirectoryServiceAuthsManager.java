@@ -16,7 +16,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.ServiceClient;
 import com.iovation.launchkey.sdk.domain.service.*;
-import cucumber.api.java.After;
+import io.cucumber.java.After;
 
 import java.util.ArrayList;
 import java.util.List;

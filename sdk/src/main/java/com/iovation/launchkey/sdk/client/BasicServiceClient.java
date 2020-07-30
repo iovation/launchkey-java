@@ -25,6 +25,7 @@ import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -185,6 +186,13 @@ public class BasicServiceClient implements ServiceClient {
             InvalidCredentialsException, CryptographyError {
         ServiceV3SessionsDeleteRequest request = new ServiceV3SessionsDeleteRequest(user);
         transport.serviceV3SessionsDelete(request, serviceEntity);
+    }
+
+    @Override
+    public boolean verifyTotp(String user, String totp) throws CommunicationErrorException, MarshallingError, InvalidResponseException, InvalidCredentialsException, CryptographyError {
+        ServiceV3TotpPostRequest request = new ServiceV3TotpPostRequest(user, totp);
+        ServiceV3TotpPostResponse response = transport.serviceV3TotpPost(request, serviceEntity);
+        return response.isValid();
     }
 
     @Override
