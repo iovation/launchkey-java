@@ -81,8 +81,8 @@ class DirectoryCommand {
                 .makeDirectoryFactory(directoryId, key).makeDirectoryClient();
     }
 
-    @CommandLine.Command(name = "generate-totp")
-    void generateTotp(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
+    @CommandLine.Command(name = "add-user-totp")
+    void addUserTotp(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
             description = "Unique identifier of the user for your application") String identifier) throws Exception {
         DirectoryUserTotp dut = getDirectoryClient().generateUserTotp(identifier);
         System.out.println();
@@ -94,8 +94,8 @@ class DirectoryCommand {
         System.out.println();
     }
 
-    @CommandLine.Command(name = "remove-totp")
-    void removeTotp(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
+    @CommandLine.Command(name = "remove-user-totp")
+    void removeUserTotp(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
             description = "Unique identifier of the user for your application") String identifier) throws Exception {
         getDirectoryClient().removeUserTotp(identifier);
         System.out.println();

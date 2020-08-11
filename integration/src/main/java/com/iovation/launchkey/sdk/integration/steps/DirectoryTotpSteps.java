@@ -7,8 +7,10 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class DirectoryTotpSteps {
     private final DirectoryTotpManager directoryTotpManager;
@@ -24,22 +26,23 @@ public class DirectoryTotpSteps {
         directoryTotpManager.generateUserTotp();
     }
 
-    @Then("the User TOTP create response contains {string} for the algorithm")
-    public void theUserTOTPCreateResponseContainsForTheAlgorithm(String expected) throws Throwable {
+    @Then("the User TOTP create response contains a valid algorithm")
+    public void theUserTOTPCreateResponseContainsForTheAlgorithm() throws Throwable {
         String actual = directoryTotpManager.getCurrentGenerateUserTotpResponse().getAlgorithm();
-        assertEquals(expected, actual);
+        List<String> validAlgorithms = Arrays.asList("SHA1", "SHA256", "SHA512");
+        assertTrue(validAlgorithms.contains(actual));
     }
 
-    @Then("the User TOTP create response contains {int} for the digits")
-    public void theUserTOTPCreateResponseContainsForTheDigits(int expected) throws Throwable {
+    @Then("the User TOTP create response contains a valid amount of digits")
+    public void theUserTOTPCreateResponseContainsAValidAmountOfDigits() throws Throwable {
         int actual = directoryTotpManager.getCurrentGenerateUserTotpResponse().getDigits();
-        assertEquals(expected, actual);
+        assertTrue(actual >= 6);
     }
 
-    @Then("the User TOTP create response contains {int} for the period")
-    public void theUserTOTPCreateResponseContainsForThePeriod(int expected) throws Throwable {
+    @Then("the User TOTP create response contains a valid period")
+    public void theUserTOTPCreateResponseContainsForThePeriod() throws Throwable {
         int actual = directoryTotpManager.getCurrentGenerateUserTotpResponse().getPeriod();
-        assertEquals(expected, actual);
+        assertTrue(actual >= 30);
     }
 
     @Then("the User TOTP create response contains a valid secret")

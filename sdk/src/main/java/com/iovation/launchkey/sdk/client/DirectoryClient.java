@@ -56,7 +56,7 @@ public interface DirectoryClient extends ServiceManagingClient, WebhookHandlingC
      * Begin the process of Linking a Subscriber Authenticator Device with an End User based on the Directory User ID.
      * If no Directory User exists for the Directory User ID, the Directory User will be created.
      *
-     * @param userId Unique value identifying the End User in the your system. It is the permanent link for the
+     * @param userId Unique value identifying the End User in your system. It is the permanent link for the
      * End User between the your application(s) and the iovation LaunchKey API. This will be used for authorization requests
      * as well as managing the End User's Devices.
      * @param ttl Number of seconds the linking code returned in the response will be valid.

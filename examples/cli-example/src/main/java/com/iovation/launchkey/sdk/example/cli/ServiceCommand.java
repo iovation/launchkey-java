@@ -188,10 +188,10 @@ class ServiceCommand {
         System.out.println();
     }
 
-    @CommandLine.Command(name = "verify-totp")
-    void verifyTotp(
-            @CommandLine.Parameters(paramLabel = "<USER_NAME>", description = "The username to verify otp") String username,
-            @CommandLine.Parameters(paramLabel = "<OTP>", description = "The otp code to verify") String otp
+    @CommandLine.Command(name = "verify-user-totp")
+    void verifyUserTotp(
+            @CommandLine.Parameters(paramLabel = "<USER_IDENTIFIER>", description = "The username to verify otp") String username,
+            @CommandLine.Parameters(paramLabel = "<OTP_CODE>", description = "The otp code to verify") String otp
     ) throws Exception {
         System.out.println();
         try{

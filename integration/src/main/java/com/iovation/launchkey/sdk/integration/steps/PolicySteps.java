@@ -35,7 +35,7 @@ public class PolicySteps {
     }
 
     @ParameterType(name="factors", value="(Knowledge|Inherence|Possession|Knowledge, Inherence|Knowledge, Possession|Inherence, Possession|Knowledge, Inherence, Possession)")
-    public List<String> defineFacgtors(String s) {
+    public List<String> defineFactors(String s) {
         String[] factorsAsStrings = s.split("\\s*,\\s*");
         List<String> factors = new ArrayList<>();
         for (String stringFactor : factorsAsStrings) {
