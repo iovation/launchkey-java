@@ -81,8 +81,8 @@ class DirectoryCommand {
                 .makeDirectoryFactory(directoryId, key).makeDirectoryClient();
     }
 
-    @CommandLine.Command(name = "add-user-totp")
-    void addUserTotp(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
+    @CommandLine.Command(name = "generate-user-totp")
+    void generateUserTotp(@CommandLine.Parameters(paramLabel = "<UNIQUE_IDENTIFIER>",
             description = "Unique identifier of the user for your application") String identifier) throws Exception {
         DirectoryUserTotp dut = getDirectoryClient().generateUserTotp(identifier);
         System.out.println();
