@@ -12,8 +12,10 @@
 
 package com.iovation.launchkey.sdk.integration;
 
-import com.google.inject.*;
-import com.google.inject.Module;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Stage;
 import com.google.inject.spi.Message;
 import com.iovation.launchkey.sdk.FactoryFactoryBuilder;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
@@ -28,8 +30,9 @@ import com.iovation.launchkey.sdk.integration.managers.kobiton.transport.Request
 import com.iovation.launchkey.sdk.integration.mobile.driver.NullMobileDriver;
 import com.iovation.launchkey.sdk.integration.mobile.driver.SampleAppMobileDriver;
 import com.iovation.launchkey.sdk.integration.mobile.driver.android.SampleAppAndroidDriver;
-import cucumber.api.guice.CucumberModules;
-import cucumber.runtime.java.guice.InjectorSource;
+import io.cucumber.core.backend.ObjectFactory;
+import io.cucumber.guice.CucumberModules;
+import io.cucumber.guice.ScenarioScope;
 import io.cucumber.java.Before;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.AssumptionViolatedException;
@@ -49,17 +52,35 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class CucumberGuiceInjectorSource implements InjectorSource {
+public class CucumberGuiceObjectFactory implements ObjectFactory {
+
+    private final Injector injector;
+
+    public CucumberGuiceObjectFactory() {
+        injector = Guice.createInjector( Stage.PRODUCTION, CucumberModules.createScenarioModule(), new CucumberJuiceModule());
+    }
 
     @Override
-    public Injector getInjector() {
-        Module scenarioModule = CucumberModules.createScenarioModule();
-        return Guice.createInjector(Stage.PRODUCTION, scenarioModule, new CucumberJuiceModule());
+    public void start() {
+        injector.getInstance( ScenarioScope.class ).enterScope();
+    }
+
+    @Override
+    public void stop() {
+        injector.getInstance( ScenarioScope.class ).exitScope();
+    }
+
+    @Override
+    public boolean addClass(Class<?> aClass) {
+        return true;
+    }
+
+    @Override
+    public <T> T getInstance(Class<T> aClass) {
+        return injector.getInstance( aClass );
     }
 
     public static class CucumberJuiceModule extends AbstractModule {
-        private boolean skipDeviceScenarios = true;
-
         @Before("@device_testing")
         public void skipDeviceScenarios() throws Exception {
             if (!System.getProperty(Capability.run_device_tests).equals("true")) {
@@ -69,7 +90,7 @@ public class CucumberGuiceInjectorSource implements InjectorSource {
 
         @Override
         protected void configure() {
-            try (InputStream in = CucumberGuiceInjectorSource.class.getResourceAsStream("/application.properties")) {
+            try (InputStream in = CucumberGuiceObjectFactory.class.getResourceAsStream("/application.properties")) {
                 Properties properties = new Properties();
                 properties.load(in);
                 for (String key : properties.stringPropertyNames()) {

@@ -5,7 +5,7 @@ import com.iovation.launchkey.sdk.domain.organization.Directory;
 import com.iovation.launchkey.sdk.integration.entities.DirectoryEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryManager;
 import com.iovation.launchkey.sdk.integration.managers.KeysManager;
-import cucumber.runtime.java.guice.ScenarioScoped;
+import io.cucumber.guice.ScenarioScoped;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;

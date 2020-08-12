@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.domain.DirectoryUserTotp;
 import com.iovation.launchkey.sdk.domain.directory.Device;
 import com.iovation.launchkey.sdk.domain.directory.DirectoryUserDeviceLinkData;
 import com.iovation.launchkey.sdk.domain.directory.Session;
@@ -55,7 +56,7 @@ public interface DirectoryClient extends ServiceManagingClient, WebhookHandlingC
      * Begin the process of Linking a Subscriber Authenticator Device with an End User based on the Directory User ID.
      * If no Directory User exists for the Directory User ID, the Directory User will be created.
      *
-     * @param userId Unique value identifying the End User in the your system. It is the permanent link for the
+     * @param userId Unique value identifying the End User in your system. It is the permanent link for the
      * End User between the your application(s) and the iovation LaunchKey API. This will be used for authorization requests
      * as well as managing the End User's Devices.
      * @param ttl Number of seconds the linking code returned in the response will be valid.
@@ -184,6 +185,59 @@ public interface DirectoryClient extends ServiceManagingClient, WebhookHandlingC
      * the signature of the response
      */
     void endAllServiceSessions(String userId) throws PlatformErrorException, UnknownEntityException,
+            InvalidResponseException, InvalidStateException, InvalidCredentialsException,
+            CommunicationErrorException, MarshallingError, CryptographyError;
+
+    /**
+     * Generate and return TOTP secret data for the given user identifier.
+     *
+     * Note that a user can only have a single TOTP configured. Submitting this request when there is an
+     * existing configuration will overwrite any previous settings.
+     *
+     * @param userId Unique value identifying the End User in the your system. It is the permanent link for the
+     *               End User between the your application(s) and the iovation LaunchKey API. This will be used for validating and
+     *               as well as managing TOTP.
+     * @throws InvalidResponseException    When the response JWT is missing or does not pass validation, when the response
+     *                                     content hash does not match the value in the JWT, or when the JWE in the body fails validation, or the decrypted
+     *                                     JWE in the body cannot be parsed or mapped to the expected data.
+     * @throws InvalidRequestException     When the Platform API returns a 400 Bad Request HTTP Status
+     * @throws InvalidCredentialsException When the Platform API returns a 401 Unauthorized or 403 Forbidden HTTP Status
+     * @throws PlatformErrorException      When the Platform API returns an unexpected HTTP Status
+     * @throws CommunicationErrorException When the HTTP client is unable to connect to the Platform API, cannot
+     *                                     negotiate TLS with the Platform API, or is disconnected while sending or receiving a message from the
+     *                                     Platform API.
+     * @throws InvalidStateException       When the SDK does not have the proper resource to perform an action. This is most
+     *                                     often due to invalid dependencies being provided or algorithms not being supported by the JCE provider.
+     * @throws MarshallingError            When the response cannot be marshaled
+     * @throws CryptographyError           When there is an error encrypting and signing the request or decrypting and verifying
+     *                                     the signature of the response
+     */
+    DirectoryUserTotp generateUserTotp(String userId) throws PlatformErrorException,
+            InvalidResponseException, InvalidStateException, InvalidCredentialsException,
+            CommunicationErrorException, MarshallingError, CryptographyError;
+
+    /**
+     * Removes a TOTP configuration from a given user.
+     *
+     * @param userId Unique value identifying the End User in the your
+     *        system. This value was used to create the Directory User and Link
+     *        Device.
+     *
+     * @throws InvalidResponseException    When the response JWT is missing or does not pass validation, when the response
+     *                                     content hash does not match the value in the JWT, or when the JWE in the body fails validation, or the decrypted
+     *                                     JWE in the body cannot be parsed or mapped to the expected data.
+     * @throws InvalidRequestException     When the Platform API returns a 400 Bad Request HTTP Status
+     * @throws InvalidCredentialsException When the Platform API returns a 401 Unauthorized or 403 Forbidden HTTP Status
+     * @throws PlatformErrorException      When the Platform API returns an unexpected HTTP Status
+     * @throws CommunicationErrorException When the HTTP client is unable to connect to the Platform API, cannot
+     *                                     negotiate TLS with the Platform API, or is disconnected while sending or receiving a message from the
+     *                                     Platform API.
+     * @throws InvalidStateException       When the SDK does not have the proper resource to perform an action. This is most
+     *                                     often due to invalid dependencies being provided or algorithms not being supported by the JCE provider.
+     * @throws MarshallingError            When the response cannot be marshaled
+     * @throws CryptographyError           When there is an error encrypting and signing the request or decrypting and verifying
+     */
+    void removeUserTotp(String userId) throws PlatformErrorException,
             InvalidResponseException, InvalidStateException, InvalidCredentialsException,
             CommunicationErrorException, MarshallingError, CryptographyError;
 }
