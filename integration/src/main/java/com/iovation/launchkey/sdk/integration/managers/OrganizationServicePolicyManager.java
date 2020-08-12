@@ -19,7 +19,7 @@ import com.iovation.launchkey.sdk.client.OrganizationFactory;
 import com.iovation.launchkey.sdk.domain.policy.Policy;
 import com.iovation.launchkey.sdk.domain.servicemanager.ServicePolicy;
 import com.iovation.launchkey.sdk.integration.entities.ServicePolicyEntity;
-import cucumber.api.java.After;
+import io.cucumber.java.After;
 
 import java.util.UUID;
 

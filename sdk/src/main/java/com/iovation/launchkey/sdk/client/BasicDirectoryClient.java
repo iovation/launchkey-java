@@ -13,6 +13,7 @@
 package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
+import com.iovation.launchkey.sdk.domain.DirectoryUserTotp;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.directory.*;
 import com.iovation.launchkey.sdk.domain.policy.LegacyPolicy;
@@ -110,6 +111,29 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
             CommunicationErrorException, CryptographyError, MarshallingError {
         DirectoryV3SessionsDeleteRequest request = new DirectoryV3SessionsDeleteRequest((userId));
         transport.directoryV3SessionsDelete(request, directory);
+    }
+
+    @Override
+    public DirectoryUserTotp generateUserTotp(String userId) throws PlatformErrorException, InvalidResponseException,
+            InvalidStateException, InvalidCredentialsException, CommunicationErrorException, MarshallingError,
+            CryptographyError {
+        DirectoryV3TotpPostRequest request = new DirectoryV3TotpPostRequest(userId);
+        DirectoryV3TotpPostResponse response = transport.directoryV3TotpPost(request, directory);
+        DirectoryUserTotp totp = new DirectoryUserTotp(
+                response.getSecret(),
+                response.getAlgorithm(),
+                response.getPeriod(),
+                response.getDigits()
+        );
+        return totp;
+    }
+
+    @Override
+    public void removeUserTotp(String userId) throws PlatformErrorException, InvalidResponseException,
+            InvalidStateException, InvalidCredentialsException, CommunicationErrorException, MarshallingError,
+            CryptographyError {
+        DirectoryV3TotpDeleteRequest request = new DirectoryV3TotpDeleteRequest(userId);
+        transport.directoryV3TotpDelete(request, directory);
     }
 
     @Override

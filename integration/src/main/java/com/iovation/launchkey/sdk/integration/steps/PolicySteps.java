@@ -7,6 +7,7 @@ import com.iovation.launchkey.sdk.integration.cucumber.converters.TerritoryFence
 import com.iovation.launchkey.sdk.integration.managers.MutablePolicy;
 import com.iovation.launchkey.sdk.integration.managers.PolicyContext;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -31,6 +32,16 @@ public class PolicySteps {
     public PolicySteps(PolicyContext policyContext, GenericSteps genericSteps) {
         this.policyContext = policyContext;
         this.genericSteps = genericSteps;
+    }
+
+    @ParameterType(name="factors", value="(Knowledge|Inherence|Possession|Knowledge, Inherence|Knowledge, Possession|Inherence, Possession|Knowledge, Inherence, Possession)")
+    public List<String> defineFactors(String s) {
+        String[] factorsAsStrings = s.split("\\s*,\\s*");
+        List<String> factors = new ArrayList<>();
+        for (String stringFactor : factorsAsStrings) {
+            factors.add(stringFactor.toUpperCase());
+        }
+        return factors;
     }
 
     @When("^I create a new MethodAmountPolicy$")
