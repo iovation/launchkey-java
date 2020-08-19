@@ -37,7 +37,7 @@ public class ServiceTotpSteps {
     }
 
 
-    @When("I verify a TOTP code with an invalid User")
+    @When("I attempt to verify a TOTP code with an invalid User")
     public void iVerifyATOTPCodeWithAnInvalidUser() throws Throwable {
         String totpCode = directoryTotpManager.getCodeForCurrentUserTotpResponse();
         try{
