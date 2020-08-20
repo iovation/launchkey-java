@@ -10,6 +10,10 @@ This changelog references the relevant changes (bug and security fixes) for the 
         * Added `genrsa` command to CLI example to generate RSA private keys acceptable to BouncyCastleFipsProvider
         * Added ability to get PEM from Private Key to JCECrypto in support of the `genrsa` command 
     * Fixed the Organization commands in the CLI example
+    * Added Directory TOTP Post and Delete
+    * Added Service TOTP POST to verify TOTP codes
+    * Upgraded Cucumber to the latest version
+    * Updated CLI to include generate-totp, remove-totp, and verify-totp
 
   * 4.7.0
   

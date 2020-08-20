@@ -1,7 +1,7 @@
 Feature: Service Client can verify a TOTP code for a user
   In order to verify User TOTP codes
   As a Service Client
-  I can request a User TOTP code can be verified and returns a result
+  I can request a User TOTP code to be verified and return a result
 
   Background:
     Given I created a Directory
@@ -17,5 +17,5 @@ Feature: Service Client can verify a TOTP code for a user
     Then the TOTP verification response is False
 
   Scenario: Verifying a code for a User that does not have a TOTP secret
-    When I verify a TOTP code with an invalid User
+    When I attempt to verify a TOTP code with an invalid User
     Then an EntityNotFound error occurs
