@@ -14,13 +14,13 @@ public class MethodsListConverter {
 
         List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
         for (Map<String, String> map : rows) {
-            String set = map.get("Set").toLowerCase();
-            String active = map.get("Active").toLowerCase();
-            String allowed = map.get("Allowed").toLowerCase();
-            String supported = map.get("Supported").toLowerCase();
-            String userRequired = map.get("User Required").toLowerCase();
-            String passed = map.get("Passed").toLowerCase();
-            String error = map.get("Error").toLowerCase();
+            String set = map.get("Set") == null ? "" : map.get("Set").toLowerCase();
+            String active = map.get("Active") == null ? "" : map.get("Active").toLowerCase();
+            String allowed = map.get("Allowed") == null ? "" : map.get("Allowed").toLowerCase();
+            String supported = map.get("Supported") == null ? "" : map.get("Supported").toLowerCase();
+            String userRequired = map.get("User Required") == null ? "" : map.get("User Required").toLowerCase();
+            String passed = map.get("Passed") == null ? "" : map.get("Passed").toLowerCase();
+            String error = map.get("Error") == null ? "" : map.get("Error").toLowerCase();
             methods.add(new AuthMethod(
                     AuthMethod.Type.fromString(map.get("Method")),
                     set.isEmpty() ? null : Boolean.valueOf(set),
