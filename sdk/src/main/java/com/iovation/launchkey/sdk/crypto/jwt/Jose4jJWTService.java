@@ -101,7 +101,7 @@ public class Jose4jJWTService implements JWTService {
         JWTClaims claims;
         try {
             AlgorithmConstraints algorithmConstraints = new AlgorithmConstraints(
-                    AlgorithmConstraints.ConstraintType.WHITELIST,
+                    AlgorithmConstraints.ConstraintType.PERMIT,
                     AlgorithmIdentifiers.RSA_USING_SHA256,
                     AlgorithmIdentifiers.RSA_USING_SHA384,
                     AlgorithmIdentifiers.RSA_USING_SHA512
