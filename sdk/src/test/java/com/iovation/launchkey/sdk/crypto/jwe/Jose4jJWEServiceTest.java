@@ -11,6 +11,7 @@ import java.security.KeyPairGenerator;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.Security;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,6 +39,9 @@ public class Jose4jJWEServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        if (Security.getProvider(BouncyCastleFipsProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(provider);
+        }
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
         keyPairGenerator.initialize(2048);
         keyPair = keyPairGenerator.generateKeyPair();
@@ -45,7 +49,7 @@ public class Jose4jJWEServiceTest {
         publicKey = keyPair.getPublic();
         publicKeyID = "Public Key ID";
 
-        jweService = new Jose4jJWEService((RSAPrivateKey) keyPair.getPrivate());
+        jweService = new Jose4jJWEService((RSAPrivateKey) keyPair.getPrivate(), provider.getName());
     }
 
     @After
@@ -54,6 +58,14 @@ public class Jose4jJWEServiceTest {
         publicKeyID = null;
         keyPair = null;
         jweService = null;
+    }
+
+    @Test
+    public void deprecatedConstructorStillWorks() throws Exception {
+        @SuppressWarnings("deprecation") JWEService jweService = new Jose4jJWEService((RSAPrivateKey) keyPair.getPrivate());
+        String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
+                " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+        assertEquals(expected, jweService.decrypt(jweService.encrypt(expected, publicKey, publicKeyID, "application/json")));
     }
 
     @Test
@@ -134,7 +146,7 @@ public class Jose4jJWEServiceTest {
 
 
         final RSAPrivateKey privateKey = JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKeyPEM);
-        final JWEService jweService = new Jose4jJWEService(privateKey);
+        final JWEService jweService = new Jose4jJWEService(privateKey, provider.getName());
 
         String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\", \"app_Pins\": \"\"," +
                 " \"device_id\": \"DeviceId\"}";
