@@ -17,6 +17,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.Provider;
+import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
@@ -80,6 +81,9 @@ public class Jose4jJWTServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        if (Security.getProvider(BouncyCastleFipsProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(provider);
+        }
         if (keyPair == null) {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
             keyPairGenerator.initialize(2048);
@@ -93,10 +97,24 @@ public class Jose4jJWTServiceTest {
                 PLATFORM_IDENTIFIER,
                 privateKeys,
                 currentPrivateKeyId,
-                EXPIRE_SECONDS
+                EXPIRE_SECONDS,
+                provider.getName()
         );
     }
 
+    @Test
+    public void deprecatedConstructorStillWorks() throws Exception {
+        //noinspection deprecation
+        jwtService = new Jose4jJWTService(
+                PLATFORM_IDENTIFIER,
+                privateKeys,
+                currentPrivateKeyId,
+                EXPIRE_SECONDS
+        );
+
+
+        jwtService.encode("JTI", "issuer", "subject", new Date(), "Method", "Path", "HashAlg", "Hash");
+    }
 
     @Test
     public void encodeEncodesSomethingThatProperlyDecodes() throws Exception {
@@ -151,7 +169,8 @@ public class Jose4jJWTServiceTest {
                 PLATFORM_IDENTIFIER,
                 new HashMap<String, RSAPrivateKey>(),
                 "Current Private Key",
-                EXPIRE_SECONDS
+                EXPIRE_SECONDS,
+                provider.getName()
         );
 
 
@@ -171,7 +190,8 @@ public class Jose4jJWTServiceTest {
                 "Invalid provider identity",
                 new HashMap<String, RSAPrivateKey>(),
                 "Current Key ID",
-                EXPIRE_SECONDS
+                EXPIRE_SECONDS,
+                provider.getName()
         );
         jwtService.decode(publicKey, "audience", "token ID", new Date(), TOKEN);
     }

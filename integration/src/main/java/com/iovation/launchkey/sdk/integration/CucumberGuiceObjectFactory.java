@@ -46,6 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.security.Provider;
+import java.security.Security;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -103,6 +104,9 @@ public class CucumberGuiceObjectFactory implements ObjectFactory {
             }
 
             Provider provider = new BouncyCastleProvider();
+            if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+                Security.addProvider(provider);
+            }
 
             bind(Provider.class).toInstance(provider);
 

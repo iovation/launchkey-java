@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.crypto.jwt;
 
+import com.iovation.launchkey.sdk.crypto.Jose4jService;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
@@ -28,11 +29,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Jose4jJWTService implements JWTService {
+public class Jose4jJWTService extends Jose4jService implements JWTService {
     private final String apiIdentifier;
     private final Map<String, RSAPrivateKey> privateKeys;
     private final String currentPrivateKeyId;
     private final int requestExpireSeconds;
+    private final String provider;
 
     /**
      * @param apiIdentifier JWT identifier for the Platform API. Used as the apiIdentifier for encoding and the
@@ -44,13 +46,30 @@ public class Jose4jJWTService implements JWTService {
      * @param requestExpireSeconds The number of seconds from the issue ("iss") time to use for the expiration ("exp")
      * time when encoding.
      */
+    @Deprecated
     public Jose4jJWTService(
             String apiIdentifier, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKeyId, int requestExpireSeconds
     ) {
+        this(apiIdentifier, privateKeys, currentPrivateKeyId, requestExpireSeconds, null);
+    }
+
+    /**
+     * @param apiIdentifier JWT identifier for the Platform API. Used as the apiIdentifier for encoding and the
+     * issuer for decoding.
+     * @param privateKeys Mapped list of RSA Private Key by key ID of the RSA public/private key pairs that will be
+     * used to generate digital encoding and decoding as well as obtaining the RSA Public Key of the RSA public/private
+     * key pair of the Platform API which will be used to verify digital signatures when decoding.
+     * @param currentPrivateKeyId Public key fingerprint of the RSA private key that wi8ll be used to encode requests.
+     * @param requestExpireSeconds The number of seconds from the issue ("iss") time to use for the expiration ("exp")
+     * time when encoding.
+     * @param jceProvider Name of the JCE provider to use for encryption/decryption
+     */
+    public Jose4jJWTService(String apiIdentifier, Map<String, RSAPrivateKey> privateKeys, String currentPrivateKeyId, int requestExpireSeconds, String jceProvider) {
         this.apiIdentifier = apiIdentifier;
         this.privateKeys = privateKeys;
         this.currentPrivateKeyId = currentPrivateKeyId;
         this.requestExpireSeconds = requestExpireSeconds;
+        this.provider = jceProvider;
     }
 
     @Override
@@ -81,7 +100,7 @@ public class Jose4jJWTService implements JWTService {
         }
         jwtClaims.setClaim("request", request);
 
-        JsonWebSignature jws = new JsonWebSignature();
+        JsonWebSignature jws = getJsonWebSignature();
         jws.setKeyIdHeaderValue(currentPrivateKeyId);
         jws.setKey(privateKeys.get(currentPrivateKeyId));
         jws.setPayload(jwtClaims.toJson());
@@ -101,7 +120,7 @@ public class Jose4jJWTService implements JWTService {
         JWTClaims claims;
         try {
             AlgorithmConstraints algorithmConstraints = new AlgorithmConstraints(
-                    AlgorithmConstraints.ConstraintType.WHITELIST,
+                    AlgorithmConstraints.ConstraintType.PERMIT,
                     AlgorithmIdentifiers.RSA_USING_SHA256,
                     AlgorithmIdentifiers.RSA_USING_SHA384,
                     AlgorithmIdentifiers.RSA_USING_SHA512
@@ -117,11 +136,12 @@ public class Jose4jJWTService implements JWTService {
                     .setRequireIssuedAt()
                     .setRequireNotBefore()
                     .setRequireExpirationTime()
-                    .setJwsAlgorithmConstraints(algorithmConstraints);
+                    .setJwsAlgorithmConstraints(algorithmConstraints)
+                    .setJweProviderContext(getProviderContext(provider))
+                    .setJwsProviderContext(getProviderContext(provider));
             if (expectedTokenId != null) {
                 builder.setRequireJwtId()
-                        .registerValidator(new JwtIdValidator(expectedTokenId))
-                        .build();
+                        .registerValidator(new JwtIdValidator(expectedTokenId));
             }
             JwtConsumer jwtConsumer = builder.build();
 
@@ -163,6 +183,8 @@ public class Jose4jJWTService implements JWTService {
             JwtConsumer consumer = new JwtConsumerBuilder()
                     .setSkipAllValidators()
                     .setSkipSignatureVerification()
+                    .setJwsProviderContext(getProviderContext(provider))
+                    .setJweProviderContext(getProviderContext(provider))
                     .build();
             JwtContext jwtContext = consumer.process(jwt);
             for (JsonWebStructure joseObject : jwtContext.getJoseObjects()) {
@@ -203,5 +225,11 @@ public class Jose4jJWTService implements JWTService {
             String jti = jwtContext.getJwtClaims().getJwtId();
             return jti != null && jti.equals(expected) ? null : "Mismatched JWT ID";
         }
+    }
+
+    protected JsonWebSignature getJsonWebSignature() {
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setProviderContext(getProviderContext(provider));
+        return jws;
     }
 }

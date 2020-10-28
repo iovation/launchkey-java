@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.crypto.jwe;
 
+import com.iovation.launchkey.sdk.crypto.Jose4jService;
 import org.jose4j.json.JsonUtil;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
@@ -24,15 +25,28 @@ import java.security.interfaces.RSAPrivateKey;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Jose4jJWEService implements JWEService {
+public class Jose4jJWEService extends Jose4jService implements JWEService {
     private final RSAPrivateKey privateKey;
+    private final String provider;
+
+    /**
+     * @deprecated Please use @{@link #Jose4jJWEService(RSAPrivateKey, String)}
+     * @param privateKey  RSA Private Key of the RSA public/private key pair that will be used to decrypt the
+     *                    Content Encryption Key (CEK) when decrypting.
+     */
+    @Deprecated
+    public Jose4jJWEService(RSAPrivateKey privateKey) {
+        this(privateKey, null);
+    }
 
     /**
      * @param privateKey  RSA Private Key of the RSA public/private key pair that will be used to decrypt the
      *                    Content Encryption Key (CEK) when decrypting.
+     * @param jceProvider Name of the JCE provider to use for encryption/decryption
      */
-    public Jose4jJWEService(RSAPrivateKey privateKey) {
+    public Jose4jJWEService(RSAPrivateKey privateKey, String jceProvider) {
         this.privateKey = privateKey;
+        this.provider = jceProvider;
     }
 
     @Override public String decrypt(String data) throws JWEFailure {
@@ -43,7 +57,7 @@ public class Jose4jJWEService implements JWEService {
     @Override
     public String decrypt(String data, PrivateKey privateKey) throws JWEFailure {
         String decrypted;
-        JsonWebEncryption jwe = new JsonWebEncryption();
+        JsonWebEncryption jwe = getJsonWebEncryption();
         jwe.setKey(privateKey);
         try {
             jwe.setCompactSerialization(data);
@@ -56,7 +70,7 @@ public class Jose4jJWEService implements JWEService {
 
     @Override public String encrypt(String data, PublicKey publicKey, String keyId, String contentType) throws JWEFailure {
         String encrypted;
-        JsonWebEncryption jwe = new JsonWebEncryption();
+        JsonWebEncryption jwe = getJsonWebEncryption();
         try {
             jwe.setKey(publicKey);
             jwe.setPlaintext(data);
@@ -74,8 +88,7 @@ public class Jose4jJWEService implements JWEService {
     @Override
     public Map<String, String> getHeaders(String data) throws JWEFailure {
         try {
-            String headerSegment = data.split("\\.")[0];
-            JsonWebEncryption jwe = new JsonWebEncryption();
+            JsonWebEncryption jwe = getJsonWebEncryption();
             jwe.setCompactSerialization(data);
             String headersJSON = jwe.getHeaders().getFullHeaderAsJsonString();
             Map<String, Object> objectMap = JsonUtil.parseJson(headersJSON);
@@ -87,5 +100,11 @@ public class Jose4jJWEService implements JWEService {
         } catch (Exception e) {
             throw new JWEFailure("Unable to parse data for JWE Header!", e);
         }
+    }
+
+    protected JsonWebEncryption getJsonWebEncryption() {
+        JsonWebEncryption jwe =  new JsonWebEncryption();
+        jwe.setProviderContext(getProviderContext(provider));
+        return jwe;
     }
 }

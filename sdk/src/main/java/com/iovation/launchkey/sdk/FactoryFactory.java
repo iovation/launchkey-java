@@ -127,8 +127,8 @@ public class FactoryFactory {
                 keyCache,
                 apiBaseURL,
                 entityIdentifier,
-                new Jose4jJWTService(apiIdentifier, privateKeys, currentPrivateKeyId, requestExpireSeconds),
-                new Jose4jJWEService(privateKeys.get(currentPrivateKeyId)),
+                new Jose4jJWTService(apiIdentifier, privateKeys, currentPrivateKeyId, requestExpireSeconds, provider.getName()),
+                new Jose4jJWEService(privateKeys.get(currentPrivateKeyId), provider.getName()),
                 offsetTTL,
                 currentPublicKeyTTL,
                 entityKeyMap
