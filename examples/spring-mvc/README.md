@@ -8,8 +8,8 @@
 # <a name="overview"></a>Overview
 
 This example project utilizes Spring MVC and Spring Boot to provide a fully self-contained, browser based tool to assist
-with building a Mobile Authenticator utilizing a LaunchKey Mobile Authenticator SDK. It is also an example of best
-practices for building a proper backend implementation utilizing the LaunchKey Service SDK for Java via webhooks.
+with building a Mobile Authenticator utilizing a TruValidate Multifactor Authentication Mobile Authenticator SDK. It is also an example of best
+practices for building a proper backend implementation utilizing the TruValidate Multifactor Authentication Service SDK for Java via webhooks.
 
 The application removes some of the configuration headache regarding webhooks in Directories for successful linking
 webhooks and Services for auth response and session end webhooks. As such, it will interfere with any other
