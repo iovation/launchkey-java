@@ -1,4 +1,4 @@
-# iovation LaunchKey SDK for Java
+# iovation TruValidate Multifactor Authentication SDK for Java
 
 Documentation can be found here:
 

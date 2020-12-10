@@ -1,4 +1,4 @@
-# iovation LaunchKey SDK for Java
+# iovation TruValidate Multifactor Authentication SDK for Java
 
 [![Build Status](https://travis-ci.org/iovation/launchkey-java.svg?branch=master)](https://travis-ci.org/iovation/launchkey-java)
 
@@ -7,13 +7,13 @@
 
 ## SDK
 
-The iovation LaunchKey SDK for Java provides a native Java SDK for interacting with the iovation LaunchKey API.
+The iovation TruValidate Multifactor Authentication SDK for Java provides a native Java SDK for interacting with the iovation TruValidate Multifactor Authentication API.
 
 [Go to the README](sdk/README.md)
 
 ## Examples
 
-Examples for using the iovation LaunchKey SDK for Java
+Examples for using the iovation TruValidate Multifactor Authentication SDK for Java
 
 ### CLI Example
 
