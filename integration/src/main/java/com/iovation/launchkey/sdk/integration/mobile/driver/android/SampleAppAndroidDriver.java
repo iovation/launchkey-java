@@ -1,6 +1,7 @@
 package com.iovation.launchkey.sdk.integration.mobile.driver.android;
 
 import com.iovation.launchkey.sdk.integration.mobile.driver.SampleAppMobileDriver;
+import io.appium.java_client.android.AndroidElement;
 import org.openqa.selenium.Capabilities;
 
 import java.net.URL;
@@ -19,40 +20,37 @@ public class SampleAppAndroidDriver extends BaseAndroidDriver implements SampleA
         firstAlertDismissed = false;
     }
 
-    private void approveAlertOnAppLaunch() {
-        if (!firstAlertDismissed) {
-            firstAlertDismissed = true;
-            pressElementWithName("OK");
-        }
-    }
-
     @Override
     public void unlinkDevice() {
         scrollToAndPressElementWithName("Unlink 2 (Custom UI)");
     }
 
     private void openLinkingMenu() {
-        scrollToAndPressElementWithName("Link (Custom UI - Manual)");
+        scrollToAndPressElementWithName("Link (Default UI - Manual)");
     }
 
     private void fillLinkingCode(String linkingCode) {
-        findElementWithName("Linking code").sendKeys(linkingCode);
+        findElementWithName("ABCD123").sendKeys(linkingCode);
     }
 
     private void fillAuthenticatorSDKKey(String sdkKey) {
-        findElementWithName("Auth SDK Key").sendKeys(sdkKey);
+        AndroidElement sdk_key_input = findElementById("configs_sdk_key");
+        sdk_key_input.click();
+        sdk_key_input.clear();
+        sdk_key_input.sendKeys(sdkKey);
+        this.pressBack();
+        scrollToElementWithName("RE-INITIALIZE");
+        pressElementWithName("RE-INITIALIZE");
     }
 
     private void typeInDeviceName(String deviceName) {
-        pressElementWithName("Use custom device name");
-
         if (deviceName != null && !deviceName.isEmpty()) {
             findElementById("demo_link_edit_name").sendKeys(deviceName);
         }
     }
 
     private void submitLinkingForm() {
-        findElementById("demo_link_button").click();
+        findElementWithName("OK").click();
     }
 
     @Override
@@ -60,18 +58,24 @@ public class SampleAppAndroidDriver extends BaseAndroidDriver implements SampleA
         linkDevice(sdkKey, linkingCode, null);
     }
 
+    public void setSDKKey(String sdkKey){
+        scrollToElementWithName("Config Testing");
+        findElementWithName("Config Testing").click();
+        fillAuthenticatorSDKKey(sdkKey);
+    }
+
     @Override
     public void linkDevice(String sdkKey, String linkingCode, String deviceName) {
-        approveAlertOnAppLaunch();
         try {
             findElementWithName("Auth SDK Demo (Device is Unlinked)");
         } catch (Throwable t) {
             resetTheApp();
-            approveAlertOnAppLaunch();
         }
+
+        setSDKKey(sdkKey);
         openLinkingMenu();
         fillLinkingCode(linkingCode);
-        fillAuthenticatorSDKKey(sdkKey);
+        findElementById("pair_entercode_button_done").click();
         typeInDeviceName(deviceName);
         submitLinkingForm();
         waitUntilLinkingIsFinished();
@@ -91,6 +95,14 @@ public class SampleAppAndroidDriver extends BaseAndroidDriver implements SampleA
 
     private void denyAuth() {
         longPressThisElementInItsCenterMillis(findElementById("auth_info_action_negative"), 1500);
+
+        // Wait for the view to animate into focus
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         pressElementWithName("I don't approve");
         longPressThisElementInItsCenterMillis(findElementById("auth_do_action_negative"), 1500);
     }
