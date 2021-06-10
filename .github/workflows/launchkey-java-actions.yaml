@@ -1,0 +1,13 @@
+name: LaunchKey Java Actions
+on: [push, pull_request]
+jobs:
+  Build-And-Test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉"
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
