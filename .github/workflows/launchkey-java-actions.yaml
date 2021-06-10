@@ -1,17 +1,16 @@
 name: LaunchKey Java Actions
 on: [ push, pull_request ]
 jobs:
-  Build-And-Test:
+  Build-And-Test-All-Java-Versions-On-Linux:
     runs-on: ${{ matrix.os }}
+
+    name: Build and Test on OpenJDK ${{ matrix.java }} / ${{ matrix.os }}
 
     strategy:
       matrix:
         distribution: [ 'adopt' ]
-        java: [ '8' ]
-#        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+        java: [ '8', '9', '10', '11', '12', '13', '14', '15', 'latest' ]
         os: [ 'ubuntu-latest' ]
-
-    name: Build and Test on OpenJDK ${{ matrix.java }} ${{ matrix.os }} sample
 
     steps:
       - uses: actions/checkout@v2
@@ -22,5 +21,66 @@ jobs:
           distribution: ${{ matrix.distribution }}
           java-version: ${{ matrix.java }}
 
-      - name: Built and Test with Maven
-        run: mvn clean test
+      - name: Build with Maven
+        run: mvn clean
+
+      - name: Run Tests
+        run: mvn test
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  Build-And-Test-Latest-On-MacOS:
+    runs-on: ${{ matrix.os }}
+
+    name: Build and Test on OpenJDK ${{ matrix.java }} / ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        distribution: [ 'adopt' ]
+        java: [ 'latest' ]
+        os: [ 'macos-latest' ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Java Environment
+        uses: actions/setup-java@v2
+        with:
+          distribution: ${{ matrix.distribution }}
+          java-version: ${{ matrix.java }}
+
+      - name: Build with Maven
+        run: mvn clean
+
+      - name: Run Tests
+        run: mvn test
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  Build-And-Test-Latest-On-Windows:
+    runs-on: ${{ matrix.os }}
+
+    name: Build and Test on OpenJDK ${{ matrix.java }} / ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        distribution: [ 'adopt' ]
+        java: [ 'latest' ]
+        os: [ 'windows-latest' ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Java Environment
+        uses: actions/setup-java@v2
+        with:
+          distribution: ${{ matrix.distribution }}
+          java-version: ${{ matrix.java }}
+
+      - name: Build with Maven
+        run: mvn clean
+
+      - name: Run Tests
+        run: mvn test
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
