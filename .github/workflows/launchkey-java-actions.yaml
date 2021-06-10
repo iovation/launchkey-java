@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         distribution: [ 'adopt' ]
-        java: [ '8', '9', '10', '11', '12', '13', '14', '15', 'latest' ]
+        java: [ '8', '9', '10', '11', '12', '13', '14', '15', '16' ]
         os: [ 'ubuntu-latest' ]
 
     steps:
@@ -21,13 +21,11 @@ jobs:
           distribution: ${{ matrix.distribution }}
           java-version: ${{ matrix.java }}
 
-      - name: Build with Maven
-        run: mvn clean
+      - name: Build and Test with Maven
+        run: mvn clean test
 
-      - name: Run Tests
-        run: mvn test
-
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Job Status
+        run: echo "🍏 This job's status is ${{ job.status }}."
 
   Build-And-Test-Latest-On-MacOS:
     runs-on: ${{ matrix.os }}
@@ -37,7 +35,7 @@ jobs:
     strategy:
       matrix:
         distribution: [ 'adopt' ]
-        java: [ 'latest' ]
+        java: [ '16' ]
         os: [ 'macos-latest' ]
 
     steps:
@@ -49,13 +47,11 @@ jobs:
           distribution: ${{ matrix.distribution }}
           java-version: ${{ matrix.java }}
 
-      - name: Build with Maven
-        run: mvn clean
+      - name: Build and Test with Maven
+        run: mvn clean test
 
-      - name: Run Tests
-        run: mvn test
-
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Job Status
+        run: echo "🍏 This job's status is ${{ job.status }}."
 
   Build-And-Test-Latest-On-Windows:
     runs-on: ${{ matrix.os }}
@@ -65,7 +61,7 @@ jobs:
     strategy:
       matrix:
         distribution: [ 'adopt' ]
-        java: [ 'latest' ]
+        java: [ '16' ]
         os: [ 'windows-latest' ]
 
     steps:
@@ -77,10 +73,8 @@ jobs:
           distribution: ${{ matrix.distribution }}
           java-version: ${{ matrix.java }}
 
-      - name: Build with Maven
-        run: mvn clean
+      - name: Build and Test with Maven
+        run: mvn clean test
 
-      - name: Run Tests
-        run: mvn test
-
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Job Status
+        run: echo "🍏 This job's status is ${{ job.status }}."
