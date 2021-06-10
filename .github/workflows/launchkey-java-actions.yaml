@@ -1,5 +1,16 @@
 name: LaunchKey Java Actions
-on: [ push, pull_request ]
+
+on:
+  push:
+    branches:
+      - 'master'
+      - '*-DEV'
+
+  pull_request:
+    branches:
+      - 'master'
+      - '*-DEV'
+
 jobs:
   Build-And-Test-All-Java-Versions-On-Linux:
     runs-on: ${{ matrix.os }}
