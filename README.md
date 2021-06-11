@@ -1,6 +1,6 @@
 # iovation LaunchKey SDK for Java
 
-![Build Status](https://github.com/iovation/launchkey-java/actions/workflows/launchkey-java-actions.yaml/badge.svg?branch=master)
+[![Build Status](https://travis-ci.org/iovation/launchkey-java.svg?branch=master)](https://travis-ci.org/iovation/launchkey-java)
 
   * [Modules](#modules)
   * [Support](#support)
