@@ -2,6 +2,10 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.9.0
+    
+      * Updated JOSE Transport to include the SDK type and version in the User Agent Header
+    
   * 4.8.0
   
     * FIPS 140-2 support validation
