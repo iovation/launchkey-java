@@ -43,6 +43,7 @@ class ApiRequestBuilder {
     private final JWEService jweService;
     private final Crypto crypto;
     private final Date currentDate;
+    private final String userAgentHeader;
     private String method = "GET";
     private String path = "/";
     private Object transportObject = null;
@@ -58,6 +59,7 @@ class ApiRequestBuilder {
         this.jwtService = jwtService;
         this.jweService = jweService;
         this.crypto = crypto;
+        this.userAgentHeader = "JavaServiceSDK/" + getClass().getPackage().getImplementationVersion();
     }
 
     public ApiRequestBuilder setMethod(String method) {
@@ -84,6 +86,7 @@ class ApiRequestBuilder {
         try {
             RequestBuilder rb = RequestBuilder.create(this.method)
                     .setUri(this.baseUrl + this.path);
+            rb.addHeader("User-Agent", this.userAgentHeader);
             if (subject != null) {
                processRequestJOSE(rb, path, requestId);
             }
