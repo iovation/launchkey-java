@@ -113,6 +113,7 @@ public class BasicDirectoryClientAddServicePublicKeyTest {
         assertTrue(requestCaptor.getValue().isActive());
     }
 
+    // Test!
     @Test
     public void returnsKeyIdAsResponse() throws Exception {
         when(response.getId()).thenReturn("Key ID");
