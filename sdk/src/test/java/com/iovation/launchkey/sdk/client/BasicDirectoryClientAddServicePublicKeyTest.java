@@ -117,6 +117,6 @@ public class BasicDirectoryClientAddServicePublicKeyTest {
     @Test
     public void returnsKeyIdAsResponse() throws Exception {
         when(response.getId()).thenReturn("Key ID");
-        assertEquals("Key ID", client.addServicePublicKey(null, publicKey, true, null));
+        assertEquals("Key ID", client.addServicePublicKey(null, publicKey, true, null);
     }
 }
