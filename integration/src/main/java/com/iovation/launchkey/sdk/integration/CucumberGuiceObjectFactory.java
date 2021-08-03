@@ -52,6 +52,9 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.security.interfaces.RSAPrivateKey;
 
 public class CucumberGuiceObjectFactory implements ObjectFactory {
 
@@ -113,18 +116,30 @@ public class CucumberGuiceObjectFactory implements ObjectFactory {
             JCECrypto crypto = new JCECrypto(provider);
             bind(Crypto.class).toInstance(crypto);
 
-            String pem = getPrivateKeyPEM(provider);
+            // String pem = getPrivateKeyPEM(provider);
+            String encryptionKey = getEncryptionKeyPEM(provider);
+            RSAPrivateKey rsaEncryptionKey = makePrivateKeyFromPEM(provider, encryptionKey);
+            String encryptionKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(provider, rsaEncryptionKey);
+
+            String signatureKey = getSignatureKeyPEM(provider);
+            RSAPrivateKey rsaSignatureKey = makePrivateKeyFromPEM(provider, signatureKey);
+            String signatureKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(provider, rsaSignatureKey);
+
+            Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<>();
+            keys.put(encryptionKeyFingerprint, rsaEncryptionKey);
+            keys.put(signatureKeyFingerprint, rsaSignatureKey);
+
             String baseURL = getApiBaseUrl();
             String organizationId = getOrganizationId();
             OrganizationFactory organizationFactory;
 
-            if (pem != null && baseURL != null && organizationId != null) {
+            if (encryptionKey != null && signatureKey != null && baseURL != null && organizationId != null) {
                 organizationFactory = new FactoryFactoryBuilder()
                         .setAPIBaseURL(baseURL)
                         .setJCEProvider(provider)
                         .setRequestExpireSeconds(1)
                         .build()
-                        .makeOrganizationFactory(organizationId, pem);
+                        .makeOrganizationFactory(organizationId, keys, signatureKeyFingerprint);
             } else {
                 organizationFactory = null;
             }
@@ -148,20 +163,62 @@ public class CucumberGuiceObjectFactory implements ObjectFactory {
             return baseUrl;
         }
 
-        private String getPrivateKeyPEM(Provider provider) {
-            String privateKeyFile = getPropertyElseAddError(Launchkey.Organization.private_key);
-            String privateKey = null;
-            if (privateKeyFile != null && !privateKeyFile.isEmpty()) {
+//        private String getPrivateKeyPEM(Provider provider) {
+//            String privateKeyFile = getPropertyElseAddError(Launchkey.Organization.private_key);
+//            String privateKey = null;
+//            if (privateKeyFile != null && !privateKeyFile.isEmpty()) {
+//                try {
+//                    privateKey = readFile(privateKeyFile);
+//                    JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKey);
+//                } catch (IOException e) {
+//                    addError(new Message("Unable to read RSA private key from file.", e));
+//                } catch (Exception e) {
+//                    addError(new Message("Invalid RSA Private Key provided. The key must be PEM formatted.", e));
+//                }
+//            }
+//            return privateKey;
+//        }
+
+        private String getEncryptionKeyPEM(Provider provider) {
+            String encryptionKeyFile = getPropertyElseAddError(Launchkey.Organization.encryption_key);
+            String encryptionKey = null;
+            if (encryptionKeyFile != null && !encryptionKeyFile.isEmpty()) {
                 try {
-                    privateKey = readFile(privateKeyFile);
-                    JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKey);
+                    encryptionKey = readFile(encryptionKeyFile);
+                    JCECrypto.getRSAPrivateKeyFromPEM(provider, encryptionKey);
                 } catch (IOException e) {
-                    addError(new Message("Unable to read RSA private key from file.", e));
+                    addError(new Message("Unable to read RSA encryption key from file.", e));
                 } catch (Exception e) {
-                    addError(new Message("Invalid RSA Private Key provided. The key must be PEM formatted.", e));
+                    addError(new Message("Invalid RSA Encryption Key provided. The key must be PEM formatted.", e));
                 }
             }
-            return privateKey;
+            return encryptionKey;
+        }
+
+        private String getSignatureKeyPEM(Provider provider) {
+            String signatureKeyFile = getPropertyElseAddError(Launchkey.Organization.signature_key);
+            String signatureKey = null;
+            if (signatureKeyFile != null && !signatureKeyFile.isEmpty()) {
+                try {
+                    signatureKey = readFile(signatureKeyFile);
+                    JCECrypto.getRSAPrivateKeyFromPEM(provider, signatureKey);
+                } catch (IOException e) {
+                    addError(new Message("Unable to read RSA signature key from file.", e));
+                } catch (Exception e) {
+                    addError(new Message("Invalid RSA Signature Key provided. The key must be PEM formatted.", e));
+                }
+            }
+            return signatureKey;
+        }
+
+        private RSAPrivateKey makePrivateKeyFromPEM(Provider provider, String privateKeyPEM) {
+            JCECrypto jceCrypto = new JCECrypto(provider);
+            return jceCrypto.getRSAPrivateKeyFromPEM(provider, privateKeyPEM);
+        }
+
+        private String getPublicKeyFingerprintFromPrivateKey(Provider provider, RSAPrivateKey privateKey) {
+            JCECrypto jceCrypto = new JCECrypto(provider);
+            return jceCrypto.getRsaPublicKeyFingerprint(provider, privateKey);
         }
 
         private String getOrganizationId() {

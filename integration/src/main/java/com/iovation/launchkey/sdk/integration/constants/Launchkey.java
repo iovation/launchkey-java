@@ -7,6 +7,8 @@ public final class Launchkey {
 
     public static final class Organization {
         public static final String id = "Launchkey.Organization.id";
-        public static final String private_key = "Launchkey.Organization.private_key";
+        // public static final String private_key = "Launchkey.Organization.private_key";
+        public static final String encryption_key = "Launchkey.Organization.encryption_key";
+        public static final String signature_key = "Launchkey.Organization.signature_key";
     }
 }

@@ -14,6 +14,7 @@ tests to validate it is in good working order. The integration tests are BDD tes
 Execute the Maven goal of _package_. Executing _clean_ as well is never a bad idea.  For example:
 
 ```
+mvn clean install
 mvn clean package
 ```
 
