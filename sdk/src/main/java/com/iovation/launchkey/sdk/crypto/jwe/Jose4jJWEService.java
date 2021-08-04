@@ -49,6 +49,10 @@ public class Jose4jJWEService extends Jose4jService implements JWEService {
         this.provider = jceProvider;
     }
 
+    // Make new constructor that does not set a single private key but instead takes a map of key and a current KID.
+    // Modify the old constructor to not set the private key
+    // Everywhere where this.privateKey is accessed, call getCurrentPrivateKey method instead
+
     @Override public String decrypt(String data) throws JWEFailure {
         return decrypt(data, privateKey);
     }
@@ -67,6 +71,9 @@ public class Jose4jJWEService extends Jose4jService implements JWEService {
         }
         return decrypted;
     }
+
+    // add decrypt method here, give it map of keys, and determine from the data parameter which key to use
+    // and then call decrypt(data, privateKey) with that key
 
     @Override public String encrypt(String data, PublicKey publicKey, String keyId, String contentType) throws JWEFailure {
         String encrypted;
