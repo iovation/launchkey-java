@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.matchers.JUnitMatchers;
 
 import static org.junit.Assert.*;
 
@@ -18,10 +19,13 @@ public class ApiRequestBuilderTest extends TestCase {
         this.apiRequestBuilder = new ApiRequestBuilder(null,null,null, null, null, null, null, null, null);
     }
 
-    //NOTE: This test has an assertion utilizing a null because one cannot get the Java SDK version value unless it is inside the built JAR.
     @Test
     public void testBuildAddsProperUserAgentHeader() throws MarshallingError, CryptographyError {
         HttpUriRequest request = this.apiRequestBuilder.build(null);
-        assertEquals("JavaServiceSDK/null", request.getFirstHeader("User-Agent").getValue());
+        String userAgent = request.getFirstHeader("User-Agent").getValue();
+        String[] userAgentParts = userAgent.split("/");
+        assertThat(userAgent, JUnitMatchers.containsString("JavaServiceSDK/"));
+        assertEquals(userAgentParts[0], "JavaServiceSDK");
+        assertNotNull(userAgentParts[1]);
     }
 }
