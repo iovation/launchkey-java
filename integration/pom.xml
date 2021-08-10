@@ -93,7 +93,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>cucumber.api.cli.Main</mainClass>
+                            <mainClass>io.cucumber.core.cli.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -14,6 +14,7 @@ package com.iovation.launchkey.sdk.transport.apachehttp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iovation.launchkey.sdk.SdkVersion;
 import com.iovation.launchkey.sdk.crypto.Crypto;
 import com.iovation.launchkey.sdk.crypto.jwe.JWEFailure;
 import com.iovation.launchkey.sdk.crypto.jwe.JWEService;
@@ -59,7 +60,7 @@ class ApiRequestBuilder {
         this.jwtService = jwtService;
         this.jweService = jweService;
         this.crypto = crypto;
-        this.userAgentHeader = "JavaServiceSDK/" + getClass().getPackage().getImplementationVersion();
+        this.userAgentHeader = "JavaServiceSDK/" + SdkVersion.SDK_VERSION;
     }
 
     public ApiRequestBuilder setMethod(String method) {
