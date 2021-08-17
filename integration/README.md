@@ -17,6 +17,10 @@ Execute the Maven goal of _package_. Executing _clean_ as well is never a bad id
 mvn clean package
 ```
 
+If testing against a SNAPSHOT or changes that you've made locally, first, in this repository's root directory run 
+`mvn clean install`. Then `cd` into this directory (`integration`) and run `mvn package`. Your tests should
+then be ready to run.
+
 ## <a name="usage"></a>Usage
 
 All of the required tests and libraries use the JAR similar to 
