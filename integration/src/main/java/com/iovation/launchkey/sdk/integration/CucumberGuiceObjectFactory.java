@@ -116,12 +116,11 @@ public class CucumberGuiceObjectFactory implements ObjectFactory {
             JCECrypto crypto = new JCECrypto(provider);
             bind(Crypto.class).toInstance(crypto);
 
-            // String pem = getPrivateKeyPEM(provider);
-            String encryptionKey = getEncryptionKeyPEM(provider);
+            String encryptionKey = getPrivateKeyPEM(provider, "encryption");
             RSAPrivateKey rsaEncryptionKey = makePrivateKeyFromPEM(provider, encryptionKey);
             String encryptionKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(provider, rsaEncryptionKey);
 
-            String signatureKey = getSignatureKeyPEM(provider);
+            String signatureKey = getPrivateKeyPEM(provider, "signature");
             RSAPrivateKey rsaSignatureKey = makePrivateKeyFromPEM(provider, signatureKey);
             String signatureKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(provider, rsaSignatureKey);
 
@@ -163,52 +162,32 @@ public class CucumberGuiceObjectFactory implements ObjectFactory {
             return baseUrl;
         }
 
-//        private String getPrivateKeyPEM(Provider provider) {
-//            String privateKeyFile = getPropertyElseAddError(Launchkey.Organization.private_key);
-//            String privateKey = null;
-//            if (privateKeyFile != null && !privateKeyFile.isEmpty()) {
-//                try {
-//                    privateKey = readFile(privateKeyFile);
-//                    JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKey);
-//                } catch (IOException e) {
-//                    addError(new Message("Unable to read RSA private key from file.", e));
-//                } catch (Exception e) {
-//                    addError(new Message("Invalid RSA Private Key provided. The key must be PEM formatted.", e));
-//                }
-//            }
-//            return privateKey;
-//        }
+        private String getPrivateKeyPEM(Provider provider, String typeOfKey) {
+            String privateKeyFile = null;
 
-        private String getEncryptionKeyPEM(Provider provider) {
-            String encryptionKeyFile = getPropertyElseAddError(Launchkey.Organization.encryption_key);
-            String encryptionKey = null;
-            if (encryptionKeyFile != null && !encryptionKeyFile.isEmpty()) {
+            if (typeOfKey.equals("encryption")) {
+                privateKeyFile = getPropertyElseAddError(Launchkey.Organization.encryption_key);
+            } else if (typeOfKey.equals("signature")) {
+                privateKeyFile = getPropertyElseAddError(Launchkey.Organization.signature_key);
+            }
+
+            if (privateKeyFile == null) {
+                addError(new Message("Unrecognized key type provided."));
+                return null;
+            }
+
+            String privateKey = null;
+            if (!privateKeyFile.isEmpty()) {
                 try {
-                    encryptionKey = readFile(encryptionKeyFile);
-                    JCECrypto.getRSAPrivateKeyFromPEM(provider, encryptionKey);
+                    privateKey = readFile(privateKeyFile);
+                    JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKey);
                 } catch (IOException e) {
-                    addError(new Message("Unable to read RSA encryption key from file.", e));
+                    addError(new Message("Unable to read RSA " + typeOfKey + " key from file.", e));
                 } catch (Exception e) {
-                    addError(new Message("Invalid RSA Encryption Key provided. The key must be PEM formatted.", e));
+                    addError(new Message("Invalid RSA " + typeOfKey + " Key provided. The key must be PEM formatted.", e));
                 }
             }
-            return encryptionKey;
-        }
-
-        private String getSignatureKeyPEM(Provider provider) {
-            String signatureKeyFile = getPropertyElseAddError(Launchkey.Organization.signature_key);
-            String signatureKey = null;
-            if (signatureKeyFile != null && !signatureKeyFile.isEmpty()) {
-                try {
-                    signatureKey = readFile(signatureKeyFile);
-                    JCECrypto.getRSAPrivateKeyFromPEM(provider, signatureKey);
-                } catch (IOException e) {
-                    addError(new Message("Unable to read RSA signature key from file.", e));
-                } catch (Exception e) {
-                    addError(new Message("Invalid RSA Signature Key provided. The key must be PEM formatted.", e));
-                }
-            }
-            return signatureKey;
+            return privateKey;
         }
 
         private RSAPrivateKey makePrivateKeyFromPEM(Provider provider, String privateKeyPEM) {

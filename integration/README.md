@@ -14,7 +14,6 @@ tests to validate it is in good working order. The integration tests are BDD tes
 Execute the Maven goal of _package_. Executing _clean_ as well is never a bad idea.  For example:
 
 ```
-mvn clean install
 mvn clean package
 ```
 
@@ -42,8 +41,14 @@ values:
 
 * Required
     * `Launchkey.Organization.id` - Organization ID from Admin Center.
-    * `Launchkey.Organization.private_key` - File name of the PEM formatted RSA private key of the Public/Private Key Pair
-    of the Organization with the ID in the `Launchkey.Organization.id` property.
+    * `Launchkey.Organization.encryption_key` - File name of the PEM formatted RSA encryption private key of the 
+        Public/Private Key Pair of the Organization with the ID in the `Launchkey.Organization.id` property.
+    * `Launchkey.Organization.signature_key` - File name of the PEM formatted RSA signature private key of the
+        Public/Private Key Pair of the Organization with the ID in the `Launchkey.Organization.id` property.
+      
+**Note:** If you are using the same key for both encryption and decryption, the path for both
+`Launchkey.Organization.encryption_key` and `Launchkey.Organization.signature_key` should be the same.
+
 * Optional
     * `Launchkey.API.base_url` - Base URL for the LaunchKey API. This will only be required if you are making changes
         to the SDK for pre-release functionality 
