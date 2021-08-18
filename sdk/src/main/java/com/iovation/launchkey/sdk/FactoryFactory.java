@@ -128,9 +128,7 @@ public class FactoryFactory {
                 apiBaseURL,
                 entityIdentifier,
                 new Jose4jJWTService(apiIdentifier, privateKeys, currentPrivateKeyId, requestExpireSeconds, provider.getName()),
-
-                // Jose4jJWEService needs to handle mutliple keys similar to the way Jose4jJWTService does.
-                new Jose4jJWEService(privateKeys.get(currentPrivateKeyId), provider.getName()),
+                new Jose4jJWEService(privateKeys, provider.getName()),
                 offsetTTL,
                 currentPublicKeyTTL,
                 entityKeyMap

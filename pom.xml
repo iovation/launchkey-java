@@ -50,7 +50,6 @@
 
     <modules>
         <module>sdk</module>
-        <module>examples</module>
         <module>integration</module>
     </modules>
 

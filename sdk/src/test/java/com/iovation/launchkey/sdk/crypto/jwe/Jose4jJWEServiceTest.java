@@ -14,8 +14,9 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.Security;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Copyright 2017 iovation, Inc. All rights reserved.
@@ -35,6 +36,7 @@ public class Jose4jJWEServiceTest {
     private KeyPair keyPair;
     private PublicKey publicKey;
     private String publicKeyID;
+    private Map<String, RSAPrivateKey> privateKeys;
 
 
     @Before
@@ -47,9 +49,12 @@ public class Jose4jJWEServiceTest {
         keyPair = keyPairGenerator.generateKeyPair();
 
         publicKey = keyPair.getPublic();
-        publicKeyID = "Public Key ID";
 
-        jweService = new Jose4jJWEService((RSAPrivateKey) keyPair.getPrivate(), provider.getName());
+        publicKeyID = JCECrypto.getRsaPublicKeyFingerprint(provider, (RSAPrivateKey) keyPair.getPrivate());
+        privateKeys = new ConcurrentHashMap<String, RSAPrivateKey>();
+        privateKeys.put(publicKeyID, (RSAPrivateKey) keyPair.getPrivate());
+
+        jweService = new Jose4jJWEService(privateKeys, provider.getName());
     }
 
     @After
@@ -58,14 +63,130 @@ public class Jose4jJWEServiceTest {
         publicKeyID = null;
         keyPair = null;
         jweService = null;
+        privateKeys = null;
     }
 
     @Test
-    public void deprecatedConstructorStillWorks() throws Exception {
+    public void superOldDeprecatedConstructorStillWorks() throws Exception {
         @SuppressWarnings("deprecation") JWEService jweService = new Jose4jJWEService((RSAPrivateKey) keyPair.getPrivate());
         String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
                 " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
         assertEquals(expected, jweService.decrypt(jweService.encrypt(expected, publicKey, publicKeyID, "application/json")));
+    }
+
+    @Test
+    public void lessOldDeprecatedConstructorStillWorks() throws Exception {
+        @SuppressWarnings("deprecation") JWEService jweService = new Jose4jJWEService(
+                (RSAPrivateKey) keyPair.getPrivate(), this.provider.getName());
+
+        String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
+                " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+
+        assertEquals(expected, jweService.decrypt(jweService.encrypt(expected, publicKey, publicKeyID, "application/json")));
+    }
+
+    @Test
+    public void currentConstructorSucceeds() throws Exception {
+        JWEService jweService = new Jose4jJWEService(privateKeys, this.provider.getName());
+
+        String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
+                " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+
+        assertEquals(expected, jweService.decrypt(jweService.encrypt(expected, publicKey, publicKeyID, "application/json")));
+    }
+
+    @Test
+    public void currentConstructorThrowsWhenNoKeysArePresent() throws Exception {
+        privateKeys.clear();
+        JWEService jweService = new Jose4jJWEService(privateKeys, this.provider.getName());
+
+        String expectedMessage = null;
+
+        String stuff = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
+                " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+
+        try {
+            jweService.decrypt(jweService.encrypt(stuff, publicKey, publicKeyID, "application/json"));
+        } catch (JWEFailure e) {
+            expectedMessage = e.getMessage();
+        }
+
+        assertNotNull(expectedMessage);
+        assertEquals(expectedMessage, "No keys were passed to the JWEService.");
+    }
+
+    @Test
+    public void currentConstructorSucceedsWithMultipleKeys() throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
+        keyPairGenerator.initialize(2048);
+        KeyPair extraneousKeyPairOne = keyPairGenerator.generateKeyPair();
+        KeyPair extraneousKeyPairTwo = keyPairGenerator.generateKeyPair();
+
+        String extraneousKeyIdOne = JCECrypto.getRsaPublicKeyFingerprint(
+                provider, (RSAPrivateKey) extraneousKeyPairOne.getPrivate());
+
+        String extraneousKeyIdTwo = JCECrypto.getRsaPublicKeyFingerprint(
+                provider, (RSAPrivateKey) extraneousKeyPairTwo.getPrivate());
+
+        privateKeys.put(extraneousKeyIdOne, (RSAPrivateKey) extraneousKeyPairOne.getPrivate());
+        privateKeys.put(extraneousKeyIdTwo, (RSAPrivateKey) extraneousKeyPairTwo.getPrivate());
+
+        JWEService jweService = new Jose4jJWEService(privateKeys, this.provider.getName());
+
+        String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
+                " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+
+        assertEquals(expected, jweService.decrypt(jweService.encrypt(expected, publicKey, publicKeyID, "application/json")));
+    }
+
+    @Test
+    public void decryptFindsCorrectKeyToDecryptWith() throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", provider);
+        keyPairGenerator.initialize(2048);
+        KeyPair desiredKeyPair = keyPairGenerator.generateKeyPair();
+        KeyPair extraneousKeyPair = keyPairGenerator.generateKeyPair();
+
+        String desiredKeyId = JCECrypto.getRsaPublicKeyFingerprint(
+                provider, (RSAPrivateKey) desiredKeyPair.getPrivate());
+
+        PublicKey desiredPublicKey = desiredKeyPair.getPublic();
+
+        String extraneousKeyId = JCECrypto.getRsaPublicKeyFingerprint(
+                provider, (RSAPrivateKey) extraneousKeyPair.getPrivate());
+
+        privateKeys.put(desiredKeyId, (RSAPrivateKey) desiredKeyPair.getPrivate());
+        privateKeys.put(extraneousKeyId, (RSAPrivateKey) extraneousKeyPair.getPrivate());
+
+        JWEService jweService = new Jose4jJWEService(privateKeys, this.provider.getName());
+
+        String expected = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
+                " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+
+        assertEquals(expected, jweService.decrypt(jweService.encrypt(expected, desiredPublicKey, desiredKeyId, "application/json")));
+    }
+
+    @Test
+    public void currentConstructorThrowsWhenNoMatchingKeyIsFound() throws Exception {
+        privateKeys.clear();
+        String actualKeyId = JCECrypto.getRsaPublicKeyFingerprint(provider, (RSAPrivateKey) keyPair.getPrivate());
+        publicKeyID = "haha won't match anything";
+        privateKeys.put(actualKeyId, (RSAPrivateKey) keyPair.getPrivate());
+
+        JWEService jweService = new Jose4jJWEService(privateKeys, this.provider.getName());
+
+        String stuff = "{\"auth_request\": \"AuthRequest\", \"action\": \"True\"," +
+                " \"app_Pins\": \"\", \"device_id\": \"DeviceId\"}";
+
+        String expectedMessage = null;
+
+        try {
+            jweService.decrypt(jweService.encrypt(stuff, publicKey, publicKeyID, "application/json"));
+        } catch (JWEFailure e) {
+            expectedMessage = e.getMessage();
+        }
+
+        assertNotNull(expectedMessage);
+        assertEquals(expectedMessage, "No keys exist that match the key ID provided.");
     }
 
     @Test
