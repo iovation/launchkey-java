@@ -27,30 +27,81 @@ import java.util.Map;
 
 public class Jose4jJWEService extends Jose4jService implements JWEService {
     private final RSAPrivateKey privateKey;
+    private final Map<String, RSAPrivateKey> privateKeys;
     private final String provider;
 
     /**
-     * @deprecated Please use @{@link #Jose4jJWEService(RSAPrivateKey, String)}
+     * @deprecated Please use @{@link #Jose4jJWEService(Map, String)}
      * @param privateKey  RSA Private Key of the RSA public/private key pair that will be used to decrypt the
      *                    Content Encryption Key (CEK) when decrypting.
      */
     @Deprecated
     public Jose4jJWEService(RSAPrivateKey privateKey) {
-        this(privateKey, null);
+        this.privateKey = privateKey;
+        this.privateKeys = null;
+        this.provider = null;
     }
 
     /**
+     * * @deprecated Please use @{@link #Jose4jJWEService(Map, String)}
      * @param privateKey  RSA Private Key of the RSA public/private key pair that will be used to decrypt the
      *                    Content Encryption Key (CEK) when decrypting.
      * @param jceProvider Name of the JCE provider to use for encryption/decryption
      */
+    @Deprecated
     public Jose4jJWEService(RSAPrivateKey privateKey, String jceProvider) {
         this.privateKey = privateKey;
+        this.privateKeys = null;
         this.provider = jceProvider;
     }
 
+    /**
+     * @param privateKeys Mapped list of RSA Private Key by key ID of the RSA public/private key pairs that will be
+     * used to generate digital encoding and decoding as well as obtaining the RSA Public Key of the RSA public/private
+     * key pair of the Platform API which will be used to verify digital signatures when decoding.
+     * @param jceProvider Name of the JCE provider to use for encryption/decryption
+     */
+    public Jose4jJWEService(
+        Map<String, RSAPrivateKey> privateKeys,
+        String jceProvider
+    ) {
+        this.privateKey = null;
+        this.privateKeys = privateKeys;
+        this.provider = jceProvider;
+    }
+
+    private RSAPrivateKey getCurrentEncryptionPrivateKey(String data) throws JWEFailure {
+        if (this.privateKeys == null || this.privateKeys.isEmpty()) {
+            // Base case for the sake of backwards compatibility...
+            if (this.privateKey == null) {
+                throw new JWEFailure("No keys were passed to the JWEService.", new Exception());
+            }
+
+            return this.privateKey;
+        }
+
+        RSAPrivateKey currentEncryptionPrivateKey;
+        JsonWebEncryption jwe = getJsonWebEncryption();
+        String currentEncryptionKeyId;
+
+        try {
+            jwe.setCompactSerialization(data);
+            currentEncryptionKeyId = jwe.getKeyIdHeaderValue();
+        } catch (JoseException e) {
+            throw new JWEFailure("An error occurred attempting to fetch current encryption key ID", e);
+        }
+
+        currentEncryptionPrivateKey = this.privateKeys.get(currentEncryptionKeyId);
+
+        if (currentEncryptionPrivateKey == null) {
+            throw new JWEFailure("No keys exist that match the key ID provided.", new Exception());
+        }
+
+        return currentEncryptionPrivateKey;
+    }
+
     @Override public String decrypt(String data) throws JWEFailure {
-        return decrypt(data, privateKey);
+        return decrypt(data, this.getCurrentEncryptionPrivateKey(data));
     }
 
 
