@@ -1,13 +1,13 @@
-# iovation LaunchKey SDK for Java
+# TransUnion TruValidate Multifactor Authentication SDK for Java
 
-[![Build Status](https://travis-ci.org/iovation/launchkey-java.svg?branch=master)](https://travis-ci.org/iovation/launchkey-java)
+![Build Status](https://github.com/iovation/launchkey-java/actions/workflows/launchkey-java-actions.yaml/badge.svg?branch=master)
 
   * [Modules](#modules)
   * [Support](#support)
 
 ## SDK
 
-The iovation LaunchKey SDK for Java provides a native Java SDK for interacting with the iovation LaunchKey API.
+The TransUnion TruValidate Multifactor Authentication SDK for Java provides a native Java SDK for interacting with the TransUnion TruValidate Multifactor Authentication API.
 
 [Go to the README](sdk/README.md)
 
