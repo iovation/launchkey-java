@@ -1,6 +1,6 @@
-# iovation LaunchKey SDK for Java - Integration Tests
+# TransUnion TruValidate Multifactor Authentication SDK for Java - Integration Tests
 
-The LaunchKey SDK for Java in a large and remarkably complex set of code. As such, it requires a battery of integration
+The TruValidate Multifactor Authentication SDK for Java in a large and remarkably complex set of code. As such, it requires a battery of integration
 tests to validate it is in good working order. The integration tests are BDD tests utilizing
 [Cucumber for Java](https://cucumber.io/docs/reference/jvm#java).
 
