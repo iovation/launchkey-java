@@ -25,8 +25,6 @@ import com.iovation.launchkey.sdk.domain.webhook.WebhookPackage;
 import com.iovation.launchkey.sdk.error.*;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.*;
 
 @SuppressWarnings("DuplicateThrows")

@@ -11,18 +11,6 @@ The TransUnion TruValidate Multifactor Authentication SDK for Java provides a na
 
 [Go to the README](sdk/README.md)
 
-## Examples
-
-Examples for using the TransUnion TruValidate Multifactor Authentication SDK for Java
-
-### CLI Example
-
-[Go to the README](examples/cli-example/README.md)
-
-### Spring MVC Example
-
-[Go to the README](examples/spring-mvc/README.md)
-
 ## Contributing
 
 1. Fork it ([GitHub forking guide](https://guides.github.com/activities/forking/))

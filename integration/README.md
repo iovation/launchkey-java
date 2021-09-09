@@ -17,6 +17,10 @@ Execute the Maven goal of _package_. Executing _clean_ as well is never a bad id
 mvn clean package
 ```
 
+If testing against a SNAPSHOT or changes that you've made locally, first, in this repository's root directory run 
+`mvn clean install`. Then `cd` into this directory (`integration`) and run `mvn package`. Your tests should
+then be ready to run.
+
 ## <a name="usage"></a>Usage
 
 All of the required tests and libraries use the JAR similar to 
@@ -37,8 +41,14 @@ values:
 
 * Required
     * `Launchkey.Organization.id` - Organization ID from Admin Center.
-    * `Launchkey.Organization.private_key` - File name of the PEM formatted RSA private key of the Public/Private Key Pair
-    of the Organization with the ID in the `Launchkey.Organization.id` property.
+    * `Launchkey.Organization.encryption_key` - File name of the PEM formatted RSA encryption private key of the 
+        Public/Private Key Pair of the Organization with the ID in the `Launchkey.Organization.id` property.
+    * `Launchkey.Organization.signature_key` - File name of the PEM formatted RSA signature private key of the
+        Public/Private Key Pair of the Organization with the ID in the `Launchkey.Organization.id` property.
+      
+**Note:** If you are using the same key for both encryption and decryption, the path for both
+`Launchkey.Organization.encryption_key` and `Launchkey.Organization.signature_key` should be the same.
+
 * Optional
     * `Launchkey.API.base_url` - Base URL for the LaunchKey API. This will only be required if you are making changes
         to the SDK for pre-release functionality 
