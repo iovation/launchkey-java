@@ -33,7 +33,7 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - name: Build and Test with Maven
-        run: mvn clean test
+        run: cd sdk && mvn clean test
 
       - name: Job Status
         run: echo "🍏 This job's status is ${{ job.status }}."
@@ -59,7 +59,7 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - name: Build and Test with Maven
-        run: mvn clean test
+        run: cd sdk && mvn clean test
 
       - name: Job Status
         run: echo "🍏 This job's status is ${{ job.status }}."
@@ -85,7 +85,7 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - name: Build and Test with Maven
-        run: mvn clean test
+        run: cd sdk && mvn clean test
 
       - name: Job Status
         run: echo "🍏 This job's status is ${{ job.status }}."
