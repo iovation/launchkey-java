@@ -2,6 +2,10 @@
 
 This changelog references the relevant changes (bug and security fixes) for the lifetime of the library.
 
+  * 4.10.0
+
+    * Bump the version of `bc-fips` in the unit test suite to a minimum of 1.0.2.1
+
   * 4.9.0
     
       * Updated JOSE Transport to include the SDK type and version in the User Agent Header
