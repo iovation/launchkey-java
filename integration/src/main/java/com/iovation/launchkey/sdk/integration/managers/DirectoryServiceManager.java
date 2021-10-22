@@ -17,6 +17,7 @@ import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.DirectoryClient;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
 import com.iovation.launchkey.sdk.client.ServiceClient;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
 import com.iovation.launchkey.sdk.error.Forbidden;
@@ -124,6 +125,13 @@ public class DirectoryServiceManager {
         String keyId = getClient(directoryId)
                 .addServicePublicKey(getCurrentServiceEntity().getId(), publicKey, active, expires);
         currentServiceEntity.getPublicKeys().add(new PublicKeyEntity(keyId, publicKey, active, null, expires));
+    }
+
+    public void addPublicKeyToCurrentService(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires, KeyType key_type)
+            throws Throwable {
+        String keyId = getClient(directoryId)
+                .addServicePublicKey(getCurrentServiceEntity().getId(), publicKey, active, expires, key_type);
+        currentServiceEntity.getPublicKeys().add(new PublicKeyEntity(keyId, publicKey, active, null, expires, key_type));
     }
 
 

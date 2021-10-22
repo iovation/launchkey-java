@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.integration.entities;
 
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 
 import java.security.interfaces.RSAPublicKey;
@@ -23,6 +24,17 @@ public class PublicKeyEntity {
     Boolean active;
     Date created;
     Date expires;
+    KeyType key_type;
+
+    public PublicKeyEntity(String keyId, RSAPublicKey publicKey, Boolean active, Date created, Date expires,
+                           KeyType key_type) {
+        this.keyId = keyId;
+        this.publicKey = publicKey;
+        this.active = active;
+        this.created = created;
+        this.expires = expires;
+        this.key_type = key_type;
+    }
 
     public PublicKeyEntity(String keyId, RSAPublicKey publicKey, Boolean active, Date created, Date expires) {
         this.keyId = keyId;
@@ -30,6 +42,7 @@ public class PublicKeyEntity {
         this.active = active;
         this.created = created;
         this.expires = expires;
+        this.key_type = KeyType.BOTH;
     }
 
     public String getKeyId() {
@@ -52,6 +65,10 @@ public class PublicKeyEntity {
         return expires;
     }
 
+    public KeyType getKeyType() {
+        return key_type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -61,6 +78,7 @@ public class PublicKeyEntity {
 
         if (keyId != null ? !keyId.equals(that.keyId) : that.keyId != null) return false;
         if (active != null ? !active.equals(that.active) : that.active != null) return false;
+        if (key_type != null ? !key_type.equals(that.key_type) : that.key_type != null) return false;
         return expires != null ? expires.equals(that.expires) : that.expires == null;
     }
 
@@ -77,11 +95,12 @@ public class PublicKeyEntity {
                 ", active=" + active +
                 ", created=" + created +
                 ", expires=" + expires +
+                ", key_type=" + key_type +
                 '}';
     }
 
     public static PublicKeyEntity fromPublicKey(PublicKey publicKey) {
         return new PublicKeyEntity(publicKey.getId(), null, publicKey.isActive(), publicKey.getCreated(),
-                publicKey.getExpires());
+                publicKey.getExpires(), publicKey.getKeyType());
     }
 }

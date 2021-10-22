@@ -14,6 +14,7 @@ package com.iovation.launchkey.sdk.client;
 
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
 import com.iovation.launchkey.sdk.domain.DirectoryUserTotp;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.directory.*;
 import com.iovation.launchkey.sdk.domain.policy.LegacyPolicy;
@@ -207,9 +208,22 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
         List<PublicKey> publicKeys = new ArrayList<>();
         for (KeysListPostResponsePublicKey publicKey : response.getPublicKeys()) {
             publicKeys.add(new PublicKey(publicKey.getId(), publicKey.isActive(), publicKey.getCreated(),
-                    publicKey.getExpires()));
+                    publicKey.getExpires(), publicKey.getKeyType()));
         }
         return publicKeys;
+    }
+
+    @Override
+    public String addServicePublicKey(UUID serviceId, RSAPublicKey publicKey, Boolean active, Date expires,
+                                      KeyType key_type)
+            throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
+            InvalidCredentialsException, CommunicationErrorException, MarshallingError,
+            CryptographyError {
+        String publicKeyPEM = JCECrypto.getPEMFromRSAPublicKey(publicKey);
+        final ServiceKeysPostRequest request = new ServiceKeysPostRequest(serviceId, publicKeyPEM, expires, active,
+                key_type);
+        final KeysPostResponse response = transport.directoryV3ServiceKeysPost(request, directory);
+        return response.getId();
     }
 
     @Override

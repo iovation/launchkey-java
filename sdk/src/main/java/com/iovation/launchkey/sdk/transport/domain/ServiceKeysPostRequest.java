@@ -15,22 +15,33 @@ package com.iovation.launchkey.sdk.transport.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.iovation.launchkey.sdk.domain.KeyType;
 
 import java.util.Date;
 import java.util.UUID;
 
-@JsonPropertyOrder({"service_id", "public_key", "date_expires", "active"})
+@JsonPropertyOrder({"service_id", "public_key", "date_expires", "active", "key_type"})
 public class ServiceKeysPostRequest {
     private final UUID serviceId;
     private final String publicKey;
     private final Date expires;
     private final Boolean active;
+    private final KeyType key_type;
+
+    public ServiceKeysPostRequest(UUID serviceId, String publicKey, Date expires, Boolean active, KeyType key_type) {
+        this.serviceId = serviceId;
+        this.publicKey = publicKey;
+        this.expires = expires;
+        this.active = active;
+        this.key_type = key_type;
+    }
 
     public ServiceKeysPostRequest(UUID serviceId, String publicKey, Date expires, Boolean active) {
         this.serviceId = serviceId;
         this.publicKey = publicKey;
         this.expires = expires;
         this.active = active;
+        this.key_type = KeyType.BOTH;
     }
 
     @JsonProperty("service_id")
@@ -52,5 +63,10 @@ public class ServiceKeysPostRequest {
     @JsonProperty("active")
     public Boolean isActive() {
         return active;
+    }
+
+    @JsonProperty("key_type")
+    public Integer getKeyType() {
+        return key_type.value();
     }
 }

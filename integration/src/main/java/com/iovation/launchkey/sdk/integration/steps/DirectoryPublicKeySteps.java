@@ -1,6 +1,7 @@
 package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.integration.Utils;
 import com.iovation.launchkey.sdk.integration.entities.PublicKeyEntity;
 import com.iovation.launchkey.sdk.integration.managers.DirectoryManager;
@@ -19,7 +20,6 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
 
 /**
  * Copyright 2017 iovation, Inc.
@@ -54,6 +54,13 @@ public class DirectoryPublicKeySteps {
         directoryManager.addPublicKeyToCurrentDirectory(key);
     }
 
+    @When("^I add a Public Key with a? (.+) type to the Directory$")
+    public void iAddAPublicKeyWithKeyTypeToTheDirectory(String raw_key_type) throws Throwable {
+        KeyType key_type = Utils.stringToKeyType(raw_key_type);
+        RSAPublicKey key = keysManager.getAlphaPublicKey();
+        directoryManager.addPublicKeyToCurrentDirectory(key, key_type);
+    }
+
     @And("^I retrieve the current Directory's Public Keys$")
     public void iRetrieveTheCurrentDirectorySPublicKeys() throws Throwable {
         directoryManager.retrieveCurrentDirectoryPublicKeysList();
@@ -62,6 +69,27 @@ public class DirectoryPublicKeySteps {
     @Then("^the Public Key is in the list of Public Keys for the Directory$")
     public void thePublicKeyIsInTheListOfPublicKeysForTheDirectory() throws Throwable {
         aPublicKeyIsInTheListOfPublicKeysForTheDirectory(keysManager.getAlphaPublicKeyMD5Fingerprint());
+    }
+
+    @Then("^the Public Key is in the list of Public Keys for the Directory and has a? \"(.+)\" key type$")
+    public void thePublicKeyIsInTheListOfPublicKeysForTheDirectoryAndHasKeyType(String raw_key_type) throws Throwable {
+        String key_id = keysManager.getAlphaPublicKeyMD5Fingerprint();
+        aPublicKeyIsInTheListOfPublicKeysForTheDirectory(key_id);
+
+        KeyType key_type = null;
+        Set<PublicKeyEntity> keys = directoryManager.getCurrentPublicKeys();
+        for (PublicKeyEntity key : keys) {
+            if (key.getKeyId().equals(key_id)) {
+                key_type = key.getKeyType();
+                break;
+            }
+        }
+
+        if (key_type == null) throw new Exception(
+                "Key with ID " + key_id + " was expected but not found in keys:\n" + keys);
+
+        assertThat("Expected a key type of \"" + raw_key_type + "\" but received \"" + Utils.keyTypeToString(key_type) + "\"",
+                Utils.stringToKeyType(raw_key_type), is(key_type));
     }
 
     @Then("^the other Public Key is in the list of Public Keys for the Directory$")
@@ -104,6 +132,16 @@ public class DirectoryPublicKeySteps {
     public void iAttemptToAddTheSamePublicKeyToTheDirectory() throws Throwable {
         try {
             directoryManager.addPublicKeyToCurrentDirectory(keysManager.getAlphaPublicKey());
+        } catch (Exception e) {
+            genericSteps.setCurrentException(e);
+        }
+    }
+
+    @And("^I attempt to add a Public Key with a? \"(.+)\" type to the Directory$")
+    public void iAttemptToAddAPublicKeyWithCustomKeyTypeToTheDirectory(String key_type) throws Throwable {
+        try {
+            directoryManager.addPublicKeyToCurrentDirectory(keysManager.getAlphaPublicKey(),
+                    Utils.stringToKeyType(key_type));
         } catch (Exception e) {
             genericSteps.setCurrentException(e);
         }

@@ -11,6 +11,7 @@ package com.iovation.launchkey.sdk.client; /**
  */
 
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.KeysPostResponse;
@@ -71,14 +72,14 @@ public class BasicDirectoryClientAddServicePublicKeyTest {
 
     @Test
     public void sendsSubjectEntityType() throws Exception {
-        client.addServicePublicKey(null, publicKey, false, null);
+        client.addServicePublicKey(null, publicKey, false, null, KeyType.ENCRYPTION);
         verify(transport).directoryV3ServiceKeysPost(any(ServiceKeysPostRequest.class), entityCaptor.capture());
         assertEquals(EntityIdentifier.EntityType.DIRECTORY, entityCaptor.getValue().getType());
     }
 
     @Test
     public void sendsSubjectEntityId() throws Exception {
-        client.addServicePublicKey(null, publicKey, false, null);
+        client.addServicePublicKey(null, publicKey, false, null, KeyType.ENCRYPTION);
         verify(transport).directoryV3ServiceKeysPost(any(ServiceKeysPostRequest.class), entityCaptor.capture());
         assertEquals(directoryId, entityCaptor.getValue().getId());
     }
@@ -86,14 +87,14 @@ public class BasicDirectoryClientAddServicePublicKeyTest {
     @Test
     public void sendServiceIdInRequest() throws Exception {
         UUID id = UUID.randomUUID();
-        client.addServicePublicKey(id, publicKey, false, null);
+        client.addServicePublicKey(id, publicKey, false, null, KeyType.ENCRYPTION);
         verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(id, requestCaptor.getValue().getServiceId());
     }
 
     @Test
     public void sendsPublicKeyPEMInRequest() throws Exception {
-        client.addServicePublicKey(null, publicKey, false, null);
+        client.addServicePublicKey(null, publicKey, false, null, KeyType.ENCRYPTION);
         verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(pem, requestCaptor.getValue().getPublicKey());
     }
@@ -101,21 +102,81 @@ public class BasicDirectoryClientAddServicePublicKeyTest {
     @Test
     public void sendsExpirationDateInRequest() throws Exception {
         Date date = new Date(0L);
-        client.addServicePublicKey(null, publicKey, false, date);
+        client.addServicePublicKey(null, publicKey, false, date, KeyType.ENCRYPTION);
         verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(date, requestCaptor.getValue().getExpires());
     }
 
     @Test
     public void sendsActiveFlagInRequest() throws Exception {
-        client.addServicePublicKey(null, publicKey, true, null);
+        client.addServicePublicKey(null, publicKey, true, null, KeyType.ENCRYPTION);
         verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertTrue(requestCaptor.getValue().isActive());
+    }
+
+    @Test
+    public void sendsKeyTypeInRequest() throws Exception {
+        Integer expected = 1;
+        client.addServicePublicKey(null, publicKey, true, null, KeyType.ENCRYPTION);
+        verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(expected, requestCaptor.getValue().getKeyType());
     }
 
     @Test
     public void returnsKeyIdAsResponse() throws Exception {
         when(response.getId()).thenReturn("Key ID");
         assertEquals("Key ID", client.addServicePublicKey(null, publicKey, true, null));
+    }
+
+    @Test
+    public void sendsSubjectEntityTypeWithoutKeyType() throws Exception {
+        client.addServicePublicKey(null, publicKey, false, null);
+        verify(transport).directoryV3ServiceKeysPost(any(ServiceKeysPostRequest.class), entityCaptor.capture());
+        assertEquals(EntityIdentifier.EntityType.DIRECTORY, entityCaptor.getValue().getType());
+    }
+
+    @Test
+    public void sendsSubjectEntityIdWithoutKeyType() throws Exception {
+        client.addServicePublicKey(null, publicKey, false, null);
+        verify(transport).directoryV3ServiceKeysPost(any(ServiceKeysPostRequest.class), entityCaptor.capture());
+        assertEquals(directoryId, entityCaptor.getValue().getId());
+    }
+
+    @Test
+    public void sendServiceIdInRequestWithoutKeyType() throws Exception {
+        UUID id = UUID.randomUUID();
+        client.addServicePublicKey(id, publicKey, false, null);
+        verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(id, requestCaptor.getValue().getServiceId());
+    }
+
+    @Test
+    public void sendsPublicKeyPEMInRequestWithoutKeyType() throws Exception {
+        client.addServicePublicKey(null, publicKey, false, null);
+        verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(pem, requestCaptor.getValue().getPublicKey());
+    }
+
+    @Test
+    public void sendsExpirationDateInRequestWithoutKeyType() throws Exception {
+        Date date = new Date(0L);
+        client.addServicePublicKey(null, publicKey, false, date);
+        verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(date, requestCaptor.getValue().getExpires());
+    }
+
+    @Test
+    public void sendsActiveFlagInRequestWithoutKeyType() throws Exception {
+        client.addServicePublicKey(null, publicKey, true, null);
+        verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertTrue(requestCaptor.getValue().isActive());
+    }
+
+    @Test
+    public void sendsKeyTypeInRequestWithoutKeyType() throws Exception {
+        Integer expected = 0;
+        client.addServicePublicKey(null, publicKey, true, null);
+        verify(transport).directoryV3ServiceKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(expected, requestCaptor.getValue().getKeyType());
     }
 }

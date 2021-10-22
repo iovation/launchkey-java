@@ -15,7 +15,9 @@ package com.iovation.launchkey.sdk.transport.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iovation.launchkey.sdk.domain.KeyType;
 
+import java.security.Key;
 import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -25,18 +27,21 @@ public class KeysListPostResponsePublicKey {
     private final Date created;
     private final Date expires;
     private final boolean active;
+    private final Integer key_type;
 
     @JsonCreator
     public KeysListPostResponsePublicKey(@JsonProperty("id") String id,
                                          @JsonProperty("public_key") String publicKey,
                                          @JsonProperty("date_created") Date created,
                                          @JsonProperty("date_expires") Date expires,
-                                         @JsonProperty("active") boolean active) {
+                                         @JsonProperty("active") boolean active,
+                                         @JsonProperty("key_type") Integer key_type) {
         this.id = id;
         this.publicKey = publicKey;
         this.created = created;
         this.expires = expires;
         this.active = active;
+        this.key_type = key_type;
     }
 
     public String getId() {
@@ -57,5 +62,20 @@ public class KeysListPostResponsePublicKey {
 
     public boolean isActive() {
         return active;
+    }
+
+    public KeyType getKeyType() {
+        switch (key_type) {
+            case 0:
+                return KeyType.BOTH;
+
+            case 1:
+                return KeyType.ENCRYPTION;
+
+            case 2:
+                return KeyType.SIGNATURE;
+        }
+
+        return KeyType.BOTH;
     }
 }

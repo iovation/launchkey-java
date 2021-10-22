@@ -17,6 +17,7 @@ import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.DirectoryClient;
 import com.iovation.launchkey.sdk.client.OrganizationClient;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.organization.Directory;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
@@ -175,14 +176,30 @@ public class DirectoryManager {
         addPublicKeyToDirectory(currentDirectoryEntity.getId(), publicKey);
     }
 
+    public void addPublicKeyToCurrentDirectory(RSAPublicKey public_key, KeyType key_type) throws Throwable {
+        addPublicKeyToDirectory(currentDirectoryEntity.getId(), public_key, key_type);
+    }
+
     public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey) throws Throwable {
         addPublicKeyToDirectory(directoryId, publicKey, null, null);
+    }
+
+    public void addPublicKeyToDirectory(UUID directory_id, RSAPublicKey public_key, KeyType key_type) throws Throwable {
+        addPublicKeyToDirectory(directory_id, public_key, null, null, key_type);
     }
 
     public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires)
             throws Throwable {
         String keyId = client.addDirectoryPublicKey(directoryId, publicKey, active, expires);
         currentDirectoryEntity.getPublicKeys().add(new PublicKeyEntity(keyId, publicKey, active, null, expires));
+    }
+
+    public void addPublicKeyToDirectory(UUID directory_id, RSAPublicKey public_key, Boolean active, Date expires,
+                                        KeyType key_type)
+            throws Throwable {
+        String keyId = client.addDirectoryPublicKey(directory_id, public_key, active, expires, key_type);
+        currentDirectoryEntity.getPublicKeys().add(
+                new PublicKeyEntity(keyId, public_key, active, null, expires, key_type));
     }
 
     public void addPublicKeyToCurrentDirectory(RSAPublicKey publicKey, boolean active, Date expires) throws Throwable {
