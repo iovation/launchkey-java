@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
@@ -90,8 +91,8 @@ public class BasicDirectoryClientGetServicePublicKeysTest {
                 new PublicKey("ID 1", true, new Date(1000L), new Date(2000L)),
                 new PublicKey("ID 2", false, new Date(3000L), new Date(4000L)));
         when(response.getPublicKeys()).thenReturn(Arrays.asList(
-                new KeysListPostResponsePublicKey("ID 1", "Key 1", new Date(1000L), new Date(2000L), true),
-                new KeysListPostResponsePublicKey("ID 2", "Key 2", new Date(3000L), new Date(4000L), true)));
+                new KeysListPostResponsePublicKey("ID 1", "Key 1", new Date(1000L), new Date(2000L), true, 0),
+                new KeysListPostResponsePublicKey("ID 2", "Key 2", new Date(3000L), new Date(4000L), true, 0)));
         List<PublicKey> actual = client.getServicePublicKeys(serviceId);
         assertEquals(expected, actual);
     }

@@ -13,6 +13,7 @@
 package com.iovation.launchkey.sdk.domain;
 
 import java.util.Date;
+import com.iovation.launchkey.sdk.domain.KeyType;
 
 @SuppressWarnings("WeakerAccess")
 public class PublicKey {
@@ -20,6 +21,23 @@ public class PublicKey {
     private final boolean active;
     private final Date created;
     private final Date expires;
+    private final KeyType keyType;
+
+    /**
+     * Create a an entity representing an RSA public key belonging to another entity
+     * @param id The MD5 id of the RSA public key.
+     * @param active Is the public key currently active
+     * @param created The date the public key was created
+     * @param expires The date the public key will expire
+     * @param keyType The key type of the public key (encryption, signature, or dual use)
+     */
+    public PublicKey(String id, boolean active, Date created, Date expires, KeyType keyType) {
+        this.id = id;
+        this.active = active;
+        this.created = created;
+        this.expires = expires;
+        this.keyType = keyType;
+    }
 
     /**
      * Create a an entity representing an RSA public key belonging to another entity
@@ -33,6 +51,7 @@ public class PublicKey {
         this.active = active;
         this.created = created;
         this.expires = expires;
+        this.keyType = KeyType.BOTH; // Defaults to a dual use key in the event no key type is passed
     }
 
     /**
@@ -67,6 +86,14 @@ public class PublicKey {
         return expires;
     }
 
+    /**
+     * Get the key type of the public key
+     * @return The key type of the public key
+     */
+    public KeyType getKeyType() {
+        return keyType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -90,6 +117,7 @@ public class PublicKey {
                 ", active=" + active +
                 ", created=" + created +
                 ", expires=" + expires +
+                ", keyType=" + keyType +
                 '}';
     }
 }

@@ -17,6 +17,7 @@ import com.google.inject.Singleton;
 import com.iovation.launchkey.sdk.client.DirectoryClient;
 import com.iovation.launchkey.sdk.client.OrganizationClient;
 import com.iovation.launchkey.sdk.client.OrganizationFactory;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.organization.Directory;
 import com.iovation.launchkey.sdk.domain.servicemanager.Service;
@@ -175,14 +176,30 @@ public class DirectoryManager {
         addPublicKeyToDirectory(currentDirectoryEntity.getId(), publicKey);
     }
 
+    public void addPublicKeyToCurrentDirectory(RSAPublicKey publicKey, KeyType keyType) throws Throwable {
+        addPublicKeyToDirectory(currentDirectoryEntity.getId(), publicKey, keyType);
+    }
+
     public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey) throws Throwable {
         addPublicKeyToDirectory(directoryId, publicKey, null, null);
+    }
+
+    public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey, KeyType keyType) throws Throwable {
+        addPublicKeyToDirectory(directoryId, publicKey, null, null, keyType);
     }
 
     public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires)
             throws Throwable {
         String keyId = client.addDirectoryPublicKey(directoryId, publicKey, active, expires);
         currentDirectoryEntity.getPublicKeys().add(new PublicKeyEntity(keyId, publicKey, active, null, expires));
+    }
+
+    public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires,
+                                        KeyType keyType)
+            throws Throwable {
+        String keyId = client.addDirectoryPublicKey(directoryId, publicKey, active, expires, keyType);
+        currentDirectoryEntity.getPublicKeys().add(
+                new PublicKeyEntity(keyId, publicKey, active, null, expires, keyType));
     }
 
     public void addPublicKeyToCurrentDirectory(RSAPublicKey publicKey, boolean active, Date expires) throws Throwable {

@@ -11,6 +11,7 @@ package com.iovation.launchkey.sdk.transport.domain; /**
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import org.junit.Test;
 
 import java.util.Date;
@@ -46,7 +47,17 @@ public class OrganizationV3DirectoryKeysPostRequestTest {
     @Test
     public void toJSON() throws Exception {
         String expected = "{\"directory_id\":\"67c87654-aed9-11e7-98e9-0469f8dc10a5\",\"public_key\":\"Public Key\"," +
-                "\"date_expires\":\"2001-02-03T04:05:06Z\",\"active\":true}";
+                "\"date_expires\":\"2001-02-03T04:05:06Z\",\"active\":true,\"key_type\":1}";
+        String actual = new ObjectMapper().writeValueAsString(
+                new OrganizationV3DirectoryKeysPostRequest(UUID.fromString("67c87654-aed9-11e7-98e9-0469f8dc10a5"), "Public Key",
+                        new Date(981173106000L), true, KeyType.ENCRYPTION));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void toJSONWithoutKeyTypeIncludesKeyType0() throws Exception {
+        String expected = "{\"directory_id\":\"67c87654-aed9-11e7-98e9-0469f8dc10a5\",\"public_key\":\"Public Key\"," +
+                "\"date_expires\":\"2001-02-03T04:05:06Z\",\"active\":true,\"key_type\":0}";
         String actual = new ObjectMapper().writeValueAsString(
                 new OrganizationV3DirectoryKeysPostRequest(UUID.fromString("67c87654-aed9-11e7-98e9-0469f8dc10a5"), "Public Key",
                         new Date(981173106000L), true));

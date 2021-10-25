@@ -11,6 +11,7 @@ package com.iovation.launchkey.sdk.client; /**
  */
 
 import com.iovation.launchkey.sdk.crypto.JCECrypto;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.transport.Transport;
 import com.iovation.launchkey.sdk.transport.domain.EntityIdentifier;
 import com.iovation.launchkey.sdk.transport.domain.KeysPostResponse;
@@ -71,14 +72,14 @@ public class BasicOrganizationClientAddDirectoryPublicKeyTest {
 
     @Test
     public void sendsSubjectEntityType() throws Exception {
-        client.addDirectoryPublicKey(null, publicKey, false, null);
+        client.addDirectoryPublicKey(null, publicKey, false, null, KeyType.ENCRYPTION);
         verify(transport).organizationV3DirectoryKeysPost(any(OrganizationV3DirectoryKeysPostRequest.class), entityCaptor.capture());
         assertEquals(EntityIdentifier.EntityType.ORGANIZATION, entityCaptor.getValue().getType());
     }
 
     @Test
     public void sendsSubjectEntityId() throws Exception {
-        client.addDirectoryPublicKey(null, publicKey, false, null);
+        client.addDirectoryPublicKey(null, publicKey, false, null, KeyType.ENCRYPTION);
         verify(transport).organizationV3DirectoryKeysPost(any(OrganizationV3DirectoryKeysPostRequest.class), entityCaptor.capture());
         assertEquals(orgId, entityCaptor.getValue().getId());
     }
@@ -86,14 +87,14 @@ public class BasicOrganizationClientAddDirectoryPublicKeyTest {
     @Test
     public void sendDirectoryIdInRequest() throws Exception {
         UUID id = UUID.randomUUID();
-        client.addDirectoryPublicKey(id, publicKey, false, null);
+        client.addDirectoryPublicKey(id, publicKey, false, null, KeyType.ENCRYPTION);
         verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(id, requestCaptor.getValue().getDirectoryId());
     }
 
     @Test
     public void sendsPublicKeyPEMInRequest() throws Exception {
-        client.addDirectoryPublicKey(null, publicKey, false, null);
+        client.addDirectoryPublicKey(null, publicKey, false, null, KeyType.ENCRYPTION);
         verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(pem, requestCaptor.getValue().getPublicKey());
     }
@@ -101,20 +102,86 @@ public class BasicOrganizationClientAddDirectoryPublicKeyTest {
     @Test
     public void sendsExpirationDateInRequest() throws Exception {
         Date date = new Date(0L);
-        client.addDirectoryPublicKey(null, publicKey, false, date);
+        client.addDirectoryPublicKey(null, publicKey, false, date, KeyType.ENCRYPTION);
         verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertEquals(date, requestCaptor.getValue().getExpires());
     }
 
     @Test
     public void sendsActiveFlagInRequest() throws Exception {
+        client.addDirectoryPublicKey(null, publicKey, true, null, KeyType.ENCRYPTION);
+        verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertTrue(requestCaptor.getValue().isActive());
+    }
+
+    @Test
+    public void sendsKeyTypeInRequest() throws Exception {
+        Integer keyType = 1;
+        client.addDirectoryPublicKey(null, publicKey, true, null, KeyType.ENCRYPTION);
+        verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(keyType, requestCaptor.getValue().getKeyType());
+    }
+
+    @Test
+    public void returnsKeyIdAsResponse() throws Exception {
+        when(response.getId()).thenReturn("Key ID");
+        assertEquals("Key ID", client.addDirectoryPublicKey(null, publicKey, true, null));
+    }
+
+    @Test
+    public void sendsSubjectEntityTypeWithoutKeyType() throws Exception {
+        client.addDirectoryPublicKey(null, publicKey, false, null);
+        verify(transport).organizationV3DirectoryKeysPost(any(OrganizationV3DirectoryKeysPostRequest.class), entityCaptor.capture());
+        assertEquals(EntityIdentifier.EntityType.ORGANIZATION, entityCaptor.getValue().getType());
+    }
+
+    @Test
+    public void sendsSubjectEntityIdWithoutKeyType() throws Exception {
+        client.addDirectoryPublicKey(null, publicKey, false, null);
+        verify(transport).organizationV3DirectoryKeysPost(any(OrganizationV3DirectoryKeysPostRequest.class), entityCaptor.capture());
+        assertEquals(orgId, entityCaptor.getValue().getId());
+    }
+
+    @Test
+    public void sendDirectoryIdInRequestWithoutKeyType() throws Exception {
+        UUID id = UUID.randomUUID();
+        client.addDirectoryPublicKey(id, publicKey, false, null);
+        verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(id, requestCaptor.getValue().getDirectoryId());
+    }
+
+    @Test
+    public void sendsPublicKeyPEMInRequestWithoutKeyType() throws Exception {
+        client.addDirectoryPublicKey(null, publicKey, false, null);
+        verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(pem, requestCaptor.getValue().getPublicKey());
+    }
+
+    @Test
+    public void sendsExpirationDateInRequestWithoutKeyType() throws Exception {
+        Date date = new Date(0L);
+        client.addDirectoryPublicKey(null, publicKey, false, date);
+        verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(date, requestCaptor.getValue().getExpires());
+    }
+
+    @Test
+    public void sendsActiveFlagInRequestWithoutKeyType() throws Exception {
         client.addDirectoryPublicKey(null, publicKey, true, null);
         verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
         assertTrue(requestCaptor.getValue().isActive());
     }
 
     @Test
-    public void returnsKeyIdAsResponse() throws Exception {
+    public void sendsKeyTypeInRequestWithoutKeyType() throws Exception {
+        Integer keyType = 0;
+        client.addDirectoryPublicKey(null, publicKey, true, null);
+        verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
+        assertEquals(keyType, requestCaptor.getValue().getKeyType());
+    }
+
+    @Test
+    public void returnsKeyIdAsResponseWithoutKeyType() throws Exception {
         when(response.getId()).thenReturn("Key ID");
         assertEquals("Key ID", client.addDirectoryPublicKey(null, publicKey, true, null));
     }
