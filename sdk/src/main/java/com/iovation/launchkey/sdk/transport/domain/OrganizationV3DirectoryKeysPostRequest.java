@@ -26,22 +26,22 @@ public class OrganizationV3DirectoryKeysPostRequest {
     private final String publicKey;
     private final Date expires;
     private final Boolean active;
-    private final KeyType key_type;
+    private final KeyType keyType;
 
     public OrganizationV3DirectoryKeysPostRequest(UUID directoryId, String publicKey, Date expires, Boolean active,
-                                                  KeyType key_type) {
+                                                  KeyType keyType) {
         this.directoryId = directoryId;
         this.publicKey = publicKey;
         this.expires = expires;
         this.active = active;
-        this.key_type = key_type;
+        this.keyType = keyType;
     }
     public OrganizationV3DirectoryKeysPostRequest(UUID directoryId, String publicKey, Date expires, Boolean active) {
         this.directoryId = directoryId;
         this.publicKey = publicKey;
         this.expires = expires;
         this.active = active;
-        this.key_type = KeyType.BOTH;
+        this.keyType = KeyType.BOTH;
     }
 
     @JsonProperty("directory_id")
@@ -67,7 +67,7 @@ public class OrganizationV3DirectoryKeysPostRequest {
 
     @JsonProperty("key_type")
     public Integer getKeyType() {
-        return key_type.value();
+        return keyType.value();
     }
 
 }

@@ -62,10 +62,10 @@ public class DirectoryServicePublicKeySteps {
     }
 
     @When("^I add a Public Key with a? (.+) type to the Directory Service$")
-    public void iAddAPublicKeyWithKeyTypeToTheDirectoryService(String raw_key_type) throws Throwable {
-        KeyType key_type = Utils.stringToKeyType(raw_key_type);
+    public void iAddAPublicKeyWithKeyTypeToTheDirectoryService(String rawKeyType) throws Throwable {
+        KeyType keyType = Utils.stringToKeyType(rawKeyType);
         RSAPublicKey key = keysManager.getAlphaPublicKey();
-        directoryServiceManager.addPublicKeyToCurrentService(getCurrentDirectoryId(), key, null, null, key_type);
+        directoryServiceManager.addPublicKeyToCurrentService(getCurrentDirectoryId(), key, null, null, keyType);
     }
 
     @And("^I retrieve the current Directory Service's Public Keys$")
@@ -84,24 +84,24 @@ public class DirectoryServicePublicKeySteps {
     }
 
     @Then("^the Public Key is in the list of Public Keys for the Directory Service and has a? \"(.+)\" key type$")
-    public void thePublicKeyIsInTheListOfPublicKeysForTheDirectoryServiceAndHasKeyType(String raw_key_type) throws Throwable {
-        String key_id = keysManager.getAlphaPublicKeyMD5Fingerprint();
-        aPublicKeyIsInTheListOfPublicKeysForTheDirectoryService(key_id);
+    public void thePublicKeyIsInTheListOfPublicKeysForTheDirectoryServiceAndHasKeyType(String rawKeyType) throws Throwable {
+        String keyId = keysManager.getAlphaPublicKeyMD5Fingerprint();
+        aPublicKeyIsInTheListOfPublicKeysForTheDirectoryService(keyId);
 
-        KeyType key_type = null;
+        KeyType keyType = null;
         Set<PublicKeyEntity> keys = directoryServiceManager.getCurrentServicePublicKeys();
         for (PublicKeyEntity key : keys) {
-            if (key.getKeyId().equals(key_id)) {
-                key_type = key.getKeyType();
+            if (key.getKeyId().equals(keyId)) {
+                keyType = key.getKeyType();
                 break;
             }
         }
 
-        if (key_type == null) throw new Exception(
-                "Key with ID " + key_id + " was expected but not found in keys:\n" + keys);
+        if (keyType == null) throw new Exception(
+                "Key with ID " + keyId + " was expected but not found in keys:\n" + keys);
 
-        assertThat("Expected a key type of \"" + raw_key_type + "\" but received \"" + Utils.keyTypeToString(key_type) + "\"",
-                Utils.stringToKeyType(raw_key_type), is(key_type));
+        assertThat("Expected a key type of \"" + rawKeyType + "\" but received \"" + Utils.keyTypeToString(keyType) + "\"",
+                Utils.stringToKeyType(rawKeyType), is(keyType));
     }
 
     private void aPublicKeyIsInTheListOfPublicKeysForTheDirectoryService(String keyId) throws Throwable {
@@ -138,10 +138,10 @@ public class DirectoryServicePublicKeySteps {
     }
 
     @And("^I attempt to add a Public Key with a? \"(.+)\" type to the Directory Service$")
-    public void iAttemptToAddAPublicKeyWithCustomKeyTypeToTheDirectory(String key_type) throws Throwable {
+    public void iAttemptToAddAPublicKeyWithCustomKeyTypeToTheDirectory(String keyType) throws Throwable {
         try {
             directoryServiceManager.addPublicKeyToCurrentService(getCurrentDirectoryId(),
-                    keysManager.getAlphaPublicKey(), null, null, Utils.stringToKeyType(key_type));
+                    keysManager.getAlphaPublicKey(), null, null, Utils.stringToKeyType(keyType));
         } catch (Exception e) {
             genericSteps.setCurrentException(e);
         }

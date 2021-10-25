@@ -175,12 +175,12 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
 
     @Override
     public String addDirectoryPublicKey(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires,
-                                        KeyType key_type)
+                                        KeyType keyType)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError, CryptographyError {
         String publicKeyPEM = JCECrypto.getPEMFromRSAPublicKey(publicKey);
         final OrganizationV3DirectoryKeysPostRequest request =
-                new OrganizationV3DirectoryKeysPostRequest(directoryId, publicKeyPEM, expires, active, key_type);
+                new OrganizationV3DirectoryKeysPostRequest(directoryId, publicKeyPEM, expires, active, keyType);
         final KeysPostResponse response = transport.organizationV3DirectoryKeysPost(request, organization);
         return response.getId();
     }
@@ -291,13 +291,13 @@ public class BasicOrganizationClient extends ServiceManagingBaseClient implement
 
     @Override
     public String addServicePublicKey(UUID serviceId, RSAPublicKey publicKey, Boolean active, Date expires,
-                                      KeyType key_type)
+                                      KeyType keyType)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
         String publicKeyPEM = JCECrypto.getPEMFromRSAPublicKey(publicKey);
         final ServiceKeysPostRequest request = new ServiceKeysPostRequest(serviceId, publicKeyPEM, expires, active,
-                key_type);
+                keyType);
         final KeysPostResponse response = transport.organizationV3ServiceKeysPost(request, organization);
         return response.getId();
     }

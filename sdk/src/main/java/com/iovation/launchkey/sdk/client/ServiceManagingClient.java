@@ -200,7 +200,7 @@ public interface ServiceManagingClient {
      * @param publicKey RSA Public key to be added
      * @param active Will the Public Key be active upon creation
      * @param expires When will the Public Key expire
-     * @param key_type Type of key (encryption, signature, or dual use)
+     * @param keyType Type of key (encryption, signature, or dual use)
      * @return Key ID for the created key. This will be used to identify the key in subsequent
      * calls for this Public Key.
      * @throws InvalidResponseException When the response JWT is missing or does not pass validation, when the response
@@ -220,7 +220,7 @@ public interface ServiceManagingClient {
      * the signature of the response
      */
     String addServicePublicKey(UUID serviceId, RSAPublicKey publicKey, Boolean active, Date expires,
-                               KeyType key_type)
+                               KeyType keyType)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError;

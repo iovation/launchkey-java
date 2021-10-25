@@ -127,11 +127,11 @@ public class DirectoryServiceManager {
         currentServiceEntity.getPublicKeys().add(new PublicKeyEntity(keyId, publicKey, active, null, expires));
     }
 
-    public void addPublicKeyToCurrentService(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires, KeyType key_type)
+    public void addPublicKeyToCurrentService(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires, KeyType keyType)
             throws Throwable {
         String keyId = getClient(directoryId)
-                .addServicePublicKey(getCurrentServiceEntity().getId(), publicKey, active, expires, key_type);
-        currentServiceEntity.getPublicKeys().add(new PublicKeyEntity(keyId, publicKey, active, null, expires, key_type));
+                .addServicePublicKey(getCurrentServiceEntity().getId(), publicKey, active, expires, keyType);
+        currentServiceEntity.getPublicKeys().add(new PublicKeyEntity(keyId, publicKey, active, null, expires, keyType));
     }
 
 

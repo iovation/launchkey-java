@@ -116,10 +116,10 @@ public class BasicOrganizationClientAddDirectoryPublicKeyTest {
 
     @Test
     public void sendsKeyTypeInRequest() throws Exception {
-        Integer key_type = 1;
+        Integer keyType = 1;
         client.addDirectoryPublicKey(null, publicKey, true, null, KeyType.ENCRYPTION);
         verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
-        assertEquals(key_type, requestCaptor.getValue().getKeyType());
+        assertEquals(keyType, requestCaptor.getValue().getKeyType());
     }
 
     @Test
@@ -174,10 +174,10 @@ public class BasicOrganizationClientAddDirectoryPublicKeyTest {
 
     @Test
     public void sendsKeyTypeInRequestWithoutKeyType() throws Exception {
-        Integer key_type = 0;
+        Integer keyType = 0;
         client.addDirectoryPublicKey(null, publicKey, true, null);
         verify(transport).organizationV3DirectoryKeysPost(requestCaptor.capture(), any(EntityIdentifier.class));
-        assertEquals(key_type, requestCaptor.getValue().getKeyType());
+        assertEquals(keyType, requestCaptor.getValue().getKeyType());
     }
 
     @Test

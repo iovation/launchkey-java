@@ -215,13 +215,13 @@ public class BasicDirectoryClient extends ServiceManagingBaseClient implements D
 
     @Override
     public String addServicePublicKey(UUID serviceId, RSAPublicKey publicKey, Boolean active, Date expires,
-                                      KeyType key_type)
+                                      KeyType keyType)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError {
         String publicKeyPEM = JCECrypto.getPEMFromRSAPublicKey(publicKey);
         final ServiceKeysPostRequest request = new ServiceKeysPostRequest(serviceId, publicKeyPEM, expires, active,
-                key_type);
+                keyType);
         final KeysPostResponse response = transport.directoryV3ServiceKeysPost(request, directory);
         return response.getId();
     }

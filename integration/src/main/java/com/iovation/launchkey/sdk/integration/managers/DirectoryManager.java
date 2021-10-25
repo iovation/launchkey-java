@@ -176,16 +176,16 @@ public class DirectoryManager {
         addPublicKeyToDirectory(currentDirectoryEntity.getId(), publicKey);
     }
 
-    public void addPublicKeyToCurrentDirectory(RSAPublicKey public_key, KeyType key_type) throws Throwable {
-        addPublicKeyToDirectory(currentDirectoryEntity.getId(), public_key, key_type);
+    public void addPublicKeyToCurrentDirectory(RSAPublicKey publicKey, KeyType keyType) throws Throwable {
+        addPublicKeyToDirectory(currentDirectoryEntity.getId(), publicKey, keyType);
     }
 
     public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey) throws Throwable {
         addPublicKeyToDirectory(directoryId, publicKey, null, null);
     }
 
-    public void addPublicKeyToDirectory(UUID directory_id, RSAPublicKey public_key, KeyType key_type) throws Throwable {
-        addPublicKeyToDirectory(directory_id, public_key, null, null, key_type);
+    public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey, KeyType keyType) throws Throwable {
+        addPublicKeyToDirectory(directoryId, publicKey, null, null, keyType);
     }
 
     public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires)
@@ -194,12 +194,12 @@ public class DirectoryManager {
         currentDirectoryEntity.getPublicKeys().add(new PublicKeyEntity(keyId, publicKey, active, null, expires));
     }
 
-    public void addPublicKeyToDirectory(UUID directory_id, RSAPublicKey public_key, Boolean active, Date expires,
-                                        KeyType key_type)
+    public void addPublicKeyToDirectory(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires,
+                                        KeyType keyType)
             throws Throwable {
-        String keyId = client.addDirectoryPublicKey(directory_id, public_key, active, expires, key_type);
+        String keyId = client.addDirectoryPublicKey(directoryId, publicKey, active, expires, keyType);
         currentDirectoryEntity.getPublicKeys().add(
-                new PublicKeyEntity(keyId, public_key, active, null, expires, key_type));
+                new PublicKeyEntity(keyId, publicKey, active, null, expires, keyType));
     }
 
     public void addPublicKeyToCurrentDirectory(RSAPublicKey publicKey, boolean active, Date expires) throws Throwable {

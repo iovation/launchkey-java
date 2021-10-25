@@ -24,16 +24,16 @@ public class PublicKeyEntity {
     Boolean active;
     Date created;
     Date expires;
-    KeyType key_type;
+    KeyType keyType;
 
     public PublicKeyEntity(String keyId, RSAPublicKey publicKey, Boolean active, Date created, Date expires,
-                           KeyType key_type) {
+                           KeyType keyType) {
         this.keyId = keyId;
         this.publicKey = publicKey;
         this.active = active;
         this.created = created;
         this.expires = expires;
-        this.key_type = key_type;
+        this.keyType = keyType;
     }
 
     public PublicKeyEntity(String keyId, RSAPublicKey publicKey, Boolean active, Date created, Date expires) {
@@ -42,7 +42,7 @@ public class PublicKeyEntity {
         this.active = active;
         this.created = created;
         this.expires = expires;
-        this.key_type = KeyType.BOTH;
+        this.keyType = KeyType.BOTH;
     }
 
     public String getKeyId() {
@@ -66,7 +66,7 @@ public class PublicKeyEntity {
     }
 
     public KeyType getKeyType() {
-        return key_type;
+        return keyType;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class PublicKeyEntity {
 
         if (keyId != null ? !keyId.equals(that.keyId) : that.keyId != null) return false;
         if (active != null ? !active.equals(that.active) : that.active != null) return false;
-        if (key_type != null ? !key_type.equals(that.key_type) : that.key_type != null) return false;
+        if (keyType != null ? !keyType.equals(that.keyType) : that.keyType != null) return false;
         return expires != null ? expires.equals(that.expires) : that.expires == null;
     }
 
@@ -95,7 +95,7 @@ public class PublicKeyEntity {
                 ", active=" + active +
                 ", created=" + created +
                 ", expires=" + expires +
-                ", key_type=" + key_type +
+                ", keyType=" + keyType +
                 '}';
     }
 

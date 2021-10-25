@@ -21,7 +21,7 @@ public class PublicKey {
     private final boolean active;
     private final Date created;
     private final Date expires;
-    private final KeyType key_type;
+    private final KeyType keyType;
 
     /**
      * Create a an entity representing an RSA public key belonging to another entity
@@ -29,14 +29,14 @@ public class PublicKey {
      * @param active Is the public key currently active
      * @param created The date the public key was created
      * @param expires The date the public key will expire
-     * @param key_type The key type of the public key (encryption, signature, or dual use)
+     * @param keyType The key type of the public key (encryption, signature, or dual use)
      */
-    public PublicKey(String id, boolean active, Date created, Date expires, KeyType key_type) {
+    public PublicKey(String id, boolean active, Date created, Date expires, KeyType keyType) {
         this.id = id;
         this.active = active;
         this.created = created;
         this.expires = expires;
-        this.key_type = key_type;
+        this.keyType = keyType;
     }
 
     /**
@@ -51,7 +51,7 @@ public class PublicKey {
         this.active = active;
         this.created = created;
         this.expires = expires;
-        this.key_type = KeyType.BOTH; // Defaults to a dual use key in the event no key type is passed
+        this.keyType = KeyType.BOTH; // Defaults to a dual use key in the event no key type is passed
     }
 
     /**
@@ -91,7 +91,7 @@ public class PublicKey {
      * @return The key type of the public key
      */
     public KeyType getKeyType() {
-        return key_type;
+        return keyType;
     }
 
     @Override
@@ -117,7 +117,7 @@ public class PublicKey {
                 ", active=" + active +
                 ", created=" + created +
                 ", expires=" + expires +
-                ", key_type=" + key_type +
+                ", keyType=" + keyType +
                 '}';
     }
 }

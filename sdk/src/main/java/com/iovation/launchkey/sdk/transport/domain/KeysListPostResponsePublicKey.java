@@ -27,7 +27,7 @@ public class KeysListPostResponsePublicKey {
     private final Date created;
     private final Date expires;
     private final boolean active;
-    private final Integer key_type;
+    private final Integer keyType;
 
     @JsonCreator
     public KeysListPostResponsePublicKey(@JsonProperty("id") String id,
@@ -35,13 +35,13 @@ public class KeysListPostResponsePublicKey {
                                          @JsonProperty("date_created") Date created,
                                          @JsonProperty("date_expires") Date expires,
                                          @JsonProperty("active") boolean active,
-                                         @JsonProperty("key_type") Integer key_type) {
+                                         @JsonProperty("key_type") Integer keyType) {
         this.id = id;
         this.publicKey = publicKey;
         this.created = created;
         this.expires = expires;
         this.active = active;
-        this.key_type = key_type;
+        this.keyType = keyType;
     }
 
     public String getId() {
@@ -65,7 +65,7 @@ public class KeysListPostResponsePublicKey {
     }
 
     public KeyType getKeyType() {
-        switch (key_type) {
+        switch (keyType) {
             case 0:
                 return KeyType.BOTH;
 

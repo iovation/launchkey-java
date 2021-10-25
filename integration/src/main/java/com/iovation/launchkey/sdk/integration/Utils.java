@@ -63,8 +63,8 @@ public class Utils {
         throw new IllegalArgumentException("Switch string must be one of [does not|does|has no]");
     }
 
-    public static KeyType stringToKeyType(String raw_key_type) {
-        switch(raw_key_type) {
+    public static KeyType stringToKeyType(String rawKeyType) {
+        switch(rawKeyType) {
             case "BOTH":
                 return KeyType.BOTH;
 
@@ -79,8 +79,8 @@ public class Utils {
         }
     }
 
-    public static String keyTypeToString(KeyType key_type) {
-        switch(key_type.value()) {
+    public static String keyTypeToString(KeyType keyType) {
+        switch(keyType.value()) {
             case 0:
                 return "BOTH";
 

@@ -26,14 +26,14 @@ public class ServiceKeysPostRequest {
     private final String publicKey;
     private final Date expires;
     private final Boolean active;
-    private final KeyType key_type;
+    private final KeyType keyType;
 
-    public ServiceKeysPostRequest(UUID serviceId, String publicKey, Date expires, Boolean active, KeyType key_type) {
+    public ServiceKeysPostRequest(UUID serviceId, String publicKey, Date expires, Boolean active, KeyType keyType) {
         this.serviceId = serviceId;
         this.publicKey = publicKey;
         this.expires = expires;
         this.active = active;
-        this.key_type = key_type;
+        this.keyType = keyType;
     }
 
     public ServiceKeysPostRequest(UUID serviceId, String publicKey, Date expires, Boolean active) {
@@ -41,7 +41,7 @@ public class ServiceKeysPostRequest {
         this.publicKey = publicKey;
         this.expires = expires;
         this.active = active;
-        this.key_type = KeyType.BOTH;
+        this.keyType = KeyType.BOTH;
     }
 
     @JsonProperty("service_id")
@@ -67,6 +67,6 @@ public class ServiceKeysPostRequest {
 
     @JsonProperty("key_type")
     public Integer getKeyType() {
-        return key_type.value();
+        return keyType.value();
     }
 }
