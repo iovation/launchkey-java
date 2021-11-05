@@ -116,15 +116,11 @@ public class KeySteps {
         RSAPrivateKey encryptionKey = getPrivateKeyPEM("encryption");
         String encryptionKeyFingerprint = jceCrypto.getRsaPublicKeyFingerprint(provider, encryptionKey);
 
-        // Intentionally using encryption key to sign...
-        RSAPrivateKey signatureKey = getPrivateKeyPEM("encryption");
-        String signatureKeyFingerprint = jceCrypto.getRsaPublicKeyFingerprint(provider, signatureKey);
-
         Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<>();
         keys.put(encryptionKeyFingerprint, encryptionKey);
-        keys.put(signatureKeyFingerprint, signatureKey);
 
-        organizationFactory = factoryFactory.makeOrganizationFactory(organizationId, keys, signatureKeyFingerprint);
+        // Intentionally using encryption key to sign...
+        organizationFactory = factoryFactory.makeOrganizationFactory(organizationId, keys, encryptionKeyFingerprint);
     }
 
     @Given("^I am using single purpose keys but I only set my signature key$")
