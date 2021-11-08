@@ -30,9 +30,10 @@ directory directly under the directory where this file is located.
 
 ### <a name="prerequisites"></a>Prerequisites
 
-In order to run the integration tests, a valid Organization with an active Public/Private Key Pair must exist. It is 
-suggested that you use a test organization that is separate from any Organizations you use in production. Creation of
-Organizations is managed by [Admin Center](https://admin.launchkey.com).
+In order to run the integration tests, a valid Organization must exist, and that Organization must have a 
+dual purpose key, an encryption key, and a signature key attached to it. It is suggested that you use a test 
+organization that is separate from any Organizations you use in production. Creation of Organizations is managed 
+by [Admin Center](https://admin.launchkey.com).
 
 ### <a name="run"></a>Run
   
@@ -41,13 +42,12 @@ values:
 
 * Required
     * `Launchkey.Organization.id` - Organization ID from Admin Center.
-    * `Launchkey.Organization.encryption_key` - File name of the PEM formatted RSA encryption private key of the 
-        Public/Private Key Pair of the Organization with the ID in the `Launchkey.Organization.id` property.
-    * `Launchkey.Organization.signature_key` - File name of the PEM formatted RSA signature private key of the
-        Public/Private Key Pair of the Organization with the ID in the `Launchkey.Organization.id` property.
-      
-**Note:** If you are using the same key for both encryption and decryption, the path for both
-`Launchkey.Organization.encryption_key` and `Launchkey.Organization.signature_key` should be the same.
+    * `Launchkey.Organization.dual_purpose_key` - File name of the PEM formatted RSA dual purpose private key
+        associated with the Organization supplied in the `Launchkey.Organization.id` property.
+    * `Launchkey.Organization.encryption_key` - File name of the PEM formatted RSA encryption private key
+        associated with the Organization supplied in the `Launchkey.Organization.id` property.
+    * `Launchkey.Organization.signature_key` - File name of the PEM formatted RSA signature private key
+        associated with the Organization supplied in the `Launchkey.Organization.id` property.
 
 * Optional
     * `Launchkey.API.base_url` - Base URL for the LaunchKey API. This will only be required if you are making changes
@@ -57,7 +57,9 @@ Example:
 ```
 java \
 -DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \
--DLaunchkey.Organization.private_key=/tmp/private-key.pem \
+-DLaunchkey.Organization.dual_purpose_key=/tmp/dual_purpose_key.pem \
+-DLaunchkey.Organization.encryption_key=/tmp/encryption_key.pem \
+-DLaunchkey.Organization.signature_key=/tmp/signature_key.pem \
 -jar target/sdk-integration-tests-4.6.0-SNAPSHOT-jar-with-dependencies.jar
 classpath:features \
 --glue classpath:com.iovation.launchkey.sdk.integration \
@@ -69,7 +71,9 @@ Example (With Emulator Based Device Tests):
  ```
  java \
  -DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \
- -DLaunchkey.Organization.private_key=/tmp/private-key.pem \
+ -DLaunchkey.Organization.dual_purpose_key=/tmp/dual_purpose_key.pem \
+ -DLaunchkey.Organization.encryption_key=/tmp/encryption_key.pem \
+ -DLaunchkey.Organization.signature_key=/tmp/signature_key.pem \
  -DAppium.url=https://localhost:4723/wd/hub \
  -jar sdk-integration-tests-4.5.0-SNAPSHOT-jar-with-dependencies.jar \
  classpath:features \
@@ -84,7 +88,9 @@ Example (With Kobiton Based Device Tests):
 ```
 java \
 -DLaunchkey.Organization.id=6ee17b28-bf8b-11e7-9b28-0469f8dc10a5 \
--DLaunchkey.Organization.private_key=/tmp/private-key.pem \
+-DLaunchkey.Organization.dual_purpose_key=/tmp/dual_purpose_key.pem \
+-DLaunchkey.Organization.encryption_key=/tmp/encryption_key.pem \
+-DLaunchkey.Organization.signature_key=/tmp/signature_key.pem \
 -DAppium.url=https://billy.jean:5e449dd9-2720-4767-babb-cf29eddecb94@api.kobiton.com/wd/hub \
 -DAppium.Kobiton.use_kobiton=true \
 -DAppium.Kobiton.auth=billy.jean:5e449dd9-2720-4767-babb-cf29eddecb94 \
