@@ -22,10 +22,10 @@ import static org.junit.Assert.*;
 
 public class KeysListPostResponseTest {
     private static final KeysListPostResponsePublicKey a =
-            new KeysListPostResponsePublicKey("a", null, null, null, false);
+            new KeysListPostResponsePublicKey("a", null, null, null, false, 0);
     private static final List<KeysListPostResponsePublicKey> as = Arrays.asList(a, a);
     private static final KeysListPostResponsePublicKey b =
-            new KeysListPostResponsePublicKey("b", null, null, null, false);
+            new KeysListPostResponsePublicKey("b", null, null, null, false, 0);
     private static final List<KeysListPostResponsePublicKey> bs = Arrays.asList(b, b);
     @Test
     public void getPublicKeys() throws Exception {

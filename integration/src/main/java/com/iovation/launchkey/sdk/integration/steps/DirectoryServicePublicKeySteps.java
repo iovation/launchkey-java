@@ -1,6 +1,7 @@
 package com.iovation.launchkey.sdk.integration.steps;
 
 import com.google.inject.Inject;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.integration.Utils;
 import com.iovation.launchkey.sdk.integration.entities.DirectoryEntity;
 import com.iovation.launchkey.sdk.integration.entities.PublicKeyEntity;
@@ -60,12 +61,19 @@ public class DirectoryServicePublicKeySteps {
         directoryServiceManager.addPublicKeyToCurrentService(getCurrentDirectoryId(), key, null, null);
     }
 
+    @When("^I add a Public Key with a? (.+) type to the Directory Service$")
+    public void iAddAPublicKeyWithKeyTypeToTheDirectoryService(String rawKeyType) throws Throwable {
+        KeyType keyType = Utils.stringToKeyType(rawKeyType);
+        RSAPublicKey key = keysManager.getAlphaPublicKey();
+        directoryServiceManager.addPublicKeyToCurrentService(getCurrentDirectoryId(), key, null, null, keyType);
+    }
+
     @And("^I retrieve the current Directory Service's Public Keys$")
     public void iRetrieveTheCurrentDirectoryServicesPublicKeys() throws Throwable {
         directoryServiceManager.retrievePublicKeysList(getCurrentDirectoryId(), getCurrentServiceEntity().getId());
     }
 
-    @Then("^the Public Key is in the list of Public Keys for the Directory Service")
+    @Then("^the Public Key is in the list of Public Keys for the Directory Service$")
     public void thePublicKeyIsInTheListOfPublicKeysForTheDirectoryService() throws Throwable {
         aPublicKeyIsInTheListOfPublicKeysForTheDirectoryService(keysManager.getAlphaPublicKeyMD5Fingerprint());
     }
@@ -73,6 +81,27 @@ public class DirectoryServicePublicKeySteps {
     @Then("^the other Public Key is in the list of Public Keys for the Directory Service")
     public void theOtherPublicKeyIsInTheListOfPublicKeysForTheDirectoryService() throws Throwable {
         aPublicKeyIsInTheListOfPublicKeysForTheDirectoryService(keysManager.getBetaPublicKeyMD5Fingerprint());
+    }
+
+    @Then("^the Public Key is in the list of Public Keys for the Directory Service and has a? \"(.+)\" key type$")
+    public void thePublicKeyIsInTheListOfPublicKeysForTheDirectoryServiceAndHasKeyType(String rawKeyType) throws Throwable {
+        String keyId = keysManager.getAlphaPublicKeyMD5Fingerprint();
+        aPublicKeyIsInTheListOfPublicKeysForTheDirectoryService(keyId);
+
+        KeyType keyType = null;
+        Set<PublicKeyEntity> keys = directoryServiceManager.getCurrentServicePublicKeys();
+        for (PublicKeyEntity key : keys) {
+            if (key.getKeyId().equals(keyId)) {
+                keyType = key.getKeyType();
+                break;
+            }
+        }
+
+        if (keyType == null) throw new Exception(
+                "Key with ID " + keyId + " was expected but not found in keys:\n" + keys);
+
+        assertThat("Expected a key type of \"" + rawKeyType + "\" but received \"" + Utils.keyTypeToString(keyType) + "\"",
+                Utils.stringToKeyType(rawKeyType), is(keyType));
     }
 
     private void aPublicKeyIsInTheListOfPublicKeysForTheDirectoryService(String keyId) throws Throwable {
@@ -103,6 +132,16 @@ public class DirectoryServicePublicKeySteps {
             directoryServiceManager.addPublicKeyToService(getCurrentDirectoryId(),
                     getCurrentServiceEntity().getId(), keysManager.getAlphaPublicKey(), null,
                     null);
+        } catch (Exception e) {
+            genericSteps.setCurrentException(e);
+        }
+    }
+
+    @And("^I attempt to add a Public Key with a? \"(.+)\" type to the Directory Service$")
+    public void iAttemptToAddAPublicKeyWithCustomKeyTypeToTheDirectory(String keyType) throws Throwable {
+        try {
+            directoryServiceManager.addPublicKeyToCurrentService(getCurrentDirectoryId(),
+                    keysManager.getAlphaPublicKey(), null, null, Utils.stringToKeyType(keyType));
         } catch (Exception e) {
             genericSteps.setCurrentException(e);
         }

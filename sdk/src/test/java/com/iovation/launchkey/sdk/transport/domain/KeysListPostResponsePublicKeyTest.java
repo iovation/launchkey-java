@@ -11,6 +11,7 @@ package com.iovation.launchkey.sdk.transport.domain; /**
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iovation.launchkey.sdk.domain.KeyType;
 import org.junit.Test;
 
 import java.util.Date;
@@ -24,29 +25,46 @@ public class KeysListPostResponsePublicKeyTest {
 
     @Test
     public void getId() throws Exception {
-        assertEquals("ID", new KeysListPostResponsePublicKey("ID", null, null, null, false).getId());
+        assertEquals("ID", new KeysListPostResponsePublicKey("ID", null, null, null, false, 0).getId());
     }
 
     @Test
     public void getPublicKey() throws Exception {
-        assertEquals("key", new KeysListPostResponsePublicKey(null, "key", null, null, false).getPublicKey());
+        assertEquals("key", new KeysListPostResponsePublicKey(null, "key", null, null, false, 0).getPublicKey());
     }
 
     @Test
     public void getCreated() throws Exception {
         Date expected = new Date();
-        assertEquals(expected, new KeysListPostResponsePublicKey(null, null, expected, null, false).getCreated());
+        assertEquals(expected, new KeysListPostResponsePublicKey(null, null, expected, null, false, 0).getCreated());
     }
 
     @Test
     public void getExpires() throws Exception {
         Date expected = new Date();
-        assertEquals(expected, new KeysListPostResponsePublicKey(null, null, null, expected, false).getExpires());
+        assertEquals(expected, new KeysListPostResponsePublicKey(null, null, null, expected, false, 0).getExpires());
     }
 
     @Test
     public void isActive() throws Exception {
-        assertTrue(new KeysListPostResponsePublicKey(null, null, null, null, true).isActive());
+        assertTrue(new KeysListPostResponsePublicKey(null, null, null, null, true, 0).isActive());
+    }
+
+    @Test
+    public void getKeyType() throws Exception {
+        KeyType expecting_both = KeyType.BOTH;
+        KeyType expecting_encryption = KeyType.ENCRYPTION;
+        KeyType expecting_signature = KeyType.SIGNATURE;
+
+        assertEquals(expecting_both, new KeysListPostResponsePublicKey(null, null, null, null, true, 0).getKeyType());
+        assertEquals(expecting_encryption, new KeysListPostResponsePublicKey(null, null, null, null, true, 1).getKeyType());
+        assertEquals(expecting_signature, new KeysListPostResponsePublicKey(null, null, null, null, true, 2).getKeyType());
+    }
+
+    @Test
+    public void getKeyTypeReturnsBothWhenReceivingUnknownKeyType() throws Exception {
+        KeyType expected = KeyType.BOTH;
+        assertEquals(expected, new KeysListPostResponsePublicKey(null, null, null, null, true, 3).getKeyType());
     }
 
     @Test

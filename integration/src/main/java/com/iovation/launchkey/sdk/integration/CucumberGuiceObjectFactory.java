@@ -116,29 +116,24 @@ public class CucumberGuiceObjectFactory implements ObjectFactory {
             JCECrypto crypto = new JCECrypto(provider);
             bind(Crypto.class).toInstance(crypto);
 
-            String encryptionKey = getPrivateKeyPEM(provider, "encryption");
-            RSAPrivateKey rsaEncryptionKey = makePrivateKeyFromPEM(provider, encryptionKey);
-            String encryptionKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(provider, rsaEncryptionKey);
-
-            String signatureKey = getPrivateKeyPEM(provider, "signature");
-            RSAPrivateKey rsaSignatureKey = makePrivateKeyFromPEM(provider, signatureKey);
-            String signatureKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(provider, rsaSignatureKey);
+            String dualPurposeKey = getPrivateKeyPEM(provider);
+            RSAPrivateKey rsaDualPurposeKey = makePrivateKeyFromPEM(provider, dualPurposeKey);
+            String dualPurposeKeyFingerprint = getPublicKeyFingerprintFromPrivateKey(provider, rsaDualPurposeKey);
 
             Map<String, RSAPrivateKey> keys = new ConcurrentHashMap<>();
-            keys.put(encryptionKeyFingerprint, rsaEncryptionKey);
-            keys.put(signatureKeyFingerprint, rsaSignatureKey);
+            keys.put(dualPurposeKeyFingerprint, rsaDualPurposeKey);
 
             String baseURL = getApiBaseUrl();
             String organizationId = getOrganizationId();
             OrganizationFactory organizationFactory;
 
-            if (encryptionKey != null && signatureKey != null && baseURL != null && organizationId != null) {
+            if (dualPurposeKey != null && baseURL != null && organizationId != null) {
                 organizationFactory = new FactoryFactoryBuilder()
                         .setAPIBaseURL(baseURL)
                         .setJCEProvider(provider)
                         .setRequestExpireSeconds(1)
                         .build()
-                        .makeOrganizationFactory(organizationId, keys, signatureKeyFingerprint);
+                        .makeOrganizationFactory(organizationId, keys, dualPurposeKeyFingerprint);
             } else {
                 organizationFactory = null;
             }
@@ -162,14 +157,8 @@ public class CucumberGuiceObjectFactory implements ObjectFactory {
             return baseUrl;
         }
 
-        private String getPrivateKeyPEM(Provider provider, String typeOfKey) {
-            String privateKeyFile = null;
-
-            if (typeOfKey.equals("encryption")) {
-                privateKeyFile = getPropertyElseAddError(Launchkey.Organization.encryption_key);
-            } else if (typeOfKey.equals("signature")) {
-                privateKeyFile = getPropertyElseAddError(Launchkey.Organization.signature_key);
-            }
+        private String getPrivateKeyPEM(Provider provider) {
+            String privateKeyFile = getPropertyElseAddError(Launchkey.Organization.dual_purpose_key);
 
             if (privateKeyFile == null) {
                 addError(new Message("Unrecognized key type provided."));
@@ -182,9 +171,9 @@ public class CucumberGuiceObjectFactory implements ObjectFactory {
                     privateKey = readFile(privateKeyFile);
                     JCECrypto.getRSAPrivateKeyFromPEM(provider, privateKey);
                 } catch (IOException e) {
-                    addError(new Message("Unable to read RSA " + typeOfKey + " key from file.", e));
+                    addError(new Message("Unable to read RSA dual purpose key from file.", e));
                 } catch (Exception e) {
-                    addError(new Message("Invalid RSA " + typeOfKey + " Key provided. The key must be PEM formatted.", e));
+                    addError(new Message("Invalid RSA dual purpose key provided. The key must be PEM formatted.", e));
                 }
             }
             return privateKey;

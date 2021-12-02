@@ -13,6 +13,8 @@
 package com.iovation.launchkey.sdk.integration;
 
 
+import com.iovation.launchkey.sdk.domain.KeyType;
+
 import java.security.SecureRandom;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,5 +61,37 @@ public class Utils {
                 return null;
         }
         throw new IllegalArgumentException("Switch string must be one of [does not|does|has no]");
+    }
+
+    public static KeyType stringToKeyType(String rawKeyType) {
+        switch(rawKeyType) {
+            case "BOTH":
+                return KeyType.BOTH;
+
+            case "ENCRYPTION":
+                return KeyType.ENCRYPTION;
+
+            case "SIGNATURE":
+                return KeyType.SIGNATURE;
+
+            default:
+                return KeyType.OTHER;
+        }
+    }
+
+    public static String keyTypeToString(KeyType keyType) {
+        switch(keyType.value()) {
+            case 0:
+                return "BOTH";
+
+            case 1:
+                return "ENCRYPTION";
+
+            case 2:
+                return "SIGNATURE";
+
+            default:
+                return "OTHER";
+        }
     }
 }

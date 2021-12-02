@@ -15,22 +15,33 @@ package com.iovation.launchkey.sdk.transport.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.iovation.launchkey.sdk.domain.KeyType;
 
 import java.util.Date;
 import java.util.UUID;
 
-@JsonPropertyOrder({"directory_id", "public_key", "date_expires", "active"})
+@JsonPropertyOrder({"directory_id", "public_key", "date_expires", "active", "key_type"})
 public class OrganizationV3DirectoryKeysPostRequest {
     private final UUID directoryId;
     private final String publicKey;
     private final Date expires;
     private final Boolean active;
+    private final KeyType keyType;
 
+    public OrganizationV3DirectoryKeysPostRequest(UUID directoryId, String publicKey, Date expires, Boolean active,
+                                                  KeyType keyType) {
+        this.directoryId = directoryId;
+        this.publicKey = publicKey;
+        this.expires = expires;
+        this.active = active;
+        this.keyType = keyType;
+    }
     public OrganizationV3DirectoryKeysPostRequest(UUID directoryId, String publicKey, Date expires, Boolean active) {
         this.directoryId = directoryId;
         this.publicKey = publicKey;
         this.expires = expires;
         this.active = active;
+        this.keyType = KeyType.BOTH;
     }
 
     @JsonProperty("directory_id")
@@ -52,6 +63,11 @@ public class OrganizationV3DirectoryKeysPostRequest {
     @JsonProperty("active")
     public Boolean isActive() {
         return active;
+    }
+
+    @JsonProperty("key_type")
+    public Integer getKeyType() {
+        return keyType.value();
     }
 
 }

@@ -55,7 +55,6 @@ public class BasicOrganizationClientTestGenerateAndAddDirectorySdkKey {
                 any(EntityIdentifier.class))).thenReturn(response);
     }
 
-
     @Test
     public void sendsSubjectEntityType() throws Exception {
         client.generateAndAddDirectorySdkKey(null);

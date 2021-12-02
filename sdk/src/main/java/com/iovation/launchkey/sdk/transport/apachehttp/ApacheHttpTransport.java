@@ -826,13 +826,18 @@ public class ApacheHttpTransport implements Transport {
         try {
 
             final String jwt = getJWT(response);
-            String expectedAudience;
-            if (response.getStatusLine().getStatusCode() == 401) {
-                expectedAudience = "public";
-            } else {
-                expectedAudience = issuer.toString();
-            }
-            final JWTClaims claims = validateJWT(expectedTokenId, jwt, expectedAudience);
+
+            // TODO: Determine how we want to deal with non-public audience from API when 401 occurs
+            // String expectedAudience;
+            // if (response.getStatusLine().getStatusCode() == 401) {
+            //     System.out.println("Made it where we expected");
+            //     expectedAudience = "public";
+            // } else {
+            //     expectedAudience = issuer.toString();
+            // }
+            // final JWTClaims claims = validateJWT(expectedTokenId, jwt, expectedAudience);
+
+            final JWTClaims claims = validateJWT(expectedTokenId, jwt, issuer.toString());
             HttpEntity entity = response.getEntity();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             if (entity != null) entity.writeTo(stream);

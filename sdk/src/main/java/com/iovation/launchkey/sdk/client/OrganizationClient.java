@@ -12,6 +12,7 @@
 
 package com.iovation.launchkey.sdk.client;
 
+import com.iovation.launchkey.sdk.domain.KeyType;
 import com.iovation.launchkey.sdk.domain.PublicKey;
 import com.iovation.launchkey.sdk.domain.organization.Directory;
 import com.iovation.launchkey.sdk.error.*;
@@ -323,6 +324,38 @@ public interface OrganizationClient extends ServiceManagingClient {
      * the signature of the response
      */
     List<PublicKey> getDirectoryPublicKeys(UUID directoryId)
+            throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
+            InvalidCredentialsException, CommunicationErrorException, MarshallingError,
+            CryptographyError;
+
+    /**
+     * Add a Public Key for a Directory
+     *
+     * @param directoryId ID of the Directory for which you wish to add a Public Key
+     * @param publicKey RSA Public key to be added
+     * @param active Will the Public Key be active upon creation
+     * @param expires When will the Public Key expire
+     * @param keyType Type of key (encryption, signature, or dual use)
+     * @return Key ID for the created key. This will be used to identify the key in subsequent
+     * calls for this Public Key.
+     * @throws InvalidResponseException When the response JWT is missing or does not pass validation, when the response
+     * content hash does not match the value in the JWT, or when the JWE in the body fails validation, or the decrypted
+     * JWE in the body cannot be parsed or mapped to the expected data.
+     * @throws InvalidRequestException When the Platform API returns a 400 Bad Request HTTP Status
+     * @throws InvalidCredentialsException When the Platform API returns a 401 Unauthorized or 403 Forbidden HTTP Status
+     * @throws PlatformErrorException When the Platform API returns an unexpected HTTP Status
+     * @throws UnknownEntityException When the Platform API returns a 404 Not Found HTTP Status.
+     * @throws CommunicationErrorException When the HTTP client is unable to connect to the Platform API, cannot
+     * negotiate TLS with the Platform API, or is disconnected while sending or receiving a message from the
+     * Platform API.
+     * @throws InvalidStateException When the SDK does not have the proper resource to perform an action. This is most
+     * often due to invalid dependencies being provided or algorithms not being supported by the JCE provider.
+     * @throws MarshallingError When the response cannot be marshaled
+     * @throws CryptographyError When there is an error encrypting and signing the request or decrypting and verifying
+     * the signature of the response
+     */
+    String addDirectoryPublicKey(UUID directoryId, RSAPublicKey publicKey, Boolean active, Date expires,
+                                 KeyType keyType)
             throws PlatformErrorException, UnknownEntityException, InvalidResponseException, InvalidStateException,
             InvalidCredentialsException, CommunicationErrorException, MarshallingError,
             CryptographyError;

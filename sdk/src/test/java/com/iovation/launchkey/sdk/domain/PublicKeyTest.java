@@ -15,6 +15,8 @@ import org.junit.Test;
 
 import java.util.Date;
 
+import com.iovation.launchkey.sdk.domain.KeyType;
+
 import static org.junit.Assert.*;
 
 public class PublicKeyTest {
@@ -57,6 +59,11 @@ public class PublicKeyTest {
     }
 
     @Test
+    public void getKeyType() throws Exception {
+        assertEquals(KeyType.BOTH, publicKey.getKeyType());
+    }
+
+    @Test
     public void equalsIsTrueForSameObject() throws Exception {
         //noinspection EqualsWithItself
         assertTrue(publicKey.equals(publicKey));
@@ -96,5 +103,39 @@ public class PublicKeyTest {
     @Test
     public void hashCodeIsNotEqualForFingerprintStringObject() throws Exception {
         assertNotEquals(publicKey.hashCode(), fingerprint.hashCode());
+    }
+
+    @Test
+    public void instantiatingPublicKeyWithNoKeyTypeResultsInKeyTypeBoth() throws Exception {
+        assertEquals(publicKey.getKeyType(), KeyType.BOTH);
+    }
+
+    @Test
+    public void instantiatingPublicKeyWithBothKeyTypeResultsInKeyTypeBoth() throws Exception {
+        publicKey = new PublicKey(fingerprint, active, created, expires, KeyType.BOTH);
+        assertEquals(publicKey.getKeyType(), KeyType.BOTH);
+        assertEquals(publicKey.getKeyType().value(), 0);
+    }
+
+    @Test
+    public void instantiatingPublicKeyWithEncryptionKeyTypeResultsInKeyTypeEncryption() throws Exception {
+        publicKey = new PublicKey(fingerprint, active, created, expires, KeyType.ENCRYPTION);
+        assertEquals(publicKey.getKeyType(), KeyType.ENCRYPTION);
+        assertEquals(publicKey.getKeyType().value(), 1);
+    }
+
+    @Test
+    public void instantiatingPublicKeyWithSignatureKeyTypeResultsInKeyTypeSignature() throws Exception {
+        publicKey = new PublicKey(fingerprint, active, created, expires, KeyType.SIGNATURE);
+        assertEquals(publicKey.getKeyType(), KeyType.SIGNATURE);
+        assertEquals(publicKey.getKeyType().value(), 2);
+    }
+
+
+    @Test
+    public void instantiatingPublicKeyWithOtherKeyTypeResultsInKeyTypeOther() throws Exception {
+        publicKey = new PublicKey(fingerprint, active, created, expires, KeyType.OTHER);
+        assertEquals(publicKey.getKeyType(), KeyType.OTHER);
+        assertEquals(publicKey.getKeyType().value(), -1);
     }
 }
