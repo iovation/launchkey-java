@@ -1,3 +1,7 @@
+⛔️ DEPRECATED ⛔️
+============
+As of 05/23/2023 the TruValidate Multifactor Authentication API has been taken offline.
+
 # TransUnion TruValidate Multifactor Authentication SDK for Java
 
 ![Build Status](https://github.com/iovation/launchkey-java/actions/workflows/launchkey-java-actions.yaml/badge.svg?branch=master)
